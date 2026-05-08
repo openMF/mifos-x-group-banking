@@ -1,225 +1,289 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
+<img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="CommonPurse" width="150" />
 
-<h1>KMP Multi-Module Project Generator</h1>
+<h1>CommonPurse</h1>
 
-<p>🚀 The Ultimate Kotlin Multiplatform Project Generator with Production-Ready Setup</p>
+<p>Offline-first community banking for VSLA / ROSCA / SHG groups — built on Mifos Fineract.</p>
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
 ![Compose Multiplatform](https://img.shields.io/badge/Jetpack%20Compose%20Multiplatform-000000?style=flat-square&logo=android&logoColor=white)
+![Mifos Fineract](https://img.shields.io/badge/Mifos%20Fineract-000000?style=flat-square&logo=apache&logoColor=white)
 
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
-![badge-desktop](http://img.shields.io/badge/platform-desktop-DB413D.svg?style=flat)
-![badge-js](http://img.shields.io/badge/platform-web-FDD835.svg?style=flat)
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/blob/development/LICENSE)
-[![Pr Checks](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml/badge.svg)](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml)
+[![License](https://img.shields.io/github/license/openMF/mifos-x-group-banking.svg?style=flat-square)](LICENSE)
 [![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
 
 </div>
 
-> \[!Note]
->
-> This branch is designed for partial customized projects. Running the `customizer.sh` script
-> doesn't rename any application module, instead it'll change all `core` and `feature` module
-> namespaces, packages, and other related configurations accordingly.
->
-> For full customization, please use the `full-customizable` branch instead.
+> **CommonPurse** digitizes the full lifecycle of self-funded community banking groups — meetings, savings, lending, and share-out — with offline-first KMP and a Mifos Fineract backend.
 
-## 🌟 Key Features
+---
 
-- **Cross-Platform Support**: Android, iOS, Desktop, and Web applications from a single codebase
-- **Multi-Module Architecture**: Clean, organized, and scalable project structure
-- **Advanced Source Set Hierarchy**: Sophisticated code sharing structure with logical platform
-  groupings
-- **Pre-configured CI/CD**: GitHub Actions workflows for building, testing, and deployment
-- **Code Quality Tools**: Static analysis and formatting tools pre-configured
-- **Sync Capabilities**: Tools to stay in sync with upstream template changes
-- **Secrets Management**: Secure handling of keystores and sensitive information
+## 🌍 The Problem
+
+Millions of people in emerging markets organise into community savings groups — **VSLA** (Village Savings & Loan Associations), **ROSCA** (Rotating Savings & Credit Associations), **ASCA**, and **SHG** (Self-Help Groups) — to pool savings, issue loans, and distribute profits.
+
+These groups operate with paper ledgers, leading to:
+
+- Record-keeping errors and disputes
+- Fraud and limited transparency
+- Inability to scale beyond a single notebook
+- No integration with formal financial systems
+
+Existing digital solutions are either **online-only**, lack **Fineract integration**, or don't support the **full group lifecycle** end-to-end.
+
+## ✨ The Solution
+
+A Kotlin Multiplatform mobile app that digitises every step of the community banking lifecycle — from group creation and member onboarding, through meeting-driven savings collection and loan disbursement, to periodic share-out — all working **offline-first** with automatic sync to Mifos Fineract when connectivity returns.
+
+### Why CommonPurse
+
+| | |
+|---|---|
+| 📵 **Offline-first** | Full functionality without internet — sync when connected (target: 95% sync success on 2G/3G) |
+| 🤝 **Meeting-centric workflow** | Mirrors how real groups operate: attendance → savings → loans → decisions |
+| 🏦 **Fineract-backed** | Enterprise-grade financial record-keeping via proven open-source core banking |
+| 👁️ **Low-literacy UX** | Icon-heavy, minimal text, voice prompts, large touch targets (≥48dp) |
+| 🔍 **Transparent** | Every member sees group balances, loan status, and share-out projections in real-time |
+
+---
+
+## 👥 Who It's For
+
+CommonPurse ships as **two client surfaces** in a single codebase:
+
+### 🛠 Admin Client (staff auth)
+
+| Persona | Role | Key Capabilities |
+|---------|------|------------------|
+| **Amina** | Treasurer / Secretary | Record savings (group-linked + individual), track loans, calculate share-out, mark attendance |
+| **Joseph** | Chairperson | Conduct meetings, approve/reject loans, initiate share-out, manage group parameters |
+| **David** | MFI Field Officer | Read-only cross-group monitoring, force sync, generate reports |
+| **Sarah** | NGO Program Manager | Read-only analytics, donor reports, programme metrics |
+
+### 📱 End User Client (self-service auth)
+
+| Persona | Role | Key Capabilities |
+|---------|------|------------------|
+| **Grace** | Regular Group Member | View own savings/loans, group summary, request loans, see share-out projection |
+
+> Two client types, two navigation graphs, two permission models — one app.
+
+---
+
+## 🎯 Feature Roadmap
+
+**v1.0.0 — Core Group Banking** (13 features)
+
+| # | Feature | Client | Description |
+|---|---------|--------|-------------|
+| 1 | Authentication | both | Fineract credentials + local PIN + optional biometric for offline |
+| 2 | End-User Dashboard | end user | Personal savings, loans, request submission |
+| 3 | Group Management | admin | Create, configure, monitor savings groups |
+| 4 | Member Onboarding | admin | Register members with name, photo, phone, role |
+| 5 | Meeting Lifecycle | admin | Schedule, conduct, summarise meetings; review previous |
+| 6 | Savings Collection | admin | Validated contribution recording during meetings |
+| 7 | Group-Linked Savings | admin | Mandatory min/max-enforced group savings (CR-003) |
+| 8 | Corpus Tracking | admin | Real-time fund balance with excess outflow blocking |
+| 9 | Loan Management | admin | Application → vote-based approval → disbursement → repayment |
+| 10 | Share-Out | admin | End-of-cycle calculation + distribution |
+| 11 | Offline Sync | both | SQLDelight cache + queue-based Fineract batch sync |
+| 12 | Fines Tracking | admin | Late attendance, missed meetings, late repayment |
+| 13 | Multi-Language | both | English, Swahili, French, Hindi (runtime switch) |
+
+**v1.1.0 — Supervision & Social**: Field-officer view, social fund.
+**v2.0.0 — Scale & Integrate**: Mobile money, web admin, SMS, inter-group lending, credit scoring.
+
+> Full feature matrix, screen inventory (28 screens), and acceptance criteria live in the `idea-layer/` of the parent product-cycle repository.
+
+---
+
+## 📊 Success Metrics
+
+- 50+ active groups onboarded within 6 months of launch
+- 90% reduction in meeting duration vs paper-based workflow
+- Zero record-keeping disputes in digitised groups
+- 95% sync success rate on 2G/3G connections
+- < 5 minute onboarding time for new group treasurer
+- 100% data parity between local cache and Fineract after sync
+
+---
+
+## 🏗️ Architecture
+
+| Concern | Choice |
+|---------|--------|
+| **Language** | Kotlin |
+| **UI** | Compose Multiplatform |
+| **Architecture** | Clean Architecture + MVI / UDF |
+| **DI** | Koin |
+| **Navigation** | Voyager |
+| **Network** | Ktor + Ktorfit |
+| **Local DB** | Room KMP / SQLDelight (offline-first) |
+| **Backend** | Mifos Fineract (REST + 36 generated MCP tools) |
+| **Platforms** | Android, iOS *(desktop & web intentionally out — rural mobile-only use-case)* |
+
+### Module Layout
+
+```
+cmp-android      — Android entry point + platform actuals
+cmp-ios          — iOS entry point + platform actuals
+cmp-shared       — App composition root (shared across platforms)
+cmp-navigation   — Voyager screen graph (admin + end-user)
+core/            — Common modules: domain, data, network, designsystem, ui
+core-base/       — Foundation: model, network, store, common
+feature/         — Feature implementations (per FEATURES.md matrix)
+build-logic/     — Convention plugins
+fastlane/        — iOS deployment automation
+```
+
+### Data Model
+
+8 core entities mapped to Fineract primitives + 10 custom Data Tables for group-banking domain extensions:
+
+| Entity | Fineract Mapping |
+|--------|------------------|
+| Group | `m_center` + `dt_group_config` |
+| Member | `m_client` + `dt_member_role` |
+| Meeting | `dt_meeting_record` + `dt_meeting_attendance` |
+| Savings Transaction | `m_savings_account_transaction` |
+| Loan | `m_loan` + `dt_loan_vote` |
+| Loan Repayment | `m_loan_transaction` |
+| Sync Queue | local-only (offline-first) |
+
+> Custom Data Tables: `dt_group_config`, `dt_meeting_record`, `dt_meeting_attendance`, `dt_member_role`, `dt_share_out`, `dt_social_fund`, `dt_loan_vote`, `dt_sync_metadata`, `dt_loan_request`, `dt_group_corpus`. Schemas in `server-layer/API_CONTRACT.yaml`.
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Bash 4.0+
-- Unix-like environment (macOS, Linux) or Git Bash on Windows
-- Android Studio/IntelliJ IDEA
-- Xcode (for iOS development)
-- Node.js (for web development)
+- JDK 17+
+- Android Studio (Hedgehog or newer) / IntelliJ IDEA
+- Xcode 15+ (for iOS development)
+- Kotlin Multiplatform Mobile plugin
 
-### Quick Start
-
-1. **Clone the Repository**
+### Clone & Build
 
 ```bash
-git clone https://github.com/openMF/kmp-project-template.git
-cd kmp-project-template
-```
-
-2. **Run the Customizer**
-
-```bash
-./customizer.sh org.example.myapp MyKMPProject
-```
-
-3. **Build and Run**
-
-```bash
+git clone https://github.com/openMF/mifos-x-group-banking.git
+cd mifos-x-group-banking
 ./gradlew build
 ```
 
+### Run
+
+```bash
+# Android
+./gradlew :cmp-android:installDebug
+
+# iOS — open via Xcode
+open cmp-ios/iosApp/iosApp.xcodeproj
+```
+
+### Backend Configuration
+
+CommonPurse talks to **Mifos Fineract**. The default sandbox is configured for development:
+
+```
+Base URL: https://sandbox.mifos.community/fineract-provider/api/v1
+Tenant:   default
+```
+
+For production deployment, point to your own Fineract instance — see [`docs/`](docs/).
+
+---
+
 ## 🍎 iOS Deployment
 
-This template includes production-ready iOS deployment infrastructure with support for Firebase App
-Distribution, TestFlight, and App Store releases.
-
-### Prerequisites
-
-- **macOS** with Xcode installed
-- **Apple Developer Account** ($99/year)
-- **Match Repository** for code signing certificates
-- **App Store Connect API Key**
-
-### Quick Setup
-
-Run the comprehensive iOS setup wizard:
+The project ships production-ready iOS deployment via Firebase App Distribution, TestFlight, and App Store Connect.
 
 ```bash
+# One-time setup
 bash scripts/setup_ios_complete.sh
+
+# Deploy
+bash scripts/deploy_firebase.sh    # Internal QA
+bash scripts/deploy_testflight.sh  # Beta
+bash scripts/deploy_appstore.sh    # Production
 ```
 
-The wizard will guide you through:
+Configuration uses a shared-vs-app-specific split:
 
-- ✅ Team ID configuration
-- ✅ App Store Connect API key setup
-- ✅ Fastlane Match repository configuration
-- ✅ Certificate synchronization
-- ✅ TestFlight & App Store review contact information
+- **Shared (IOS_SHARED)**: Team ID, API keys, Match repo
+- **App-specific (IOS)**: Bundle ID, Firebase app ID
 
-### Deployment Scripts
+See:
+- [iOS Setup Guide](docs/IOS_SETUP.md)
+- [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md)
+- [GitHub Actions iOS Configuration](docs/GITHUB_ACTIONS_IOS_MIGRATION.md)
 
-Three deployment targets are available:
+---
 
-| Target         | Purpose              | Script                              |
-|----------------|----------------------|-------------------------------------|
-| **Firebase**   | Internal testing, QA | `bash scripts/deploy_firebase.sh`   |
-| **TestFlight** | Beta testing         | `bash scripts/deploy_testflight.sh` |
-| **App Store**  | Production release   | `bash scripts/deploy_appstore.sh`   |
+## 🎨 Brand
 
-**Example:**
+| Element | Value |
+|---------|-------|
+| Display name | **CommonPurse** |
+| Primary | `#2E7D32` — Forest Green (growth, trust; WCAG AAA on white) |
+| Accent | `#FF8F00` — Amber |
+| Typography | Noto Sans (large scale for low-literacy users) |
+| Iconography | Rounded |
+| Touch target | ≥ 48dp (accessibility floor) |
 
-```bash
-# Deploy to Firebase for internal testing
-bash scripts/deploy_firebase.sh
+---
 
-# Deploy to TestFlight for beta testing
-bash scripts/deploy_testflight.sh
+## 🧭 Repository Layout
 
-# Deploy to App Store for production
-bash scripts/deploy_appstore.sh
-```
+This repo holds the **source code** for CommonPurse. It was scaffolded from [openMF/kmp-project-template](https://github.com/openMF/kmp-project-template) and customised for the group-banking domain (`org.mifos.groupbanking`).
 
-### Configuration Architecture
+The full product cycle (idea, server contract, design tokens, feature plan, implementation pipeline) lives in the parent **claude-product-cycle** workspace under `workspaces/mifos-x/mifos-x-group-banking/`.
 
-The project uses a **shared vs app-specific** configuration pattern:
-
-- **Shared Config (IOS_SHARED)**: Team ID, API keys, Match repo - same for all apps
-- **App-Specific Config (IOS)**: Bundle ID, Firebase app ID - changes per app
-
-When you run `customizer.sh`, it updates only app-specific values while preserving shared
-infrastructure.
-
-### Optional: Push Notifications
-
-If your app uses Firebase Cloud Messaging:
-
-```bash
-bash scripts/setup_apn_key.sh
-```
-
-### GitHub Actions CI/CD
-
-The project uses a centralized configuration system for iOS deployment workflows.
-
-**Configuration Files:**
-
-- `fastlane-config/project_config.rb` - Application-specific configuration
-- `secrets/shared_keys.env` - Team-wide credentials and secrets
-
-**Configuration Loading:**
-
-- Local deployments read from `secrets/shared_keys.env`
-- CI/CD workflows extract configuration from `project_config.rb` and GitHub Secrets
-
-**Setup:**
-
-1. Configure GitHub Secrets as documented in the iOS Configuration Guide
-2. Update `project_config.rb` with application-specific values
-3. Execute workflows
-
-Configuration is read from `fastlane-config/project_config.rb` for both local and CI deployments.
-
-See [iOS Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) for detailed setup instructions.
-
-### Documentation
-
-- [Complete iOS Setup Guide](docs/IOS_SETUP.md) - Detailed setup instructions
-- [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
-- [GitHub Actions Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) - CI/CD setup and configuration
-
-## 📁 Project Structure
-
-The project follows a modular architecture:
-
-- **Platform Modules**: `cmp-android`, `cmp-ios`, `cmp-desktop`, `cmp-web`, etc.
-- **Core Modules**: Common, reusable components shared across all features
-- **Feature Modules**: Self-contained feature implementations
-- **Build Logic**: Custom Gradle plugins and build configuration
+---
 
 ## 📚 Documentation
 
-Our project includes comprehensive documentation to help you get started and understand the
-architecture:
+- [Setup Guide](docs/SETUP.md)
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Source Set Hierarchy](docs/SOURCE_SET_HIERARCHY.md)
+- [Style Guide](docs/STYLE_GUIDE.md)
+- [Sync with Template](docs/SYNC_SCRIPT.md)
+- [Secrets Manager](docs/SECRETS_MANAGER.md)
+- [Fastlane Configuration](docs/FASTLANE_CONFIGURATION.md)
 
-- [ ] [Setup Guide](docs/SETUP.md) - Detailed instructions for setting up your development
-  environment
-- [ ] [Architecture Overview](docs/ARCHITECTURE.md) - Explanation of the project's structure and
-  design patterns
-- [ ] [Code Style Guide](docs/STYLE_GUIDE.md) - Coding conventions and best practices
-- [ ] [Source Set Hierarchy](docs/SOURCE_SET_HIERARCHY.md) - Guide to the Kotlin Multiplatform code
-  sharing structure
-- [ ] [Sync Script](docs/SYNC_SCRIPT.md) - Information about keeping in sync with upstream changes
-- [ ] [Secrets Manager](docs/SECRETS_MANAGER.md) - Documentation for the keystore and secrets
-  management system
-- [ ] [Fastlane Configuration](docs/FASTLANE_CONFIGURATION.md) - Guide to automating deployments
-  with fastlane
-
-> Documentation is continuously improving. Check back for updates or contribute to enhancing our
-> docs!
+---
 
 ## 🤝 Contributing
 
-We welcome contributions to improve the project template! Here's how you can help:
+PRs welcome — please read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) first.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a pull request
+```bash
+# Standard flow
+git checkout -b feat/your-feature
+# ... make changes ...
+git commit -m "feat(scope): your change"
+git push origin feat/your-feature
+# Open PR against openMF/mifos-x-group-banking
+```
 
-Please follow our [Contributing Guidelines](CONTRIBUTING.md) for detailed information.
+---
 
-## 📫 Support
+## 📫 Support & Community
 
-- Join
-  our [Slack channel](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
-- Report issues on [GitHub](https://github.com/openMF/kmp-project-template/issues)
-- Track progress on [Jira](https://mifosforge.jira.com/jira/software/c/projects/KMPPT/boards/63)
+- 💬 [Mifos Slack](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
+- 🐛 [Issue Tracker](https://github.com/openMF/mifos-x-group-banking/issues)
+- 📋 [Jira (KMPPT)](https://mifosforge.jira.com/jira/software/c/projects/KMPPT/boards/63)
+
+---
 
 ## 📄 License
 
-This project is licensed under the [Mozilla Public License 2.0](LICENSE)
+[Mozilla Public License 2.0](LICENSE)
+
+> Built on [openMF/kmp-project-template](https://github.com/openMF/kmp-project-template) — sync upstream improvements via `customizer.sh`.
