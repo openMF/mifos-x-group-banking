@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="CommonPurse" width="150" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/branding/logo_dark.svg">
+  <img src="docs/assets/branding/logo.svg" alt="CommonPurse — five members in a ring around a shared fund" width="150" />
+</picture>
 
 <h1>CommonPurse</h1>
 

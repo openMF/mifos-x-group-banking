@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CommonPurse — dark-theme logo.
+  Same geometry as logo.svg; uses the M3 dark-mode primary (#8BD68F)
+  and a brighter amber (#FFB95C) so contrast remains AA against dark surfaces.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">CommonPurse</title>
+  <desc id="desc">Five members in a ring around a shared fund — dark theme.</desc>
+
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#8BD68F" stroke-width="10"/>
+
+  <g fill="#8BD68F">
+    <circle cx="100" cy="22"  r="13"/>
+    <circle cx="174" cy="76"  r="13"/>
+    <circle cx="146" cy="166" r="13"/>
+    <circle cx="54"  cy="166" r="13"/>
+    <circle cx="26"  cy="76"  r="13"/>
+  </g>
+
+  <circle cx="100" cy="100" r="24" fill="#FFB95C"/>
+  <circle cx="100" cy="100" r="16" fill="none" stroke="#1A1C19" stroke-width="2" stroke-opacity="0.55"/>
+</svg>

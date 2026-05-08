@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CommonPurse — light-theme logo.
+  Concept: a community circle of 5 members ringing a shared pool (the corpus).
+  Primary green = brand anchor. Amber dot = the shared fund.
+  ViewBox 200×200, no padding; safe to crop / use as adaptive-icon foreground.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">CommonPurse</title>
+  <desc id="desc">Five members in a ring around a shared fund — the group savings pool.</desc>
+
+  <!-- outer ring: the community boundary -->
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#2E7D32" stroke-width="10"/>
+
+  <!-- 5 members evenly spaced (start at top, 72° apart) -->
+  <g fill="#2E7D32">
+    <circle cx="100" cy="22"  r="13"/>
+    <circle cx="174" cy="76"  r="13"/>
+    <circle cx="146" cy="166" r="13"/>
+    <circle cx="54"  cy="166" r="13"/>
+    <circle cx="26"  cy="76"  r="13"/>
+  </g>
+
+  <!-- shared corpus / pooled fund: amber -->
+  <circle cx="100" cy="100" r="24" fill="#FF8F00"/>
+
+  <!-- subtle highlight ring inside the corpus (depth) -->
+  <circle cx="100" cy="100" r="16" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.55"/>
+</svg>
