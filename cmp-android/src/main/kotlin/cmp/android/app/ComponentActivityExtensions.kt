@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.mifos.open.banking.core.model.DarkThemeConfig
+import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
 
 @ColorInt
 private val SCRIM_COLOR: Int = Color.TRANSPARENT

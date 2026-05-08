@@ -7,6 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/datastore/src/commonMain/kotlin/org/mifos/open/banking/core/datastore/UserPreferencesRepository.kt
 package org.mifos.open.banking.core.datastore
 
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,16 @@ import org.mifos.open.banking.core.model.DarkThemeConfig
 import org.mifos.open.banking.core.model.LanguageConfig
 import org.mifos.open.banking.core.model.ThemeBrand
 import org.mifos.open.banking.core.model.UserData
+========
+package org.mifos.groupbanking.groupbanking.core.datastore
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
+import org.mifos.groupbanking.groupbanking.core.model.LanguageConfig
+import org.mifos.groupbanking.groupbanking.core.model.ThemeBrand
+import org.mifos.groupbanking.groupbanking.core.model.UserData
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/datastore/src/commonMain/kotlin/org/mifos/groupbanking/core/datastore/UserPreferencesRepository.kt
 
 /**
  * Repository interface for managing user preferences with reactive

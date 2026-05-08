@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/NavigationItem.kt
 package org.mifos.open.banking.core.ui
+========
+package org.mifos.groupbanking.groupbanking.core.ui
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/NavigationItem.kt
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource

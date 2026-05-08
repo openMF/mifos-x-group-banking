@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsTracker.kt
 package org.mifos.open.banking.core.analytics
+========
+package org.mifos.groupbanking.groupbanking.core.analytics
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsTracker.kt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,7 +26,11 @@ import template.core.base.analytics.rememberAnalyticsHelper
  * Project-specific analytics tracker that provides domain-specific
  * tracking methods for the Mifos application.
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsTracker.kt
 class MifosXOpenBankingAnalyticsTracker(
+========
+class CommonPurseAnalyticsTracker(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsTracker.kt
     private val analyticsHelper: AnalyticsHelper,
 ) {
 
@@ -233,7 +241,13 @@ class MifosXOpenBankingAnalyticsTracker(
 }
 
 @Composable
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsTracker.kt
 fun rememberMifosXOpenBankingAnalyticsTracker(): MifosXOpenBankingAnalyticsTracker {
     val analyticsHelper = rememberAnalyticsHelper()
     return remember(analyticsHelper) { MifosXOpenBankingAnalyticsTracker(analyticsHelper) }
+========
+fun rememberCommonPurseAnalyticsTracker(): CommonPurseAnalyticsTracker {
+    val analyticsHelper = rememberAnalyticsHelper()
+    return remember(analyticsHelper) { CommonPurseAnalyticsTracker(analyticsHelper) }
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsTracker.kt
 }

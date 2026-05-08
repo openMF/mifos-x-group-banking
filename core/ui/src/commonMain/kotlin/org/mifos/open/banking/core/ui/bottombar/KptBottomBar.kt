@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/bottombar/KptBottomBar.kt
 package org.mifos.open.banking.core.ui.bottombar
+========
+package org.mifos.groupbanking.groupbanking.core.ui.bottombar
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/bottombar/KptBottomBar.kt
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/bottombar/KptBottomBar.kt
 import org.mifos.open.banking.core.ui.NavigationItem
+========
+import org.mifos.groupbanking.groupbanking.core.ui.NavigationItem
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/bottombar/KptBottomBar.kt
 
 @Composable
 fun KptBottomBar(

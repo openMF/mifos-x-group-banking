@@ -9,7 +9,11 @@
  */
 @file:Suppress("ktlint:standard:discouraged-comment-location")
 
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsExtensions.kt
 package org.mifos.open.banking.core.analytics
+========
+package org.mifos.groupbanking.groupbanking.core.analytics
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsExtensions.kt
 
 import template.core.base.analytics.AnalyticsHelper
 import template.core.base.analytics.ParamKeys
@@ -250,9 +254,13 @@ fun AnalyticsHelper.trackBackupRestore(
 /**
  * Convenience function to create Mifos analytics tracker
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsExtensions.kt
 fun AnalyticsHelper.mifosxopenbankingTracker(): MifosXOpenBankingAnalyticsTracker {
     return MifosXOpenBankingAnalyticsTracker(this)
 }
+========
+fun AnalyticsHelper.commonpurseTracker(): CommonPurseAnalyticsTracker = CommonPurseAnalyticsTracker(this)
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsExtensions.kt
 
 /**
  * Extension for tracking custom business events specific to microfinance

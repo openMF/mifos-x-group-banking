@@ -9,7 +9,11 @@
  */
 @file:Suppress("ktlint:standard:discouraged-comment-location", "ModifierMissing", "SpreadOperator")
 
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
 package org.mifos.open.banking.core.analytics
+========
+package org.mifos.groupbanking.groupbanking.core.analytics
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -78,6 +82,7 @@ class BasicAnalyticsExample(private val analytics: AnalyticsHelper) {
 }
 
 /** Example: Mifos-specific analytics usage */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
 class MifosXOpenBankingAnalyticsExample(private val analytics: AnalyticsHelper) {
 
     private val mifosxopenbankingTracker = analytics.mifosxopenbankingTracker()
@@ -85,6 +90,15 @@ class MifosXOpenBankingAnalyticsExample(private val analytics: AnalyticsHelper) 
     fun demonstrateMifosXOpenBankingFeatures() {
         // Client operations
         mifosxopenbankingTracker.trackClientOperation(
+========
+class CommonPurseAnalyticsExample(private val analytics: AnalyticsHelper) {
+
+    private val commonpurseTracker = analytics.commonpurseTracker()
+
+    fun demonstrateCommonPurseFeatures() {
+        // Client operations
+        commonpurseTracker.trackClientOperation(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
             operation = "create",
             clientId = "C12345",
             success = true,
@@ -92,7 +106,11 @@ class MifosXOpenBankingAnalyticsExample(private val analytics: AnalyticsHelper) 
         )
 
         // Loan operations
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
         mifosxopenbankingTracker.trackLoanOperation(
+========
+        commonpurseTracker.trackLoanOperation(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
             operation = "apply",
             loanType = "personal",
             amount = "50000",
@@ -100,7 +118,11 @@ class MifosXOpenBankingAnalyticsExample(private val analytics: AnalyticsHelper) 
         )
 
         // Savings operations
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
         mifosxopenbankingTracker.trackSavingsOperation(
+========
+        commonpurseTracker.trackSavingsOperation(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
             operation = "deposit",
             accountId = "S67890",
             amount = "10000",
@@ -108,7 +130,11 @@ class MifosXOpenBankingAnalyticsExample(private val analytics: AnalyticsHelper) 
         )
 
         // Performance tracking
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
         mifosxopenbankingTracker.trackPerformance(
+========
+        commonpurseTracker.trackPerformance(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
             operation = "sync_clients",
             duration = 2500L,
             success = true,
@@ -133,14 +159,22 @@ fun ClientDetailsScreen(
     onNavigateBack: () -> Unit,
 ) {
     // Automatic screen tracking with business context
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     TrackMifosXOpenBankingScreen(
+========
+    TrackCommonPurseScreen(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
         screenName = "ClientDetails",
         clientId = clientId,
         additionalParams = mapOf("source" to "client_list"),
     )
 
     // Track flow progress
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     TrackMifosXOpenBankingFlowCompletion(
+========
+    TrackCommonPurseFlowCompletion(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
         flowName = "client_onboarding",
         step = "3",
         totalSteps = 5,
@@ -149,8 +183,13 @@ fun ClientDetailsScreen(
 
     // Remember analytics helper
     val analytics = rememberAnalyticsHelper()
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     val documentTracker = rememberMifosXOpenBankingDocumentTracker()
     val mifosxopenbankingAnalytics = rememberMifosXOpenBankingAnalyticsTracker()
+========
+    val documentTracker = rememberCommonPurseDocumentTracker()
+    val commonpurseAnalytics = rememberCommonPurseAnalyticsTracker()
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
 
     Column(
         modifier = Modifier
@@ -163,7 +202,11 @@ fun ClientDetailsScreen(
             onClick = {
                 analytics.logEvent(
                     "client_action",
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
                     MifosXOpenBankingParamKeys.CLIENT_ID to clientId,
+========
+                    CommonPurseParamKeys.CLIENT_ID to clientId,
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
                     "action" to "view_loans",
                 )
             },
@@ -185,7 +228,11 @@ fun ClientDetailsScreen(
 
         Button(
             onClick = {
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
                 mifosxopenbankingAnalytics.trackClientOperation("update", clientId, success = true)
+========
+                commonpurseAnalytics.trackClientOperation("update", clientId, success = true)
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
                 onNavigateBack()
             },
         ) {
@@ -194,7 +241,11 @@ fun ClientDetailsScreen(
     }
 
     // Track form field interactions
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     TrackMifosXOpenBankingFormField(
+========
+    TrackCommonPurseFormField(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
         fieldName = "client_name",
         formName = "client_details",
         fieldType = "text",
@@ -204,12 +255,20 @@ fun ClientDetailsScreen(
 /** Example: Survey tracking */
 @Composable
 fun SurveyScreen(surveyId: String) {
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     val analytics = rememberMifosXOpenBankingAnalyticsTracker()
+========
+    val analytics = rememberCommonPurseAnalyticsTracker()
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
     var currentQuestion by remember { mutableStateOf(1) }
     val totalQuestions = 5
 
     // Track survey start
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     TrackMifosXOpenBankingSurvey(surveyId, action = "started")
+========
+    TrackCommonPurseSurvey(surveyId, action = "started")
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
 
     Column {
         Text("Question $currentQuestion of $totalQuestions")
@@ -332,7 +391,11 @@ class AppLifecycleExample(analytics: AnalyticsHelper) {
 /** Example: Report tracking */
 @Composable
 fun ReportScreen() {
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
     val reportTracker = rememberMifosXOpenBankingReportTracker()
+========
+    val reportTracker = rememberCommonPurseReportTracker()
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
     val analytics = rememberAnalyticsHelper()
 
     Column {
@@ -384,7 +447,11 @@ object AnalyticsDIExample {
         }
 
         // Mifos tracker
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/AnalyticsUsageExamples.kt
         single<MifosXOpenBankingAnalyticsTracker> { MifosXOpenBankingAnalyticsTracker(get()) }
+========
+        single<CommonPurseAnalyticsTracker> { CommonPurseAnalyticsTracker(get()) }
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/AnalyticsUsageExamples.kt
 
         // Performance tracker
         single<PerformanceTracker> { get<AnalyticsHelper>().performanceTracker() }

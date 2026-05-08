@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/utils/ModifierExt.kt
 package org.mifos.open.banking.core.designsystem.utils
+========
+package org.mifos.groupbanking.groupbanking.core.designsystem.utils
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/utils/ModifierExt.kt
 
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.clickable

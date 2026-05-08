@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/repository/TimeZoneMonitor.kt
 package org.mifos.open.banking.core.data.repository
+========
+package org.mifos.groupbanking.groupbanking.core.data.repository
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/commonMain/kotlin/org/mifos/groupbanking/core/data/repository/TimeZoneMonitor.kt
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.TimeZone

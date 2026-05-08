@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/androidMain/kotlin/org/mifos/open/banking/core/data/repository/TimeZoneMonitorImpl.kt
 package org.mifos.open.banking.core.data.repository
+========
+package org.mifos.groupbanking.groupbanking.core.data.repository
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/androidMain/kotlin/org/mifos/groupbanking/core/data/repository/TimeZoneMonitorImpl.kt
 
 import android.content.BroadcastReceiver
 import android.content.Context

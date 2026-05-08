@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/bottombar/KptNavigationBarItem.kt
 package org.mifos.open.banking.core.ui.bottombar
+========
+package org.mifos.groupbanking.groupbanking.core.ui.bottombar
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/bottombar/KptNavigationBarItem.kt
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background

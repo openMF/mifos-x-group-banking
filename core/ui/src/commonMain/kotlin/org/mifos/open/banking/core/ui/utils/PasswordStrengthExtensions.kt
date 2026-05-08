@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/utils/PasswordStrengthExtensions.kt
 package org.mifos.open.banking.core.ui.utils
+========
+package org.mifos.groupbanking.groupbanking.core.ui.utils
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/utils/PasswordStrengthExtensions.kt
 
 /**
  * Converts the given [Int] to a [PasswordStrength]. A `null` value is returned if this value is

@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsViewmodel.kt
 package org.mifos.open.banking.feature.settings
+========
+package org.mifos.groupbanking.groupbanking.feature.settings
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsViewmodel.kt
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,9 +20,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsViewmodel.kt
 import org.mifos.open.banking.core.data.repository.UserDataRepository
 import org.mifos.open.banking.core.model.DarkThemeConfig
 import org.mifos.open.banking.core.model.ThemeBrand
+========
+import org.mifos.groupbanking.groupbanking.core.data.repository.UserDataRepository
+import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
+import org.mifos.groupbanking.groupbanking.core.model.LanguageConfig
+import org.mifos.groupbanking.groupbanking.core.model.ThemeBrand
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsViewmodel.kt
 import template.core.base.analytics.AnalyticsHelper
 
 class SettingsViewmodel(

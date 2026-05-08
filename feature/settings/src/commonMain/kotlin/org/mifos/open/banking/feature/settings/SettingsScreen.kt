@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsScreen.kt
 package org.mifos.open.banking.feature.settings
+========
+package org.mifos.groupbanking.groupbanking.feature.settings
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsScreen.kt
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,11 +34,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsScreen.kt
 import org.mifos.open.banking.core.designsystem.icon.AppIcons
 import org.mifos.open.banking.core.ui.scaffold.KptScaffold
 import org.mifos.open.banking.feature.settings.generated.resources.Res
 import org.mifos.open.banking.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import org.mifos.open.banking.feature.settings.generated.resources.feature_settings_change_theme_text
+========
+import org.mifos.groupbanking.groupbanking.core.designsystem.icon.AppIcons
+import org.mifos.groupbanking.groupbanking.core.ui.scaffold.KptScaffold
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.Res
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_change_language_text
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_change_theme_text
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsScreen.kt
 import template.core.base.analytics.AnalyticsHelper
 import template.core.base.analytics.TrackScreenView
 import template.core.base.analytics.rememberAnalyticsHelper

@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.open.banking.core.datastore"
+    namespace = "org.mifos.groupbanking.core.datastore"
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -29,6 +29,7 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.coreBase.common)
+            implementation(projects.coreBase.datastore)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)

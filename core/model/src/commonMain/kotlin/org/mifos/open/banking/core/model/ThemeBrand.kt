@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/model/src/commonMain/kotlin/org/mifos/open/banking/core/model/ThemeBrand.kt
 package org.mifos.open.banking.core.model
+========
+package org.mifos.groupbanking.groupbanking.core.model
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/model/src/commonMain/kotlin/org/mifos/groupbanking/core/model/ThemeBrand.kt
 
 enum class ThemeBrand(val brandName: String) {
     DEFAULT("Default"),

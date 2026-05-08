@@ -7,6 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/repositoryImpl/UserDataRepositoryImpl.kt
 package org.mifos.open.banking.core.data.repositoryImpl
 
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,18 @@ import org.mifos.open.banking.core.model.DarkThemeConfig
 import org.mifos.open.banking.core.model.LanguageConfig
 import org.mifos.open.banking.core.model.ThemeBrand
 import org.mifos.open.banking.core.model.UserData
+========
+package org.mifos.groupbanking.groupbanking.core.data.repositoryImpl
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import org.mifos.groupbanking.groupbanking.core.data.repository.UserDataRepository
+import org.mifos.groupbanking.groupbanking.core.datastore.UserPreferencesRepository
+import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
+import org.mifos.groupbanking.groupbanking.core.model.LanguageConfig
+import org.mifos.groupbanking.groupbanking.core.model.ThemeBrand
+import org.mifos.groupbanking.groupbanking.core.model.UserData
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/commonMain/kotlin/org/mifos/groupbanking/core/data/repositoryImpl/UserDataRepositoryImpl.kt
 
 class UserDataRepositoryImpl(
     private val preferencesRepository: UserPreferencesRepository,

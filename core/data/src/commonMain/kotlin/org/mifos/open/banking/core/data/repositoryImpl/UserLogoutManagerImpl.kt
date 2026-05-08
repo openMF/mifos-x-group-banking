@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/repositoryImpl/UserLogoutManagerImpl.kt
 package org.mifos.open.banking.core.data.repositoryImpl
+========
+package org.mifos.groupbanking.groupbanking.core.data.repositoryImpl
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/commonMain/kotlin/org/mifos/groupbanking/core/data/repositoryImpl/UserLogoutManagerImpl.kt
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -15,11 +19,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/repositoryImpl/UserLogoutManagerImpl.kt
 import org.mifos.open.banking.core.data.model.LogoutEvent
 import org.mifos.open.banking.core.data.model.LogoutReason
 import org.mifos.open.banking.core.data.repository.UserLogoutManager
 import org.mifos.open.banking.core.data.util.bufferedMutableSharedFlow
 import org.mifos.open.banking.core.datastore.UserPreferencesRepository
+========
+import org.mifos.groupbanking.groupbanking.core.data.model.LogoutEvent
+import org.mifos.groupbanking.groupbanking.core.data.model.LogoutReason
+import org.mifos.groupbanking.groupbanking.core.data.repository.StoreCacheManager
+import org.mifos.groupbanking.groupbanking.core.data.repository.UserLogoutManager
+import org.mifos.groupbanking.groupbanking.core.data.util.bufferedMutableSharedFlow
+import org.mifos.groupbanking.groupbanking.core.datastore.UserPreferencesRepository
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/commonMain/kotlin/org/mifos/groupbanking/core/data/repositoryImpl/UserLogoutManagerImpl.kt
 import template.core.base.common.manager.DispatcherManager
 
 class UserLogoutManagerImpl(

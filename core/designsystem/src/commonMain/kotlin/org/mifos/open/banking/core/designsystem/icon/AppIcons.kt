@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/icon/AppIcons.kt
 package org.mifos.open.banking.core.designsystem.icon
+========
+package org.mifos.groupbanking.groupbanking.core.designsystem.icon
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/icon/AppIcons.kt
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack

@@ -7,12 +7,20 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsEvents.kt
 package org.mifos.open.banking.core.analytics
+========
+package org.mifos.groupbanking.groupbanking.core.analytics
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsEvents.kt
 
 /**
  * Mifos-specific analytics event types and parameters
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsEvents.kt
 object MifosXOpenBankingEventTypes {
+========
+object CommonPurseEventTypes {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsEvents.kt
     // Client Management Events
     const val CLIENT_CREATED = "client_created"
     const val CLIENT_UPDATED = "client_updated"
@@ -110,7 +118,11 @@ object MifosXOpenBankingEventTypes {
 /**
  * Mifos-specific parameter keys
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsEvents.kt
 object MifosXOpenBankingParamKeys {
+========
+object CommonPurseParamKeys {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsEvents.kt
     // Client-specific parameters
     const val CLIENT_ID = "client_id"
     const val CLIENT_TYPE = "client_type"
@@ -206,7 +218,11 @@ object MifosXOpenBankingParamKeys {
 /**
  * Predefined common parameter values
  */
+<<<<<<<< HEAD:core/analytics/src/commonMain/kotlin/org/mifos/open/banking/core/analytics/MifosXOpenBankingAnalyticsEvents.kt
 object MifosXOpenBankingParamValues {
+========
+object CommonPurseParamValues {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/analytics/src/commonMain/kotlin/org/mifos/groupbanking/core/analytics/CommonPurseAnalyticsEvents.kt
     // Client types
     const val CLIENT_TYPE_INDIVIDUAL = "individual"
     const val CLIENT_TYPE_ENTITY = "entity"

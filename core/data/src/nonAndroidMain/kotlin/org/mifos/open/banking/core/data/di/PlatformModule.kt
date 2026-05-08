@@ -7,11 +7,19 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/nonAndroidMain/kotlin/org/mifos/open/banking/core/data/di/PlatformModule.kt
 package org.mifos.open.banking.core.data.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.open.banking.core.data.repository.TimeZoneMonitor
+========
+package org.mifos.groupbanking.groupbanking.core.data.di
+
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.mifos.groupbanking.groupbanking.core.data.repository.TimeZoneMonitor
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/nonAndroidMain/kotlin/org/mifos/groupbanking/core/data/di/PlatformModule.kt
 
 actual val platformModule: Module
     get() = module {

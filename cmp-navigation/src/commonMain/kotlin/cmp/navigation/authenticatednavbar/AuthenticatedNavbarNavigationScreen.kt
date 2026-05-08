@@ -40,24 +40,28 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.open.banking.core.ui.NavigationItem
-import org.mifos.open.banking.feature.home.TasksDestination
-import org.mifos.open.banking.feature.home.navigateToTasks
-import org.mifos.open.banking.feature.home.tasksGraph
-import org.mifos.open.banking.feature.profile.navigateToProfile
-import org.mifos.open.banking.feature.profile.profileDestination
+import org.mifos.groupbanking.core.ui.NavigationItem
+import org.mifos.groupbanking.feature.home.HomeDestination
+import org.mifos.groupbanking.feature.home.homeGraph
+import org.mifos.groupbanking.feature.home.navigateToHome
+import org.mifos.groupbanking.feature.profile.navigateToProfile
+import org.mifos.groupbanking.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
 import template.core.base.ui.EventsEffect
 import template.core.base.ui.RootTransitionProviders
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
+    navigateToSettingsScreen: () -> Unit,
+    navigateToRates: () -> Unit,
+    navigateToHistory: () -> Unit,
+    navigateToCrypto: () -> Unit,
+    navigateToEmi: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
     ),
     viewModel: AuthenticatedNavbarNavigationViewModel = koinViewModel(),
-    navigateToSettingsScreen: () -> Unit,
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
     val scope = rememberCoroutineScope()
@@ -70,7 +74,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
                 AuthenticatedNavBarEvent.NavigateToHomeScreen -> {
                     analyticsHelper.logDestinationChanged(event.tab.startDestinationRoute)
                     navigateToTabOrRoot(tabToNavigateTo = event.tab) {
-                        navigateToTasks(navOptions = it)
+                        navigateToHome(navOptions = it)
                     }
                 }
 
@@ -101,6 +105,10 @@ internal fun AuthenticatedNavbarNavigationScreen(
         snackbarHostState = snackbarHostState,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
+        navigateToRates = navigateToRates,
+        navigateToHistory = navigateToHistory,
+        navigateToCrypto = navigateToCrypto,
+        navigateToEmi = navigateToEmi,
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -111,6 +119,10 @@ internal fun AuthenticatedNavbarNavigationScreen(
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
     navigateToSettingsScreen: () -> Unit,
+    navigateToRates: () -> Unit,
+    navigateToHistory: () -> Unit,
+    navigateToCrypto: () -> Unit,
+    navigateToEmi: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -153,16 +165,19 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
         // - consume the IME insets.
         NavHost(
             navController = navController,
-            startDestination = TasksDestination,
+            startDestination = HomeDestination,
             enterTransition = RootTransitionProviders.Enter.fadeIn,
             exitTransition = RootTransitionProviders.Exit.fadeOut,
             popEnterTransition = RootTransitionProviders.Enter.fadeIn,
             popExitTransition = RootTransitionProviders.Exit.fadeOut,
         ) {
-            // TOP LEVEL DESTINATION
-            tasksGraph(
-                navController = navController,
+            // TOP LEVEL DESTINATIONS
+            homeGraph(
                 onSettingsClick = navigateToSettingsScreen,
+                onNavigateToRates = navigateToRates,
+                onNavigateToHistory = navigateToHistory,
+                onNavigateToCrypto = navigateToCrypto,
+                onNavigateToEmi = navigateToEmi,
             )
 
             profileDestination()
@@ -175,14 +190,10 @@ private fun NavController.navigateToTabOrRoot(
     navigate: (NavOptions) -> Unit,
 ) {
     if (tabToNavigateTo.startDestinationRoute == currentDestination?.route) {
-        // We are at the start destination already, so nothing to do.
         return
     } else if (currentDestination?.parent?.route == tabToNavigateTo.graphRoute) {
-        // We are not at the start destination but we are in the correct graph,
-        // so lets pop up to the start destination.
         popBackStack(route = tabToNavigateTo.startDestinationRoute, inclusive = false)
     } else {
-        // We are not in correct graph at all, so navigate there.
         navigate(
             navOptions {
                 popUpTo(graph.findStartDestination().id) {

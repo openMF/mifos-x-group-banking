@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Color.kt
 package org.mifos.open.banking.core.designsystem.theme
+========
+package org.mifos.groupbanking.groupbanking.core.designsystem.theme
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Color.kt
 
 import androidx.compose.ui.graphics.Color
 

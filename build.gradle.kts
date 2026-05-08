@@ -31,7 +31,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
-    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.moduleGraph) apply true
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
@@ -66,6 +65,22 @@ tasks.register("printModulePaths") {
     subprojects {
         if (subprojects.isEmpty()) {
             println(this.path)
+        }
+    }
+}
+
+// Force consistent versions across all subprojects to fix KLIB resolver duplicate warnings
+// The conflict is between org.jetbrains.androidx.* (CMP) and androidx.* (Google) transitive deps
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            // Replace Google androidx.lifecycle with JetBrains fork for non-Android targets
+            if (requested.group == "org.jetbrains.androidx.lifecycle") {
+                useVersion("2.9.6")
+            }
+            if (requested.group == "org.jetbrains.androidx.savedstate") {
+                useVersion("1.3.6")
+            }
         }
     }
 }

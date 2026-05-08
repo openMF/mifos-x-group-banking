@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/util/ConnectivityProvider.kt
 package org.mifos.open.banking.core.data.util
+========
+package org.mifos.groupbanking.groupbanking.feature.home.di
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/home/src/commonMain/kotlin/org/mifos/groupbanking/feature/home/di/HomeModule.kt
 
 import dev.jordond.connectivity.Connectivity
 

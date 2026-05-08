@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Theme.kt
 package org.mifos.open.banking.core.designsystem.theme
+========
+package org.mifos.groupbanking.groupbanking.core.designsystem.theme
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Theme.kt
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
@@ -15,6 +19,11 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Theme.kt
+========
+import androidx.compose.runtime.CompositionLocalProvider
+import org.mifos.groupbanking.groupbanking.core.store.appScreenStateDefaults
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Theme.kt
 import template.core.base.designsystem.KptMaterialTheme
 import template.core.base.designsystem.theme.KptThemeProviderImpl
 import template.core.base.designsystem.toKptColorScheme
@@ -109,7 +118,11 @@ val darkScheme = darkColorScheme(
  * @param content The composable content that will have access to both KptTheme and MaterialTheme.
  */
 @Composable
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Theme.kt
 fun MifosXOpenBankingTheme(
+========
+fun CommonPurseTheme(
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Theme.kt
     darkTheme: Boolean = isSystemInDarkTheme(),
     androidTheme: Boolean = false,
     useDynamicColor: Boolean = false,
@@ -121,11 +134,19 @@ fun MifosXOpenBankingTheme(
         else -> if (darkTheme) darkScheme else lightScheme
     }.toKptColorScheme()
 
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Theme.kt
     val mifosxopenbankingTypography = Typography().toKptTypography(fontFamily)
 
     val themeProvider = KptThemeProviderImpl(
         colors = colorScheme,
         typography = mifosxopenbankingTypography,
+========
+    val commonpurseTypography = Typography().toKptTypography(fontFamily)
+
+    val themeProvider = KptThemeProviderImpl(
+        colors = colorScheme,
+        typography = commonpurseTypography,
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Theme.kt
     )
 
     KptMaterialTheme(

@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/PasswordStrengthIndicator.kt
 package org.mifos.open.banking.core.ui
+========
+package org.mifos.groupbanking.groupbanking.core.ui
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/PasswordStrengthIndicator.kt
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -36,8 +40,13 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/PasswordStrengthIndicator.kt
 import org.mifos.open.banking.core.designsystem.icon.AppIcons
 import org.mifos.open.banking.core.designsystem.theme.MifosXOpenBankingTheme
+========
+import org.mifos.groupbanking.groupbanking.core.designsystem.icon.AppIcons
+import org.mifos.groupbanking.groupbanking.core.designsystem.theme.CommonPurseTheme
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/PasswordStrengthIndicator.kt
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "MagicNumber")
 @Composable
@@ -182,7 +191,11 @@ private val weakColor = Color(0xFF8B6609)
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_minCharMet() {
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/PasswordStrengthIndicator.kt
     MifosXOpenBankingTheme {
+========
+    CommonPurseTheme {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/PasswordStrengthIndicator.kt
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 12,
@@ -194,7 +207,11 @@ private fun PasswordStrengthIndicatorPreview_minCharMet() {
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_minCharNotMet() {
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/PasswordStrengthIndicator.kt
     MifosXOpenBankingTheme {
+========
+    CommonPurseTheme {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/PasswordStrengthIndicator.kt
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 11,
@@ -206,7 +223,11 @@ private fun PasswordStrengthIndicatorPreview_minCharNotMet() {
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_noMinChar() {
+<<<<<<<< HEAD:core/ui/src/commonMain/kotlin/org/mifos/open/banking/core/ui/PasswordStrengthIndicator.kt
     MifosXOpenBankingTheme {
+========
+    CommonPurseTheme {
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/ui/src/commonMain/kotlin/org/mifos/groupbanking/core/ui/PasswordStrengthIndicator.kt
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 12,

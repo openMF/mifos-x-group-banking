@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:feature/profile/src/commonMain/kotlin/org/mifos/open/banking/feature/profile/ProfileRoute.kt
 package org.mifos.open.banking.feature.profile
+========
+package org.mifos.groupbanking.groupbanking.feature.profile
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/profile/src/commonMain/kotlin/org/mifos/groupbanking/feature/profile/ProfileRoute.kt
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.open.banking.feature.settings"
+    namespace = "org.mifos.groupbanking.feature.settings"
 }
 
 kotlin {
@@ -33,6 +33,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.open.banking.feature.settings.generated.resources"
+        packageOfResClass = "org.mifos.groupbanking.feature.settings.generated.resources"
     }
 }

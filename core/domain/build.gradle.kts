@@ -12,15 +12,15 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.open.banking.core.domain"
+    namespace = "org.mifos.groupbanking.core.domain"
 }
 
 kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)
-            implementation(projects.core.data)
-            implementation(projects.core.model)
+            api(projects.core.data)
+            api(projects.core.model)
         }
     }
 }

@@ -7,11 +7,19 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/database/src/commonTest/kotlin/org/mifos/open/banking/core/database/di/TestDatabaseModule.kt
 package org.mifos.open.banking.core.database.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.open.banking.core.database.AppDatabase
+========
+package org.mifos.groupbanking.groupbanking.core.database.di
+
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.mifos.groupbanking.groupbanking.core.database.AppDatabase
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/database/src/commonTest/kotlin/org/mifos/groupbanking/core/database/di/TestDatabaseModule.kt
 
 val TestDatabaseModule = module {
     includes(testPlatformModule)

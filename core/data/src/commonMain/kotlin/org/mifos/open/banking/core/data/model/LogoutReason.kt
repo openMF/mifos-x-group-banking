@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/data/src/commonMain/kotlin/org/mifos/open/banking/core/data/model/LogoutReason.kt
 package org.mifos.open.banking.core.data.model
+========
+package org.mifos.groupbanking.groupbanking.core.data.model
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/data/src/commonMain/kotlin/org/mifos/groupbanking/core/data/model/LogoutReason.kt
 
 /**
  * Indicates the reason that the user is being logged out.

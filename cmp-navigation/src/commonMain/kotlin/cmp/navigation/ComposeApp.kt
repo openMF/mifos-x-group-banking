@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.navigation.rootnav.RootNavScreen
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.open.banking.core.designsystem.theme.MifosXOpenBankingTheme
+import org.mifos.groupbanking.core.designsystem.theme.CommonPurseTheme
 import template.core.base.ui.EventsEffect
 
 @Composable
@@ -44,7 +44,7 @@ fun ComposeApp(
         }
     }
 
-    MifosXOpenBankingTheme(
+    CommonPurseTheme(
         darkTheme = uiState.darkTheme,
         androidTheme = uiState.isAndroidTheme,
         useDynamicColor = uiState.isDynamicColorsEnabled,

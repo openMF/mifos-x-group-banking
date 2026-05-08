@@ -7,12 +7,17 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Type.kt
 package org.mifos.open.banking.core.designsystem.theme
+========
+package org.mifos.groupbanking.groupbanking.core.designsystem.theme
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Type.kt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import org.jetbrains.compose.resources.Font
+<<<<<<<< HEAD:core/designsystem/src/commonMain/kotlin/org/mifos/open/banking/core/designsystem/theme/Type.kt
 import org.mifos.open.banking.core.designsystem.generated.resources.Res
 import org.mifos.open.banking.core.designsystem.generated.resources.outfit_black
 import org.mifos.open.banking.core.designsystem.generated.resources.outfit_bold
@@ -23,6 +28,18 @@ import org.mifos.open.banking.core.designsystem.generated.resources.outfit_mediu
 import org.mifos.open.banking.core.designsystem.generated.resources.outfit_regular
 import org.mifos.open.banking.core.designsystem.generated.resources.outfit_semi_bold
 import org.mifos.open.banking.core.designsystem.generated.resources.outfit_thin
+========
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.Res
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_black
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_bold
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_extra_bold
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_extra_light
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_light
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_medium
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_regular
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_semi_bold
+import org.mifos.groupbanking.groupbanking.core.designsystem.generated.resources.outfit_thin
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/designsystem/src/commonMain/kotlin/org/mifos/groupbanking/core/designsystem/theme/Type.kt
 
 val fontFamily: FontFamily
     @Composable get() = FontFamily(

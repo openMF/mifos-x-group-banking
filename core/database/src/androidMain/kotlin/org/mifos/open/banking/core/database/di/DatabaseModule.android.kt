@@ -7,13 +7,22 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:core/database/src/androidMain/kotlin/org/mifos/open/banking/core/database/di/DatabaseModule.android.kt
 package org.mifos.open.banking.core.database.di
+========
+package org.mifos.groupbanking.groupbanking.core.database.di
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/database/src/androidMain/kotlin/org/mifos/groupbanking/core/database/di/DatabaseModule.android.kt
 
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.Module
 import org.koin.dsl.module
+<<<<<<<< HEAD:core/database/src/androidMain/kotlin/org/mifos/open/banking/core/database/di/DatabaseModule.android.kt
 import org.mifos.open.banking.core.database.AppDatabase
+========
+import org.mifos.groupbanking.groupbanking.core.database.AppDatabase
+import org.mifos.groupbanking.groupbanking.core.database.utils.ChargeTypeConverters
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):core/database/src/androidMain/kotlin/org/mifos/groupbanking/core/database/di/DatabaseModule.android.kt
 import template.core.base.database.AppDatabaseFactory
 import kotlin.coroutines.CoroutineContext
 

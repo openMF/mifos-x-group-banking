@@ -158,14 +158,14 @@ update_root_project_name() {
     print_processing "Updating rootProject.name in $settings_file"
 
     # Check if the line already exists
-    if grep -qE '^\s*rootProject\.name\s*=' "$settings_file"; then
+    if grep -qE '^[[:space:]]*rootProject\.name[[:space:]]*=' "$settings_file"; then
         # Replace using BSD/GNU compatible sed
         if [[ "$OSTYPE" == "darwin"* ]]; then
             # macOS (BSD sed requires backup suffix)
-            sed -i '' -E "s|^\s*rootProject\.name\s*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
+            sed -i '' -E "s|^[[:space:]]*rootProject\.name[[:space:]]*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
         else
             # Linux/GNU sed
-            sed -i -E "s|^\s*rootProject\.name\s*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
+            sed -i -E "s|^[[:space:]]*rootProject\.name[[:space:]]*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
         fi
         print_success "Updated rootProject.name to \"$PROJECT_NAME\""
     else
@@ -212,38 +212,57 @@ update_fastlane_config() {
         print_success "Updated Android package_name to '$PACKAGE'"
     fi
 
-    # Update iOS app_identifier (look for any pattern, not just org.mifos)
-    if grep -q 'app_identifier: "com\.niyaj' "$config_file"; then
-        sed -i.bak 's/app_identifier: "com\.niyaj\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
-    elif grep -q 'app_identifier: "org\.mifos' "$config_file"; then
-        sed -i.bak 's/app_identifier: "org\.mifos\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
-    elif grep -q 'app_identifier: "[^"]*"' "$config_file"; then
-        # Fallback: update any app_identifier in IOS section
-        sed -i.bak '/IOS = {/,/^[[:space:]]*}/ s/app_identifier: "[^"]*"/app_identifier: "'"$PACKAGE"'"/' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
+    # Update iOS app_identifier ONLY in IOS section (NOT IOS_SHARED)
+    # CRITICAL: Use section-bounded sed to avoid modifying IOS_SHARED
+    # Pattern: /^[[:space:]]*IOS[[:space:]]*=[[:space:]]*{/,/^[[:space:]]*}/
+    # This matches from "IOS = {" to the next closing "}" at the same indentation level
+    if grep -q 'app_identifier:' "$config_file"; then
+        sed -i.bak '/^[[:space:]]*IOS[[:space:]]*=[[:space:]]*{/,/^[[:space:]]*}/ s/app_identifier: "[^"]*"/app_identifier: "'"$PACKAGE"'"/' "$config_file"
+        print_success "Updated iOS app_identifier to '$PACKAGE' (in IOS section only)"
     fi
 
-    # Update iOS provisioning profile names (AdHoc)
-    if grep -q '"match AdHoc com\.niyaj' "$config_file"; then
-        sed -i.bak 's/"match AdHoc com\.niyaj\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AdHoc provisioning profile"
-    elif grep -q '"match AdHoc org\.mifos' "$config_file"; then
-        sed -i.bak 's/"match AdHoc org\.mifos\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AdHoc provisioning profile"
-    fi
+    # Note: iOS provisioning profile names are now dynamically generated in IOS_SHARED
+    # They reference IOS[:app_identifier], so no manual update needed
+    # See fastlane-config/project_config.rb line ~105:
+    #   provisioning_profiles: {
+    #     adhoc: "match AdHoc #{IOS[:app_identifier]}",
+    #     appstore: "match AppStore #{IOS[:app_identifier]}"
+    #   }
 
-    # Update iOS provisioning profile names (AppStore)
-    if grep -q '"match AppStore com\.niyaj' "$config_file"; then
-        sed -i.bak 's/"match AppStore com\.niyaj\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AppStore provisioning profile"
-    elif grep -q '"match AppStore org\.mifos' "$config_file"; then
-        sed -i.bak 's/"match AppStore org\.mifos\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AppStore provisioning profile"
+    # VALIDATION: Ensure IOS_SHARED section still has ENV reads
+    # Extract IOS_SHARED section and check for ENV reads
+    if sed -n '/^[[:space:]]*IOS_SHARED[[:space:]]*=/,/^[[:space:]]*}/p' "$config_file" | grep -q "ENV\["; then
+        print_success "iOS shared config preserved (IOS_SHARED intact with ENV reads)"
+    else
+        print_warning "⚠️  Warning: IOS_SHARED section may have been modified!"
+        print_warning "Please verify fastlane-config/project_config.rb manually"
+        print_warning "IOS_SHARED should contain ENV[] reads for shared config"
     fi
 
     print_success "Fastlane configuration updated successfully"
+}
+
+update_ios_bundle_identifier() {
+    print_section "Updating iOS Bundle Identifier in Xcode"
+
+    local project_file="cmp-ios/iosApp.xcodeproj/project.pbxproj"
+
+    if [ ! -f "$project_file" ]; then
+        print_warning "Xcode project not found at $project_file, skipping"
+        return 0
+    fi
+
+    print_processing "Updating PRODUCT_BUNDLE_IDENTIFIER in $project_file"
+
+    # Update PRODUCT_BUNDLE_IDENTIFIER in all build configurations
+    # This updates the bundle ID for all targets and configurations
+    sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*/PRODUCT_BUNDLE_IDENTIFIER = $ESCAPED_PACKAGE/g" "$project_file"
+
+    if [ $? -eq 0 ]; then
+        print_success "Updated Xcode bundle identifier to '$PACKAGE'"
+    else
+        print_warning "Failed to update Xcode bundle identifier"
+    fi
 }
 
 update_libs_versions_toml() {
@@ -344,24 +363,33 @@ process_module_dirs() {
         if [ -d "$kotlin_dir" ]; then
             print_processing "Processing $kotlin_dir"
 
-            mkdir -p "$kotlin_dir/$SUBDIR"
-
             if [ -d "$kotlin_dir/org/mifos" ]; then
                 print_info "Moving files from org/mifos to $SUBDIR"
-                cp -r "$kotlin_dir/org/mifos"/* "$kotlin_dir/$SUBDIR/" 2>/dev/null || true
+                # Stage to a temp dir OUTSIDE kotlin_dir to avoid recursive-copy
+                # bug when $SUBDIR overlaps the source path (e.g. org.mifos.foo
+                # → kotlin/org/mifos/foo, which would otherwise be created INSIDE
+                # the source then nuked by `rm -rf kotlin_dir/org/mifos`).
+                local stage_dir
+                stage_dir="$(mktemp -d "${TMPDIR:-/tmp}/customizer.XXXXXX")"
+                cp -R "$kotlin_dir/org/mifos"/. "$stage_dir/" 2>/dev/null || true
 
-                if [ -d "$kotlin_dir/$SUBDIR" ]; then
-                    print_info "Updating package declarations and imports"
-                    find "$kotlin_dir/$SUBDIR" -type f -name "*.kt" -exec sed -i.bak \
-                        -e "s/package org\.mifos/package $PACKAGE/g" \
-                        -e "s/package com\.niyaj/package $PACKAGE/g" \
-                        -e "s/import org\.mifos/import $PACKAGE/g" \
-                        -e "s/import com\.niyaj/import $PACKAGE/g" {} \;
-                fi
+                print_info "Updating package declarations and imports"
+                find "$stage_dir" -type f -name "*.kt" -exec sed -i.bak \
+                    -e "s/package org\.mifos/package $PACKAGE/g" \
+                    -e "s/package com\.niyaj/package $PACKAGE/g" \
+                    -e "s/import org\.mifos/import $PACKAGE/g" \
+                    -e "s/import com\.niyaj/import $PACKAGE/g" {} \;
 
                 print_info "Cleaning up old directory structure"
                 rm -rf "$kotlin_dir/org/mifos"
                 rmdir "$kotlin_dir/org" 2>/dev/null || true
+
+                mkdir -p "$kotlin_dir/$SUBDIR"
+                # Move staged content (incl. dotfiles) into the new SUBDIR
+                if [ -n "$(ls -A "$stage_dir" 2>/dev/null)" ]; then
+                    cp -R "$stage_dir"/. "$kotlin_dir/$SUBDIR/" 2>/dev/null || true
+                fi
+                rm -rf "$stage_dir"
             fi
         fi
     done
@@ -406,7 +434,7 @@ update_android_app_imports() {
         if grep -q "import org\.mifos" "$file"; then
             print_processing "Updating imports in: $file"
             sed -i.bak "s/import org\.mifos/import $PACKAGE/g" "$file"
-            ((count++))
+            count=$((count + 1))
         fi
     done < <(find "$target_dir" -type f -name "*.kt")
 
@@ -533,6 +561,7 @@ main() {
     update_package_namespace
     update_root_project_name
     update_fastlane_config
+    update_ios_bundle_identifier
     update_libs_versions_toml
     update_google_services_json
     process_module_content

@@ -13,8 +13,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.mifos.open.banking.core.data.repository.NetworkMonitor
-import org.mifos.open.banking.core.model.UserData
+import org.mifos.groupbanking.core.data.repository.NetworkMonitor
+import org.mifos.groupbanking.core.model.UserData
 import template.core.base.ui.BaseViewModel
 
 internal class AuthenticatedNavbarNavigationViewModel(

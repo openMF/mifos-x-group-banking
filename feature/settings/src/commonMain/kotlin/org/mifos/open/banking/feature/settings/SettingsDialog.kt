@@ -7,7 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsDialog.kt
 package org.mifos.open.banking.feature.settings
+========
+package org.mifos.groupbanking.groupbanking.feature.settings
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsDialog.kt
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -37,6 +41,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+<<<<<<<< HEAD:feature/settings/src/commonMain/kotlin/org/mifos/open/banking/feature/settings/SettingsDialog.kt
 import org.mifos.open.banking.core.model.DarkThemeConfig
 import org.mifos.open.banking.core.model.ThemeBrand
 import org.mifos.open.banking.feature.settings.generated.resources.Res
@@ -53,6 +58,24 @@ import org.mifos.open.banking.feature.settings.generated.resources.feature_setti
 import org.mifos.open.banking.feature.settings.generated.resources.feature_settings_loading
 import org.mifos.open.banking.feature.settings.generated.resources.feature_settings_theme
 import org.mifos.open.banking.feature.settings.generated.resources.feature_settings_title
+========
+import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
+import org.mifos.groupbanking.groupbanking.core.model.ThemeBrand
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.Res
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_brand_android
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_brand_default
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dark_mode_config_dark
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dark_mode_config_light
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dark_mode_config_system_default
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dark_mode_preference
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dismiss_dialog_button_text
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dynamic_color_no
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dynamic_color_preference
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_dynamic_color_yes
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_loading
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_theme
+import org.mifos.groupbanking.groupbanking.feature.settings.generated.resources.feature_settings_title
+>>>>>>>> c3e419f (feat(scaffold): customise kmp-project-template for group-banking (CommonPurse)):feature/settings/src/commonMain/kotlin/org/mifos/groupbanking/feature/settings/SettingsDialog.kt
 
 @Composable
 fun SettingsDialog(
