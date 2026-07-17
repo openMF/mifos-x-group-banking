@@ -21,6 +21,7 @@ import org.mifos.groupbanking.feature.crypto.di.CryptoModule
 import org.mifos.groupbanking.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.groupbanking.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.groupbanking.feature.home.di.HomeModule
+import org.mifos.groupbanking.groupbanking.feature.loginsignup.di.LoginSignupModule
 import org.mifos.groupbanking.feature.settings.SettingsModule
 import template.core.base.analytics.di.analyticsModule
 import template.core.base.common.di.CommonModule
@@ -50,6 +51,7 @@ object KoinModules {
             CurrencyRatesModule,
             EmiCalculatorModule,
             HomeModule,
+            LoginSignupModule,
             SettingsModule,
         )
     }

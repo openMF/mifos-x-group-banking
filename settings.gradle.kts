@@ -115,6 +115,7 @@ include(":feature:settings")
 include(":feature:crypto")
 include(":feature:currency-rates")
 include(":feature:emi-calculator")
+include(":feature:login-signup")
 
 include(":core-base:analytics")
 include(":core-base:common")

@@ -28,6 +28,7 @@ import org.mifos.groupbanking.feature.emicalculator.navigation.navigateToEmiCalc
 import org.mifos.groupbanking.feature.settings.navigateToSettings
 import org.mifos.groupbanking.feature.settings.notificationDestination
 import org.mifos.groupbanking.feature.settings.settingsDestination
+import org.mifos.groupbanking.groupbanking.feature.loginsignup.navigation.loginSignupGraph
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -62,5 +63,17 @@ internal fun NavGraphBuilder.authenticatedGraph(
         cryptoGraph(navController)
         currencyRatesGraph(navController)
         emiCalculatorDestination(onBackClick = navController::popBackStack)
+
+        // Companion auth (login-signup) graph. Post-auth destinations resolve to
+        // real screens once group-list / personal-dashboard land; wired here so the
+        // graph is reachable and the callbacks are non-dead.
+        loginSignupGraph(
+            onNavigateToPersonalDashboard = { navController.popBackStack() },
+            onNavigateToGroupList = { navController.popBackStack() },
+            onNavigateToGroupTypePicker = { navController.popBackStack() },
+            onNavigateToJoinWithCode = { navController.popBackStack() },
+            onPromptBiometric = {},
+            onShowSnackbar = {},
+        )
     }
 }
