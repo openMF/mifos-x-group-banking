@@ -10,6 +10,15 @@
 package cmp.navigation.rootnav
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +38,12 @@ import cmp.navigation.splash.navigateToSplash
 import cmp.navigation.splash.splashDestination
 import cmp.navigation.ui.rememberKptNavController
 import cmp.navigation.utils.toObjectNavigationRoute
+import kpt.core.base.designsystem.theme.motion
+import kpt.core.base.ui.KptConnectivityBanner
+import kpt.core.base.ui.util.NonNullEnterTransitionProvider
+import kpt.core.base.ui.util.NonNullExitTransitionProvider
+import kpt.core.base.ui.util.RootTransitionProviders
 import org.koin.compose.viewmodel.koinViewModel
-import template.core.base.ui.NonNullEnterTransitionProvider
-import template.core.base.ui.NonNullExitTransitionProvider
-import template.core.base.ui.RootTransitionProviders
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
@@ -53,20 +64,44 @@ fun RootNavScreen(
         if (isNotSplashScreen) onSplashScreenRemoved()
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = SplashRoute,
-        modifier = modifier,
-        enterTransition = { toEnterTransition()(this) },
-        exitTransition = { toExitTransition()(this) },
-        popEnterTransition = { toEnterTransition()(this) },
-        popExitTransition = { toExitTransition()(this) },
-    ) {
-        splashDestination()
-//        onboardingDestination()
-//        authNavGraph(navController)
-        authenticatedGraph(navController)
-//        userUnlockDestination()
+    // Snapshot theme tokens once so the non-Composable transition lambdas capture
+    // theme-resolved providers. Splash → main handoff suppresses motion; other transitions
+    // use the M3 fade-through pattern, both honoring MaterialTheme.motion.
+    val motion = MaterialTheme.motion
+    val fadeThroughEnter = RootTransitionProviders.Kpt.Enter.fadeThrough(motion)
+    val fadeThroughExit = RootTransitionProviders.Kpt.Exit.fadeThrough(motion)
+    val noEnter = RootTransitionProviders.Kpt.Enter.none
+    val noExit = RootTransitionProviders.Kpt.Exit.none
+
+    // Column layout: connectivity stripe always sits above the NavHost.
+    // The stripe's outer Box unconditionally claims statusBarsPadding() space so the
+    // NavHost below it never sees the status-bar inset — inner TopAppBars start flush
+    // against the stripe without double-padding. This covers ALL authenticated routes
+    // (including Settings, Loans, etc.) without per-screen wiring.
+    Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        KptConnectivityBanner()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = SplashRoute,
+                modifier = Modifier.fillMaxSize(),
+                enterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
+                exitTransition = { pickExit(fadeThroughExit, noExit)(this) },
+                popEnterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
+                popExitTransition = { pickExit(fadeThroughExit, noExit)(this) },
+            ) {
+                splashDestination()
+//            onboardingDestination()
+//            authNavGraph(navController)
+                authenticatedGraph(navController)
+//            userUnlockDestination()
+            }
+        }
     }
 
     val targetRoute = when (state) {
@@ -133,20 +168,25 @@ private fun NavDestination?.rootLevelRoute(): String? = when {
     else -> parent.rootLevelRoute()
 }
 
-@Suppress("MaxLineLength")
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.toEnterTransition(): NonNullEnterTransitionProvider =
-    when (targetState.destination.rootLevelRoute()) {
-        SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Enter.none
-        else -> RootTransitionProviders.Enter.fadeIn
-    }
+/**
+ * Pick which pre-resolved enter provider applies, based on the target route. Splash → main
+ * handoff suppresses animation (the splash has its own exit choreography); everything else
+ * gets the M3 fade-through pattern.
+ */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.pickEnter(
+    fadeThrough: NonNullEnterTransitionProvider,
+    none: NonNullEnterTransitionProvider,
+): NonNullEnterTransitionProvider = when (targetState.destination.rootLevelRoute()) {
+    SplashRoute.toObjectNavigationRoute() -> none
+    else -> fadeThrough
+}
 
-@Suppress("MaxLineLength")
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.toExitTransition(): NonNullExitTransitionProvider {
-    return when (initialState.destination.rootLevelRoute()) {
-        // Disable transitions when coming from the splash screen
-        SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Exit.none
-        else -> RootTransitionProviders.Exit.fadeOut
-    }
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.pickExit(
+    fadeThrough: NonNullExitTransitionProvider,
+    none: NonNullExitTransitionProvider,
+): NonNullExitTransitionProvider = when (initialState.destination.rootLevelRoute()) {
+    SplashRoute.toObjectNavigationRoute() -> none
+    else -> fadeThrough
 }
 
 @Composable

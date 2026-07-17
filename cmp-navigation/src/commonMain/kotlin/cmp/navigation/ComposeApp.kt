@@ -15,9 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.navigation.rootnav.RootNavScreen
+import kpt.core.base.ui.effects.EventsEffect
+import kpt.core.designsystem.theme.KptTheme
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.groupbanking.core.designsystem.theme.CommonPurseTheme
-import template.core.base.ui.EventsEffect
 
 @Composable
 fun ComposeApp(
@@ -44,7 +44,13 @@ fun ComposeApp(
         }
     }
 
-    CommonPurseTheme(
+    // Bottom-nav tab-switch retention (per-tab back-stack + scroll) is handled by
+    // Navigation's own `saveState = true` / `restoreState = true` in the bottom-nav
+    // NavHost; rotation and system-initiated process death ride Android's standard
+    // saved-instance-state Bundle. No app-root SaveableStateRegistry override — the
+    // platform default is used, so Navigation's Bundle-typed back-stack state is
+    // never rejected. Feature modules carry zero retention code.
+    KptTheme(
         darkTheme = uiState.darkTheme,
         androidTheme = uiState.isAndroidTheme,
         useDynamicColor = uiState.isDynamicColorsEnabled,

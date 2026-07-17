@@ -6,12 +6,12 @@ import org.gradle.kotlin.dsl.dependencies
 /**
  * Plugin that applies the CMP feature plugin and configures it.
  * This plugin applies the following plugins:
- * - org.mifos.kmp.library - Kotlin Multiplatform Library
- * - org.mifos.kmp.koin - Koin for Kotlin Multiplatform
+ * - kpt.kmp.library - Kotlin Multiplatform Library
+ * - kpt.kmp.koin - Koin for Kotlin Multiplatform
  * - org.jetbrains.kotlin.plugin.compose - Kotlin Compose
  * - org.jetbrains.compose - Compose Multiplatform
- * - org.mifos.detekt.plugin - Detekt Plugin
- * - org.mifos.spotless.plugin - Spotless Plugin
+ * - kpt.detekt.plugin - Detekt Plugin
+ * - kpt.spotless.plugin - Spotless Plugin
  *
  */
 class CMPFeatureConventionPlugin : Plugin<Project> {
@@ -26,7 +26,20 @@ class CMPFeatureConventionPlugin : Plugin<Project> {
                 apply("org.convention.spotless.plugin")
             }
 
+            // Compose Multiplatform UI-test infra (RULE-KMP-COMPOSE-UITEST-001):
+            // commonTest gets the multiplatform `runComposeUiTest` API; the desktop (JVM)
+            // target gets the JUnit4-backed runner that actually executes it (CI-runnable).
+            // Referenced by coordinate — build-logic does not expose the
+            // org.jetbrains.compose plugin types, only its plugin id.
+            val composeVersion = libs.findVersion("compose-plugin").get().requiredVersion
+
             dependencies {
+                add("commonTestImplementation", "org.jetbrains.compose.ui:ui-test:$composeVersion")
+                add(
+                    "desktopTestImplementation",
+                    "org.jetbrains.compose.ui:ui-test-junit4:$composeVersion",
+                )
+
                 add("commonMainImplementation", project(":core:ui"))
                 add("commonMainImplementation", project(":core-base:ui"))
                 add("commonMainImplementation", project(":core:designsystem"))

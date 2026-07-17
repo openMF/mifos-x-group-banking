@@ -8,26 +8,27 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 import com.android.build.api.instrumentation.InstrumentationScope
-import org.convention.AppBuildType
 import org.convention.dynamicVersion
 
 plugins {
     alias(libs.plugins.android.application.convention)
     alias(libs.plugins.android.application.compose.convention)
-    alias(libs.plugins.android.application.flavors.convention)
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
     alias(libs.plugins.ksp)
 }
 
-val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
+val appId: String = libs.versions.appId.get()
+val appDisplayName: String = libs.versions.appDisplayName.get()
 
 android {
-    namespace = "cmp.android.app"
+    namespace = appId
 
     defaultConfig {
-        applicationId = packageNameSpace
+        applicationId = appId
+        // app_name is injected from libs.versions.toml — no hardcoded strings.xml entry needed
+        resValue("string", "app_name", appDisplayName)
         versionName = System.getenv("VERSION") ?: project.dynamicVersion
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
         vectorDrawables.useSupportLibrary = true
@@ -36,7 +37,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../keystores/release_keystore.keystore")
+            // v2 Play App Signing model — Gradle signs release AABs with the UPLOAD key.
+            // Single source of truth: secrets/android/keystores/upload_keystore.keystore
+            // - Local-dev: developer drops their real upload_keystore.keystore into secrets/android/keystores/
+            // - CI: materialize-android-secrets.sh decodes UPLOAD_KEYSTORE_FILE GHA secret to the same path
+            // - KEYSTORE_PATH env var overrides (advanced use)
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../secrets/android/keystores/upload_keystore.keystore")
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "Wizard@123"
             keyAlias = System.getenv("KEYSTORE_ALIAS") ?: "kmp-project-template"
             keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: "Wizard@123"
@@ -46,15 +52,16 @@ android {
     }
 
     buildTypes {
-        debug {
-            applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
+        // debug/staging/release are registered by org.convention.kmp.flavors via
+        // KMPFlavorsConventionPlugin (isDebuggable, applicationIdSuffix, isMinifyEnabled).
+        // Only Android-app-specific settings that the plugin doesn't own live here.
+        getByName("staging") {
+            isJniDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-
         release {
-            isMinifyEnabled = true
-            applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix
             isShrinkResources = true
-            isDebuggable = false
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -64,6 +71,7 @@ android {
     buildFeatures {
         dataBinding = true
         buildConfig = true
+        resValues = true
     }
 
     packaging {
@@ -92,6 +100,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.firebase.bom))
+
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
     implementation(projects.coreBase.platform)
@@ -102,6 +112,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
+    implementation(projects.sync)
 
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)

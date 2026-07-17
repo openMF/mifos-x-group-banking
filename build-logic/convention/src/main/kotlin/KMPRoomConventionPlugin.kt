@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.dependencies
  *
  * Applies the `androidx.room3` Gradle plugin and `com.google.devtools.ksp`, sets the
  * schema export directory, adds the `room3-runtime` dependency, and registers the
- * Room KSP compiler for all seven KMP targets (Android, Desktop, iOS Arm64, iOS x64,
+ * Room KSP compiler for all six KMP targets (Android, Desktop, iOS Arm64,
  * iOS Simulator Arm64, JS, WasmJS).
  *
  * Usage: apply via `alias(libs.plugins.mifos.kmp.room)` in a module's `build.gradle.kts`.
@@ -26,13 +26,12 @@ class KMPRoomConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                "implementation"(libs.findLibrary("androidx.room.runtime").get())
+                "commonMainImplementation"(libs.findLibrary("androidx.room.runtime").get())
 
                 listOf(
                     "kspAndroid",
                     "kspDesktop",
                     "kspIosArm64",
-                    "kspIosX64",
                     "kspIosSimulatorArm64",
                     "kspJs",
                     "kspWasmJs",

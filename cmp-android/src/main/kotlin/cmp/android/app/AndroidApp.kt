@@ -21,12 +21,12 @@ import coil3.disk.directory
 import coil3.request.CachePolicy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kpt.core.base.ui.util.getDefaultImageLoader
+import kpt.core.data.user.UserDataRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.mifos.groupbanking.groupbanking.core.data.repository.UserDataRepository
-import template.core.base.ui.getDefaultImageLoader
 
 /**
  * Android application class.
@@ -80,15 +80,14 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
         }
     }
 
-    override fun newImageLoader(context: PlatformContext): ImageLoader =
-        getDefaultImageLoader(context)
-            .newBuilder()
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(context.cacheDir.resolve("image_cache"))
-                    .maxSizePercent(0.25)
-                    .build()
-            }
-            .build()
+    override fun newImageLoader(context: PlatformContext): ImageLoader = getDefaultImageLoader(context)
+        .newBuilder()
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .diskCache {
+            DiskCache.Builder()
+                .directory(context.cacheDir.resolve("image_cache"))
+                .maxSizePercent(0.25)
+                .build()
+        }
+        .build()
 }

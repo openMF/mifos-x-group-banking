@@ -14,10 +14,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.store"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -29,6 +25,22 @@ kotlin {
 
             // Compose runtime — needed for the @Composable appScreenStateDefaults() factory.
             implementation(compose.runtime)
+            // compose-resources — for stringResource()-based ScreenState copy (i18n).
+            implementation(compose.components.resources)
+
+            implementation(projects.core.database)
+            implementation(projects.core.model)
+            implementation(projects.core.network)
+            implementation(libs.cmp.network.monitor)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kermit.logging)
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "kpt.core.store.generated.resources"
 }

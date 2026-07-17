@@ -10,17 +10,14 @@
 package cmp.navigation.authenticatednavbar
 
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material3.SnackbarDuration.Indefinite
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -30,33 +27,26 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import cmp.navigation.generated.resources.Res
-import cmp.navigation.generated.resources.not_connected
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.analytics.rememberAnalyticsHelper
+import kpt.core.base.designsystem.theme.motion
+import kpt.core.base.ui.effects.EventsEffect
+import kpt.core.base.ui.util.RootTransitionProviders
+import kpt.core.ui.NavigationItem
+import kpt.feature.home.HomeDestination
+import kpt.feature.home.homeGraph
+import kpt.feature.home.navigateToHome
+import kpt.feature.profile.navigateToProfile
+import kpt.feature.profile.profileDestination
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.groupbanking.core.ui.NavigationItem
-import org.mifos.groupbanking.feature.home.HomeDestination
-import org.mifos.groupbanking.feature.home.homeGraph
-import org.mifos.groupbanking.feature.home.navigateToHome
-import org.mifos.groupbanking.feature.profile.navigateToProfile
-import org.mifos.groupbanking.feature.profile.profileDestination
-import template.core.base.analytics.rememberAnalyticsHelper
-import template.core.base.ui.EventsEffect
-import template.core.base.ui.RootTransitionProviders
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
     navigateToSettingsScreen: () -> Unit,
-    navigateToRates: () -> Unit,
-    navigateToHistory: () -> Unit,
-    navigateToCrypto: () -> Unit,
-    navigateToEmi: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -64,9 +54,6 @@ internal fun AuthenticatedNavbarNavigationScreen(
     viewModel: AuthenticatedNavbarNavigationViewModel = koinViewModel(),
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
 
     EventsEffect(eventFlow = viewModel.eventFlow) { event ->
         navController.apply {
@@ -88,27 +75,10 @@ internal fun AuthenticatedNavbarNavigationScreen(
         }
     }
 
-    val message = stringResource(Res.string.not_connected)
-    LaunchedEffect(isOffline) {
-        if (isOffline) {
-            scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = message,
-                    duration = Indefinite,
-                )
-            }
-        }
-    }
-
     AuthenticatedNavbarNavigationScreenContent(
         navController = navController,
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
-        navigateToRates = navigateToRates,
-        navigateToHistory = navigateToHistory,
-        navigateToCrypto = navigateToCrypto,
-        navigateToEmi = navigateToEmi,
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -119,10 +89,6 @@ internal fun AuthenticatedNavbarNavigationScreen(
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
     navigateToSettingsScreen: () -> Unit,
-    navigateToRates: () -> Unit,
-    navigateToHistory: () -> Unit,
-    navigateToCrypto: () -> Unit,
-    navigateToEmi: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -163,21 +129,21 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
         // Because this Scaffold has a bottom navigation bar, the NavHost will:
         // - consume the vertical navigation bar insets.
         // - consume the IME insets.
+        // Snapshot motion tokens once so the non-Composable enterTransition lambdas capture
+        // theme-resolved values rather than the hardcoded fallbacks.
+        val motion = MaterialTheme.motion
         NavHost(
             navController = navController,
             startDestination = HomeDestination,
-            enterTransition = RootTransitionProviders.Enter.fadeIn,
-            exitTransition = RootTransitionProviders.Exit.fadeOut,
-            popEnterTransition = RootTransitionProviders.Enter.fadeIn,
-            popExitTransition = RootTransitionProviders.Exit.fadeOut,
+            // Sibling navigation (bottom-nav tab switch) uses M3 fade-through pattern.
+            enterTransition = RootTransitionProviders.Kpt.Enter.fadeThrough(motion),
+            exitTransition = RootTransitionProviders.Kpt.Exit.fadeThrough(motion),
+            popEnterTransition = RootTransitionProviders.Kpt.Enter.fadeThrough(motion),
+            popExitTransition = RootTransitionProviders.Kpt.Exit.fadeThrough(motion),
         ) {
             // TOP LEVEL DESTINATIONS
             homeGraph(
                 onSettingsClick = navigateToSettingsScreen,
-                onNavigateToRates = navigateToRates,
-                onNavigateToHistory = navigateToHistory,
-                onNavigateToCrypto = navigateToCrypto,
-                onNavigateToEmi = navigateToEmi,
             )
 
             profileDestination()
@@ -206,8 +172,7 @@ private fun NavController.navigateToTabOrRoot(
     }
 }
 
-private fun NavBackStackEntry?.isCurrentRoute(route: String): Boolean =
-    this
-        ?.destination
-        ?.hierarchy
-        ?.any { it.route == route } == true
+private fun NavBackStackEntry?.isCurrentRoute(route: String): Boolean = this
+    ?.destination
+    ?.hierarchy
+    ?.any { it.route == route } == true

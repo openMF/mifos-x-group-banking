@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mifos.groupbanking.core.data.repository.UserDataRepository
-import org.mifos.groupbanking.core.model.DarkThemeConfig
-import org.mifos.groupbanking.core.model.LanguageConfig
-import template.core.base.platform.garbage.GarbageCollectionManager
-import template.core.base.ui.BaseViewModel
+import kpt.core.base.platform.garbage.GarbageCollectionManager
+import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.user.UserDataRepository
+import kpt.core.model.user.DarkThemeConfig
+import kpt.core.model.user.LanguageConfig
 
 class AppViewModel(
     private val settingsRepository: UserDataRepository,

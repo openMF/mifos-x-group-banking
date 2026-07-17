@@ -15,13 +15,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.Navigator
 import androidx.navigation.compose.rememberNavController
 import co.touchlab.kermit.Logger
-import template.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.AnalyticsHelper
 
 @Composable
-fun rememberKptNavController(
-    name: String,
-    vararg navigators: Navigator<out NavDestination>,
-): NavHostController =
+fun rememberKptNavController(name: String, vararg navigators: Navigator<out NavDestination>): NavHostController =
     rememberNavController(navigators = navigators).apply {
         this.addOnDestinationChangedListener { _, destination, _ ->
             val graph = destination.parent?.route?.let { " in $it" }.orEmpty()

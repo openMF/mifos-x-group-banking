@@ -13,16 +13,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)
             implementation(libs.androidx.browser)
             implementation(libs.androidx.compose.runtime)
+            implementation(compose.uiTooling)
         }
 
         commonMain.dependencies {
@@ -50,12 +47,9 @@ kotlin {
         }
     }
 }
-dependencies {
-    debugImplementation(compose.uiTooling)
-}
 
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "org.mifos.groupbanking.core.ui.generated.resources"
+    packageOfResClass = "kpt.core.ui.generated.resources"
 }

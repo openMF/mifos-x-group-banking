@@ -24,15 +24,10 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)
-            implementation(libs.androidx.browser)
             implementation(libs.androidx.compose.runtime)
         }
 
@@ -40,6 +35,7 @@ kotlin {
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.designsystem)
             implementation(libs.cmp.network.monitor.compose)
+            implementation(libs.cmp.intent.launcher)
 
             implementation(compose.ui)
             implementation(compose.material3)
@@ -88,5 +84,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "template.core.base.ui.generated.resources"
+    packageOfResClass = "kpt.core.base.ui.generated.resources"
 }

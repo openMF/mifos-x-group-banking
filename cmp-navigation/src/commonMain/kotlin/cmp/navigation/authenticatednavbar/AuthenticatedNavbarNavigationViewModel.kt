@@ -9,27 +9,13 @@
  */
 package cmp.navigation.authenticatednavbar
 
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import org.mifos.groupbanking.core.data.repository.NetworkMonitor
-import org.mifos.groupbanking.core.model.UserData
-import template.core.base.ui.BaseViewModel
+import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.model.user.UserData
 
-internal class AuthenticatedNavbarNavigationViewModel(
-    networkMonitor: NetworkMonitor,
-) : BaseViewModel<Unit, AuthenticatedNavBarEvent, AuthenticatedNavBarAction>(
-    initialState = Unit,
-) {
-
-    val isOffline = networkMonitor.isOnline
-        .map(Boolean::not)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = false,
-        )
+internal class AuthenticatedNavbarNavigationViewModel :
+    BaseViewModel<Unit, AuthenticatedNavBarEvent, AuthenticatedNavBarAction>(
+        initialState = Unit,
+    ) {
 
     override fun handleAction(action: AuthenticatedNavBarAction) {
         when (action) {

@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import org.mifos.groupbanking.core.data.repository.UserDataRepository
-import org.mifos.groupbanking.core.model.AuthState
-import org.mifos.groupbanking.core.model.UserData
-import template.core.base.ui.BaseViewModel
+import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.user.UserDataRepository
+import kpt.core.model.user.AuthState
+import kpt.core.model.user.UserData
 
 class RootNavViewModel(
     userDataRepository: UserDataRepository,
@@ -42,9 +42,7 @@ class RootNavViewModel(
         }
     }
 
-    private fun handleUserStateUpdateReceive(
-        action: UserStateUpdateReceive,
-    ) {
+    private fun handleUserStateUpdateReceive(action: UserStateUpdateReceive) {
         val userData = action.userData
 
         // TODO:: Configure this based on the user state

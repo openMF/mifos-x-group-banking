@@ -9,13 +9,10 @@
  */
 package cmp.android.app
 
-import org.mifos.groupbanking.groupbanking.core.model.DarkThemeConfig
+import kpt.core.model.user.DarkThemeConfig
 
-fun DarkThemeConfig.isDarkMode(
-    isSystemDarkMode: Boolean,
-): Boolean =
-    when (this) {
-        DarkThemeConfig.FOLLOW_SYSTEM -> isSystemDarkMode
-        DarkThemeConfig.DARK -> true
-        DarkThemeConfig.LIGHT -> false
-    }
+fun DarkThemeConfig.isDarkMode(isSystemDarkMode: Boolean): Boolean = when (this) {
+    DarkThemeConfig.FOLLOW_SYSTEM -> isSystemDarkMode
+    DarkThemeConfig.DARK -> true
+    DarkThemeConfig.LIGHT -> false
+}

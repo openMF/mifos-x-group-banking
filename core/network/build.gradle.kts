@@ -7,20 +7,46 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.ktrofit)
+    alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.kmp.supabase.config)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.network"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+
+buildkonfig {
+    // packageName mirrors the module's Kotlin source package (module scope) so the generated
+    // `kpt.core.network.BuildKonfig` is imported without ceremony.
+    packageName = "kpt.core.network"
+    defaultConfigs {
+        buildConfigField(
+            STRING, "FRED_API_KEY",
+            System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
+        )
     }
-    testOptions {
-        unitTests {
+}
+
+// Supabase credentials are sourced dynamically from the gitignored `secrets/supabaseCredentialsFile.json`
+// (url + anonKey) via the shared SupabaseConfigConventionPlugin — the project's established secrets
+// mechanism — which generates `kpt.core.network.config.SupabaseCredentials`. When the file is absent
+// (the toolkit ships no Supabase project) it generates empty creds, so SupabaseConfigClient stays inert.
+supabaseConfig {
+    packageName = "kpt.core.network.config"
+}
+
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isReturnDefaultValues = true
             isIncludeAndroidResources = true
         }
@@ -59,6 +85,15 @@ kotlin {
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktorfit.lib)
+        }
     }
 }
 
@@ -68,7 +103,6 @@ dependencies {
     add("kspJs", libs.ktorfit.ksp)
     add("kspWasmJs", libs.ktorfit.ksp)
     add("kspDesktop", libs.ktorfit.ksp)
-    add("kspIosX64", libs.ktorfit.ksp)
     add("kspIosArm64", libs.ktorfit.ksp)
     add("kspIosSimulatorArm64", libs.ktorfit.ksp)
 }

@@ -11,10 +11,9 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.data"
-    testOptions {
-        unitTests {
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
         }
@@ -33,7 +32,7 @@ kotlin {
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)
-            api(projects.coreBase.store)
+            api(projects.core.store)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
@@ -44,6 +43,13 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.tracing.ktx)
             implementation(libs.koin.android)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.koin.test)
         }
     }
 }

@@ -18,17 +18,10 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
-import org.mifos.groupbanking.feature.crypto.navigation.cryptoGraph
-import org.mifos.groupbanking.feature.crypto.navigation.navigateToCrypto
-import org.mifos.groupbanking.feature.currencyrates.navigation.currencyRatesGraph
-import org.mifos.groupbanking.feature.currencyrates.navigation.navigateToCurrencyRates
-import org.mifos.groupbanking.feature.currencyrates.navigation.navigateToRateHistory
-import org.mifos.groupbanking.feature.emicalculator.navigation.emiCalculatorDestination
-import org.mifos.groupbanking.feature.emicalculator.navigation.navigateToEmiCalculator
-import org.mifos.groupbanking.feature.settings.navigateToSettings
-import org.mifos.groupbanking.feature.settings.notificationDestination
-import org.mifos.groupbanking.feature.settings.settingsDestination
-import org.mifos.groupbanking.groupbanking.feature.loginsignup.navigation.loginSignupGraph
+import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.settings.navigateToSettings
+import kpt.feature.settings.notificationDestination
+import kpt.feature.settings.settingsDestination
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -37,43 +30,18 @@ internal fun NavController.navigateToAuthenticatedGraph(navOptions: NavOptions? 
     navigate(route = AuthenticatedGraphRoute, navOptions = navOptions)
 }
 
-internal fun NavGraphBuilder.authenticatedGraph(
-    navController: NavController,
-) {
+internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
     navigation<AuthenticatedGraphRoute>(
         startDestination = AuthenticatedNavbarRoute,
     ) {
         authenticatedNavbarGraph(
             navigateToSettingsScreen = navController::navigateToSettings,
-            navigateToRates = { navController.navigateToCurrencyRates() },
-            navigateToHistory = { navController.navigateToRateHistory() },
-            navigateToCrypto = { navController.navigateToCrypto() },
-            navigateToEmi = { navController.navigateToEmiCalculator() },
         )
 
-        notificationDestination(
-            onBackClick = navController::popBackStack,
-        )
+        notificationDestination(onBackClick = { navController.popBackStackSafely() })
 
         settingsDestination(
-            onBackClick = navController::popBackStack,
-        )
-
-        // Fintech feature graphs
-        cryptoGraph(navController)
-        currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = navController::popBackStack)
-
-        // Companion auth (login-signup) graph. Post-auth destinations resolve to
-        // real screens once group-list / personal-dashboard land; wired here so the
-        // graph is reachable and the callbacks are non-dead.
-        loginSignupGraph(
-            onNavigateToPersonalDashboard = { navController.popBackStack() },
-            onNavigateToGroupList = { navController.popBackStack() },
-            onNavigateToGroupTypePicker = { navController.popBackStack() },
-            onNavigateToJoinWithCode = { navController.popBackStack() },
-            onPromptBiometric = {},
-            onShowSnackbar = {},
+            onBackClick = { navController.popBackStackSafely() },
         )
     }
 }

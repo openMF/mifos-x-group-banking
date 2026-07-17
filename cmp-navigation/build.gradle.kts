@@ -29,29 +29,39 @@ kotlin {
             implementation(projects.coreBase.platform)
             implementation(projects.coreBase.security)
 
+            // shell (framework) — kept
             implementation(projects.feature.home)
-            implementation(projects.feature.crypto)
-            implementation(projects.feature.currencyRates)
-            implementation(projects.feature.emiCalculator)
-            implementation(projects.feature.loginSignup)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
+            implementation(projects.sync)
 
-            //put your multiplatform dependencies here
+            // put your multiplatform dependencies here
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.foundation)
             implementation(compose.ui)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.components.resources)
-            implementation(libs.window.size)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            // Phase 3 (store5-screen-state-persistence 03-vm-scoping) — enables
+            // koinNavViewModel() so nav destinations acquire ViewModels scoped to
+            // NavBackStackEntry (cleared on pop) instead of Activity (cleared on
+            // Activity death). Resolves io.insert-koin:koin-compose-viewmodel-navigation
+            // via gradle/libs.versions.toml:259; version is the shared Koin ref.
+            implementation(libs.koin.compose.navigation)
+            // Provides `com.russhwolf.settings.Settings` referenced by
+            // `saveable/PersistentSaveableStateRegistry.kt` at the app root.
+            // The `named("plain")` binding itself is contributed by
+            // `core-base/datastore/DatastoreBaseModule` (transitively wired in
+            // via `core/datastore/DatastoreModule` in `KoinModules.allModules`).
+            implementation(libs.multiplatform.settings)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlinx.serialization.core)
         }
     }
-}
-
-android {
-    namespace = "cmp.navigation"
 }
 
 compose.resources {

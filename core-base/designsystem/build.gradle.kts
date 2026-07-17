@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.designsystem"
-}
-
 kotlin {
     sourceSets{
         androidMain.dependencies {
@@ -36,7 +32,6 @@ kotlin {
             api(libs.jetbrains.compose.material3.adaptive.navigation)
 
             implementation(libs.jb.lifecycleViewmodel)
-            implementation(libs.window.size)
             implementation(libs.ui.backhandler)
         }
     }
@@ -45,5 +40,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "template.core.base.designsystem.generated.resources"
+    packageOfResClass = "kpt.core.base.designsystem.generated.resources"
 }

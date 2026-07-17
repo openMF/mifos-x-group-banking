@@ -12,10 +12,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.common"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

@@ -1,16 +1,19 @@
-# Claude Code - KMP Project Template
+# Claude Code - Money Toolkit (KMP)
 
-**Last Updated:** 2026-02-13
-**Project Type:** Kotlin Multiplatform (KMP)
+**Last Updated:** 2026-05-24
+**Project Type:** Kotlin Multiplatform (KMP) — generic financial utility toolkit
 **Platforms:** Android | iOS | macOS | Desktop (Windows/macOS/Linux) | Web
 
 ---
 
 ## Quick Links
 
+🚀 **New fork? Start here:**
+- [Fork Quickstart](docs/setup/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
-- [Fastlane Deployment](fastlane/CLAUDE.md) - iOS & Android deployment lanes
+- [Fastlane Deployment](deployment/BOOTSTRAP.md) - Deployment architecture, secrets bootstrap, all 18 targets
 - [Bash Scripts](scripts/CLAUDE.md) - Setup, deployment, and verification scripts
 
 📚 **Deep-Dive Documentation:**
@@ -18,6 +21,10 @@
 - [Onboarding Guide](docs/claude/onboarding.md)
 - [Deployment Playbook](docs/claude/deployment-playbook.md)
 - [Patterns & Best Practices](docs/claude/patterns.md)
+- [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
+- [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
+- [Room Invalidation Bridge](core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/README.md) - `RoomChangeBus` + `daoFlow{}` + `notifyingWrite{}` — absorbs Room 3 alpha05's wasmJs async-fan-out gap so DAO Flow consumers re-emit after writes; no-op on Android/Desktop/iOS
+- [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
 - [Version Handling](docs/claude/version-handling.md)
@@ -29,7 +36,19 @@
 
 ## Project Overview
 
-This is a **Kotlin Multiplatform (KMP) mobile/desktop/web application** with comprehensive CI/CD infrastructure spanning **5 platforms** and **9 deployment targets**.
+This is the **Money Toolkit** — a generic, open-source financial utility template
+built on Kotlin Multiplatform. It ships working personal-finance tools out of
+the box (loan tracking, bill reminders, interest-rate watching, calculators,
+country-level macro indicators) wired through the same offline-first store
+contract every framework feature uses. No login. No backend. Fork to brand and
+extend.
+
+The project doubles as a **reference implementation** for every architectural
+pattern in `core-base/store` and `core-base/ui` — each shipped feature is the
+canonical showcase for one or more framework archetypes (see "Toolkit feature
+showcase" below).
+
+CI/CD infrastructure spans **5 platforms** and **18 deployment targets** (see `deployment/DEPLOYMENT_MANIFEST.yaml`).
 
 ### Architecture
 
@@ -43,10 +62,44 @@ kmp-project-template/
 ├── core/                # Core modules (data, domain, network, etc.)
 ├── core-base/           # Base platform implementations
 ├── feature/             # Feature modules
-├── fastlane/            # Deployment automation (iOS & Android)
+├── deployment/          # Deployment automation — 18 targets across 5 platforms
 ├── .github/workflows/   # GitHub Actions CI/CD
 └── scripts/             # Bash automation scripts
 ```
+
+### Toolkit feature showcase
+
+Every shipped feature exists for two reasons: it's a working tool, AND it's the
+canonical demo of one or more framework patterns. Forks can keep the lot, swap
+the per-feature branding, or selectively remove features they don't need.
+
+| Feature                   | What it does                                              | Pattern showcased                                          |
+|---------------------------|-----------------------------------------------------------|------------------------------------------------------------|
+| **B1 Loan Tracker**       | Personal loans — track principal, EMI, due dates locally  | `PagingScreenStream` list + `SubmitHandler` edit form      |
+| **B2 EMI Calculator**     | Compute monthly EMI for any loan                          | Pure local state (no Store)                                |
+| **B3 Affordability**      | "How much loan can I afford?" calculator                  | Pure local state + derived multi-input math                |
+| **B4 Bill Reminders**     | Recurring bills + in-app notification scheduler           | `DraftSubmitHandler` (offline-resilient form)              |
+| **B5 Amortization**       | Full payment schedule for any loan                        | Read-side projection of `LoanRepository`                   |
+| **B6 Loan Comparison**    | Side-by-side total-cost comparison wizard                 | Multi-step wizard state machine                            |
+| **B7 Interest Rates**     | FRED-backed federal funds / mortgage / treasury series    | `NETWORK_WITH_CACHE` `ScreenDataStream` + 4-stream combine |
+| **B8 Country Macro**      | GDP / CPI / unemployment from World Bank                  | Multi-source combine + country picker                      |
+| **Home dashboard**        | Loans summary + upcoming bills + rates + USD exchange     | `combineScreenStates` 4-way fan-in                         |
+| **Currency Rates**        | Live FX rates by base currency                            | `Store` + search filter + emptyIfContent                   |
+| **Rate History**          | Historical FX charts                                      | Dynamic-key flow + auto-refresh                            |
+| **Amortization Schedule** | Month-by-month payment breakdown for any loan             | OFFLINE_LOCAL_ONLY projection via `ScreenDataStream`       |
+
+## Store Archetype Showcases (kmp-project-template)
+
+| Archetype | Store | ViewModel/Feature | Test |
+|---|---|---|---|
+| OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | `AmortizationScheduleViewModel` | `AlertsStoreTest`, `LoansStoreTest`, `AmortizationScheduleViewModelTest` |
+| NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `ExchangeRatesViewModel` | `EconomicMemoryOnlyTest` |
+| NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (online) | `SpotRateLookupStoreTest` |
+| CACHE_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (offline) | `CurrencyConverterViewModelTest` |
+| PERIODIC | `ExchangeRatesStore` | `HomeDashboardViewModel` tile | `HomeDashboardViewModelTest` |
+| MEMORY_ONLY | `MacroIndicatorStore` | `MacroIndicatorsViewModel` | `EconomicMemoryOnlyTest` |
+| LOAD_ONCE | `LoansStore` | `LoanDetailViewModel` | `LoanDetailViewModelTest` |
+| MUTABLE | (DraftSubmitHandler) | `BillReminderCreateViewModel` | (existing) |
 
 ### Tech Stack
 
@@ -66,9 +119,9 @@ kmp-project-template/
 - Koin (dependency injection)
 
 **CI/CD:**
-- GitHub Actions with **reusable workflows** (`openMF/mifos-x-actionhub@v1.0.8`)
+- GitHub Actions with the **v2 reusable workflows** from `openMF/mifos-x-actionhub` (per-workflow pins — the wrapper file is authoritative; see `.github/CLAUDE.md`)
 - **13 custom actions** (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
-- **Fastlane** (12 lanes: 7 Android + 5 iOS)
+- **Fastlane** (8 lanes across 8 deployment targets in `deployment/<platform>/<target>/lane.rb`)
 - **17 bash scripts** for setup, deployment, and verification
 
 **Code Quality:**
@@ -102,6 +155,46 @@ kmp-project-template/
 
 ---
 
+## First-time Fork Setup
+
+> **Canonical guide:** [`deployment/BOOTSTRAP.md`](deployment/BOOTSTRAP.md) — Path A
+> (manual mode, OSS forks) and Path B (vault mode, framework maintainers) with a
+> decision matrix at the top. Start there for the full step-by-step.
+
+The `template_version: "2.6.0"` epic (fastlane-modernization) replaced the
+legacy `.env.local.example` pattern with a structured secrets pipeline. Pick
+the path that matches your team:
+
+- **Path A — OSS fork (manual mode):** copy `secrets/sample/` into `secrets/live/`
+  and fill in real values; CI consumes them via the per-target
+  `deployment/<platform>/<target>/workflow-snippet.yml` manual flavor.
+- **Path B — Vault mode (maintainers):** run `/secrets pull` from a
+  framework-bound session; secrets materialize to canonical filesystem
+  locations from the SOPS+age vault.
+
+**FRED (Federal Reserve Economic Data)** — free developer key required for the
+B7 Interest Rate Tracker + B8 Country Macro Snapshot screens:
+
+1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
+2. Provide the key one of two ways:
+   - **Path A:** add `FRED_API_KEY=<your-key>` to `local.properties` (gitignored,
+     matches the KMP ecosystem convention) — no shared env bundle needed.
+   - **Path B:** run `/secrets request mifos_x_fred_api_key` from a
+     project-bound session; the framework opens a vault PR proposing the
+     new alias row. After it merges, `/secrets pull` materializes it.
+3. Wire it into Koin in your fork's app module:
+   ```kotlin
+   single { FredApiConfig(apiKey = System.getenv("FRED_API_KEY")) }
+   ```
+   (Or load via BuildKonfig / Gradle property — whichever your fork prefers.)
+
+Leave the key unset and the FRED-backed screens render an explicit "FRED key
+not configured" empty state rather than crashing.
+
+**World Bank Open Data** — no setup. Fully open API.
+
+---
+
 ## Development Workflow
 
 ### 1. Initial Setup
@@ -113,7 +206,7 @@ kmp-project-template/
 # OR follow detailed setup:
 ./keystore-manager.sh generate  # Generate Android keystores
 ./firebase-setup.sh             # Configure Firebase projects
-./scripts/setup_ios_complete.sh # iOS code signing setup
+./scripts/ios/setup_ios_complete.sh # iOS code signing setup
 ```
 
 ### 2. Daily Development
@@ -140,36 +233,47 @@ git commit -m "feat(android): add new feature"
 ./gradlew test
 
 # Verify iOS deployment configuration (iOS only)
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check version sanitization (iOS only)
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 ### 4. Deployment
 
 **Via GitHub Actions (Recommended):**
-1. Push to `dev` branch
-2. Trigger `multi-platform-build-and-publish` workflow
-3. Select deployment targets via workflow inputs
+1. Trigger the **`Release · Multi-Platform`** workflow (`release-multi-platform.yml`)
+2. For each platform pick the top **rung** to reach (`<platform>_rung`: internal → beta → production); lower rungs auto-fire
+3. Production-facing stages pause for approval if the environment has required reviewers (set up via `scripts/configure-release-environments.sh`)
+
+See `.github/CLAUDE.md` for the full rung-ladder + environment-gate model.
 
 **Via Fastlane (Local/Manual):**
 ```bash
+# Invocation: (cd deployment && bundle exec fastlane <platform> <lane>)
+# --fastlane-dir flag does NOT exist in Fastlane 2.235.0 (doc bug fixed).
+
 # Android
-bundle exec fastlane android deployReleaseApkOnFirebase
-bundle exec fastlane android deployInternal
+(cd deployment && bundle exec fastlane android deployReleaseApkOnFirebase)
+(cd deployment && bundle exec fastlane android deployInternal)
+(cd deployment && bundle exec fastlane android promoteToBeta)
+(cd deployment && bundle exec fastlane android promote_to_production)
 
 # iOS
-bundle exec fastlane ios deploy_on_firebase
-bundle exec fastlane ios beta
-bundle exec fastlane ios release
+(cd deployment && bundle exec fastlane ios deploy_on_firebase)
+(cd deployment && bundle exec fastlane ios beta)
+(cd deployment && bundle exec fastlane ios release)
+
+# macOS / Desktop
+(cd deployment && bundle exec fastlane mac desktop_testflight)
+(cd deployment && bundle exec fastlane mac desktop_release)
 ```
 
 **Via Bash Scripts (iOS only):**
 ```bash
-./scripts/deploy_firebase.sh
-./scripts/deploy_testflight.sh
-./scripts/deploy_appstore.sh  # Double confirmation required
+./scripts/deploy/deploy_firebase.sh
+./scripts/deploy/deploy_testflight.sh
+./scripts/deploy/deploy_appstore.sh  # Double confirmation required
 ```
 
 ---
@@ -195,6 +299,24 @@ Customize in **`core/store`** (the single discoverable seam):
 See `core/store/README.md` for the "what you get for free" list and full integration
 pattern.
 
+### User-facing surfaces (extend these in your fork)
+
+The Money Toolkit ships two domain surfaces forks typically brand or extend:
+
+- **Banking domain** (`core/model/banking/`, `core/data/banking/`,
+  `core/database/banking/`) — `Loan` + `BillReminder` entities, repositories,
+  Room DAOs. Add fields, new categories, or related entities (savings goals,
+  budgets) here. The `feature/loans` and `feature/bills` UIs read straight from
+  the repository contracts — extend the model + DAO and the UI follows.
+- **Economic API integration** (`core/network/economic/`, `core/data/economic/`,
+  `core/store/economic/`) — FRED + World Bank API clients, Store5-backed
+  caches, repository surfaces. Add new FRED series by extending
+  `feature/rates/.../RateSeriesCatalog.kt` (no client changes needed); add new
+  World Bank indicators by extending `core/model/economic/MacroIndicator.kt`
+  and the `MacroIndicatorsRepository` query set.
+
+Both surfaces follow the same offline-first contract — see `core/store/README.md`.
+
 **Do NOT modify `core-base/store` or `core-base/ui`** — they're framework-shared and
 upgrade cleanly across template versions. Push fork pressure to `core/store` instead.
 
@@ -206,6 +328,83 @@ For detail pages, non-paginated lists, multi-source dashboards, and other patter
 see the **screen-type taxonomy table** in `core/store/README.md` — it maps every
 common screen type to the right framework API. (`PagingScreenContent` is for
 infinite-scroll paginated lists only; detail pages use `ScreenContent`.)
+
+For **input screens** (form, wizard, quick-action, confirm, gesture — anything where
+the user submits a mutation), use `SubmitHandler` (simple) or `DraftSubmitHandler`
+(offline-resilient, persists payload across restarts). Wire the screen with
+`MutationScreenContent`. Control network vs. cache strategy per-request via `FetchPolicy`
+(`CACHE_ONLY` / `NETWORK_ONLY` / `NETWORK_WITH_CACHE`).
+
+> Screen-archetype vocabulary (used by `/kmp-feature` codegen via `ui.yaml.screens[].type`):
+> `screen-content` (→ `ScreenContent`), `paging-list` (→ `PagingScreenContent`),
+> `input` (→ `MutationScreenContent` + `SubmitHandler`/`DraftSubmitHandler`),
+> `custom` (bring-your-own), `pure-ui` (no Store). Names align 1:1 with the Compose
+> composable that wraps the screen body — see `core/store/README.md` taxonomy table.
+
+On **logout**, call `storeCacheManager.clearAll()` to wipe all Store caches and draft rows.
+On **app start**, call `storeCacheManager.pruneExpiredDrafts()` to remove SUBMITTED/FAILED
+drafts older than 30 days (PENDING drafts are never pruned).
+
+See [Store Implementation Guide](docs/claude/store-implementation.md) for full examples.
+
+---
+
+## Fork branding
+
+The toolkit centralises every brand-touching string into **five properties** in
+`gradle.properties`. Today they're reference values (consumers still have the
+strings hardcoded across `cmp-android/build.gradle.kts`, `cmp-ios/`,
+`cmp-desktop/build.gradle.kts`, `cmp-web/build.gradle.kts`, `Info.plist`,
+`AndroidManifest.xml`, etc.). The intent: a future one-shot rename script reads
+these five properties + does substitutions across the consumer build files in a
+single pass.
+
+> **Source of truth: `gradle/libs.versions.toml`** — the `appId`, `appDisplayName`,
+> `baseNamespace`, `desktopAppName`, and `projectName` keys are what the build system
+> actually reads at runtime. `gradle.properties` holds fork-rename placeholders for
+> the future `scripts/fork-rename.sh` script. When in doubt, read `libs.versions.toml`.
+
+| Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
+| -------- | ------------------- | ----------------------------------- | ------------------ |
+| `APP_ID_BASE` | `cmp.android.app` _(placeholder)_ | `appId = "org.mifos.kmp.template"` | Android `applicationId`; iOS bundle ID |
+| `APP_NAME` | `Money Toolkit` | `appDisplayName = "Money Toolkit"` | Android `app_name`, iOS `CFBundleDisplayName` |
+| `APP_VERSION_BASE` | `1.0.0` | _(not in toml — Gradle computes `YYYY.M.D` from git)_ | Base for version string generation |
+| `APP_BUNDLE_DISPLAY_NAME` | `Money Toolkit` | `desktopAppName = "Money Toolkit"` | iOS Springboard label; macOS `CFBundleName` |
+| `APP_BRAND_PREFIX` | `Kpt` | `baseNamespace = "kpt"` | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`) |
+
+**Today**: forks edit these properties **and** every consumer file by hand.
+**Roadmap**: a `scripts/fork-rename.sh` (TBD) will accept new values and write
+them through to every consumer file in one pass — eliminating the rename-drift
+class of fork failure. The properties exist today so:
+
+1. Forks can grep `APP_NAME` / `APP_ID_BASE` and confirm the rename surface.
+2. The rename-script PR has a stable target — no schema renegotiation.
+3. Consumer build files can incrementally migrate to reading these properties
+   via `project.findProperty("APP_NAME") as? String ?: "Money Toolkit"` patterns
+   without breaking forks mid-flight.
+
+See `gradle.properties` for the current values; see Phase 10 of the
+core-base-store-coverage epic for the seam rationale.
+
+### Fork app icons
+
+App icons follow the same source-of-truth → `syncForkConfig` propagation pattern
+as the text fields above, just for binary files:
+
+- **Drop fork-specific icons** into `branding/icons/` (one file per platform —
+  see `branding/icons/README.md` for the exact name → destination mapping).
+- **Run** `./gradlew syncForkConfig`. The task copies whichever files are
+  present into the canonical platform locations
+  (`cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon.png`,
+  `cmp-web/src/{js,wasmJs}Main/resources/favicon.ico`,
+  `cmp-desktop/icons/ic_launcher.{icns,ico,png}`).
+- **Missing source = no-op.** An empty `branding/icons/` keeps the template
+  defaults — every drop is opt-in.
+- **Android adaptive icons** require Android Studio's Image Asset Studio (one
+  time per fork, commit the result). Alternatively drop a pre-built res tree
+  into `branding/icons/android/` to have `syncForkConfig` copy it across.
+
+Implementation: `build-logic/convention/src/main/kotlin/SyncForkConfigPlugin.kt`.
 
 ---
 
@@ -248,7 +447,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ## Platform-Specific Notes
 
 ### Android
-- **Package:** `cmp.android.app`
+- **Package:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Do NOT use `APP_ID_BASE` in `gradle.properties` — that is a fork-rename placeholder, not the runtime applicationId.
 - **Min SDK:** 24, **Target SDK:** 34
 - **Flavors:** `prod`, `demo`
 - **Build Types:** `debug`, `release`
@@ -256,7 +455,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Firebase:** 2 apps registered (prod + demo), 4 variants in google-services.json
 
 ### iOS
-- **Bundle ID:** `org.mifos.kmp.template`
+- **Bundle ID:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Same key as Android — both platforms share the single `appId` source of truth.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
 - **CocoaPods:** Required for iOS dependencies
@@ -323,7 +522,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 2. **Signing parameter naming inconsistency** - Mixed snake_case/camelCase/UPPERCASE
 
 ### 🟡 Medium
-3. **Hardcoded keystore filename** - `release_keystore.keystore` in multiple places
+3. **Hardcoded keystore filename** - `upload_keystore.keystore` in multiple places
 4. **Version generation may fail silently** - `set +e` swallows errors
 5. **Production promotion has no validation** - Doesn't verify beta release exists
 

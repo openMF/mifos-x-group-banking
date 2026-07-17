@@ -39,6 +39,7 @@ pathToEntries.forEach { (path, entries) ->
 pluginManagement {
     includeBuild("build-logic")
     repositories {
+        mavenLocal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -54,6 +55,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
+        mavenLocal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -87,7 +89,9 @@ extensions.configure<org.ajoberstar.reckon.gradle.ReckonExtension> {
     setTagWriter { it.toString() }
 }
 
-rootProject.name = "CommonPurse"
+// Project name is driven by fork.project.name in gradle.properties (written by syncForkConfig).
+// Fallback keeps the template name so a clean checkout builds without running syncForkConfig first.
+rootProject.name = providers.gradleProperty("fork.project.name").getOrElse("kmp-project-template")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -98,6 +102,7 @@ include(":cmp-web")
 include(":cmp-navigation")
 
 include(":core:analytics")
+include(":core:auth")
 include(":core:common")
 include(":core:data")
 include(":core:database")
@@ -106,16 +111,13 @@ include(":core:designsystem")
 include(":core:domain")
 include(":core:model")
 include(":core:network")
+include(":core:platform")
 include(":core:store")
 include(":core:ui")
 
 include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
-include(":feature:crypto")
-include(":feature:currency-rates")
-include(":feature:emi-calculator")
-include(":feature:login-signup")
 
 include(":core-base:analytics")
 include(":core-base:common")
@@ -123,6 +125,7 @@ include(":core-base:database")
 include(":core-base:datastore")
 include(":core-base:designsystem")
 include(":core-base:network")
+include(":core-base:observability")
 include(":core-base:platform")
 include(":core-base:security")
 include(":core-base:store")
@@ -135,3 +138,4 @@ check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     https://developer.android.com/build/jdks#jdk-config-in-studio
     """.trimIndent()
 }
+include(":sync")

@@ -13,12 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    namespace = "org.mifos.groupbanking.core.designsystem"
-}
 
 kotlin {
     sourceSets {
@@ -51,5 +45,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "org.mifos.groupbanking.core.designsystem.generated.resources"
+    packageOfResClass = "kpt.core.designsystem.generated.resources"
 }

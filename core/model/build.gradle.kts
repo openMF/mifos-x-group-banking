@@ -13,15 +13,12 @@ plugins {
     id("kotlinx-serialization")
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.model"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
         }
     }
 }

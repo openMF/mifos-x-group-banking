@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
 }
 
-android {
-    namespace = "template.core.base.store"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -24,6 +20,7 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
             implementation(project(":core-base:common"))
+            implementation(project(":core-base:observability"))
         }
 
         commonTest.dependencies {

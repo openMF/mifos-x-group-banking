@@ -12,10 +12,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.feature.profile"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -31,6 +27,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.groupbanking.feature.profile.generated.resources"
+        packageOfResClass = "kpt.feature.profile.generated.resources"
     }
 }

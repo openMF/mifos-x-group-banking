@@ -32,6 +32,12 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
+    compileOnly(libs.kover.gradlePlugin)
+    implementation(libs.kmp.product.flavors.plugin)
+    // worker-kmp app plugin — must be `implementation` (not `compileOnly`) so its
+    // META-INF/gradle-plugins descriptor is on the build-logic runtime classpath,
+    // letting WorkerComposeConventionPlugin apply it via pluginManager.apply(id).
+    implementation(libs.worker.app.plugin)
 }
 
 tasks {
@@ -61,9 +67,9 @@ gradlePlugin {
             implementationClass = "AndroidApplicationConventionPlugin"
         }
 
-        register("androidFlavors") {
-            id = "org.convention.android.application.flavors"
-            implementationClass = "AndroidApplicationFlavorsConventionPlugin"
+        register("kmpFlavors") {
+            id = "org.convention.kmp.flavors"
+            implementationClass = "KMPFlavorsConventionPlugin"
         }
 
         register("androidFirebase") {
@@ -112,6 +118,11 @@ gradlePlugin {
             implementationClass = "KtlintConventionPlugin"
             description = "Configures kotlinter for the project"
         }
+        register("kover") {
+            id = "org.convention.kover.plugin"
+            implementationClass = "KoverConventionPlugin"
+            description = "Applies the kover code-coverage plugin to a module. Chained from base convention plugins (Android/KMP/CMP)."
+        }
         register("gitHooks") {
             id = "org.convention.git.hooks"
             implementationClass = "GitHooksConventionPlugin"
@@ -125,5 +136,22 @@ gradlePlugin {
             description = "Configures Room for the project"
         }
 
+        // Fork identity sync
+        register("forkSyncConfig") {
+            id = "org.convention.fork.sync-config"
+            implementationClass = "SyncForkConfigPlugin"
+            description = "Registers syncForkConfig task — syncs libs.versions.toml identity to iOS xcconfig, local.properties, gradle.properties"
+        }
+        register("workerCompose") {
+            id = "org.convention.worker.compose"
+            implementationClass = "WorkerComposeConventionPlugin"
+            description = "Wires the worker-kmp app plugin + the worker-compose-all bundle into a Compose Multiplatform module. Use on the module that hosts the consumer-facing workers + WorkScheduler."
+        }
+        // Supabase Config Plugin
+        register("supabaseConfig") {
+            id = "org.convention.kmp.supabase.config"
+            implementationClass = "SupabaseConfigConventionPlugin"
+            description = "Generates Supabase credentials from secrets file"
+        }
     }
 }

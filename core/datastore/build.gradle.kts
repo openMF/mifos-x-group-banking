@@ -11,13 +11,9 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.datastore"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    testOptions {
-        unitTests {
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isReturnDefaultValues = true
         }
     }

@@ -23,10 +23,13 @@ LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
 SYNC_DIRS=(
+    "cmp-android"
     "cmp-desktop"
+    "cmp-ios"
     "cmp-web"
     "cmp-shared"
     "core-base"
+    "core"          # framework-only: **/demo/** + the core/store seam are excluded by convention (is_excluded)
     "build-logic"
     "fastlane"
     "fastlane-config"
@@ -48,11 +51,26 @@ SYNC_FILES=(
 # type can be 'dir' or 'file'
 # Use "root" key for files in the root directory
 declare -A EXCLUSIONS=(
+    # Android — consumer-branded resources (drawables, strings, mipmaps), Firebase config,
+    # launcher icon, and the dependency-guard baseline directory are preserved across syncs.
+    ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
+    # iOS — consumer-branded asset catalog (app icon, color palette) preserved across syncs.
+    ["cmp-ios"]="iosApp/Assets.xcassets:dir Configuration/Config.xcconfig:file"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
     [".github"]="workflows/sync-dirs.yaml:file"
-    ["root"]="secrets.env:file"
+    # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
+    # Keystore DN now lives in gradle/fork.properties (non-secret, already synced
+    # via the fork.properties sync entry). Keystore passwords live in
+    # secrets/android/keystores/ per-value files (gitignored, not synced).
+    # DO NOT REMOVE — preserves consumer-specific flavor extensions across syncs.
+    # Each downstream consumer app (mifos-mobile, mifos-pay, mifos-x-field-officer-app,
+    # mifos-x-group-banking, mifos-x-open-banking, reels-downloader-new, ...) may
+    # create build-logic/convention/src/main/kotlin/local/LocalFlavors.kt to add
+    # their own flavors / dimensions / overrides on top of the synced base.
+    # See docs/architecture/FLAVORS_EXTENSION.md for the pattern.
+    ["build-logic"]="convention/src/main/kotlin/local:dir"
 )
 
 # Display help information
@@ -153,6 +171,19 @@ is_excluded() {
 
     # Remove ./ from the beginning of the path if it exists
     full_path="${full_path#./}"
+
+    # ── Convention exclusions (showcase-framework-separation) ───────────────
+    # core/ is synced framework-only. Never overwrite a fork's removed demo
+    # (**/demo/**) or the per-fork core/store seam files (D8). These are matched
+    # by convention (pattern), not the exact-path EXCLUSIONS map above.
+    case "$full_path" in
+        */demo/*)                       return 0 ;;  # demo showcase packages
+        */demo)                         return 0 ;;  # a demo/ dir itself
+        core/store/*AppScreenStateDefaults.kt) return 0 ;;  # fork seam (D8)
+        core/store/*AppErrorMapper.kt)         return 0 ;;
+        core/store/*AppStoreRegistry.kt)       return 0 ;;
+        core/store/*StoreModule.kt)            return 0 ;;
+    esac
 
     # Check for root-level exclusions
     if [ -n "${EXCLUSIONS["root"]}" ] && [[ "$check_type" == "file" ]]; then
@@ -532,12 +563,132 @@ for file in "${SYNC_FILES[@]}"; do
     sync_file "$file" "$TEMP_BRANCH"
 done
 
+# Self-heal libs.versions.toml — pull missing build-logic aliases from upstream.
+# `build-logic/` is sync'd but `gradle/libs.versions.toml` is consumer-local (it
+# carries project-specific package names + version overrides). When upstream adds
+# new `libs.<X>` accessors in build-logic with their matching catalog entries,
+# only the build-logic gets sync'd — the consumer's catalog falls behind and the
+# synced build-logic references aliases that don't exist locally. This function
+# detects that gap and pulls the missing alias entries (and their referenced
+# version keys) directly from the upstream catalog (`$TEMP_BRANCH`).
+heal_libs_versions_toml() {
+    local libs_toml="gradle/libs.versions.toml"
+
+    if [ ! -f "$libs_toml" ]; then
+        return 0
+    fi
+    if [ ! -d "build-logic" ]; then
+        return 0
+    fi
+
+    echo -e "\n${BLUE}${BOLD}Healing libs.versions.toml...${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+
+    local raw_refs
+    raw_refs=$(grep -rhoE '\blibs\.[a-zA-Z][a-zA-Z0-9._]*' \
+            --include='*.kt' --include='*.kts' \
+            build-logic 2>/dev/null \
+        | sed -E 's/^libs\.//' \
+        | sort -u)
+
+    # Method-call accessors are not alias references — they take string args.
+    local method_re='^(findLibrary|findVersion|findBundle|findPlugin)([(.]|$)'
+
+    # Cache upstream's catalog content once.
+    local upstream_toml
+    upstream_toml=$(git show "${TEMP_BRANCH}:${libs_toml}" 2>/dev/null || true)
+    if [ -z "$upstream_toml" ]; then
+        print_warning "Upstream has no ${libs_toml} — skipping heal."
+        return 0
+    fi
+
+    # Helper: insert a line right after [section] in the consumer's catalog.
+    insert_into_section() {
+        local section_name="$1"
+        local line="$2"
+        local line_no
+        line_no=$(grep -n "^\[${section_name}\]" "$libs_toml" | head -1 | cut -d: -f1)
+        if [ -z "$line_no" ]; then
+            print_warning "No [${section_name}] section header — skipping insert of '$line'"
+            return 1
+        fi
+        { head -n "$line_no" "$libs_toml"; echo "$line"; tail -n +$((line_no + 1)) "$libs_toml"; } > "${libs_toml}.tmp"
+        mv "${libs_toml}.tmp" "$libs_toml"
+    }
+
+    local healed=0
+    local warnings=0
+    while IFS= read -r ref; do
+        [ -z "$ref" ] && continue
+        [[ "$ref" =~ $method_re ]] && continue
+
+        local section="libraries"
+        local lookup="$ref"
+        case "$ref" in
+            plugins.*)
+                section="plugins"
+                lookup="${ref#plugins.}"
+                ;;
+            versions.*)
+                section="versions"
+                lookup="${ref#versions.}"
+                [ "$lookup" = "toml" ] && continue
+                ;;
+        esac
+        local key
+        key=$(echo "$lookup" | sed 's/\./-/g')
+
+        if grep -qE "^${key}[[:space:]]*=" "$libs_toml"; then
+            continue
+        fi
+
+        local upstream_line
+        upstream_line=$(echo "$upstream_toml" | grep -E "^${key}[[:space:]]*=" | head -1)
+        if [ -z "$upstream_line" ]; then
+            print_warning "Missing alias '$key' (for libs.$ref) not present in upstream catalog either — manual fix needed."
+            warnings=$((warnings + 1))
+            continue
+        fi
+
+        # Pull the version key too, if the alias version.refs something missing.
+        local ref_version
+        ref_version=$(echo "$upstream_line" | grep -oE 'version\.ref = "[^"]+"' | sed -E 's/version\.ref = "([^"]+)"/\1/' | head -1)
+        if [ -n "$ref_version" ] && ! grep -qE "^${ref_version}[[:space:]]*=" "$libs_toml"; then
+            local ver_line
+            ver_line=$(echo "$upstream_toml" | grep -E "^${ref_version}[[:space:]]*=" | head -1)
+            if [ -n "$ver_line" ]; then
+                if insert_into_section "versions" "$ver_line"; then
+                    echo -e "  ${GREEN}${CHECKMARK}${NC} Added version '${ref_version}' (referenced by '${key}') to [versions]"
+                    healed=$((healed + 1))
+                fi
+            fi
+        fi
+
+        if insert_into_section "$section" "$upstream_line"; then
+            echo -e "  ${GREEN}${CHECKMARK}${NC} Added '${key}' to [${section}] from upstream"
+            healed=$((healed + 1))
+        fi
+    done <<< "$raw_refs"
+
+    if [ $healed -gt 0 ]; then
+        echo -e "\n${GREEN}${BOLD}🩹 Healed ${healed} entries in ${libs_toml} — they will be included in the sync.${NC}"
+    elif [ $warnings -gt 0 ]; then
+        print_warning "${warnings} missing aliases could not be auto-healed (not in upstream either). Manual fix needed."
+    else
+        echo -e "  ${GREEN}${CHECKMARK}${NC} libs.versions.toml already in sync with build-logic — no heal needed."
+    fi
+}
+
 if [ "$DRY_RUN" = false ]; then
     # Restore root-level excluded files
     restore_root_files
 
     cleanup_temp_dirs
     rm -rf temp_files
+
+    # Self-heal the version catalog BEFORE we drop the temp branch (we need it
+    # to access upstream's libs.versions.toml).
+    heal_libs_versions_toml
 
     # Cleanup temporary branch
     print_step "Cleaning up temporary branch..."
@@ -548,11 +699,16 @@ if [ "$DRY_RUN" = false ]; then
     if ! git diff --quiet --exit-code --cached; then
         print_step "Committing changes..."
         git add "${SYNC_DIRS[@]}" "${SYNC_FILES[@]}"
+        # Include any catalog heal additions made by heal_libs_versions_toml.
+        if [ -f "gradle/libs.versions.toml" ]; then
+            git add "gradle/libs.versions.toml"
+        fi
         git commit -m "sync: Update directories and files from upstream
 
 This PR syncs the following items with upstream:
 - Directories: ${SYNC_DIRS[*]}
-- Files: ${SYNC_FILES[*]}" || handle_error "Failed to commit changes"
+- Files: ${SYNC_FILES[*]}
+- Auto-heal: gradle/libs.versions.toml (pulls missing build-logic aliases from upstream)" || handle_error "Failed to commit changes"
         show_progress
 
         if [ "$FORCE" = false ]; then

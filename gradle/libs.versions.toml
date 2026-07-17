@@ -1,128 +1,155 @@
 [versions]
+buildkonfig = "0.21.2"
+kmpProductFlavors = "2.8.3"
+
+# ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
+appId            = "org.mifos.groupbanking"
+appDisplayName   = "CommonPurse"
+baseNamespace    = "org.mifos"
+desktopAppName   = "Mifos - Money Toolkit"     # JVM package name, dock name
+projectName      = "mifos-x-group-banking"
+iosTeamId        = "XXXXXXXXXX"
+# ─────────────────────────────────────────────────────────────────────────────────────────────────
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "8.12.3"
-androidTools = "31.12.3"
+androidGradlePlugin = "9.2.1"
+androidTools = "32.2.1"
+compileSdk = "37"
+minSdk = "26"
+targetSdk = "37"
+javaVersion = "17"
+jvmToolchain = "21"
 
-commonsCodec = "1.20.0"
-firebaseBom = "34.7.0"
-firebaseCrashlyticsPlugin = "3.0.6"
+commonsCodec = "1.22.0"
+firebaseBom = "34.15.0"
+firebaseCrashlyticsPlugin = "3.0.7"
 firebasePerfPlugin = "2.0.2"
-androidxMacroBenchmark = "1.4.1"
-githubApi = "1.329"
+androidxMacroBenchmark = "1.5.0-alpha06"
+githubApi = "1.330"
 gmsPlugin = "4.4.4"
 
 # AndroidX Dependencies
 androidx-test-ext-junit = "1.3.0"
-androidxActivity = "1.12.2"
-androidxBrowser = "1.9.0"
-androidxComposeBom = "2025.12.01"
+androidxActivity = "1.13.0"
+androidxBrowser = "1.10.0"
+androidxComposeBom = "2026.06.01"
 androidxComposeCompiler = "1.5.15"
-androidxComposeRuntimeTracing = "1.10.0"
+androidxComposeRuntimeTracing = "1.11.0"
 androidxCoreSplashscreen = "1.2.0"
-androidxWork = "2.11.0"
+androidxWork = "2.11.2"
 androidxMetrics = "1.0.0"
 androidxProfileinstaller = "1.4.1"
 androidxTracing = "1.3.0"
 appcompatVersion = "1.7.1"
-calfPermissions = "0.8.0"
-coreKtxVersion = "1.17.0"
+calfPermissions = "0.12.0"
+coreKtxVersion = "1.19.0"
 
-jacksonCore = "2.19.2"
-junitJupiterApi = "5.13.4"
-junitPlatformLauncherVersion = "1.13.4"
-okhttp = "5.3.2"
-robolectric = "4.16"
-roborazzi = "1.52.0"
+jacksonCore = "2.22.0"
+junitJupiterApi = "5.14.4"
+junitPlatformLauncherVersion = "1.14.4"
+okhttp = "5.4.0"
+robolectric = "4.16.1"
+roborazzi = "1.67.0"
 
 # Testing Dependencies
 junitVersion = "4.13.2"
 truth = "1.4.5"
 
 # Security Dependencies
-androidxSecurityCrypto = "1.1.0-alpha06"
-bouncycastle = "1.78.1"
+androidxSecurityCrypto = "1.1.0"
+bouncycastle = "1.84"
 
 # Utility Dependencies
 dependencyGuard = "0.5.0"
-googleOss = "17.3.0"
-googleOssPlugin = "0.10.10"
+googleOss = "17.5.1"
+googleOssPlugin = "0.12.0"
 review = "2.0.2"
 appUpdate = "2.1.0"
 integrity = "1.6.0"
 
 # Static Analysis & Code Formatting
-ktlint = "12.1.1"
+ktlint = "14.2.0"
 detekt = "1.23.8"
-spotlessVersion = "7.0.2"
+spotlessVersion = "8.8.0"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
+# AGP 9 migration (agp9-migration-build-logic epic T2/T3):
+# Type-safe libs.* accessors in convention plugin source files.
+# Verify latest on plugins.gradle.org before bumping.
+typesafeConventions = "0.5.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.3.20"
-kotlinInject = "0.7.2"
-kotlinxCoroutines = "1.10.2"
-kotlinxDatetime = "0.7.1"
-kotlinxImmutable = "0.4.0"
-kotlinxSerializationJson = "1.9.0"
-ksp = "2.3.6"
+kotlin = "2.4.0"
+kover = "0.9.8"
+kotlinInject = "0.9.0"
+kotlinxBrowser = "0.5.0"
+kotlinxCoroutines = "1.11.0"
+kotlinxDatetime = "0.8.0"
+kotlinxImmutable = "0.5.1"
+kotlinxSerializationJson = "1.11.0"
+ksp = "2.3.9"
 
 # Ktor & Ktorfit
-ktorVersion = "3.3.3"
-ktorfit = "2.7.3"
+ktorVersion = "3.5.1"
+ktorfit = "2.7.5"
+
+# Supabase
+supabase = "3.6.0"
 
 # Koin CMP Dependencies
-koin = "4.1.1"
-koinAnnotationsVersion = "2.1.0"
+koin = "4.2.2"
+koinAnnotationsVersion = "4.2.2"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.2.3"
+kmptoolkit = "3.5.3"
 
 # CMP Libraries
-compose-plugin = "1.10.3"
-coil = "3.3.0"
+compose-plugin = "1.11.1"
+coil = "3.5.0"
 backHandlerVersion = "2.5.0"
-constraintLayout = "0.6.0"
+constraintLayout = "0.8.0"
 multiplatformSettings = "1.3.0"
-mokoPermission = "0.19.1"
-qroseVersion = "1.0.1"
-okioVersion = "3.16.4"
-kermit = "2.0.8"
-fileKit = "0.12.0"
-uiBackhandler = "1.10.3"
-wire = "5.4.0"
-compottie = "2.0.0-rc04"
+mokoPermission = "0.20.1"
+qroseVersion = "1.1.2"
+okioVersion = "3.17.0"
+kermit = "2.1.0"
+fileKit = "0.14.2"
+uiBackhandler = "1.11.1"
+wire = "6.2.0"
+compottie = "2.2.4"
 
 # Jetbrains CMP
-windowsSizeClass = "0.5.0"
-composeJB = "1.10.3"
-composeLifecycle = "2.9.6"
-composeNavigation = "2.9.1"
+composeJB = "1.11.1"
+composeLifecycle = "2.11.0-beta01"
+composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
-material3adaptive = "1.1.2"
+material3adaptive = "1.2.0"
 gitLive = "2.4.0"
-aboutLibraries = "13.2.1"
+aboutLibraries = "15.0.3"
 
 # Desktop Version
-desktopPackageName = "CommonPurseDesktop"
-desktopPackageNamespace = "org.mifos.groupbanking"
 desktopPackageVersion = "1.0.0"
-
-# Android Version
-androidPackageNamespace = "org.mifos.groupbanking"
 
 # Store 5
 store = "5.1.0-alpha08"
 
 #Room 3
-room = "3.0.0-alpha03"
-sqliteBundled = "2.6.2"
-sqliteWeb = "2.6.2"
+room = "3.0.0"
+sqliteBundled = "2.7.0"
+sqliteWeb = "2.7.0"
+
+# worker-kmp — single-API background + foreground worker scheduling across
+# Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.
+# Pin tracks last published release on Maven Central.
+worker-version = "4.0.4"
+# KMPNotifier — Kotlin Multiplatform local + push notifications (Android/iOS/Desktop/Web).
+kmpnotifier = "2.0.0"
 
 [libraries]
+kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
@@ -192,6 +219,7 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 platform-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatformLauncherVersion" }
 spotless-gradle = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotlessVersion" }
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+kover-gradlePlugin = { group = "org.jetbrains.kotlinx", name = "kover-gradle-plugin", version.ref = "kover" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 twitter-detekt-compose = { group = "com.twitter.compose.rules", name = "detekt", version.ref = "twitter-detekt-compose" }
 
@@ -254,6 +282,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", v
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 
+kotlinx-browser = { group = "org.jetbrains.kotlinx", name = "kotlinx-browser", version.ref = "kotlinxBrowser" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
@@ -276,6 +305,7 @@ ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.r
 ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktorVersion" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktorVersion" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktorVersion" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktorVersion" }
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktorVersion" }
 ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktorVersion" }
 ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version.ref = "ktorVersion" }
@@ -285,6 +315,8 @@ ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref =
 ktorfit-ksp = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-ksp", version.ref = "ktorfit" }
 ktorfit-converters-flow = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-converters-flow", version.ref = "ktorfit" }
 ktorfit-lib = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-lib", version.ref = "ktorfit" }
+
+supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgrest-kt", version.ref = "supabase" }
 
 coil-core = { group = "io.coil-kt.coil3", name = "coil-core", version.ref = "coil" }
 coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
@@ -324,9 +356,10 @@ moko-permission = { group = "dev.icerock.moko", name = "permissions", version.re
 moko-permission-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "mokoPermission" }
 
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
-window-size = { group = "dev.chrisbanes.material3", name = "material3-window-size-class-multiplatform", version.ref = "windowsSizeClass" }
 
 
+cmp-intent-launcher = { module = "io.github.mobilebytelabs:cmp-intent-launcher", version.ref = "kmptoolkit" }
+cmp-share = { module = "io.github.mobilebytelabs:cmp-share", version.ref = "kmptoolkit" }
 cmp-network-monitor = { module = "io.github.mobilebytelabs:cmp-network-monitor", version.ref = "kmptoolkit" }
 cmp-network-monitor-compose = { module = "io.github.mobilebytelabs:cmp-network-monitor-compose", version.ref = "kmptoolkit" }
 
@@ -351,6 +384,16 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
+# worker-kmp
+worker-kmp         = { module = "io.github.mobilebytelabs:worker-kmp",         version.ref = "worker-version" }
+worker-compose-all = { module = "io.github.mobilebytelabs:worker-compose-all", version.ref = "worker-version" }
+worker-app-plugin  = { module = "io.github.mobilebytelabs:worker-app-plugin",  version.ref = "worker-version" }
+worker-android     = { module = "io.github.mobilebytelabs:worker-android",     version.ref = "worker-version" }
+worker-koin        = { module = "io.github.mobilebytelabs:worker-koin",        version.ref = "worker-version" }
+worker-sync        = { module = "io.github.mobilebytelabs:worker-sync",        version.ref = "worker-version" }
+worker-app-annotations = { module = "io.github.mobilebytelabs:worker-app-annotations", version.ref = "worker-version" }
+kmpnotifier-local  = { module = "io.github.mirzemehdi:kmpnotifier-local",       version.ref = "kmpnotifier" }
+
 [bundles]
 androidx-compose-ui-test = [
     "androidx-compose-ui-test",
@@ -358,16 +401,24 @@ androidx-compose-ui-test = [
 ]
 
 [plugins]
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
+kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
 # Android & Kotlin Plugins
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+# AGP 9 unified KMP+Android plugin — used by KMPLibraryConventionPlugin + KMPCoreBaseLibraryConventionPlugin
+android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
+# AGP 9 migration (T3): type-safe libs.* accessors in convention plugin source files.
+# When activated, convention plugins switch from libs.findVersion("compileSdk").get().requiredVersion
+# to the type-safe libs.versions.compileSdk.get() form.
+typesafe-conventions = { id = "dev.panuszewski.typesafe-conventions", version.ref = "typesafeConventions" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 
-android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
-android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
-android-application-flavors-convention = { id = "org.convention.android.application.flavors", version = "unspecified" }
+android-application-convention = { id = "org.convention.android.application" }
+android-application-compose-convention = { id = "org.convention.android.application.compose" }
 
 # KMP & CMP Plugins
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -376,6 +427,8 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+kover-convention = { id = "org.convention.kover.plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
@@ -386,20 +439,20 @@ roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 
-cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
-kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
-kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
-kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library", version = "unspecified" }
+cmp-feature-convention = { id = "org.convention.cmp.feature" }
+kmp-koin-convention = { id = "org.convention.kmp.koin" }
+kmp-library-convention = { id = "org.convention.kmp.library" }
+kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library" }
 
 android-application-firebase = { id = "org.convention.android.application.firebase" }
 android-lint = { id = "org.convention.android.application.lint" }
 
 # Utility Plugins
-detekt-convention = { id = "org.convention.detekt.plugin", version = "unspecified" }
-git-hooks-convention = { id = "org.convention.git.hooks", version = "unspecified" }
-ktlint-convention = { id = "org.convention.ktlint.plugin", version = "unspecified" }
-spotless-convention = { id = "org.convention.spotless.plugin", version = "unspecified" }
-keystore-management = { id = "org.convention.keystore.management", version = "unspecified" }
+detekt-convention = { id = "org.convention.detekt.plugin" }
+git-hooks-convention = { id = "org.convention.git.hooks" }
+ktlint-convention = { id = "org.convention.ktlint.plugin" }
+spotless-convention = { id = "org.convention.spotless.plugin" }
+keystore-management = { id = "org.convention.keystore.management" }
 
 dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
 moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }
@@ -409,4 +462,12 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 
 #Room 3 Plugin
 room = { id = "androidx.room3", version.ref = "room" }
-mifos-kmp-room = { id = "mifos.kmp.room", version = "unspecified" }
+mifos-kmp-room = { id = "mifos.kmp.room" }
+
+# worker-kmp — apply `id("io.github.mobilebytelabs.worker-app")` to a CMP module
+# to codegen per-platform launchers (Android Application/Activity, iOS
+# MainViewController + xcodegen, JVM main, wasmJs main + index.html).
+worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }
+
+# Supabase Config Plugin
+kmp-supabase-config = { id = "org.convention.kmp.supabase.config" }

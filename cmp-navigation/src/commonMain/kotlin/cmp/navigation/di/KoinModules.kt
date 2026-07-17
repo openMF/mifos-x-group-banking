@@ -12,25 +12,23 @@ package cmp.navigation.di
 import cmp.navigation.AppViewModel
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
 import cmp.navigation.rootnav.RootNavViewModel
+import kpt.core.base.analytics.di.analyticsModule
+import kpt.core.base.common.di.CommonModule
+import kpt.core.base.platform.di.platformModule
+import kpt.core.base.security.di.SecurityModule
+import kpt.core.data.di.DataModule
+import kpt.core.database.di.DatabaseModule
+import kpt.core.datastore.di.DatastoreModule
+import kpt.core.store.di.appStoreModule
+import kpt.feature.home.di.HomeModule
+import kpt.feature.settings.SettingsModule
+import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.mifos.groupbanking.core.data.di.DataModule
-import org.mifos.groupbanking.core.database.di.DatabaseModule
-import org.mifos.groupbanking.core.datastore.di.DatastoreModule
-import org.mifos.groupbanking.feature.crypto.di.CryptoModule
-import org.mifos.groupbanking.feature.currencyrates.di.CurrencyRatesModule
-import org.mifos.groupbanking.feature.emicalculator.di.EmiCalculatorModule
-import org.mifos.groupbanking.feature.home.di.HomeModule
-import org.mifos.groupbanking.groupbanking.feature.loginsignup.di.LoginSignupModule
-import org.mifos.groupbanking.feature.settings.SettingsModule
-import template.core.base.analytics.di.analyticsModule
-import template.core.base.common.di.CommonModule
-import template.core.base.platform.di.platformModule
-import template.core.base.security.di.SecurityModule
 
 object KoinModules {
     private val dataModule = module {
-        includes(DataModule)
+        includes(DataModule, appStoreModule)
     }
 
     private val dispatcherModule = module {
@@ -47,11 +45,8 @@ object KoinModules {
 
     private val featureModule = module {
         includes(
-            CryptoModule,
-            CurrencyRatesModule,
-            EmiCalculatorModule,
+            // shell (framework) — kept
             HomeModule,
-            LoginSignupModule,
             SettingsModule,
         )
     }
@@ -65,5 +60,6 @@ object KoinModules {
         DatastoreModule,
         featureModule,
         AppModule,
+        SyncModule,
     )
 }

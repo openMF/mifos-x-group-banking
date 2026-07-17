@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.domain"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

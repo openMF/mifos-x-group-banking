@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.core.analytics"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -24,6 +20,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(libs.cmp.network.monitor)
         }
     }
 }

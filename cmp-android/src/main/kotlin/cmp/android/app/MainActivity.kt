@@ -23,14 +23,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.lifecycleTracker
+import kpt.core.base.platform.update.AppUpdateManager
+import kpt.core.base.platform.update.AppUpdateManagerImpl
+import kpt.core.base.ui.util.ShareUtils
+import kpt.core.data.infra.NetworkMonitor
+import kpt.core.data.user.UserDataRepository
 import org.koin.android.ext.android.inject
-import org.mifos.groupbanking.groupbanking.core.data.repository.NetworkMonitor
-import org.mifos.groupbanking.groupbanking.core.data.repository.UserDataRepository
-import template.core.base.analytics.AnalyticsHelper
-import template.core.base.analytics.lifecycleTracker
-import template.core.base.platform.update.AppUpdateManager
-import template.core.base.platform.update.AppUpdateManagerImpl
-import template.core.base.ui.ShareUtils
+import org.mifos.kmp.template.BuildConfig
 import java.util.Locale
 
 /**
@@ -130,7 +131,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateScreenCapture(isScreenCaptureAllowed: Boolean) {
-        if (isScreenCaptureAllowed) {
+        // Debug builds always allow screen capture so QA / device-test tooling (adb
+        // screencap, screen recordings, Android Studio Profiler captures) work without
+        // toggling the user-facing "Allow screen capture" preference. Release builds
+        // honor the user preference — FLAG_SECURE is on by default for production
+        // because this is a fintech app (loan balances, EMI amounts, account names).
+        val allow = isScreenCaptureAllowed || BuildConfig.DEBUG
+        if (allow) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         } else {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)

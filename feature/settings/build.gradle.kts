@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.cmp.feature.convention)
 }
 
-android {
-    namespace = "org.mifos.groupbanking.feature.settings"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -33,6 +29,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.groupbanking.feature.settings.generated.resources"
+        packageOfResClass = "kpt.feature.settings.generated.resources"
     }
 }

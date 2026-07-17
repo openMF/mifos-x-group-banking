@@ -32,12 +32,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,13 +45,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import org.mifos.groupbanking.core.ui.bottombar.KptBottomBar
-import org.mifos.groupbanking.core.ui.bottombar.KptNavigationRail
-import org.mifos.groupbanking.core.ui.scaffold.KptPullToRefreshState
-import org.mifos.groupbanking.core.ui.scaffold.rememberKptPullToRefreshState
-import template.core.base.designsystem.theme.KptTheme
+import kpt.core.base.designsystem.theme.KptTheme
+import kpt.core.ui.bottombar.KptBottomBar
+import kpt.core.ui.bottombar.KptNavigationRail
+import kpt.core.ui.scaffold.KptPullToRefreshState
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongMethod")
 @Composable
 fun KptRootScaffold(
@@ -71,8 +71,9 @@ fun KptRootScaffold(
         .only(WindowInsetsSides.Horizontal),
     content: @Composable () -> Unit,
 ) {
-    val windowSize = calculateWindowSizeClass()
-    val isCompact = windowSize.widthSizeClass == WindowWidthSizeClass.Compact
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val isCompact = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo) ==
+        NavigationSuiteType.NavigationBar
     val hasNavigationItems = navigationData?.shouldShowNavigation == true
     val isNavigationRailVisible = !isCompact && hasNavigationItems
     val isNavigationBarVisible = isCompact && hasNavigationItems
@@ -156,10 +157,7 @@ fun KptRootScaffold(
 }
 
 @Composable
-private fun ScaffoldBottomAppBar(
-    navigationData: ScaffoldNavigationData,
-    modifier: Modifier = Modifier,
-) {
+private fun ScaffoldBottomAppBar(navigationData: ScaffoldNavigationData, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth()) {
         KptBottomBar(
             navigationItems = navigationData.navigationItems,
@@ -173,10 +171,7 @@ private fun ScaffoldBottomAppBar(
 }
 
 @Composable
-private fun ScaffoldNavigationRail(
-    navigationData: ScaffoldNavigationData,
-    modifier: Modifier = Modifier,
-) {
+private fun ScaffoldNavigationRail(navigationData: ScaffoldNavigationData, modifier: Modifier = Modifier) {
     // We set the z-index to 1f in order to make sure the content transitions
     // animate in under the navigation rail.
     Box(

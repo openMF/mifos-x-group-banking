@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
 }
 
-android {
-    namespace = "template.core.base.network"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -26,6 +22,7 @@ kotlin {
             api(libs.ktorfit.lib)
             api(libs.kermit.logging)
             implementation(projects.coreBase.security)
+            api(libs.supabase.postgrest)
         }
 
         androidMain.dependencies {
