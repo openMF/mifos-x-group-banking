@@ -2,298 +2,8 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "1da3c11293f0a6d57b506b9caaf1a86f",
+    "identityHash": "89c1f8b1c73a05e82ac9ae6741722c6e",
     "entities": [
-      {
-        "tableName": "samples",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "exchange_rates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`baseCurrency` TEXT NOT NULL, `date` TEXT NOT NULL, `ratesJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`baseCurrency`))",
-        "fields": [
-          {
-            "fieldPath": "baseCurrency",
-            "columnName": "baseCurrency",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "date",
-            "columnName": "date",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "ratesJson",
-            "columnName": "ratesJson",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fetchedAt",
-            "columnName": "fetchedAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "baseCurrency"
-          ]
-        }
-      },
-      {
-        "tableName": "coin_markets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL, `name` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `currentPrice` REAL NOT NULL, `marketCap` INTEGER NOT NULL, `marketCapRank` INTEGER NOT NULL, `priceChangePercent24h` REAL NOT NULL, `high24h` REAL NOT NULL, `low24h` REAL NOT NULL, `page` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "symbol",
-            "columnName": "symbol",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "imageUrl",
-            "columnName": "imageUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "currentPrice",
-            "columnName": "currentPrice",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "marketCap",
-            "columnName": "marketCap",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "marketCapRank",
-            "columnName": "marketCapRank",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "priceChangePercent24h",
-            "columnName": "priceChangePercent24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "high24h",
-            "columnName": "high24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "low24h",
-            "columnName": "low24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "page",
-            "columnName": "page",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fetchedAt",
-            "columnName": "fetchedAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "coin_detail",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `currentPrice` REAL NOT NULL, `marketCap` INTEGER NOT NULL, `marketCapRank` INTEGER NOT NULL, `priceChangePercent24h` REAL NOT NULL, `high24h` REAL NOT NULL, `low24h` REAL NOT NULL, `circulatingSupply` REAL NOT NULL, `maxSupply` REAL, `description` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "symbol",
-            "columnName": "symbol",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "imageUrl",
-            "columnName": "imageUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "currentPrice",
-            "columnName": "currentPrice",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "marketCap",
-            "columnName": "marketCap",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "marketCapRank",
-            "columnName": "marketCapRank",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "priceChangePercent24h",
-            "columnName": "priceChangePercent24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "high24h",
-            "columnName": "high24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "low24h",
-            "columnName": "low24h",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "circulatingSupply",
-            "columnName": "circulatingSupply",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "maxSupply",
-            "columnName": "maxSupply",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fetchedAt",
-            "columnName": "fetchedAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "rate_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fromCurrency` TEXT NOT NULL, `toCurrency` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, `ratesJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`fromCurrency`, `toCurrency`, `startDate`, `endDate`))",
-        "fields": [
-          {
-            "fieldPath": "fromCurrency",
-            "columnName": "fromCurrency",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "toCurrency",
-            "columnName": "toCurrency",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "startDate",
-            "columnName": "startDate",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "endDate",
-            "columnName": "endDate",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "ratesJson",
-            "columnName": "ratesJson",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fetchedAt",
-            "columnName": "fetchedAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "fromCurrency",
-            "toCurrency",
-            "startDate",
-            "endDate"
-          ]
-        }
-      },
       {
         "tableName": "store_bookkeeper",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `lastFailedSync` INTEGER NOT NULL, PRIMARY KEY(`key`))",
@@ -341,11 +51,371 @@
             "storeKey"
           ]
         }
+      },
+      {
+        "tableName": "framework_submit_drafts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `formKey` TEXT NOT NULL, `uniqueKey` TEXT, `payloadJson` TEXT NOT NULL, `status` TEXT NOT NULL, `createdAtMs` INTEGER NOT NULL, `updatedAtMs` INTEGER NOT NULL, `errorMessage` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formKey",
+            "columnName": "formKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uniqueKey",
+            "columnName": "uniqueKey",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payloadJson",
+            "columnName": "payloadJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtMs",
+            "columnName": "createdAtMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtMs",
+            "columnName": "updatedAtMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "errorMessage",
+            "columnName": "errorMessage",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "group_type_config",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`typeSlug` TEXT NOT NULL, `displayName` TEXT NOT NULL, `tagline` TEXT NOT NULL, `savingsMechanism` TEXT NOT NULL, `contributionMode` TEXT NOT NULL, `lendingEnabled` INTEGER NOT NULL, `hasSocialFund` INTEGER NOT NULL, `hasBankLinkage` INTEGER NOT NULL, `welfareOnlyMode` INTEGER NOT NULL, `formallyRegistered` INTEGER NOT NULL, `defaultLoanMultiplier` REAL NOT NULL, `defaultInterestRatePct` REAL NOT NULL, `defaultCycleLengthMonths` INTEGER NOT NULL, `maxMembers` INTEGER NOT NULL, `minMembers` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`typeSlug`))",
+        "fields": [
+          {
+            "fieldPath": "typeSlug",
+            "columnName": "typeSlug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tagline",
+            "columnName": "tagline",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "savingsMechanism",
+            "columnName": "savingsMechanism",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contributionMode",
+            "columnName": "contributionMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lendingEnabled",
+            "columnName": "lendingEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasSocialFund",
+            "columnName": "hasSocialFund",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasBankLinkage",
+            "columnName": "hasBankLinkage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "welfareOnlyMode",
+            "columnName": "welfareOnlyMode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formallyRegistered",
+            "columnName": "formallyRegistered",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultLoanMultiplier",
+            "columnName": "defaultLoanMultiplier",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultInterestRatePct",
+            "columnName": "defaultInterestRatePct",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultCycleLengthMonths",
+            "columnName": "defaultCycleLengthMonths",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxMembers",
+            "columnName": "maxMembers",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minMembers",
+            "columnName": "minMembers",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "typeSlug"
+          ]
+        }
+      },
+      {
+        "tableName": "group_list_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `rowOrder` INTEGER NOT NULL, `name` TEXT NOT NULL, `groupType` TEXT NOT NULL, `viewerRole` TEXT NOT NULL, `cycleNumber` INTEGER NOT NULL, `memberCount` INTEGER NOT NULL, `lastMeetingDate` TEXT NOT NULL, `overdueRate` REAL NOT NULL, `status` TEXT NOT NULL, `fineractCenterId` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`groupId`))",
+        "fields": [
+          {
+            "fieldPath": "groupId",
+            "columnName": "groupId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageIndex",
+            "columnName": "pageIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowOrder",
+            "columnName": "rowOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupType",
+            "columnName": "groupType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "viewerRole",
+            "columnName": "viewerRole",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cycleNumber",
+            "columnName": "cycleNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberCount",
+            "columnName": "memberCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastMeetingDate",
+            "columnName": "lastMeetingDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "overdueRate",
+            "columnName": "overdueRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fineractCenterId",
+            "columnName": "fineractCenterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "groupId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_group_list_cache_pageIndex",
+            "unique": false,
+            "columnNames": [
+              "pageIndex"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_group_list_cache_pageIndex` ON `${TABLE_NAME}` (`pageIndex`)"
+          }
+        ]
+      },
+      {
+        "tableName": "member_dashboard_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cacheKey` TEXT NOT NULL, `memberName` TEXT NOT NULL, `selectedGroupId` TEXT NOT NULL, `selectedGroupName` TEXT NOT NULL, `selectedGroupPoolModel` TEXT NOT NULL, `poolModel` TEXT NOT NULL, `groupLinkedSavingsBalance` REAL NOT NULL, `individualSavingsBalance` REAL NOT NULL, `shareOutProjection` REAL, `rotationPosition` INTEGER, `nextRecipientEta` TEXT, `myGroupsJson` TEXT NOT NULL, `recentTransactionsJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))",
+        "fields": [
+          {
+            "fieldPath": "cacheKey",
+            "columnName": "cacheKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberName",
+            "columnName": "memberName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedGroupId",
+            "columnName": "selectedGroupId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedGroupName",
+            "columnName": "selectedGroupName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedGroupPoolModel",
+            "columnName": "selectedGroupPoolModel",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poolModel",
+            "columnName": "poolModel",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupLinkedSavingsBalance",
+            "columnName": "groupLinkedSavingsBalance",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "individualSavingsBalance",
+            "columnName": "individualSavingsBalance",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shareOutProjection",
+            "columnName": "shareOutProjection",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "rotationPosition",
+            "columnName": "rotationPosition",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nextRecipientEta",
+            "columnName": "nextRecipientEta",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "myGroupsJson",
+            "columnName": "myGroupsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recentTransactionsJson",
+            "columnName": "recentTransactionsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "cacheKey"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1da3c11293f0a6d57b506b9caaf1a86f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '89c1f8b1c73a05e82ac9ae6741722c6e')"
     ]
   }
 }

@@ -37,6 +37,10 @@ mappers in `core/network/mapper`.
 | `JoinGroupResult` | `Invitation.kt` | data class — COMP-GRP-003 associate-clients result |
 | `InvitationAcceptance` | `Invitation.kt` | data class — COMP-DT-004 mark-accepted input |
 | `InvitationAcceptanceResult` | `Invitation.kt` | data class — COMP-DT-004 mark-accepted result |
+| `MemberDashboard` | `MemberDashboard.kt` | data class — personal-dashboard member home screen (companion `GET /companion/member/dashboard`) |
+| `GroupSummary` | `MemberDashboard.kt` | data class — lightweight per-group summary row; reuses `SavingsMechanism` |
+| `SavingsTransaction` | `SavingsTransaction.kt` | data class — CANONICAL compact recent-activity row (personal-dashboard); see registry/naming-collision note in `core/network/model/API.md` |
+| `TransactionType` | `SavingsTransaction.kt` | enum (`DEPOSIT`, `WITHDRAWAL`, `UNKNOWN`) |
 
 ## 3. Consumers
 
@@ -45,7 +49,9 @@ mappers in `core/network/mapper`.
 - Repositories (`core/data` — `AuthRepositoryImpl` / `GroupRepositoryImpl` map
   `core/network/model` DTOs through `core/network/mapper` into these domain
   types before returning them; the join-with-code repository maps
-  `JoinWithCodeMappers.kt` output the same way)
+  `JoinWithCodeMappers.kt` output the same way; the personal-dashboard
+  repository maps `MemberDashboardMappers.kt` / `SavingsTransactionMappers.kt`
+  output the same way)
 
 ## 4. Boundaries
 
@@ -129,6 +135,23 @@ mappers in `core/network/mapper`.
 | `InvitationAcceptance` | `acceptedAt` | `Instant` | non-null |
 | `InvitationAcceptanceResult` | `resourceId` | `Long` | non-null |
 | `InvitationAcceptanceResult` | `acceptedAt` | `Instant` | non-null |
+| `MemberDashboard` | `memberName` | `String` | non-null |
+| `MemberDashboard` | `myGroups` | `List<GroupSummary>` | non-null (may be empty) |
+| `MemberDashboard` | `selectedGroup` | `GroupSummary` | non-null |
+| `MemberDashboard` | `poolModel` | `SavingsMechanism` | non-null |
+| `MemberDashboard` | `groupLinkedSavingsBalance` | `Double` | non-null |
+| `MemberDashboard` | `individualSavingsBalance` | `Double` | non-null |
+| `MemberDashboard` | `shareOutProjection` | `Double?` | nullable (ACCUMULATING pool models only) |
+| `MemberDashboard` | `rotationPosition` | `Int?` | nullable (ROTATING_PAYOUT pool models only) |
+| `MemberDashboard` | `nextRecipientEta` | `String?` | nullable (ROTATING_PAYOUT pool models only) |
+| `MemberDashboard` | `recentTransactions` | `List<SavingsTransaction>` | non-null (may be empty) |
+| `GroupSummary` | `groupId` | `String` | non-null |
+| `GroupSummary` | `name` | `String` | non-null |
+| `GroupSummary` | `poolModel` | `SavingsMechanism` | non-null |
+| `SavingsTransaction` | `id` | `String` | non-null |
+| `SavingsTransaction` | `date` | `LocalDate` | non-null |
+| `SavingsTransaction` | `type` | `TransactionType` | non-null |
+| `SavingsTransaction` | `amount` | `Double` | non-null |
 
 ## 6. Errors
 
@@ -142,9 +165,10 @@ malformed `tokenExpiresAt` ISO-8601 string, or `Group.lastMeetingDate`'s
 Domain models are pure data classes exercised indirectly via the mapper test
 suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
 `GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
-`JoinWithCodeMappersTest.kt`), which assert every field is mapped and equality
-holds end to end. `HealthIndicator.fromOverdueRate` additionally has direct
-boundary-value tests in `GroupMappersTest.kt`; `Invitation.isExpired` /
+`JoinWithCodeMappersTest.kt`, `MemberDashboardMappersTest.kt`,
+`SavingsTransactionMappersTest.kt`), which assert every field is mapped and
+equality holds end to end. `HealthIndicator.fromOverdueRate` additionally has
+direct boundary-value tests in `GroupMappersTest.kt`; `Invitation.isExpired` /
 `isAlreadyUsed` have direct boundary-value tests in `JoinWithCodeMappersTest.kt`
 (before-expiry / at-exact-expiry / after-expiry, plus null-vs-non-null
 `acceptedAt`).
@@ -153,12 +177,19 @@ boundary-value tests in `GroupMappersTest.kt`; `Invitation.isExpired` /
 
 Never log `LoginCredentials.password` or `AuthSession.sessionToken` — both
 carry sensitive auth material. `Invitation.invitedEmailPhone` carries PII —
-avoid logging it.
+avoid logging it. `MemberDashboard` / `GroupSummary` / `SavingsTransaction`
+carry no sensitive fields (balances are not PII by this project's threat
+model, but avoid logging full transaction history in bulk).
 
 ## 9. Evolution
 
 New auth-related domain concepts are added to `AuthModels.kt`; unrelated
 feature domains get their own `{Feature}.kt` file in this module (one file
 per feature, per `kmp-dto-gen`'s Step 3 convention). Join-with-code's domain
-concepts live in `Invitation.kt`.
+concepts live in `Invitation.kt`. Personal-dashboard's domain concepts live in
+`MemberDashboard.kt` (`MemberDashboard` + `GroupSummary`); the CANONICAL
+compact `SavingsTransaction` shape lives in its own `SavingsTransaction.kt`
+file since it is explicitly intended for reuse across multiple features
+(personal-dashboard today; personal-savings/savings-dashboard pending the
+naming-collision resolution flagged in `core/network/model/API.md`).
 <!-- kmp-dto-gen:END -->

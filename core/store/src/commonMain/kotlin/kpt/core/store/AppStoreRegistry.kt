@@ -49,6 +49,9 @@ object AppStoreRegistry : StoreRegistry() {
     // REGISTRY:GroupList — group-list paginated store (PAGINATED NETWORK_WITH_CACHE, COMP-GRP-001)
     val GroupList = store("groupList")
 
+    // REGISTRY:MemberDashboard — personal-dashboard member home (dynamic-key NETWORK_WITH_CACHE, COMP-DASH-001)
+    val MemberDashboard = store("memberDashboard")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
@@ -58,6 +61,10 @@ object AppStoreRegistry : StoreRegistry() {
         // REGISTRY:GroupList — 5m matches data-flow.yaml ttl_seconds:300 (stale-while-revalidate);
         // group membership + health rotate frequently, so a short TTL revalidates aggressively.
         val GROUP_LIST: Duration = 5.minutes
+
+        // REGISTRY:MemberDashboard — 5m matches data-flow.yaml ttl_seconds:300 (stale-while-revalidate);
+        // per-group dashboard balances + recent activity rotate frequently.
+        val MEMBER_DASHBOARD: Duration = 5.minutes
     }
 
     /**
@@ -70,5 +77,7 @@ object AppStoreRegistry : StoreRegistry() {
         "groupTypeConfig" to Ttl.GROUP_TYPE_CONFIG,
         // REGISTRY:GroupList
         "groupList" to Ttl.GROUP_LIST,
+        // REGISTRY:MemberDashboard
+        "memberDashboard" to Ttl.MEMBER_DASHBOARD,
     )
 }

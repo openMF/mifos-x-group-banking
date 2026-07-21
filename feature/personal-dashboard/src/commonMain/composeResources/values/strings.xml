@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_personal_dashboard_greeting_morning">Good morning, %1$s</string>
+    <string name="screens_personal_dashboard_greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="screens_personal_dashboard_greeting_evening">Good evening, %1$s</string>
+    <string name="screens_personal_dashboard_notification_icon_cd">Notifications</string>
+
+    <string name="screens_personal_dashboard_currency_kes">KES</string>
+    <string name="screens_personal_dashboard_no_group_label">No group yet</string>
+
+    <string name="screens_personal_dashboard_card_cd">View personal savings</string>
+    <string name="screens_personal_dashboard_total_savings_label">Total Savings</string>
+    <string name="screens_personal_dashboard_amount_kes">KES %1$s</string>
+    <string name="screens_personal_dashboard_group_linked_amount">Group-linked: KES %1$s</string>
+    <string name="screens_personal_dashboard_individual_amount">Individual: KES %1$s</string>
+
+    <string name="screens_personal_dashboard_shareout_label">Projected Share-Out</string>
+    <string name="screens_personal_dashboard_rotation_position_label">Your Rotation Position</string>
+    <string name="screens_personal_dashboard_rotation_position">#%1$d in queue</string>
+    <string name="screens_personal_dashboard_next_recipient_eta">Your turn: ~%1$s</string>
+
+    <string name="screens_personal_dashboard_recent_activity_title">Recent Activity</string>
+    <string name="screens_personal_dashboard_transaction_deposit_amount">+ KES %1$s</string>
+    <string name="screens_personal_dashboard_transaction_withdrawal_amount">- KES %1$s</string>
+
+    <string name="screens_personal_dashboard_empty_icon_cd">No groups</string>
+    <string name="screens_personal_dashboard_empty_title">Welcome! You haven\'t joined a group yet</string>
+    <string name="screens_personal_dashboard_empty_body">Join an existing savings group or create your own to start saving together.</string>
+
+    <string name="screens_personal_dashboard_error_icon_cd">Error</string>
+    <string name="screens_personal_dashboard_error_title">Could not load dashboard</string>
+    <string name="screens_personal_dashboard_error_subtitle">Check your internet connection and try again.</string>
+    <string name="screens_personal_dashboard_retry_action">Try Again</string>
+</resources>

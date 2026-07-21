@@ -28,11 +28,17 @@
 | `MarkAcceptedRequestDto` | `accepted_at` | required | `PUT /companion/datatables/invitations/{entityId}/{rowId}` (COMP-DT-004) request; snake_case (raw datatable column) |
 | `MarkAcceptedResponseDto` | `resourceId`, `changes` (nested `MarkAcceptedChangesDto`) | all required | response of the mark-accepted `PUT` |
 | `MarkAcceptedChangesDto` | `accepted_at` | required | nested in `MarkAcceptedResponseDto.changes`; snake_case, echoes the updated datatable column |
+| `MemberDashboardResponseDto` | `memberName`, `myGroups` (default `[]`), `selectedGroup`, `poolModel` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `groupLinkedSavingsBalance`, `individualSavingsBalance`, `shareOutProjection` (nullable, default `null`), `rotationPosition` (nullable, default `null`), `nextRecipientEta` (nullable, default `null`), `recentTransactions` (default `[]`) | 3 nullable fields default `null`; `myGroups`/`recentTransactions` default empty; `poolModel` defaults `UNKNOWN`; rest required | `GET /companion/member/dashboard` — unified-identity companion API, no `clientId`/`selfServiceToken` |
+| `GroupSummaryDto` | `groupId`, `name`, `poolModel` (default `UNKNOWN`, reuses `SavingsMechanismDto`) | `poolModel` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.myGroups` / `.selectedGroup` |
+| `SavingsTransactionDto` | `id`, `date`, `type` (default `UNKNOWN`), `amount` | `type` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.recentTransactions` — CANONICAL compact shape, see naming-collision note below |
+| `TransactionTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback (also absorbs richer wire values like `INTEREST_POSTING`/`FEE_DEDUCTION` that this compact contract does not model) | field of `SavingsTransactionDto.type` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
 `idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
-`idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003).
+`idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003);
+`idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET
+/companion/member/dashboard`, status: approved, approved 2026-07-17).
 
 **Enum reuse (join-with-code, no new enums introduced):** `InvitationRowDto.roleToAssign`,
 `GroupPreviewDto.roleToAssign`, and `AssociateClientsRequestDto.roleToAssign` all reuse the
@@ -43,6 +49,50 @@ the fit. `GroupPreviewDto.groupType` reuses the existing `GroupTypeSlugDto` (dec
 `GroupTypeConfigDto.kt`, long-form slugs) rather than the short-form `GroupTypeDto` used by
 `GroupDto` — this is a companion-bridge group lookup (like COMP-DT-003), not the group-list row
 contract.
+
+**Enum reuse (personal-dashboard, no new pool-model enum introduced):**
+`MemberDashboardResponseDto.poolModel` and `GroupSummaryDto.poolModel` both
+reuse the existing `SavingsMechanismDto` (declared in `GroupTypeConfigDto.kt`)
+rather than introducing a new pool-model wire enum — its value-set
+(`ACCUMULATING`/`ROTATING_PAYOUT`/`NONE`/`UNKNOWN`) exactly matches
+`idea-layer/screens/personal-dashboard/api.yaml#dtos.GroupSummary.poolModel`'s
+declared `ACCUMULATING | ROTATING_PAYOUT | NONE`.
+
+**Naming collision (`SavingsTransactionDto`, flagged for the cross-feature
+repair station — NOT resolved here, out of this generation's scope):** three
+sources declare a type named `SavingsTransactionDto` with THREE incompatible
+shapes:
+
+1. **This file** (from `personal-dashboard`'s own approved `api.yaml`, status
+   `approved`, approved 2026-07-17): compact companion shape — `id: String`,
+   `date: String`, `type: TransactionTypeDto` (`DEPOSIT`/`WITHDRAWAL`/`UNKNOWN`),
+   `amount: Double`.
+2. `idea-layer/dtos/SavingsTransactionDto.yaml` (registry v1.0.0): richer
+   Fineract-raw shape — `id: Long`, `memberId: Long`, `savingsAccountId: Long`,
+   `transactionType: String` (4 values incl. `interest_posting`/`fee_deduction`),
+   `date: String`, `currency: String`, `runningBalance: Double?`, `note: String?`
+   — sourced from `GET /savingsaccounts/{accountId}/transactions` and lists
+   `end-user-dashboard` / api_id `list_self_savings` as a consumer, but that
+   api_id does not exist on `personal-dashboard`'s current `api.yaml`
+   (`get_member_dashboard` is the only operation); `docs.yaml` states the
+   single companion call REPLACES the old per-account SelfService path this
+   registry entry describes — the registry entry is stale for this consumer.
+3. `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`:
+   still-richer raw-Fineract-SelfService component shape — `id: Long`,
+   `transactionType: {value: Int, code: String, description: String}`,
+   `date: List<Int>`, `amount: Double`, `runningBalance: Double`,
+   `currency: {code: String, displaySymbol: String}`.
+
+This generation emitted shape (1), the compact companion contract, per Hard
+Rule 5 (`@SerialName` must match the DECLARING feature's own approved
+contract) — `personal-dashboard`'s `api.yaml` is the SoT for THIS feature's
+DTO. Before `personal-savings` (or `savings-dashboard`, though its own
+`api.yaml` does not currently declare a `SavingsTransactionDto` at all) is
+generated via `kmp-dto-gen`, this class-name collision MUST be resolved at
+Station 3 — options include renaming `personal-savings`' raw ledger row to
+`SavingsLedgerEntryDto`, or migrating `personal-savings` onto the companion
+API and reusing THIS `SavingsTransactionDto` outright (matching the pattern
+already established for `GroupDto` below).
 
 **Wire-casing note:** `InvitationRowDto` and `MarkAcceptedRequestDto`/`MarkAcceptedChangesDto`
 use snake_case `@SerialName`s (raw Fineract datatable columns, matching `idea-layer/screens/join-with-code/api.yaml#dtos.InvitationRow` /
@@ -64,7 +114,8 @@ matches `api.yaml#dtos` field names verbatim (no case translation).
 
 Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
 mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
-`GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`.
+`GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
+`MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

@@ -16,6 +16,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
+import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
 
 /**
  * Koin module for app-level Store wiring.
@@ -62,5 +63,17 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.GroupList))
+    }
+
+    // MODULE:MemberDashboard — personal-dashboard member home store (dynamic-key NETWORK_WITH_CACHE).
+    // Internal to the store seam — exposed to UI only through MemberDashboardRepository.asScreenStream().
+    single(AppStoreRegistry.MemberDashboard) {
+        provideMemberDashboardStore(api = get(), dao = get())
+    }
+
+    // MODULE:MemberDashboard — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MemberDashboard))
     }
 }

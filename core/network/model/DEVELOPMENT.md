@@ -41,16 +41,23 @@ logic, no domain field names.
 | `MarkAcceptedRequestDto` | `JoinWithCodeDto.kt` | `@Serializable` request (COMP-DT-004 `PUT`), snake_case |
 | `MarkAcceptedResponseDto` | `JoinWithCodeDto.kt` | `@Serializable` response (COMP-DT-004 `PUT`) |
 | `MarkAcceptedChangesDto` | `JoinWithCodeDto.kt` | `@Serializable` nested response DTO, snake_case |
+| `MemberDashboardResponseDto` | `MemberDashboardDto.kt` | `@Serializable` response (companion `GET /companion/member/dashboard`) |
+| `GroupSummaryDto` | `MemberDashboardDto.kt` | `@Serializable` nested response DTO; reuses `SavingsMechanismDto` |
+| `SavingsTransactionDto` | `SavingsTransactionDto.kt` | `@Serializable` CANONICAL compact recent-activity row — see `## 4. Boundaries` naming-collision note |
+| `TransactionTypeDto` | `SavingsTransactionDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 
 ## 3. Consumers
 
 - Ktor Services (`core/network` — the companion auth service + companion
-  datatables service + companion groups service built on these DTOs)
+  datatables service + companion groups service + companion member-dashboard
+  service built on these DTOs)
 - Repository mappers (`core/network/mapper/LoginSignupMappers.kt` → `core/data`
   `AuthRepositoryImpl`; `core/network/mapper/GroupTypeConfigMappers.kt` →
   `core/data` `GroupTypeConfigRepositoryImpl`; `core/network/mapper/GroupMappers.kt`
   → `core/data` `GroupRepositoryImpl`; `core/network/mapper/JoinWithCodeMappers.kt`
-  → `core/data` invitation/join repository)
+  → `core/data` invitation/join repository; `core/network/mapper/MemberDashboardMappers.kt`
+  + `core/network/mapper/SavingsTransactionMappers.kt` → `core/data`
+  `MemberDashboardRepository`)
 
 ## 4. Boundaries
 
@@ -65,6 +72,14 @@ logic, no domain field names.
   carries an `UNKNOWN` `@SerialName` fallback entry — both per T7/EC30
   cross-version safety (a server-added field/enum value must never crash a
   staggered old client).
+- **Naming-collision note (`SavingsTransactionDto`, flagged for the
+  cross-feature repair station):** `idea-layer/dtos/SavingsTransactionDto.yaml`
+  (registry) AND `idea-layer/screens/personal-savings/api.yaml#dtos` each
+  declare a DIFFERENT, richer Fineract-raw shape under the SAME DTO name than
+  the compact companion shape emitted here from `personal-dashboard`'s own
+  approved `api.yaml`. See the full note in `SavingsTransactionDto.kt` kdoc and
+  `## dtos` below — this MUST be resolved before `personal-savings` DTOs are
+  generated (class-name collision, not just a field mismatch).
 
 ## 5. Data
 
@@ -138,6 +153,23 @@ logic, no domain field names.
 | `MarkAcceptedResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 | `MarkAcceptedResponseDto` | `changes` | `changes` | `MarkAcceptedChangesDto` | — |
 | `MarkAcceptedChangesDto` | `acceptedAt` | `accepted_at` | `String` (ISO-8601) | — |
+| `MemberDashboardResponseDto` | `memberName` | `memberName` | `String` | — |
+| `MemberDashboardResponseDto` | `myGroups` | `myGroups` | `List<GroupSummaryDto>` | `emptyList()` |
+| `MemberDashboardResponseDto` | `selectedGroup` | `selectedGroup` | `GroupSummaryDto` | — |
+| `MemberDashboardResponseDto` | `poolModel` | `poolModel` | `SavingsMechanismDto` | `SavingsMechanismDto.UNKNOWN` |
+| `MemberDashboardResponseDto` | `groupLinkedSavingsBalance` | `groupLinkedSavingsBalance` | `Double` | — |
+| `MemberDashboardResponseDto` | `individualSavingsBalance` | `individualSavingsBalance` | `Double` | — |
+| `MemberDashboardResponseDto` | `shareOutProjection` | `shareOutProjection` | `Double?` | `null` |
+| `MemberDashboardResponseDto` | `rotationPosition` | `rotationPosition` | `Int?` | `null` |
+| `MemberDashboardResponseDto` | `nextRecipientEta` | `nextRecipientEta` | `String?` | `null` |
+| `MemberDashboardResponseDto` | `recentTransactions` | `recentTransactions` | `List<SavingsTransactionDto>` | `emptyList()` |
+| `GroupSummaryDto` | `groupId` | `groupId` | `String` | — |
+| `GroupSummaryDto` | `name` | `name` | `String` | — |
+| `GroupSummaryDto` | `poolModel` | `poolModel` | `SavingsMechanismDto` | `SavingsMechanismDto.UNKNOWN` |
+| `SavingsTransactionDto` | `id` | `id` | `String` | — |
+| `SavingsTransactionDto` | `date` | `date` | `String` (ISO date) | — |
+| `SavingsTransactionDto` | `type` | `type` | `TransactionTypeDto` | `TransactionTypeDto.UNKNOWN` |
+| `SavingsTransactionDto` | `amount` | `amount` | `Double` | — |
 
 ## 6. Errors
 
@@ -151,13 +183,17 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 ## 7. Testing
 
 `core/network/src/commonTest/.../model/LoginSignupDtoTest.kt`,
-`GroupTypeConfigDtoTest.kt`, `GroupDtoTest.kt`, and `JoinWithCodeDtoTest.kt` —
+`GroupTypeConfigDtoTest.kt`, `GroupDtoTest.kt`, `JoinWithCodeDtoTest.kt`,
+`MemberDashboardDtoTest.kt`, and `SavingsTransactionDtoTest.kt` —
 construction, serialization round-trip, default-value, and equality tests per
 DTO, plus a T7/EC30 cross-version fixture proving an old client tolerates a
 server-added field + a server-added enum value without crashing.
 `JoinWithCodeDtoTest.kt` additionally covers `InvitationRowDto.acceptedAt`
 nullability (both the unused-code `null` case and the already-used
-non-null case).
+non-null case). `MemberDashboardDtoTest.kt` additionally covers the
+mutually-exclusive nullable ACCUMULATING (`shareOutProjection`) vs
+ROTATING_PAYOUT (`rotationPosition` + `nextRecipientEta`) field groups and
+their omitted-from-payload default-null behavior.
 
 ## 8. Observability
 
@@ -166,10 +202,16 @@ Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
 `GroupTypeConfigDto` and `GroupDto` carry no sensitive fields.
 `InvitationRowDto.invitedEmailPhone` carries PII (email/phone) — avoid logging
 it; other join-with-code DTOs carry no sensitive fields.
+`MemberDashboardResponseDto` / `GroupSummaryDto` / `SavingsTransactionDto`
+carry no sensitive fields (balances only; no PII).
 
 ## 9. Evolution
 
 Bump the affected DTO's `SCHEMA_VERSION` when its shape changes; add new enum
 values above `UNKNOWN` (never remove existing entries) to keep old clients
-decoding safely.
+decoding safely. Before generating `personal-savings` or `savings-dashboard`
+DTOs, resolve the `SavingsTransactionDto` naming collision flagged in
+`## 4. Boundaries` and `## dtos` (API.md) — either rename the richer
+per-account ledger row to `SavingsLedgerEntryDto` or migrate the consuming
+feature onto this companion shape.
 <!-- kmp-dto-gen:END -->

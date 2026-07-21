@@ -21,6 +21,7 @@ import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
+import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
@@ -29,6 +30,8 @@ import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
+import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
+import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
@@ -111,4 +114,13 @@ val NetworkModule = module {
     // to cache) is registered in RepositoryModule.kt.
     single<InvitationApiConfig> { InvitationApiConfig() }
     single<InvitationApi> { InvitationApiImpl(httpClient = get()) }
+
+    // Personal dashboard (COMP-DASH-001) — personal-dashboard feature client stack. Reuses the
+    // shared HttpClient singleton above (same companion server, no second engine). The config
+    // binding is registered for override-surface symmetry with CompanionAuthApiConfig even
+    // though the shared client is the one actually dispatching requests today. The
+    // Repository/Store5 wrapper consuming MemberDashboardApi is emitted by a downstream
+    // kmp-store-gen/kmp-client-gen generation step, not registered here.
+    single<MemberDashboardApiConfig> { MemberDashboardApiConfig() }
+    single<MemberDashboardApi> { MemberDashboardApiImpl(httpClient = get()) }
 }

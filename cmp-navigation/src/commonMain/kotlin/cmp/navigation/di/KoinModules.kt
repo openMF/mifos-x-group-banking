@@ -30,6 +30,7 @@ import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
 import org.mifos.groupbanking.feature.joinwithcode.di.JoinWithCodeModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
+import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
 
 object KoinModules {
     private val dataModule = module {
@@ -57,6 +58,7 @@ object KoinModules {
             GroupTypePickerModule,
             GroupListModule,
             JoinWithCodeModule, // <- added by kmp-viewmodel-gen
+            PersonalDashboardModule, // <- added by kmp-viewmodel-gen
         )
     }
 

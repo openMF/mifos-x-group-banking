@@ -38,6 +38,8 @@ import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
+import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -66,6 +68,17 @@ val DataModule = module {
     single<GroupRepository> {
         GroupRepositoryImpl(
             groupsPagingStore = get(AppStoreRegistry.GroupList),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // personal-dashboard member home (COMP-DASH-001) — wraps the dynamic-key NETWORK_WITH_CACHE
+    // MemberDashboardStore (bound via AppStoreRegistry.MemberDashboard in appStoreModule) and
+    // surfaces the offline-first .asScreenStream() read (per-group ScreenState<MemberDashboard>).
+    single<MemberDashboardRepository> {
+        MemberDashboardRepositoryImpl(
+            memberDashboardStore = get(AppStoreRegistry.MemberDashboard),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
