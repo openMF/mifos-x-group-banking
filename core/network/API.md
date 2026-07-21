@@ -12,21 +12,31 @@
 | `CompanionAuthApi` (`org.mifos.groupbanking.core.network.service.loginsignup`) | `/companion/auth/self-register` | POST | `SelfRegisterRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
 | `CompanionAuthApi` | `/companion/auth/login` | POST | `LoginRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
 | `CompanionAuthApi` | `/companion/auth/me` | GET (Bearer) | — | `UserProfileDto` | `NetworkResult<UserProfileDto, NetworkError>` |
+| `GroupTypeConfigApi` (`org.mifos.groupbanking.core.network.service.grouptypepicker`) | `/companion/datatables/group_type_config/{entityId}` | GET | — (path param `entityId: Long = 0`) | `List<GroupTypeConfigDto>` | `NetworkResult<List<GroupTypeConfigDto>, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
 refresh) — see `idea-layer/screens/login-signup/api.yaml` + the feature export
-`idea-layer/exports/login-signup/API.md`.
+`idea-layer/exports/login-signup/API.md`. COMP-DT-003 (group-type catalogue) — see
+`idea-layer/screens/group-type-picker/api.yaml`. `GroupTypeConfigApi` is consumed by the
+group-type-picker feature's Store5 store (owned by a downstream `kmp-store-gen` generation
+step, not by `core/network`).
 
 ## dtos (core/network/model)
 
 `SelfRegisterRequestDto`, `LoginRequestDto`, `AuthResponseDto`, `UserProfileDto`,
-`GroupMembershipDto`, `GroupRoleDto` — see `core/network/model/API.md` for the DTO-owning
-generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
+`GroupMembershipDto`, `GroupRoleDto`, `GroupTypeConfigDto` (+ `GroupTypeSlugDto` /
+`SavingsMechanismDto` / `ContributionModeDto` wire enums) — see `core/network/model/API.md` for
+the DTO-owning generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
 
 ## config
 
 `CompanionAuthApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable, override
 per fork/environment by re-registering the `single<CompanionAuthApiConfig>` binding in
 `kpt.core.network.di.NetworkModule`.
+
+`GroupTypeConfigApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `GroupTypeConfigApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

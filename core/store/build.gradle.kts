@@ -36,6 +36,11 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kermit.logging)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+        }
     }
 }
 

@@ -35,6 +35,7 @@ kotlin {
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
             implementation(projects.feature.loginSignup)
+            implementation(projects.feature.groupTypePicker)
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

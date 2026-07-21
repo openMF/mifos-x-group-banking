@@ -23,6 +23,10 @@ mappers in `core/network/mapper`.
 | `GroupRole` | `AuthModels.kt` | enum (`ORGANIZER`, `MEMBER`, `TREASURER`, `SECRETARY`, `UNKNOWN`) |
 | `AuthState` | `user/AuthState.kt` | sealed class (pre-existing template model) |
 | `UserData` | `user/UserData.kt` | data class (pre-existing template model) |
+| `GroupTypeConfig` | `GroupTypeConfig.kt` | data class — COMP-DT-003 seeded group-type catalogue row (group-type-picker) |
+| `GroupTypeSlug` | `GroupTypeConfig.kt` | enum (`VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO_VILLAGE_BANK`, `BURIAL_WELFARE`, `JLG`, `UNKNOWN`) |
+| `SavingsMechanism` | `GroupTypeConfig.kt` | enum (`ACCUMULATING`, `ROTATING_PAYOUT`, `NONE`, `UNKNOWN`) |
+| `ContributionMode` | `GroupTypeConfig.kt` | enum (`SHARE_BASED_VARIABLE`, `FIXED`, `MINIMAL`, `UNKNOWN`) |
 
 ## 3. Consumers
 
@@ -63,6 +67,21 @@ mappers in `core/network/mapper`.
 | `GroupMembership` | `groupName` | `String` | non-null |
 | `GroupMembership` | `role` | `GroupRole` | non-null |
 | `GroupMembership` | `joinedAt` | `Instant` | non-null |
+| `GroupTypeConfig` | `typeSlug` | `GroupTypeSlug` | non-null |
+| `GroupTypeConfig` | `displayName` | `String` | non-null |
+| `GroupTypeConfig` | `tagline` | `String` | non-null |
+| `GroupTypeConfig` | `savingsMechanism` | `SavingsMechanism` | non-null |
+| `GroupTypeConfig` | `contributionMode` | `ContributionMode` | non-null |
+| `GroupTypeConfig` | `lendingEnabled` | `Boolean` | non-null |
+| `GroupTypeConfig` | `hasSocialFund` | `Boolean` | non-null |
+| `GroupTypeConfig` | `hasBankLinkage` | `Boolean` | non-null |
+| `GroupTypeConfig` | `welfareOnlyMode` | `Boolean` | non-null |
+| `GroupTypeConfig` | `formallyRegistered` | `Boolean` | non-null |
+| `GroupTypeConfig` | `defaultLoanMultiplier` | `Double` | non-null |
+| `GroupTypeConfig` | `defaultInterestRatePct` | `Double` | non-null |
+| `GroupTypeConfig` | `defaultCycleLengthMonths` | `Int` | non-null |
+| `GroupTypeConfig` | `maxMembers` | `Int` | non-null |
+| `GroupTypeConfig` | `minMembers` | `Int` | non-null |
 
 ## 6. Errors
 
@@ -73,8 +92,9 @@ exceptions at the mapper boundary (`core/network/mapper`), not here.
 ## 7. Testing
 
 Domain models are pure data classes exercised indirectly via the mapper test
-suite (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`),
-which asserts every field is mapped and equality holds end to end.
+suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
+`GroupTypeConfigMappersTest.kt`), which assert every field is mapped and
+equality holds end to end.
 
 ## 8. Observability
 

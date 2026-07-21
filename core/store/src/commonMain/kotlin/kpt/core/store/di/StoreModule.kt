@@ -14,6 +14,7 @@ import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 
 /**
  * Koin module for app-level Store wiring.
@@ -36,5 +37,17 @@ val appStoreModule: Module = module {
             bookkeeperDao = get(),
             draftDao = get(),
         )
+    }
+
+    // MODULE:GroupTypeConfig — group-type-picker seeded catalogue store (NETWORK_WITH_CACHE).
+    // Internal to the store seam — exposed to UI only through GroupTypeConfigRepository.
+    single(AppStoreRegistry.GroupTypeConfig) {
+        provideGroupTypeConfigStore(api = get(), dao = get())
+    }
+
+    // MODULE:GroupTypeConfig — register for logout cache clearing (clears in-memory + Room SoT).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.GroupTypeConfig))
     }
 }

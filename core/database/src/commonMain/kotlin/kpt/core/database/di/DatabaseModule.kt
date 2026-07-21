@@ -37,6 +37,9 @@ val DatabaseModule = module {
     includes(platformModule)
     // infra (framework) — always kept
     single { get<AppDatabase>().bookkeeperDao }
+
+    // group-banking domain — group-type-picker seeded catalogue cache (SourceOfTruth DAO)
+    single { get<AppDatabase>().groupTypeConfigDao }
 }
 
 /**

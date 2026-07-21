@@ -29,8 +29,11 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import kpt.core.store.AppStoreRegistry
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
+import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -41,6 +44,17 @@ val DataModule = module {
     // login-signup client stack (COMP-AUTH-001/002/003) — Store5-free (business_logic.kind:
     // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
     single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get()) }
+
+    // group-type-picker seeded catalogue (COMP-DT-003) — wraps the NETWORK_WITH_CACHE
+    // GroupTypeConfigStore (bound via AppStoreRegistry.GroupTypeConfig in appStoreModule) and
+    // surfaces the offline-first .asScreenStream() read.
+    single<GroupTypeConfigRepository> {
+        GroupTypeConfigRepositoryImpl(
+            groupTypeConfigStore = get(AppStoreRegistry.GroupTypeConfig),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

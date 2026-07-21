@@ -18,6 +18,9 @@ import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
+import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
+import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
+import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
@@ -77,4 +80,11 @@ val NetworkModule = module {
         }
     }
     single<CompanionAuthApi> { CompanionAuthApiImpl(httpClient = get()) }
+
+    // Group-type catalogue (COMP-DT-003) — group-type-picker feature client stack. Reuses the
+    // shared HttpClient singleton above (same companion server, no second engine). The config
+    // binding is registered for override-surface symmetry with CompanionAuthApiConfig even
+    // though the shared client is the one actually dispatching requests today.
+    single<GroupTypeConfigApiConfig> { GroupTypeConfigApiConfig() }
+    single<GroupTypeConfigApi> { GroupTypeConfigApiImpl(httpClient = get()) }
 }

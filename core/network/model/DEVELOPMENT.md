@@ -25,12 +25,18 @@ logic, no domain field names.
 | `UserProfileDto` | `LoginSignupDto.kt` | `@Serializable` response (COMP-AUTH-003) |
 | `GroupMembershipDto` | `LoginSignupDto.kt` | `@Serializable` nested response DTO |
 | `GroupRoleDto` | `LoginSignupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `GroupTypeConfigDto` | `GroupTypeConfigDto.kt` | `@Serializable` response row (COMP-DT-003) |
+| `GroupTypeSlugDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `SavingsMechanismDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `ContributionModeDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 
 ## 3. Consumers
 
-- Ktor Services (`core/network` — the companion auth service built on these DTOs)
+- Ktor Services (`core/network` — the companion auth service + companion
+  datatables service built on these DTOs)
 - Repository mappers (`core/network/mapper/LoginSignupMappers.kt` → `core/data`
-  `AuthRepositoryImpl`)
+  `AuthRepositoryImpl`; `core/network/mapper/GroupTypeConfigMappers.kt` →
+  `core/data` `GroupTypeConfigRepositoryImpl`)
 
 ## 4. Boundaries
 
@@ -67,6 +73,21 @@ logic, no domain field names.
 | `GroupMembershipDto` | `groupName` | `groupName` | `String` | — |
 | `GroupMembershipDto` | `role` | `role` | `GroupRoleDto` | `GroupRoleDto.UNKNOWN` |
 | `GroupMembershipDto` | `joinedAt` | `joinedAt` | `String` (ISO-8601) | — |
+| `GroupTypeConfigDto` | `typeSlug` | `typeSlug` | `GroupTypeSlugDto` | `GroupTypeSlugDto.UNKNOWN` |
+| `GroupTypeConfigDto` | `displayName` | `displayName` | `String` | — |
+| `GroupTypeConfigDto` | `tagline` | `tagline` | `String` | — |
+| `GroupTypeConfigDto` | `savingsMechanism` | `savingsMechanism` | `SavingsMechanismDto` | `SavingsMechanismDto.UNKNOWN` |
+| `GroupTypeConfigDto` | `contributionMode` | `contributionMode` | `ContributionModeDto` | `ContributionModeDto.UNKNOWN` |
+| `GroupTypeConfigDto` | `lendingEnabled` | `lendingEnabled` | `Boolean` | — |
+| `GroupTypeConfigDto` | `hasSocialFund` | `hasSocialFund` | `Boolean` | — |
+| `GroupTypeConfigDto` | `hasBankLinkage` | `hasBankLinkage` | `Boolean` | — |
+| `GroupTypeConfigDto` | `welfareOnlyMode` | `welfareOnlyMode` | `Boolean` | — |
+| `GroupTypeConfigDto` | `formallyRegistered` | `formallyRegistered` | `Boolean` | — |
+| `GroupTypeConfigDto` | `defaultLoanMultiplier` | `defaultLoanMultiplier` | `Double` | — |
+| `GroupTypeConfigDto` | `defaultInterestRatePct` | `defaultInterestRatePct` | `Double` | — |
+| `GroupTypeConfigDto` | `defaultCycleLengthMonths` | `defaultCycleLengthMonths` | `Int` | — |
+| `GroupTypeConfigDto` | `maxMembers` | `maxMembers` | `Int` | — |
+| `GroupTypeConfigDto` | `minMembers` | `minMembers` | `Int` | — |
 
 ## 6. Errors
 
@@ -79,15 +100,17 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 
 ## 7. Testing
 
-`core/network/src/commonTest/.../model/LoginSignupDtoTest.kt` — construction,
-serialization round-trip, default-value, and equality tests per DTO, plus a
-T7/EC30 cross-version fixture proving an old client tolerates a
-server-added field + a server-added enum value without crashing.
+`core/network/src/commonTest/.../model/LoginSignupDtoTest.kt` and
+`GroupTypeConfigDtoTest.kt` — construction, serialization round-trip,
+default-value, and equality tests per DTO, plus a T7/EC30 cross-version
+fixture proving an old client tolerates a server-added field + a
+server-added enum value without crashing.
 
 ## 8. Observability
 
 Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
 `AuthResponseDto.sessionToken` — all carry sensitive auth material.
+`GroupTypeConfigDto` carries no sensitive fields.
 
 ## 9. Evolution
 

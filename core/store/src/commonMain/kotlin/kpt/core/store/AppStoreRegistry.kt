@@ -10,6 +10,8 @@
 package kpt.core.store
 
 import kpt.core.base.store.infra.StoreRegistry
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Application-level [StoreRegistry] — the single named-qualifier registry for every
@@ -39,4 +41,24 @@ import kpt.core.base.store.infra.StoreRegistry
  * Centralizing here gives a one-place audit of every Store the app owns and prevents
  * qualifier-name collisions across feature modules.
  */
-object AppStoreRegistry : StoreRegistry()
+object AppStoreRegistry : StoreRegistry() {
+    // REGISTRY:GroupTypeConfig — group-type-picker seeded catalogue (NETWORK_WITH_CACHE, COMP-DT-003)
+    val GroupTypeConfig = store("groupTypeConfig")
+
+    /** Per-store TTL durations. */
+    object Ttl {
+        // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
+        // catalogue only changes on server deploys, so an aggressive TTL is correct.
+        val GROUP_TYPE_CONFIG: Duration = 24.hours
+    }
+
+    /**
+     * Runtime lookup of per-store TTL by qualifier name — paired with the compile-time [Ttl]
+     * object so `ScreenDataStream` / `asScreenStream` can resolve a store's TTL dynamically when
+     * the qualifier is only known at runtime.
+     */
+    val ttlByName: Map<String, Duration> = mapOf(
+        // REGISTRY:GroupTypeConfig
+        "groupTypeConfig" to Ttl.GROUP_TYPE_CONFIG,
+    )
+}

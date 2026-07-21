@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_group_type_picker_title">Choose Group Type</string>
+    <string name="screens_group_type_picker_loading_message">Loading group types…</string>
+    <string name="screens_group_type_picker_action_retry">Retry</string>
+    <string name="screens_group_type_picker_error_icon_cd">Error</string>
+
+    <string name="screens_group_type_picker_error_network_message">Could not load group types. Check your connection and retry.</string>
+    <string name="screens_group_type_picker_error_server_message">Server error loading group types. Please retry.</string>
+    <string name="screens_group_type_picker_error_auth_message">Session expired. Please log in again.</string>
+
+    <string name="screens_group_type_picker_vsla_feature_1">Share-based saving</string>
+    <string name="screens_group_type_picker_vsla_feature_2">Internal lending</string>
+    <string name="screens_group_type_picker_vsla_feature_3">Annual share-out</string>
+
+    <string name="screens_group_type_picker_rosca_feature_1">Rotating payout</string>
+    <string name="screens_group_type_picker_rosca_feature_2">Fixed contribution</string>
+
+    <string name="screens_group_type_picker_asca_feature_1">Accumulating fund</string>
+    <string name="screens_group_type_picker_asca_feature_2">Internal lending</string>
+    <string name="screens_group_type_picker_asca_feature_3">Fixed contributions</string>
+
+    <string name="screens_group_type_picker_silc_feature_1">Share-based saving</string>
+    <string name="screens_group_type_picker_silc_feature_2">CRS-promoted</string>
+    <string name="screens_group_type_picker_silc_feature_3">Internal lending</string>
+
+    <string name="screens_group_type_picker_shg_feature_1">Bank linkage</string>
+    <string name="screens_group_type_picker_shg_feature_2">Internal fund</string>
+    <string name="screens_group_type_picker_shg_feature_3">India-origin model</string>
+
+    <string name="screens_group_type_picker_sacco_feature_1">Share capital</string>
+    <string name="screens_group_type_picker_sacco_feature_2">Formal governance</string>
+    <string name="screens_group_type_picker_sacco_feature_3">Regulated</string>
+
+    <string name="screens_group_type_picker_cbo_feature_1">MFI on-lending</string>
+    <string name="screens_group_type_picker_cbo_feature_2">Internal savings</string>
+    <string name="screens_group_type_picker_cbo_feature_3">FINCA model</string>
+
+    <string name="screens_group_type_picker_burial_feature_1">Welfare-only mode</string>
+    <string name="screens_group_type_picker_burial_feature_2">Nestable</string>
+
+    <string name="screens_group_type_picker_jlg_feature_1">Joint guarantee</string>
+    <string name="screens_group_type_picker_jlg_feature_2">External MFI loan</string>
+    <string name="screens_group_type_picker_jlg_feature_3">No savings pool</string>
+</resources>
