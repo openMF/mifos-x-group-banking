@@ -29,12 +29,18 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.data.repository.AuthRepository
+import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
 
     single<NetworkMonitor> { NetworkMonitorProvider.install() }
     singleOf(::UserDataRepositoryImpl) bind UserDataRepository::class
+
+    // login-signup client stack (COMP-AUTH-001/002/003) — Store5-free (business_logic.kind:
+    // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
+    single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

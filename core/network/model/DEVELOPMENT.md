@@ -1,0 +1,97 @@
+<!-- generated-by: kmp-dto-gen -->
+<!-- kmp-dto-gen:BEGIN -->
+# core/network/model — DEVELOPMENT.md
+
+> Docs-only anchor per `RULE-FEATURE-DEVELOPMENT-MD-001`. The DTO source files
+> physically live in the `core/network` Gradle module, under the
+> `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/model/`
+> package (per `core/registries/KMP_MODULE_PLACEMENT.yaml` — `Dto → core/network`,
+> package `core/network/model`). This directory carries only the docs surface.
+
+## 1. Module Identity
+
+`core/network/model` is the **wire/DTO layer** — every class here is
+`@Serializable` with `@SerialName` on every field, matching the companion
+bridge's actual JSON casing exactly (see `## 4. Boundaries`). No business
+logic, no domain field names.
+
+## 2. Public API
+
+| DTO | File | Kind |
+|---|---|---|
+| `SelfRegisterRequestDto` | `LoginSignupDto.kt` | `@Serializable` request (COMP-AUTH-001) |
+| `LoginRequestDto` | `LoginSignupDto.kt` | `@Serializable` request (COMP-AUTH-002) |
+| `AuthResponseDto` | `LoginSignupDto.kt` | `@Serializable` response (COMP-AUTH-001/002) |
+| `UserProfileDto` | `LoginSignupDto.kt` | `@Serializable` response (COMP-AUTH-003) |
+| `GroupMembershipDto` | `LoginSignupDto.kt` | `@Serializable` nested response DTO |
+| `GroupRoleDto` | `LoginSignupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+
+## 3. Consumers
+
+- Ktor Services (`core/network` — the companion auth service built on these DTOs)
+- Repository mappers (`core/network/mapper/LoginSignupMappers.kt` → `core/data`
+  `AuthRepositoryImpl`)
+
+## 4. Boundaries
+
+- Every DTO field carries `@SerialName` matching the companion bridge's actual
+  JSON key casing (camelCase — e.g. `emailPhone`, `tokenExpiresAt`,
+  `groupMemberships` — confirmed against the existing `idea-layer/dtos/LoanDto.yaml`
+  registry precedent + `api.yaml#dtos`, both of which declare camelCase field
+  names; this is a Fineract/companion-bridge convention, not a raw Postgres
+  snake_case table).
+- No domain field names, no business logic, no navigation/state concerns.
+- Every DTO carries `SCHEMA_VERSION` (companion `const val`); every enum
+  carries an `UNKNOWN` `@SerialName` fallback entry — both per T7/EC30
+  cross-version safety (a server-added field/enum value must never crash a
+  staggered old client).
+
+## 5. Data
+
+| DTO | Field | `@SerialName` | Type | Default |
+|---|---|---|---|---|
+| `SelfRegisterRequestDto` | `name` | `name` | `String` | — |
+| `SelfRegisterRequestDto` | `emailPhone` | `emailPhone` | `String` | — |
+| `SelfRegisterRequestDto` | `password` | `password` | `String` | — |
+| `LoginRequestDto` | `emailPhone` | `emailPhone` | `String` | — |
+| `LoginRequestDto` | `password` | `password` | `String` | — |
+| `AuthResponseDto` | `userId` | `userId` | `String` | — |
+| `AuthResponseDto` | `sessionToken` | `sessionToken` | `String` | — |
+| `AuthResponseDto` | `tokenExpiresAt` | `tokenExpiresAt` | `String` (ISO-8601) | — |
+| `AuthResponseDto` | `groupMemberships` | `groupMemberships` | `List<GroupMembershipDto>` | `emptyList()` |
+| `UserProfileDto` | `userId` | `userId` | `String` | — |
+| `UserProfileDto` | `name` | `name` | `String` | — |
+| `UserProfileDto` | `emailPhone` | `emailPhone` | `String` | — |
+| `UserProfileDto` | `groupMemberships` | `groupMemberships` | `List<GroupMembershipDto>` | `emptyList()` |
+| `GroupMembershipDto` | `groupId` | `groupId` | `String` | — |
+| `GroupMembershipDto` | `groupName` | `groupName` | `String` | — |
+| `GroupMembershipDto` | `role` | `role` | `GroupRoleDto` | `GroupRoleDto.UNKNOWN` |
+| `GroupMembershipDto` | `joinedAt` | `joinedAt` | `String` (ISO-8601) | — |
+
+## 6. Errors
+
+Malformed JSON or an unrecognized required field raises
+`kotlinx.serialization.SerializationException`, caught by the shared Ktor
+error-mapper (`core-base/network`, consumed not modified). Unknown *optional*
+fields and unknown enum values are tolerated (never thrown) via the shared
+`Json { ignoreUnknownKeys = true; coerceInputValues = true }` config wired in
+`NetworkModule` (emitted by `kmp-client-gen`).
+
+## 7. Testing
+
+`core/network/src/commonTest/.../model/LoginSignupDtoTest.kt` — construction,
+serialization round-trip, default-value, and equality tests per DTO, plus a
+T7/EC30 cross-version fixture proving an old client tolerates a
+server-added field + a server-added enum value without crashing.
+
+## 8. Observability
+
+Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
+`AuthResponseDto.sessionToken` — all carry sensitive auth material.
+
+## 9. Evolution
+
+Bump the affected DTO's `SCHEMA_VERSION` when its shape changes; add new enum
+values above `UNKNOWN` (never remove existing entries) to keep old clients
+decoding safely.
+<!-- kmp-dto-gen:END -->

@@ -18,7 +18,10 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.datetime)
+            // api: kotlinx.datetime.Instant is exposed publicly on domain models
+            // (e.g. AuthModels.kt AuthSession/GroupMembership) — consumers (core/network
+            // mappers, feature ViewModels) need it resolvable on their own classpath.
+            api(libs.kotlinx.datetime)
         }
     }
 }

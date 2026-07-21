@@ -34,5 +34,12 @@ kotlin {
             implementation(libs.multiplatform.settings.serialization)
             implementation(libs.multiplatform.settings.coroutines)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            // MapSettings — in-memory Settings fake used by CompanionSessionStoreImplTest.
+            implementation(libs.multiplatform.settings.test)
+        }
     }
 }

@@ -118,6 +118,7 @@ include(":core:ui")
 include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
+include(":feature:login-signup")
 
 include(":core-base:analytics")
 include(":core-base:common")

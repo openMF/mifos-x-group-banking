@@ -9,9 +9,17 @@
  */
 package kpt.core.network.di
 
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestRetry
+import kotlinx.serialization.json.Json
 import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseCredentials
+import kpt.core.base.network.httpClient
+import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
+import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
+import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
@@ -40,4 +48,33 @@ val NetworkModule = module {
     // file is absent, so the client stays inert until a fork provides a project).
     single<SupabaseCredentials> { GeneratedSupabaseCredentials }
     single { SupabaseConfigClient(credentials = get()) }
+
+    // Companion auth bridge (COMP-AUTH-001/002/003) — login-signup feature client stack.
+    // CompanionAuthApiConfig.baseUrl default-param is overridden per-fork/per-environment by
+    // re-registering the single<CompanionAuthApiConfig> binding (see that class's KDoc).
+    single<CompanionAuthApiConfig> { CompanionAuthApiConfig() }
+    single<HttpClient> {
+        val defaultConfig = setupDefaultHttpClient(
+            baseUrl = get<CompanionAuthApiConfig>().baseUrl,
+            // EC30 client-side half: ignoreUnknownKeys + coerceInputValues so a server-added
+            // field/enum value never crashes a staggered old client (pairs with the DTO
+            // SCHEMA_VERSION + @SerialName("UNKNOWN") enum fallback in LoginSignupDto.kt).
+            jsonConfig = Json {
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            },
+        )
+        httpClient {
+            defaultConfig()
+            // SC3 (RULE-IMPLEMENT-SCALE-CODEGEN-001): setupDefaultHttpClient already installs
+            // HttpTimeout; HttpRequestRetry is layered on top here (core-base/network is
+            // non-writable — Hard Rule #8) so this client never spins forever on a transient
+            // 5xx/connection blip.
+            install(HttpRequestRetry) {
+                retryOnServerErrors(maxRetries = 3)
+                exponentialDelay()
+            }
+        }
+    }
+    single<CompanionAuthApi> { CompanionAuthApiImpl(httpClient = get()) }
 }

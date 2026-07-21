@@ -1,0 +1,89 @@
+<!-- generated-by: kmp-dto-gen -->
+<!-- kmp-dto-gen:BEGIN -->
+# core/model — DEVELOPMENT.md
+
+## 1. Module Identity
+
+`core/model` holds **pure-Kotlin domain models** — no `@Serializable`, no
+`@SerialName`, no wire-format or platform concerns. Every type here is a
+business shape consumed by UseCases, Repositories, and ViewModels. Wire
+representations of the same concepts live in `core/network/model` (see that
+module's `DEVELOPMENT.md`) and are converted at the network boundary via
+mappers in `core/network/mapper`.
+
+## 2. Public API
+
+| Model | File | Kind |
+|---|---|---|
+| `LoginCredentials` | `AuthModels.kt` | data class — login-signup input |
+| `SelfRegistration` | `AuthModels.kt` | data class — login-signup input |
+| `AuthSession` | `AuthModels.kt` | data class — login-signup auth-result value object |
+| `UserProfile` | `AuthModels.kt` | data class — companion_me domain model |
+| `GroupMembership` | `AuthModels.kt` | data class |
+| `GroupRole` | `AuthModels.kt` | enum (`ORGANIZER`, `MEMBER`, `TREASURER`, `SECRETARY`, `UNKNOWN`) |
+| `AuthState` | `user/AuthState.kt` | sealed class (pre-existing template model) |
+| `UserData` | `user/UserData.kt` | data class (pre-existing template model) |
+
+## 3. Consumers
+
+- UseCases (`core/domain`)
+- ViewModels (`feature/*`)
+- Repositories (`core/data` — `AuthRepositoryImpl` maps `core/network/model` DTOs
+  through `core/network/mapper` into these domain types before returning them)
+
+## 4. Boundaries
+
+- NO `@Serializable` / `@SerialName` — these types never touch the wire directly.
+- NO wire-format concerns (JSON keys, snake/camelCase server casing) — that's
+  `core/network/model`'s job.
+- Timestamps use `kotlinx.datetime.Instant` (parsed from ISO-8601 wire strings
+  by the mapper), never a raw `String`.
+- `core/model` depends only on `core/common` + `kotlinx.datetime` (exposed as
+  `api` since `Instant` appears in public model signatures) — no Ktor, no
+  kotlinx.serialization runtime dependency leaking into its public surface.
+
+## 5. Data
+
+| Model | Field | Type | Nullability |
+|---|---|---|---|
+| `LoginCredentials` | `emailPhone` | `String` | non-null |
+| `LoginCredentials` | `password` | `String` | non-null |
+| `SelfRegistration` | `name` | `String` | non-null |
+| `SelfRegistration` | `emailPhone` | `String` | non-null |
+| `SelfRegistration` | `password` | `String` | non-null |
+| `AuthSession` | `userId` | `String` | non-null |
+| `AuthSession` | `sessionToken` | `String` | non-null |
+| `AuthSession` | `tokenExpiresAt` | `Instant` | non-null |
+| `AuthSession` | `groupMemberships` | `List<GroupMembership>` | non-null (may be empty) |
+| `UserProfile` | `userId` | `String` | non-null |
+| `UserProfile` | `name` | `String` | non-null |
+| `UserProfile` | `emailPhone` | `String` | non-null |
+| `UserProfile` | `groupMemberships` | `List<GroupMembership>` | non-null (may be empty) |
+| `GroupMembership` | `groupId` | `String` | non-null |
+| `GroupMembership` | `groupName` | `String` | non-null |
+| `GroupMembership` | `role` | `GroupRole` | non-null |
+| `GroupMembership` | `joinedAt` | `Instant` | non-null |
+
+## 6. Errors
+
+`core/model` types carry no error/exception state — parse failures (e.g. a
+malformed `tokenExpiresAt` ISO-8601 string) surface as `Instant.parse`
+exceptions at the mapper boundary (`core/network/mapper`), not here.
+
+## 7. Testing
+
+Domain models are pure data classes exercised indirectly via the mapper test
+suite (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`),
+which asserts every field is mapped and equality holds end to end.
+
+## 8. Observability
+
+Never log `LoginCredentials.password` or `AuthSession.sessionToken` — both
+carry sensitive auth material.
+
+## 9. Evolution
+
+New auth-related domain concepts are added to `AuthModels.kt`; unrelated
+feature domains get their own `{Feature}.kt` file in this module (one file
+per feature, per `kmp-dto-gen`'s Step 3 convention).
+<!-- kmp-dto-gen:END -->

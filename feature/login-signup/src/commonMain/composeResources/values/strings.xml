@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_login_signup_title">Welcome to MifosX</string>
+    <string name="screens_login_signup_logo_cd">Mifos X logo</string>
+    <string name="screens_login_signup_mode_toggle_cd">Switch between Sign In and Sign Up modes</string>
+    <string name="screens_login_signup_tab_login">Sign In</string>
+    <string name="screens_login_signup_tab_signup">Sign Up</string>
+
+    <string name="screens_login_signup_field_name_label">Full Name</string>
+    <string name="screens_login_signup_field_name_placeholder">e.g. Grace Wanjiku</string>
+    <string name="screens_login_signup_field_name_cd">Full name input</string>
+
+    <string name="screens_login_signup_field_email_phone_label">Email or Phone</string>
+    <string name="screens_login_signup_field_email_phone_placeholder">email@example.com or +254700000000</string>
+    <string name="screens_login_signup_field_email_phone_cd">Email or phone number input</string>
+
+    <string name="screens_login_signup_field_password_label">Password</string>
+    <string name="screens_login_signup_field_password_placeholder_login">Your password</string>
+    <string name="screens_login_signup_field_password_placeholder_signup">Minimum 8 characters</string>
+    <string name="screens_login_signup_field_password_cd">Password input</string>
+
+    <string name="screens_login_signup_action_forgot_password">Forgot password?</string>
+    <string name="screens_login_signup_forgot_password_cd">Forgot password link</string>
+
+    <string name="screens_login_signup_action_sign_in">Sign In</string>
+    <string name="screens_login_signup_sign_in_cd">Sign in to your account</string>
+
+    <string name="screens_login_signup_action_create_account">Create Account</string>
+    <string name="screens_login_signup_create_account_cd">Create a new account</string>
+
+    <string name="screens_login_signup_action_biometric">Sign in with biometrics</string>
+    <string name="screens_login_signup_biometric_cd">Sign in using biometric authentication</string>
+
+    <string name="screens_login_signup_divider_or">or</string>
+
+    <string name="screens_login_signup_error_icon_cd">Error</string>
+
+    <string name="screens_login_signup_zero_groups_title">You\'re all set!</string>
+    <string name="screens_login_signup_zero_groups_message">You don\'t belong to any savings group yet. Create your first group or join one with an invite code.</string>
+    <string name="screens_login_signup_zero_groups_illustration_cd">Empty groups illustration</string>
+
+    <string name="screens_login_signup_action_create_group">Create Your First Group</string>
+    <string name="screens_login_signup_create_group_cd">Create your first savings group</string>
+
+    <string name="screens_login_signup_action_join_with_code">Join with Invite Code</string>
+    <string name="screens_login_signup_join_with_code_cd">Join an existing group with invite code</string>
+
+    <string name="screens_login_signup_error_invalid_credentials">Incorrect email or password. Please try again.</string>
+    <string name="screens_login_signup_error_account_exists">An account with this email or phone already exists. Please sign in.</string>
+    <string name="screens_login_signup_error_weak_password">Password must be at least 8 characters.</string>
+    <string name="screens_login_signup_error_network">No internet connection. Please try again.</string>
+    <string name="screens_login_signup_error_server">Something went wrong on our end. Please retry.</string>
+    <string name="screens_login_signup_error_biometric_failed">Biometric authentication failed. Please sign in manually.</string>
+
+    <string name="screens_login_signup_validation_name_required">Full name is required.</string>
+    <string name="screens_login_signup_validation_email_phone_invalid">Enter a valid email address or phone number.</string>
+    <string name="screens_login_signup_validation_password_weak">Password must be at least 8 characters.</string>
+
+    <string name="screens_login_signup_forgot_password_snackbar">To reset your password, use the web portal or contact your group organizer.</string>
+</resources>

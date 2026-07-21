@@ -19,6 +19,8 @@ import kpt.core.datastore.infra.SyncStatePersister
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
+import org.mifos.groupbanking.core.datastore.session.CompanionSessionStoreImpl
 
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)
@@ -35,5 +37,14 @@ val DatastoreModule = module {
     // Read by Synchronizer at sync start; written on snapshot/changeList completion.
     single<SyncStatePersister> {
         SettingsSyncStatePersister(plainSettings = get<Settings>(named("plain")))
+    }
+
+    // Companion auth session persistence (session_store table, data-flow.yaml) — SECURE
+    // (encrypted) Settings-backed; see CompanionSessionStore KDoc for why this is NOT Store5.
+    single<CompanionSessionStore> {
+        CompanionSessionStoreImpl(
+            secureSettings = get<Settings>(named("secure")),
+            dispatcher = get(),
+        )
     }
 }

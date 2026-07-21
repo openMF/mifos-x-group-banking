@@ -28,11 +28,13 @@ kotlin {
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.platform)
             implementation(projects.coreBase.security)
+            implementation(projects.coreBase.observability)
 
             // shell (framework) — kept
             implementation(projects.feature.home)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
+            implementation(projects.feature.loginSignup)
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

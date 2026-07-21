@@ -14,6 +14,7 @@ import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
 import cmp.navigation.rootnav.RootNavViewModel
 import kpt.core.base.analytics.di.analyticsModule
 import kpt.core.base.common.di.CommonModule
+import kpt.core.base.observability.di.observabilityModule
 import kpt.core.base.platform.di.platformModule
 import kpt.core.base.security.di.SecurityModule
 import kpt.core.data.di.DataModule
@@ -25,6 +26,7 @@ import kpt.feature.settings.SettingsModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
 
 object KoinModules {
     private val dataModule = module {
@@ -48,6 +50,7 @@ object KoinModules {
             // shell (framework) — kept
             HomeModule,
             SettingsModule,
+            LoginSignupModule,
         )
     }
 
@@ -57,6 +60,7 @@ object KoinModules {
         DatabaseModule,
         dispatcherModule,
         analyticsModule,
+        observabilityModule,
         DatastoreModule,
         featureModule,
         AppModule,
