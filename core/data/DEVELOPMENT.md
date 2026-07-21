@@ -14,6 +14,9 @@
 
 - `AuthRepository` / `AuthRepositoryImpl` — companion auth mutation + session-read repository
   (COMP-AUTH-001/002/003). See API.md#repositories.
+- `InvitationRepository` / `InvitationRepositoryImpl` — join-with-code mutation orchestration
+  repository (`validateCode` / `fetchGroupPreview` / `joinGroup` — associate-then-mark-accepted,
+  COMP-DT-004 + COMP-GRP-003). See API.md#repositories.
 - `UserDataRepository` / `UserDataRepositoryImpl` — template-provided user preferences
   (theme/language/passcode), unrelated to the companion auth session.
 - `UserLogoutManager` / `UserLogoutManagerImpl` — logout event bus + cache-clear orchestration.
@@ -23,7 +26,11 @@
 Feature ViewModels are the only consumers of `core/data` Repositories — e.g. a future
 `login-signup` ViewModel injects `AuthRepository` and wires `login`/`selfRegister` behind a
 `SubmitHandler`/`DraftSubmitHandler` (per this project's `core-base/store` input-screen
-convention), and observes `currentSession` for the on-mount token-presence check.
+convention), and observes `currentSession` for the on-mount token-presence check. The
+`join-with-code` ViewModel injects `InvitationRepository` directly — `validateCode` on
+`OnValidateCode`, `fetchGroupPreview` chained on a valid non-expired/non-used result, `joinGroup`
+on `OnConfirmJoin` (threading `clientId` from `AuthRepository.currentSession` and `rowId` from
+wherever the contract-gap resolution lands — see API.md's KNOWN GAP note).
 
 ## 4. Boundaries
 
@@ -58,18 +65,24 @@ prefs read only); absence is represented as `null`, never an exception.
 
 `commonTest` — `AuthRepositoryTest` (fake `CompanionAuthApi` + fake `CompanionSessionStore`;
 ≥3 cases per mutation method covering success + ≥2 distinct error branches, plus
-`currentSession`/`clearSession` coverage).
+`currentSession`/`clearSession` coverage); `InvitationRepositoryTest` (fake `InvitationApi`;
+≥3 cases per method incl. `joinGroup`'s associate-then-mark-accepted call-order assertion, the
+associate-failure short-circuit, and the mark-accepted-failure-is-non-fatal case).
 
 ## 8. Observability
 
 Kermit tag `AuthRepository` — debug on submit, info on success (with `userId`), error on every
-failure branch (mirrors the Service's own logging one layer down).
+failure branch (mirrors the Service's own logging one layer down). Kermit tag
+`InvitationRepository` — debug on each call start, info on success (incl.
+`expired`/`alreadyUsed` flags on `validateCode` success, `resourceId` on `joinGroup` success),
+error on every failure branch including the non-fatal mark-accepted failure (still logged, does
+not fail the call).
 
 ## 9. Evolution
 
-Adding a new companion-backed mutation: extend `AuthRepository`/`AuthRepositoryImpl` following
-the same `when`-over-`NetworkResult` shape; if the new feature's `business_logic.kind` is NOT
-`crud`/`nav_only`/`processor` (i.e. it declares a genuine read-stream), route it through the
-Store5 path instead (SP-04) — do not retrofit this Repository's mutation shape onto a
-read-stream feature.
+Adding a new companion-backed mutation: extend `AuthRepository`/`AuthRepositoryImpl` (or
+`InvitationRepository`/`InvitationRepositoryImpl`) following the same `when`-over-`NetworkResult`
+shape; if the new feature's `business_logic.kind` is NOT `crud`/`nav_only`/`processor` (i.e. it
+declares a genuine read-stream), route it through the Store5 path instead (SP-04) — do not
+retrofit this Repository's mutation shape onto a read-stream feature.
 <!-- kmp-client-gen:END -->

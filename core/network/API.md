@@ -14,6 +14,10 @@
 | `CompanionAuthApi` | `/companion/auth/me` | GET (Bearer) | — | `UserProfileDto` | `NetworkResult<UserProfileDto, NetworkError>` |
 | `GroupTypeConfigApi` (`org.mifos.groupbanking.core.network.service.grouptypepicker`) | `/companion/datatables/group_type_config/{entityId}` | GET | — (path param `entityId: Long = 0`) | `List<GroupTypeConfigDto>` | `NetworkResult<List<GroupTypeConfigDto>, NetworkError>` |
 | `GroupApi` (`org.mifos.groupbanking.core.network.service.grouplist`) | `/companion/groups/mine` | GET (query `paged`/`limit`/`offset`) | — | `GroupPageDto` | `NetworkResult<GroupPageDto, NetworkError>` |
+| `InvitationApi` (`org.mifos.groupbanking.core.network.service.joinwithcode`) | `/companion/datatables/invitations/{code}` | GET | — | `InvitationRowDto` | `NetworkResult<InvitationRowDto, NetworkError>` |
+| `InvitationApi` | `/companion/groups/{groupId}` | GET | — | `GroupPreviewDto` | `NetworkResult<GroupPreviewDto, NetworkError>` |
+| `InvitationApi` | `/companion/groups/{groupId}/associate-clients` | POST | `AssociateClientsRequestDto` | `AssociateClientsResponseDto` | `NetworkResult<AssociateClientsResponseDto, NetworkError>` |
+| `InvitationApi` | `/companion/datatables/invitations/{code}/{rowId}` | PUT | `MarkAcceptedRequestDto` | `MarkAcceptedResponseDto` | `NetworkResult<MarkAcceptedResponseDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -25,16 +29,22 @@ step, not by `core/network`). COMP-GRP-001 (group list, offset-paginated, `page_
 `idea-layer/screens/group-list/api.yaml`. `GroupApi` is service-layer only; the Store5 store +
 Repository that wrap it (`.asPagingScreenStream()` per `data-flow.yaml#cache_strategy:
 stale-while-revalidate`) are owned by downstream `kmp-store-gen`/`kmp-client-gen` generation
-steps, not by `core/network`.
+steps, not by `core/network`. COMP-DT-004 (invitations datatable validate/mark-accepted) +
+COMP-GRP-003 (associate-client-to-group) — see
+`idea-layer/screens/join-with-code/api.yaml`. `InvitationApi` backs a **Store5-free mutation
+orchestration flow** (`business_logic.kind: processor`, `cache_strategy: no-cache` throughout) —
+its Repository (`InvitationRepositoryImpl`, `core/data`) surfaces `NetworkResult` directly, no
+`.asScreenStream()`/Store5 wrapping.
 
 ## dtos (core/network/model)
 
 `SelfRegisterRequestDto`, `LoginRequestDto`, `AuthResponseDto`, `UserProfileDto`,
 `GroupMembershipDto`, `GroupRoleDto`, `GroupTypeConfigDto` (+ `GroupTypeSlugDto` /
 `SavingsMechanismDto` / `ContributionModeDto` wire enums), `GroupDto`, `GroupPageDto` (+
-`GroupTypeDto` / `ViewerRoleDto` / `HealthIndicatorDto` wire enums) — see
-`core/network/model/API.md` for the DTO-owning generator's own doc surface (schema-versioned,
-EC30 `UNKNOWN` enum fallback).
+`GroupTypeDto` / `ViewerRoleDto` / `HealthIndicatorDto` wire enums), `InvitationRowDto`,
+`GroupPreviewDto`, `AssociateClientsRequestDto`/`ResponseDto`, `MarkAcceptedRequestDto`/
+`ResponseDto` (+ nested `MarkAcceptedChangesDto`) — see `core/network/model/API.md` for the
+DTO-owning generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
 
 ## config
 
@@ -51,4 +61,9 @@ second engine from this config's `baseUrl`.
 override-surface symmetry; `GroupApiImpl` currently reuses the shared `HttpClient` singleton
 (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine from this
 config's `baseUrl`.
+
+`InvitationApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable, registered
+for override-surface symmetry; `InvitationApiImpl` currently reuses the shared `HttpClient`
+singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine
+from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

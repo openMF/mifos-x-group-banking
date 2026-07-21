@@ -20,11 +20,18 @@
 | `GroupPage` | `totalFilteredRecords: Int`, `groups: List<Group>` | offset-paginated envelope of COMP-GRP-001 |
 | `ViewerRole` | enum: `ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN` | mirrors wire `ViewerRoleDto` 1:1; NOT unified with `GroupRole` (missing `CHAIRPERSON`) — see `Group.kt` kdoc |
 | `HealthIndicator` | enum: `GREEN`, `AMBER`, `RED`, `UNKNOWN` | mirrors wire `HealthIndicatorDto` 1:1; `fromOverdueRate(rate: Double)` factory independently re-derives GREEN(<0.05)/AMBER(0.05–0.20)/RED(>=0.20) |
+| `Invitation` | `token: String`, `groupId: Long`, `inviterClientId: Long`, `invitedEmailPhone: String`, `roleToAssign: GroupRole`, `expiresAt: Instant`, `acceptedAt: Instant?` | COMP-DT-004 invitations-datatable row; `isAlreadyUsed` derived property + `isExpired(now: Instant = Clock.System.now())` derived function; reuses `GroupRole` (no new role enum) |
+| `GroupPreview` | `groupId: Long`, `groupName: String`, `groupType: GroupTypeSlug`, `organizerName: String`, `memberCount: Int`, `officeId: Long`, `roleToAssign: GroupRole` | join-with-code group preview card; reuses `GroupTypeSlug` + `GroupRole` (no new enums) |
+| `JoinGroupRequest` | `clientIds: List<Long>`, `roleToAssign: GroupRole` | COMP-GRP-003 associate-clients input |
+| `JoinGroupResult` | `resourceId: Long`, `groupId: Long`, `clientIds: List<Long>` | COMP-GRP-003 associate-clients result |
+| `InvitationAcceptance` | `acceptedAt: Instant` | COMP-DT-004 mark-accepted input |
+| `InvitationAcceptanceResult` | `resourceId: Long`, `acceptedAt: Instant` | COMP-DT-004 mark-accepted result; flattens wire's nested `changes.accepted_at` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
-`idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001).
+`idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
+`idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003).
 
 Wire counterparts + `@SerialName` mapping: see `core/network/model/API.md`
 (includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`).

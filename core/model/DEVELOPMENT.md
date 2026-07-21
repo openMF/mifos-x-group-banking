@@ -31,6 +31,12 @@ mappers in `core/network/mapper`.
 | `GroupPage` | `Group.kt` | data class — offset-paginated envelope |
 | `ViewerRole` | `Group.kt` | enum (`ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN`) |
 | `HealthIndicator` | `Group.kt` | enum (`GREEN`, `AMBER`, `RED`, `UNKNOWN`) + `fromOverdueRate(rate: Double)` companion factory |
+| `Invitation` | `Invitation.kt` | data class — COMP-DT-004 invitations-datatable row; `isAlreadyUsed` property + `isExpired(now)` function |
+| `GroupPreview` | `Invitation.kt` | data class — join-with-code group preview card; reuses `GroupTypeSlug` + `GroupRole` |
+| `JoinGroupRequest` | `Invitation.kt` | data class — COMP-GRP-003 associate-clients input |
+| `JoinGroupResult` | `Invitation.kt` | data class — COMP-GRP-003 associate-clients result |
+| `InvitationAcceptance` | `Invitation.kt` | data class — COMP-DT-004 mark-accepted input |
+| `InvitationAcceptanceResult` | `Invitation.kt` | data class — COMP-DT-004 mark-accepted result |
 
 ## 3. Consumers
 
@@ -38,7 +44,8 @@ mappers in `core/network/mapper`.
 - ViewModels (`feature/*`)
 - Repositories (`core/data` — `AuthRepositoryImpl` / `GroupRepositoryImpl` map
   `core/network/model` DTOs through `core/network/mapper` into these domain
-  types before returning them)
+  types before returning them; the join-with-code repository maps
+  `JoinWithCodeMappers.kt` output the same way)
 
 ## 4. Boundaries
 
@@ -100,6 +107,28 @@ mappers in `core/network/mapper`.
 | `Group` | `fineractCenterId` | `Long` | non-null |
 | `GroupPage` | `totalFilteredRecords` | `Int` | non-null |
 | `GroupPage` | `groups` | `List<Group>` | non-null (may be empty) |
+| `Invitation` | `token` | `String` | non-null |
+| `Invitation` | `groupId` | `Long` | non-null |
+| `Invitation` | `inviterClientId` | `Long` | non-null |
+| `Invitation` | `invitedEmailPhone` | `String` | non-null |
+| `Invitation` | `roleToAssign` | `GroupRole` | non-null |
+| `Invitation` | `expiresAt` | `Instant` | non-null |
+| `Invitation` | `acceptedAt` | `Instant?` | nullable (`null` = code unused) |
+| `GroupPreview` | `groupId` | `Long` | non-null |
+| `GroupPreview` | `groupName` | `String` | non-null |
+| `GroupPreview` | `groupType` | `GroupTypeSlug` | non-null |
+| `GroupPreview` | `organizerName` | `String` | non-null |
+| `GroupPreview` | `memberCount` | `Int` | non-null |
+| `GroupPreview` | `officeId` | `Long` | non-null |
+| `GroupPreview` | `roleToAssign` | `GroupRole` | non-null |
+| `JoinGroupRequest` | `clientIds` | `List<Long>` | non-null |
+| `JoinGroupRequest` | `roleToAssign` | `GroupRole` | non-null |
+| `JoinGroupResult` | `resourceId` | `Long` | non-null |
+| `JoinGroupResult` | `groupId` | `Long` | non-null |
+| `JoinGroupResult` | `clientIds` | `List<Long>` | non-null |
+| `InvitationAcceptance` | `acceptedAt` | `Instant` | non-null |
+| `InvitationAcceptanceResult` | `resourceId` | `Long` | non-null |
+| `InvitationAcceptanceResult` | `acceptedAt` | `Instant` | non-null |
 
 ## 6. Errors
 
@@ -112,18 +141,24 @@ malformed `tokenExpiresAt` ISO-8601 string, or `Group.lastMeetingDate`'s
 
 Domain models are pure data classes exercised indirectly via the mapper test
 suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
-`GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`), which assert every
-field is mapped and equality holds end to end. `HealthIndicator.fromOverdueRate`
-additionally has direct boundary-value tests in `GroupMappersTest.kt`.
+`GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
+`JoinWithCodeMappersTest.kt`), which assert every field is mapped and equality
+holds end to end. `HealthIndicator.fromOverdueRate` additionally has direct
+boundary-value tests in `GroupMappersTest.kt`; `Invitation.isExpired` /
+`isAlreadyUsed` have direct boundary-value tests in `JoinWithCodeMappersTest.kt`
+(before-expiry / at-exact-expiry / after-expiry, plus null-vs-non-null
+`acceptedAt`).
 
 ## 8. Observability
 
 Never log `LoginCredentials.password` or `AuthSession.sessionToken` — both
-carry sensitive auth material.
+carry sensitive auth material. `Invitation.invitedEmailPhone` carries PII —
+avoid logging it.
 
 ## 9. Evolution
 
 New auth-related domain concepts are added to `AuthModels.kt`; unrelated
 feature domains get their own `{Feature}.kt` file in this module (one file
-per feature, per `kmp-dto-gen`'s Step 3 convention).
+per feature, per `kmp-dto-gen`'s Step 3 convention). Join-with-code's domain
+concepts live in `Invitation.kt`.
 <!-- kmp-dto-gen:END -->

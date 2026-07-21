@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_join_with_code_title">Join a Group</string>
+    <string name="screens_join_with_code_back_cd">Dismiss the join screen and return to the previous screen</string>
+
+    <string name="screens_join_with_code_hero_icon_cd">Join a group illustration</string>
+
+    <string name="screens_join_with_code_field_invite_code_label">Invite Code</string>
+    <string name="screens_join_with_code_field_invite_code_placeholder">e.g. MWG7X2</string>
+    <string name="screens_join_with_code_field_invite_code_cd">Invite code text field, 6 characters</string>
+
+    <string name="screens_join_with_code_action_validate">Validate Code</string>
+    <string name="screens_join_with_code_action_validate_cd">Validate the entered invite code</string>
+
+    <string name="screens_join_with_code_validating_message">Checking code…</string>
+    <string name="screens_join_with_code_validating_cd">Validating invite code, please wait</string>
+
+    <string name="screens_join_with_code_preview_title">You\'re invited to join</string>
+    <string name="screens_join_with_code_preview_card_cd">Group preview details</string>
+    <string name="screens_join_with_code_label_group_type">Type</string>
+    <string name="screens_join_with_code_label_organizer">Organiser</string>
+    <string name="screens_join_with_code_label_member_count">Members</string>
+    <string name="screens_join_with_code_label_members">members</string>
+    <string name="screens_join_with_code_role_chip_cd">Your role in the group</string>
+
+    <string name="screens_join_with_code_action_join_group">Join Group</string>
+    <string name="screens_join_with_code_action_join_group_cd">Confirm and join the group</string>
+
+    <string name="screens_join_with_code_error_icon_cd">Error</string>
+    <string name="screens_join_with_code_action_retry">Retry</string>
+    <string name="screens_join_with_code_hint_expired_message">Ask your group organiser for a new invite code.</string>
+
+    <string name="screens_join_with_code_error_invalid_code_message">This invite code is not valid. Please check and try again.</string>
+    <string name="screens_join_with_code_error_expired_message">This invite code has expired.</string>
+    <string name="screens_join_with_code_error_already_member_message">You are already a member of this group.</string>
+    <string name="screens_join_with_code_error_network_message">No internet connection. Please check your network and retry.</string>
+    <string name="screens_join_with_code_error_auth_message">Your session has expired. Please log in again.</string>
+</resources>

@@ -34,6 +34,13 @@ logic, no domain field names.
 | `GroupTypeDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `ViewerRoleDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `HealthIndicatorDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `InvitationRowDto` | `JoinWithCodeDto.kt` | `@Serializable` response row (COMP-DT-004), snake_case wire columns |
+| `GroupPreviewDto` | `JoinWithCodeDto.kt` | `@Serializable` response (companion group lookup) |
+| `AssociateClientsRequestDto` | `JoinWithCodeDto.kt` | `@Serializable` request (COMP-GRP-003) |
+| `AssociateClientsResponseDto` | `JoinWithCodeDto.kt` | `@Serializable` response (COMP-GRP-003) |
+| `MarkAcceptedRequestDto` | `JoinWithCodeDto.kt` | `@Serializable` request (COMP-DT-004 `PUT`), snake_case |
+| `MarkAcceptedResponseDto` | `JoinWithCodeDto.kt` | `@Serializable` response (COMP-DT-004 `PUT`) |
+| `MarkAcceptedChangesDto` | `JoinWithCodeDto.kt` | `@Serializable` nested response DTO, snake_case |
 
 ## 3. Consumers
 
@@ -42,7 +49,8 @@ logic, no domain field names.
 - Repository mappers (`core/network/mapper/LoginSignupMappers.kt` → `core/data`
   `AuthRepositoryImpl`; `core/network/mapper/GroupTypeConfigMappers.kt` →
   `core/data` `GroupTypeConfigRepositoryImpl`; `core/network/mapper/GroupMappers.kt`
-  → `core/data` `GroupRepositoryImpl`)
+  → `core/data` `GroupRepositoryImpl`; `core/network/mapper/JoinWithCodeMappers.kt`
+  → `core/data` invitation/join repository)
 
 ## 4. Boundaries
 
@@ -107,6 +115,29 @@ logic, no domain field names.
 | `GroupDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
 | `GroupPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
 | `GroupPageDto` | `pageItems` | `pageItems` | `List<GroupDto>` | `emptyList()` |
+| `InvitationRowDto` | `token` | `token` | `String` | — |
+| `InvitationRowDto` | `groupId` | `group_id` | `Long` | — |
+| `InvitationRowDto` | `inviterClientId` | `inviter_client_id` | `Long` | — |
+| `InvitationRowDto` | `invitedEmailPhone` | `invited_email_phone` | `String` | — |
+| `InvitationRowDto` | `roleToAssign` | `role_to_assign` | `GroupRoleDto` | `GroupRoleDto.UNKNOWN` |
+| `InvitationRowDto` | `expiresAt` | `expires_at` | `String` (ISO-8601) | — |
+| `InvitationRowDto` | `acceptedAt` | `accepted_at` | `String?` (ISO-8601) | `null` |
+| `GroupPreviewDto` | `groupId` | `groupId` | `Long` | — |
+| `GroupPreviewDto` | `groupName` | `groupName` | `String` | — |
+| `GroupPreviewDto` | `groupType` | `groupType` | `GroupTypeSlugDto` | `GroupTypeSlugDto.UNKNOWN` |
+| `GroupPreviewDto` | `organizerName` | `organizerName` | `String` | — |
+| `GroupPreviewDto` | `memberCount` | `memberCount` | `Int` | — |
+| `GroupPreviewDto` | `officeId` | `officeId` | `Long` | — |
+| `GroupPreviewDto` | `roleToAssign` | `roleToAssign` | `GroupRoleDto` | `GroupRoleDto.UNKNOWN` |
+| `AssociateClientsRequestDto` | `clientIds` | `clientIds` | `List<Long>` | — |
+| `AssociateClientsRequestDto` | `roleToAssign` | `roleToAssign` | `GroupRoleDto` | `GroupRoleDto.UNKNOWN` |
+| `AssociateClientsResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `AssociateClientsResponseDto` | `groupId` | `groupId` | `Long` | — |
+| `AssociateClientsResponseDto` | `clientIds` | `clientIds` | `List<Long>` | — |
+| `MarkAcceptedRequestDto` | `acceptedAt` | `accepted_at` | `String` (ISO-8601) | — |
+| `MarkAcceptedResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `MarkAcceptedResponseDto` | `changes` | `changes` | `MarkAcceptedChangesDto` | — |
+| `MarkAcceptedChangesDto` | `acceptedAt` | `accepted_at` | `String` (ISO-8601) | — |
 
 ## 6. Errors
 
@@ -120,16 +151,21 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 ## 7. Testing
 
 `core/network/src/commonTest/.../model/LoginSignupDtoTest.kt`,
-`GroupTypeConfigDtoTest.kt`, and `GroupDtoTest.kt` — construction,
-serialization round-trip, default-value, and equality tests per DTO, plus a
-T7/EC30 cross-version fixture proving an old client tolerates a
+`GroupTypeConfigDtoTest.kt`, `GroupDtoTest.kt`, and `JoinWithCodeDtoTest.kt` —
+construction, serialization round-trip, default-value, and equality tests per
+DTO, plus a T7/EC30 cross-version fixture proving an old client tolerates a
 server-added field + a server-added enum value without crashing.
+`JoinWithCodeDtoTest.kt` additionally covers `InvitationRowDto.acceptedAt`
+nullability (both the unused-code `null` case and the already-used
+non-null case).
 
 ## 8. Observability
 
 Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
 `AuthResponseDto.sessionToken` — all carry sensitive auth material.
 `GroupTypeConfigDto` and `GroupDto` carry no sensitive fields.
+`InvitationRowDto.invitedEmailPhone` carries PII (email/phone) — avoid logging
+it; other join-with-code DTOs carry no sensitive fields.
 
 ## 9. Evolution
 

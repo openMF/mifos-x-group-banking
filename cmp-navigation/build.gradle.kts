@@ -37,6 +37,7 @@ kotlin {
             implementation(projects.feature.loginSignup)
             implementation(projects.feature.groupTypePicker)
             implementation(projects.feature.groupList)
+            implementation(projects.feature.joinWithCode) // <- added by kmp-viewmodel-gen
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

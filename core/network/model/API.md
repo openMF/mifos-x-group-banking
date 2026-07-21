@@ -21,10 +21,41 @@
 | `GroupTypeDto` | enum `@SerialName`: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO`, `BURIAL`, `JLG`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOTE short-form `CBO`/`BURIAL` (distinct wire values from `GroupTypeSlugDto`'s `CBO_VILLAGE_BANK`/`BURIAL_WELFARE` — see `## 4. Boundaries`) | field of `GroupDto.groupType` |
 | `ViewerRoleDto` | enum `@SerialName`: `ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupDto.viewerRole` |
 | `HealthIndicatorDto` | enum `@SerialName`: `GREEN`, `AMBER`, `RED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; server-computed from `overdueRate`, mapped 1:1 (domain also independently re-derives via `HealthIndicator.fromOverdueRate`) | field of `GroupDto.healthIndicator` |
+| `InvitationRowDto` | `token`, `group_id`, `inviter_client_id`, `invited_email_phone`, `role_to_assign` (default `UNKNOWN`, reuses `GroupRoleDto`), `expires_at`, `accepted_at` (nullable, default `null`) | `roleToAssign` defaults `UNKNOWN`; `acceptedAt` nullable (`null` = code unused); rest required. Raw Fineract datatable columns — snake_case `@SerialName`s, NOT the companion-bridge camelCase convention used elsewhere in this file | `GET /companion/datatables/invitations/{entityId}` (COMP-DT-004) |
+| `GroupPreviewDto` | `groupId`, `groupName`, `groupType` (default `UNKNOWN`, reuses `GroupTypeSlugDto`), `organizerName`, `memberCount`, `officeId`, `roleToAssign` (default `UNKNOWN`, reuses `GroupRoleDto`) | 2 enum fields default `UNKNOWN`; rest required. Companion-bridge camelCase | `GET /companion/groups/{groupId}` |
+| `AssociateClientsRequestDto` | `clientIds`, `roleToAssign` (default `UNKNOWN`, reuses `GroupRoleDto`) | `clientIds` required, non-empty expected; `roleToAssign` defaults `UNKNOWN` | `POST /companion/groups/{groupId}/associate-clients` (COMP-GRP-003) request |
+| `AssociateClientsResponseDto` | `resourceId`, `groupId`, `clientIds` | all required | response of COMP-GRP-003 |
+| `MarkAcceptedRequestDto` | `accepted_at` | required | `PUT /companion/datatables/invitations/{entityId}/{rowId}` (COMP-DT-004) request; snake_case (raw datatable column) |
+| `MarkAcceptedResponseDto` | `resourceId`, `changes` (nested `MarkAcceptedChangesDto`) | all required | response of the mark-accepted `PUT` |
+| `MarkAcceptedChangesDto` | `accepted_at` | required | nested in `MarkAcceptedResponseDto.changes`; snake_case, echoes the updated datatable column |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
-`idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001).
+`idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
+`idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003).
+
+**Enum reuse (join-with-code, no new enums introduced):** `InvitationRowDto.roleToAssign`,
+`GroupPreviewDto.roleToAssign`, and `AssociateClientsRequestDto.roleToAssign` all reuse the
+existing `GroupRoleDto` (declared in `LoginSignupDto.kt`) — its value-set
+(`ORGANIZER`/`MEMBER`/`TREASURER`/`SECRETARY`/`UNKNOWN`) exactly covers every role an invite can
+assign; `ViewerRoleDto`'s extra `CHAIRPERSON` value is never assignable via invite so it was not
+the fit. `GroupPreviewDto.groupType` reuses the existing `GroupTypeSlugDto` (declared in
+`GroupTypeConfigDto.kt`, long-form slugs) rather than the short-form `GroupTypeDto` used by
+`GroupDto` — this is a companion-bridge group lookup (like COMP-DT-003), not the group-list row
+contract.
+
+**Wire-casing note:** `InvitationRowDto` and `MarkAcceptedRequestDto`/`MarkAcceptedChangesDto`
+use snake_case `@SerialName`s (raw Fineract datatable columns, matching `idea-layer/screens/join-with-code/api.yaml#dtos.InvitationRow` /
+`#dtos.MarkAcceptedRequest` verbatim) — distinct from every other DTO in this file, which uses the
+companion bridge's normalized camelCase. `GroupPreviewDto` / `AssociateClientsRequestDto` /
+`AssociateClientsResponseDto` (companion-bridge, non-datatable endpoints) use camelCase as usual.
+
+**Registry gap (flagged for the cross-feature repair station):** `mark_invitation_accepted`'s
+`rowId` path param is declared sourced from `validate_invite_token_response.id`, but neither
+`api.yaml#api[0].response.fields` nor `#dtos.InvitationRow` declare an `id` field —
+`InvitationRowDto` therefore does not carry one either (Hard Rule 4 forbids inventing an
+undeclared field). The repository/use-case layer that wires `mark_invitation_accepted`'s `rowId`
+will need this contract gap resolved upstream in the idea-layer `api.yaml`.
 
 Field-name casing precedent: `idea-layer/dtos/LoanDto.yaml` (camelCase wire
 fields, e.g. `memberId`, `disbursedOn`) — the companion bridge returns
@@ -33,7 +64,7 @@ matches `api.yaml#dtos` field names verbatim (no case translation).
 
 Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
 mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
-`GroupTypeConfigMappers.kt`, `GroupMappers.kt`.
+`GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

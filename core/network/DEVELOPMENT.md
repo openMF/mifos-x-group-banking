@@ -18,12 +18,17 @@ as a library — never edits it.
   seeded group-type catalogue (COMP-DT-003). See API.md#services.
 - `GroupApi` / `GroupApiImpl` (`.../service/grouplist/`) — fetch the authenticated user's
   offset-paginated group list (COMP-GRP-001). See API.md#services.
+- `InvitationApi` / `InvitationApiImpl` (`.../service/joinwithcode/`) — validate an invite
+  token, fetch the group-preview card, associate the invitee to the group, and mark the
+  invitation datatable row as accepted (COMP-DT-004 + COMP-GRP-003). See API.md#services.
 - `SupabaseConfigClient` (`kpt.core.base.network`, wired here) — dynamic server config, inert by
   default.
 - `CompanionAuthApiConfig` — Koin-injectable base-URL config for the companion backend.
 - `GroupTypeConfigApiConfig` — Koin-injectable base-URL config for the group-type-config
   endpoint (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 - `GroupApiConfig` — Koin-injectable base-URL config for the group-list endpoint
+  (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `InvitationApiConfig` — Koin-injectable base-URL config for the join-with-code endpoints
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
@@ -33,8 +38,9 @@ Services — e.g. `AuthRepositoryImpl` (`core/data`) calls `CompanionAuthApi`; t
 group-type-picker feature's Store5 store (downstream `kmp-store-gen` generation step) calls
 `GroupTypeConfigApi`; the group-list feature's Store5 store (downstream `kmp-store-gen`
 generation step) will call `GroupApi` and surface it via `.asPagingScreenStream()` (COMP-GRP-001
-is offset-paginated). Feature ViewModels never call a Service directly (Repository/Store
-boundary).
+is offset-paginated); `InvitationRepositoryImpl` (`core/data`) calls `InvitationApi` directly
+(Store5-free — no read-stream to cache, see API.md#services). Feature ViewModels never call a
+Service directly (Repository/Store boundary).
 
 ## 4. Boundaries
 
@@ -64,17 +70,19 @@ returning — no silent failures.
 
 ## 7. Testing
 
-`commonTest` — `CompanionAuthApiTest`, `GroupTypeConfigApiTest`, `GroupApiTest` (MockEngine-backed;
-≥3 cases per method: success + at least two distinct error-status branches; `GroupApiTest` also
-covers default/explicit `paged`/`limit`/`offset` query-param threading). Ktor test deps
-(`ktor-client-mock`, `ktor-client-content-negotiation`, `ktor-serialization-kotlinx-json`)
-already declared in `core/network/build.gradle.kts`.
+`commonTest` — `CompanionAuthApiTest`, `GroupTypeConfigApiTest`, `GroupApiTest`, `InvitationApiTest`
+(MockEngine-backed; ≥3 cases per method: success + at least two distinct error-status branches;
+`GroupApiTest` also covers default/explicit `paged`/`limit`/`offset` query-param threading;
+`InvitationApiTest` covers all 4 `InvitationApi` methods incl. path templating for
+`{code}`/`{groupId}`/`{code}/{rowId}` and the `associateClientToGroup`/`markInvitationAccepted`
+request-body wiring). Ktor test deps (`ktor-client-mock`, `ktor-client-content-negotiation`,
+`ktor-serialization-kotlinx-json`) already declared in `core/network/build.gradle.kts`.
 
 ## 8. Observability
 
-Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`) — debug on request
-start, info on 2xx, error on every failure branch (status-mapped or transport/serialization
-exception).
+Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`) —
+debug on request start, info on 2xx, error on every failure branch (status-mapped or
+transport/serialization exception).
 
 ## 9. Evolution
 

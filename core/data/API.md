@@ -10,14 +10,22 @@
 | Repository | Read | Write | Branch |
 |---|---|---|---|
 | `AuthRepository` / `AuthRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `currentSession: Flow<AuthSession?>` (session-token presence, `CompanionSessionStore`-backed) | `selfRegister(SelfRegistration): NetworkResult<AuthSession, NetworkError>`, `login(LoginCredentials): NetworkResult<AuthSession, NetworkError>`, `refreshSession(sessionToken): NetworkResult<UserProfile, NetworkError>`, `clearSession()` | Legacy/mutation path — `business_logic.kind: processor` (NOT Store5; see RULE-IMPLEMENT-STORE5-001 scope) |
+| `InvitationRepository` / `InvitationRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | — (no read-stream; `validateCode`/`fetchGroupPreview` are one-shot no-cache reads) | `validateCode(code): NetworkResult<Invitation, NetworkError>`, `fetchGroupPreview(groupId): NetworkResult<GroupPreview, NetworkError>`, `joinGroup(groupId, clientId, role, code, rowId): NetworkResult<JoinGroupResult, NetworkError>` (associates then best-effort marks the invite accepted — non-fatal on mark-accepted failure) | Store5-free mutation orchestration — `business_logic.kind: processor`, `cache_strategy: no-cache` throughout (see RULE-IMPLEMENT-STORE5-001 scope) |
 | `UserDataRepository` / `UserDataRepositoryImpl` (`kpt.core.data.user`) | `userData: StateFlow<UserData>`, theme/language/preference flows | `setLanguage`/`setThemeBrand`/`setIsAuthenticated`/etc. | Template-provided user-preferences repository (unrelated to auth session) |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
+Contract refs (InvitationRepository): COMP-DT-004 + COMP-GRP-003 — see
+`idea-layer/screens/join-with-code/api.yaml`. **KNOWN GAP**: `joinGroup`'s `rowId` param is
+NOT derivable from `validateCode`'s result — `api.yaml#mark_invitation_accepted.params.rowId`
+declares a `validate_invite_token_response.id` source that the response contract does not
+actually define. Exposed as an explicit caller-supplied param; see
+`InvitationRepository.joinGroup` KDoc.
 
 ## Store5 note
 
 `core/data` also hosts Store5-wrapping Repositories for read-stream features (per SP-04 —
 `.asScreenStream()` / `.asPagingScreenStream()` over a `core/store` `Store`/`MutableStore`).
-None exist yet for `login-signup` (out of Store5 scope — see DEVELOPMENT.md#4).
+None exist yet for `login-signup` or `join-with-code` (both out of Store5 scope — see
+DEVELOPMENT.md#4).
 <!-- kmp-client-gen:END -->

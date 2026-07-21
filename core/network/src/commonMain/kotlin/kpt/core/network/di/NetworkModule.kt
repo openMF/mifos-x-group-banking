@@ -20,10 +20,13 @@ import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
+import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
+import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
+import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
@@ -99,4 +102,13 @@ val NetworkModule = module {
     // generation step, not registered here.
     single<GroupApiConfig> { GroupApiConfig() }
     single<GroupApi> { GroupApiImpl(httpClient = get()) }
+
+    // join-with-code (COMP-DT-004 + COMP-GRP-003) — join-with-code feature client stack.
+    // Reuses the shared HttpClient singleton above (same companion server, no second engine).
+    // The config binding is registered for override-surface symmetry with CompanionAuthApiConfig
+    // even though the shared client is the one actually dispatching requests today. The
+    // Repository consuming InvitationApi (Store5-free mutation orchestration — no read-stream
+    // to cache) is registered in RepositoryModule.kt.
+    single<InvitationApiConfig> { InvitationApiConfig() }
+    single<InvitationApi> { InvitationApiImpl(httpClient = get()) }
 }

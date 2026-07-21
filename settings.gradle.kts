@@ -121,6 +121,7 @@ include(":feature:settings")
 include(":feature:login-signup")
 include(":feature:group-type-picker")
 include(":feature:group-list")
+include(":feature:join-with-code")
 
 include(":core-base:analytics")
 include(":core-base:common")

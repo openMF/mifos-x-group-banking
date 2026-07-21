@@ -28,6 +28,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
+import org.mifos.groupbanking.feature.joinwithcode.di.JoinWithCodeModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
 
 object KoinModules {
@@ -54,7 +55,8 @@ object KoinModules {
             SettingsModule,
             LoginSignupModule,
             GroupTypePickerModule,
-            GroupListModule, // <- added by kmp-viewmodel-gen
+            GroupListModule,
+            JoinWithCodeModule, // <- added by kmp-viewmodel-gen
         )
     }
 

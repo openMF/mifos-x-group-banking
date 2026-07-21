@@ -36,6 +36,8 @@ import org.mifos.groupbanking.core.data.repository.GroupRepository
 import org.mifos.groupbanking.core.data.repository.GroupRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.InvitationRepository
+import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -68,6 +70,12 @@ val DataModule = module {
             fetchedAtRepository = get(),
         )
     }
+
+    // join-with-code (COMP-DT-004 + COMP-GRP-003) — Store5-free mutation orchestration
+    // (business_logic.kind: processor, no read-stream to cache), wraps InvitationApi
+    // (NetworkModule) directly. Surfaces NetworkResult, never .asScreenStream()/.write() — same
+    // branch as AuthRepository above.
+    single<InvitationRepository> { InvitationRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
