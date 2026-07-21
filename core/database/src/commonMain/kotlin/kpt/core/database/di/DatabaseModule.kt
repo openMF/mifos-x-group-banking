@@ -40,6 +40,9 @@ val DatabaseModule = module {
 
     // group-banking domain — group-type-picker seeded catalogue cache (SourceOfTruth DAO)
     single { get<AppDatabase>().groupTypeConfigDao }
+
+    // group-banking domain — group-list paginated cache (SourceOfTruth DAO, COMP-GRP-001)
+    single { get<AppDatabase>().groupListDao }
 }
 
 /**

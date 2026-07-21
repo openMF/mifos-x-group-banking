@@ -12,6 +12,7 @@ package kpt.core.store
 import kpt.core.base.store.infra.StoreRegistry
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Application-level [StoreRegistry] — the single named-qualifier registry for every
@@ -45,11 +46,18 @@ object AppStoreRegistry : StoreRegistry() {
     // REGISTRY:GroupTypeConfig — group-type-picker seeded catalogue (NETWORK_WITH_CACHE, COMP-DT-003)
     val GroupTypeConfig = store("groupTypeConfig")
 
+    // REGISTRY:GroupList — group-list paginated store (PAGINATED NETWORK_WITH_CACHE, COMP-GRP-001)
+    val GroupList = store("groupList")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
         // catalogue only changes on server deploys, so an aggressive TTL is correct.
         val GROUP_TYPE_CONFIG: Duration = 24.hours
+
+        // REGISTRY:GroupList — 5m matches data-flow.yaml ttl_seconds:300 (stale-while-revalidate);
+        // group membership + health rotate frequently, so a short TTL revalidates aggressively.
+        val GROUP_LIST: Duration = 5.minutes
     }
 
     /**
@@ -60,5 +68,7 @@ object AppStoreRegistry : StoreRegistry() {
     val ttlByName: Map<String, Duration> = mapOf(
         // REGISTRY:GroupTypeConfig
         "groupTypeConfig" to Ttl.GROUP_TYPE_CONFIG,
+        // REGISTRY:GroupList
+        "groupList" to Ttl.GROUP_LIST,
     )
 }

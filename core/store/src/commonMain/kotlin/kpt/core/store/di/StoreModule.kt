@@ -14,6 +14,7 @@ import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 
 /**
@@ -49,5 +50,17 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.GroupTypeConfig))
+    }
+
+    // MODULE:GroupList — group-list PAGINATED store (NETWORK_WITH_CACHE, COMP-GRP-001).
+    // Internal to the store seam — exposed to UI only through GroupRepository.asPagingScreenStream().
+    single(AppStoreRegistry.GroupList) {
+        provideGroupsPagingStore(api = get(), dao = get())
+    }
+
+    // MODULE:GroupList — register for logout cache clearing (clears in-memory + Room SoT pages).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.GroupList))
     }
 }

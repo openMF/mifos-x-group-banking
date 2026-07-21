@@ -13,6 +13,7 @@
 | `CompanionAuthApi` | `/companion/auth/login` | POST | `LoginRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
 | `CompanionAuthApi` | `/companion/auth/me` | GET (Bearer) | — | `UserProfileDto` | `NetworkResult<UserProfileDto, NetworkError>` |
 | `GroupTypeConfigApi` (`org.mifos.groupbanking.core.network.service.grouptypepicker`) | `/companion/datatables/group_type_config/{entityId}` | GET | — (path param `entityId: Long = 0`) | `List<GroupTypeConfigDto>` | `NetworkResult<List<GroupTypeConfigDto>, NetworkError>` |
+| `GroupApi` (`org.mifos.groupbanking.core.network.service.grouplist`) | `/companion/groups/mine` | GET (query `paged`/`limit`/`offset`) | — | `GroupPageDto` | `NetworkResult<GroupPageDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -20,14 +21,20 @@ refresh) — see `idea-layer/screens/login-signup/api.yaml` + the feature export
 `idea-layer/exports/login-signup/API.md`. COMP-DT-003 (group-type catalogue) — see
 `idea-layer/screens/group-type-picker/api.yaml`. `GroupTypeConfigApi` is consumed by the
 group-type-picker feature's Store5 store (owned by a downstream `kmp-store-gen` generation
-step, not by `core/network`).
+step, not by `core/network`). COMP-GRP-001 (group list, offset-paginated, `page_size=20`) — see
+`idea-layer/screens/group-list/api.yaml`. `GroupApi` is service-layer only; the Store5 store +
+Repository that wrap it (`.asPagingScreenStream()` per `data-flow.yaml#cache_strategy:
+stale-while-revalidate`) are owned by downstream `kmp-store-gen`/`kmp-client-gen` generation
+steps, not by `core/network`.
 
 ## dtos (core/network/model)
 
 `SelfRegisterRequestDto`, `LoginRequestDto`, `AuthResponseDto`, `UserProfileDto`,
 `GroupMembershipDto`, `GroupRoleDto`, `GroupTypeConfigDto` (+ `GroupTypeSlugDto` /
-`SavingsMechanismDto` / `ContributionModeDto` wire enums) — see `core/network/model/API.md` for
-the DTO-owning generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
+`SavingsMechanismDto` / `ContributionModeDto` wire enums), `GroupDto`, `GroupPageDto` (+
+`GroupTypeDto` / `ViewerRoleDto` / `HealthIndicatorDto` wire enums) — see
+`core/network/model/API.md` for the DTO-owning generator's own doc surface (schema-versioned,
+EC30 `UNKNOWN` enum fallback).
 
 ## config
 
@@ -39,4 +46,9 @@ per fork/environment by re-registering the `single<CompanionAuthApiConfig>` bind
 registered for override-surface symmetry; `GroupTypeConfigApiImpl` currently reuses the shared
 `HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
 second engine from this config's `baseUrl`.
+
+`GroupApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable, registered for
+override-surface symmetry; `GroupApiImpl` currently reuses the shared `HttpClient` singleton
+(bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine from this
+config's `baseUrl`.
 <!-- kmp-client-gen:END -->

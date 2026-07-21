@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_group_list_title">My Groups</string>
+    <string name="screens_group_list_loading_message">Loading your groups…</string>
+
+    <string name="screens_group_list_search_hint">Search groups…</string>
+    <string name="screens_group_list_search_icon_cd">Search</string>
+    <string name="screens_group_list_search_clear_cd">Clear search</string>
+    <string name="screens_group_list_search_empty_message">No results for \'%1$s\'</string>
+
+    <string name="screens_group_list_cycle_label">Cycle %1$d</string>
+    <string name="screens_group_list_member_count">%1$d members</string>
+    <string name="screens_group_list_last_met">Last met: %1$s</string>
+    <string name="screens_group_list_card_cd">%1$s, cycle %2$d, %3$d members, health %4$s</string>
+
+    <string name="screens_group_list_fab_cd">Create new savings group</string>
+    <string name="screens_group_list_action_create">Create Group</string>
+    <string name="screens_group_list_action_join">Join with Code</string>
+    <string name="screens_group_list_action_retry">Retry</string>
+
+    <string name="screens_group_list_empty_icon_cd">No groups</string>
+    <string name="screens_group_list_empty_title">No groups yet</string>
+    <string name="screens_group_list_empty_body">Create your first savings group to get started.</string>
+
+    <string name="screens_group_list_error_title">Could not load groups</string>
+    <string name="screens_group_list_error_icon_cd">Error</string>
+    <string name="screens_group_list_error_network_message">Could not load your groups. Check your connection and retry.</string>
+    <string name="screens_group_list_error_server_message">Server error loading your groups. Please retry.</string>
+    <string name="screens_group_list_error_auth_message">Session expired. Please log in again.</string>
+</resources>

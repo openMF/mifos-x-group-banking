@@ -29,14 +29,20 @@ logic, no domain field names.
 | `GroupTypeSlugDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `SavingsMechanismDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `ContributionModeDto` | `GroupTypeConfigDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `GroupDto` | `GroupDto.kt` | `@Serializable` response row (COMP-GRP-001) — canonical `Group` |
+| `GroupPageDto` | `GroupDto.kt` | `@Serializable` offset-paginated envelope |
+| `GroupTypeDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `ViewerRoleDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `HealthIndicatorDto` | `GroupDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 
 ## 3. Consumers
 
 - Ktor Services (`core/network` — the companion auth service + companion
-  datatables service built on these DTOs)
+  datatables service + companion groups service built on these DTOs)
 - Repository mappers (`core/network/mapper/LoginSignupMappers.kt` → `core/data`
   `AuthRepositoryImpl`; `core/network/mapper/GroupTypeConfigMappers.kt` →
-  `core/data` `GroupTypeConfigRepositoryImpl`)
+  `core/data` `GroupTypeConfigRepositoryImpl`; `core/network/mapper/GroupMappers.kt`
+  → `core/data` `GroupRepositoryImpl`)
 
 ## 4. Boundaries
 
@@ -88,6 +94,19 @@ logic, no domain field names.
 | `GroupTypeConfigDto` | `defaultCycleLengthMonths` | `defaultCycleLengthMonths` | `Int` | — |
 | `GroupTypeConfigDto` | `maxMembers` | `maxMembers` | `Int` | — |
 | `GroupTypeConfigDto` | `minMembers` | `minMembers` | `Int` | — |
+| `GroupDto` | `id` | `id` | `String` | — |
+| `GroupDto` | `name` | `name` | `String` | — |
+| `GroupDto` | `groupType` | `groupType` | `GroupTypeDto` | `GroupTypeDto.UNKNOWN` |
+| `GroupDto` | `viewerRole` | `viewerRole` | `ViewerRoleDto` | `ViewerRoleDto.UNKNOWN` |
+| `GroupDto` | `cycleNumber` | `cycleNumber` | `Int` | — |
+| `GroupDto` | `memberCount` | `memberCount` | `Int` | — |
+| `GroupDto` | `lastMeetingDate` | `lastMeetingDate` | `String` (ISO date) | — |
+| `GroupDto` | `healthIndicator` | `healthIndicator` | `HealthIndicatorDto` | `HealthIndicatorDto.UNKNOWN` |
+| `GroupDto` | `overdueRate` | `overdueRate` | `Double` | — |
+| `GroupDto` | `status` | `status` | `String` | — |
+| `GroupDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `GroupPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
+| `GroupPageDto` | `pageItems` | `pageItems` | `List<GroupDto>` | `emptyList()` |
 
 ## 6. Errors
 
@@ -100,17 +119,17 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 
 ## 7. Testing
 
-`core/network/src/commonTest/.../model/LoginSignupDtoTest.kt` and
-`GroupTypeConfigDtoTest.kt` — construction, serialization round-trip,
-default-value, and equality tests per DTO, plus a T7/EC30 cross-version
-fixture proving an old client tolerates a server-added field + a
-server-added enum value without crashing.
+`core/network/src/commonTest/.../model/LoginSignupDtoTest.kt`,
+`GroupTypeConfigDtoTest.kt`, and `GroupDtoTest.kt` — construction,
+serialization round-trip, default-value, and equality tests per DTO, plus a
+T7/EC30 cross-version fixture proving an old client tolerates a
+server-added field + a server-added enum value without crashing.
 
 ## 8. Observability
 
 Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
 `AuthResponseDto.sessionToken` — all carry sensitive auth material.
-`GroupTypeConfigDto` carries no sensitive fields.
+`GroupTypeConfigDto` and `GroupDto` carry no sensitive fields.
 
 ## 9. Evolution
 

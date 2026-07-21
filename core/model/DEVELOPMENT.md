@@ -27,13 +27,18 @@ mappers in `core/network/mapper`.
 | `GroupTypeSlug` | `GroupTypeConfig.kt` | enum (`VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO_VILLAGE_BANK`, `BURIAL_WELFARE`, `JLG`, `UNKNOWN`) |
 | `SavingsMechanism` | `GroupTypeConfig.kt` | enum (`ACCUMULATING`, `ROTATING_PAYOUT`, `NONE`, `UNKNOWN`) |
 | `ContributionMode` | `GroupTypeConfig.kt` | enum (`SHARE_BASED_VARIABLE`, `FIXED`, `MINIMAL`, `UNKNOWN`) |
+| `Group` | `Group.kt` | data class — COMP-GRP-001 canonical group-list row (also used by group-dashboard + member features) |
+| `GroupPage` | `Group.kt` | data class — offset-paginated envelope |
+| `ViewerRole` | `Group.kt` | enum (`ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN`) |
+| `HealthIndicator` | `Group.kt` | enum (`GREEN`, `AMBER`, `RED`, `UNKNOWN`) + `fromOverdueRate(rate: Double)` companion factory |
 
 ## 3. Consumers
 
 - UseCases (`core/domain`)
 - ViewModels (`feature/*`)
-- Repositories (`core/data` — `AuthRepositoryImpl` maps `core/network/model` DTOs
-  through `core/network/mapper` into these domain types before returning them)
+- Repositories (`core/data` — `AuthRepositoryImpl` / `GroupRepositoryImpl` map
+  `core/network/model` DTOs through `core/network/mapper` into these domain
+  types before returning them)
 
 ## 4. Boundaries
 
@@ -82,19 +87,34 @@ mappers in `core/network/mapper`.
 | `GroupTypeConfig` | `defaultCycleLengthMonths` | `Int` | non-null |
 | `GroupTypeConfig` | `maxMembers` | `Int` | non-null |
 | `GroupTypeConfig` | `minMembers` | `Int` | non-null |
+| `Group` | `id` | `String` | non-null |
+| `Group` | `name` | `String` | non-null |
+| `Group` | `groupType` | `GroupTypeSlug` | non-null |
+| `Group` | `viewerRole` | `ViewerRole` | non-null |
+| `Group` | `cycleNumber` | `Int` | non-null |
+| `Group` | `memberCount` | `Int` | non-null |
+| `Group` | `lastMeetingDate` | `LocalDate` | non-null |
+| `Group` | `healthIndicator` | `HealthIndicator` | non-null |
+| `Group` | `overdueRate` | `Double` | non-null |
+| `Group` | `status` | `String` | non-null |
+| `Group` | `fineractCenterId` | `Long` | non-null |
+| `GroupPage` | `totalFilteredRecords` | `Int` | non-null |
+| `GroupPage` | `groups` | `List<Group>` | non-null (may be empty) |
 
 ## 6. Errors
 
 `core/model` types carry no error/exception state — parse failures (e.g. a
-malformed `tokenExpiresAt` ISO-8601 string) surface as `Instant.parse`
-exceptions at the mapper boundary (`core/network/mapper`), not here.
+malformed `tokenExpiresAt` ISO-8601 string, or `Group.lastMeetingDate`'s
+`LocalDate.parse`) surface as exceptions at the mapper boundary
+(`core/network/mapper`), not here.
 
 ## 7. Testing
 
 Domain models are pure data classes exercised indirectly via the mapper test
 suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
-`GroupTypeConfigMappersTest.kt`), which assert every field is mapped and
-equality holds end to end.
+`GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`), which assert every
+field is mapped and equality holds end to end. `HealthIndicator.fromOverdueRate`
+additionally has direct boundary-value tests in `GroupMappersTest.kt`.
 
 ## 8. Observability
 

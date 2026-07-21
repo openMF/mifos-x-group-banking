@@ -32,6 +32,8 @@ import org.koin.dsl.module
 import kpt.core.store.AppStoreRegistry
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.GroupRepository
+import org.mifos.groupbanking.core.data.repository.GroupRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 
@@ -51,6 +53,17 @@ val DataModule = module {
     single<GroupTypeConfigRepository> {
         GroupTypeConfigRepositoryImpl(
             groupTypeConfigStore = get(AppStoreRegistry.GroupTypeConfig),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // group-list (COMP-GRP-001) — wraps the PAGINATED NETWORK_WITH_CACHE GroupsPagingStore
+    // (bound via AppStoreRegistry.GroupList in appStoreModule) and surfaces the offline-first
+    // .asPagingScreenStream() read (paged ScreenState<List<Group>> + load-more + pull-to-refresh).
+    single<GroupRepository> {
+        GroupRepositoryImpl(
+            groupsPagingStore = get(AppStoreRegistry.GroupList),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

@@ -18,7 +18,10 @@ import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
+import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
+import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
+import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
@@ -87,4 +90,13 @@ val NetworkModule = module {
     // though the shared client is the one actually dispatching requests today.
     single<GroupTypeConfigApiConfig> { GroupTypeConfigApiConfig() }
     single<GroupTypeConfigApi> { GroupTypeConfigApiImpl(httpClient = get()) }
+
+    // Group list (COMP-GRP-001) — group-list feature client stack. Reuses the shared HttpClient
+    // singleton above (same companion server, no second engine). The config binding is
+    // registered for override-surface symmetry with CompanionAuthApiConfig even though the
+    // shared client is the one actually dispatching requests today. The Repository/Store5
+    // wrapper consuming GroupApi is emitted by a downstream kmp-store-gen/kmp-client-gen
+    // generation step, not registered here.
+    single<GroupApiConfig> { GroupApiConfig() }
+    single<GroupApi> { GroupApiImpl(httpClient = get()) }
 }
