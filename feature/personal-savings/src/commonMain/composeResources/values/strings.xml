@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_personal_savings_title">My Savings</string>
+
+    <string name="screens_personal_savings_tab_row_cd">Switch between group-linked and individual savings</string>
+    <string name="screens_personal_savings_tab_group_linked">Group-linked</string>
+    <string name="screens_personal_savings_tab_individual">Individual</string>
+
+    <string name="screens_personal_savings_shimmer_cd">Loading savings</string>
+
+    <string name="screens_personal_savings_group_linked_balance_label">Group-Linked Savings</string>
+    <string name="screens_personal_savings_individual_balance_label">Individual Savings</string>
+    <string name="screens_personal_savings_balance_amount_format">KES %1$s</string>
+    <string name="screens_personal_savings_account_number_format">Acc: %1$s</string>
+    <string name="screens_personal_savings_balance_card_cd">%1$s, KES %2$s</string>
+
+    <string name="screens_personal_savings_contribution_progress_icon_cd">Contribution progress</string>
+    <string name="screens_personal_savings_contribution_progress_label">Contribution Progress</string>
+    <string name="screens_personal_savings_meetings_progress_format">%1$d / %2$d meetings</string>
+    <string name="screens_personal_savings_this_cycle_format">This cycle: KES %1$s</string>
+
+    <string name="screens_personal_savings_transaction_history_label">Transaction History</string>
+
+    <string name="screens_personal_savings_txn_deposit_icon_cd">Deposit</string>
+    <string name="screens_personal_savings_txn_withdrawal_icon_cd">Withdrawal</string>
+    <string name="screens_personal_savings_txn_amount_deposit_format">+KES %1$s</string>
+    <string name="screens_personal_savings_txn_amount_withdrawal_format">-KES %1$s</string>
+    <string name="screens_personal_savings_txn_balance_format">Balance: KES %1$s</string>
+    <string name="screens_personal_savings_txn_row_cd">%1$s, KES %2$s, %3$s</string>
+
+    <string name="screens_personal_savings_empty_individual_icon_cd">No individual savings account</string>
+    <string name="screens_personal_savings_empty_individual_title">No individual savings yet</string>
+    <string name="screens_personal_savings_empty_individual_body">Speak to your group treasurer to open an individual savings account.</string>
+
+    <string name="screens_personal_savings_error_icon_cd">Failed to load savings, tap Try Again to retry</string>
+    <string name="screens_personal_savings_error_title">Could not load savings</string>
+    <string name="screens_personal_savings_error_network_message">Check your internet connection and try again.</string>
+    <string name="screens_personal_savings_error_server_message">Something went wrong on our end. Please try again.</string>
+    <string name="screens_personal_savings_error_session_message">Your session has expired. Please log in again.</string>
+    <string name="screens_personal_savings_action_retry">Try Again</string>
+</resources>

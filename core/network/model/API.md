@@ -93,6 +93,63 @@
 | `BatchSyncResponseItemDto` | `requestId`, `statusCode`, `body` | all required | response ROW of `batch_sync` — the HTTP body itself is a bare `type: array` of this shape, no wrapper object |
 | `ChangePinRequestDto` | `password`, `repeatPassword` | both required, no defaults (`api.yaml` declares neither field as optional, so no `@EncodeDefault` is needed, unlike `LoanRequestPayloadDto.status`) | `PUT /fineract-provider/api/v1/self/user/updatePassword` (`change_pin`) request; both fields resolve to the SAME domain `ChangePinRequest.newPin` — see `## 4. Boundaries` |
 | `ChangePinResponseDto` | `resourceId` | required | response of `change_pin` — standard Fineract self-service `updatePassword` command-processing envelope |
+| `SavingsLedgerEntryDto` | `id`, `transactionType` (raw `{value,code,description}`), `date` (raw `List<Int>`), `amount`, `runningBalance`, `currency` | all required | `GET /self/savingsaccounts/{savingsId}/transactions` (`get_group_linked_transactions`/`get_individual_transactions`) — raw Fineract self-service ledger row; see 4-way `SavingsTransactionDto` naming-collision note below |
+| `SavingsLedgerTransactionTypeDto` | `value`, `code`, `description` | all required | field of `SavingsLedgerEntryDto.transactionType`; kept raw (no enum, no declared `code` value-set — Hard Rule 4) |
+| `SavingsLedgerCurrencyDto` | `code`, `displaySymbol` | both required | field of `SavingsLedgerEntryDto.currency` |
+| `SavingsMemberDto` | `memberId`, `displayName`, `photoUri` (nullable, default `null`) | `photoUri` nullable; rest required | field of `MemberSavingsDetailDto.member` |
+| `SavingsDataPointDto` | `date`, `balance` | both required | field of `MemberSavingsDetailDto.sparklineData`; maps to the EXISTING `core/model.SavingsDataPoint` |
+| `SavingsStatementTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `INTEREST_POSTING`, `FEE_DEDUCTION`, `TRANSFER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `SavingsStatementEntryDto.type` |
+| `SavingsStatementEntryDto` | `id`, `date`, `type` (default `UNKNOWN`), `amount`, `runningBalance`, `reversed` | `type` defaults `UNKNOWN`; rest required | field of `MemberSavingsDetailDto.transactions` — see 4-way naming-collision note below |
+| `MemberSavingsDetailDto` | `member`, `savingsAccountNo`, `savingsBalance`, `sharesHeld` (nullable, default `null`), `shareValue` (nullable, default `null`), `sparklineData` (default `[]`), `transactions` (default `[]`), `totalTransactions`, `hasNextPage` | 2 SHARE_BASED_VARIABLE-only fields nullable; 2 lists default empty; rest required | `GET /companion/groups/{groupId}/members/{memberId}/savings` (`get_member_savings_detail`) |
+| `WeeklyContributionPointDto` | `weekLabel`, `groupAmount`, `individualAmount` | all required | field of `GroupSavingsSummaryDto.weeklyTrend` / `IndividualSavingsSummaryDto.weeklyTrend` |
+| `MemberGroupSavingsRowDto` | `memberId`, `name`, `totalContributed`, `lastContribution`, `meetingsContributed`, `sharesHeld` (nullable, default `null`), `shareValue` (nullable, default `null`) | 2 SHARE_BASED_VARIABLE-only fields nullable; rest required | field of `GroupSavingsSummaryDto.memberRows` |
+| `GroupSavingsSummaryDto` | `cycleTarget`, `cycleCollected`, `totalCollected`, `weeklyTrend` (default `[]`), `memberRows` (default `[]`) | 2 lists default empty; rest required | `GET /companion/groups/{groupId}/savings` (`get_group_savings_summary`) |
+| `MemberIndividualSavingsRowDto` | `memberId`, `name`, `currentBalance`, `lastTransaction` (nullable, default `null`), `lastTransactionDate` (nullable, default `null`) | 2 nullable fields default `null`; rest required | field of `IndividualSavingsSummaryDto.memberRows` |
+| `IndividualSavingsSummaryDto` | `totalBalance`, `weeklyTrend` (default `[]`), `memberRows` (default `[]`) | 2 lists default empty; rest required | `GET /companion/groups/{groupId}/savings/individual` (`get_individual_savings_summary`) |
+
+**Shared Savings domain layer (`SavingsDto.kt`/`SavingsMappers.kt`) — built ONCE for personal-savings +
+member-savings-detail + savings-dashboard (informational; no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for member-savings-detail or savings-dashboard — each feature's own
+`api.yaml` is the sole SoT, per PP-1):** `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`
+(raw Fineract shape) was generated as `SavingsLedgerEntryDto` — see the 4-way naming-collision note
+immediately below. `idea-layer/screens/member-savings-detail/api.yaml#dtos.SavingsTransaction` was
+generated as `SavingsStatementEntryDto` (same collision-avoidance reasoning). `SavingsDataPointDto`
+reuses the EXISTING `core/model.SavingsDataPoint` domain model outright on the mapper side (no new
+domain type) — see `core/model/API.md`.
+
+**FOUR-way `SavingsTransactionDto`/`SavingsTransaction` naming collision (flagged for the
+cross-feature repair station, extends the THREE-way note already on `SavingsTransactionDto.kt`):**
+four sources now declare a type under the conceptual "savings transaction" name, each with a
+DIFFERENT shape:
+
+1. `SavingsTransactionDto` (`SavingsTransactionDto.kt`, personal-dashboard's own approved
+   `api.yaml`, status `approved`): compact companion shape — `id: String`, `date: String`,
+   `type: TransactionTypeDto` (`DEPOSIT`/`WITHDRAWAL`/`UNKNOWN`), `amount: Double`.
+2. `idea-layer/dtos/SavingsTransactionDto.yaml` (registry v1.0.0): richer Fineract-raw shape —
+   `id: Long`, `memberId: Long`, `savingsAccountId: Long`, `transactionType: String` (4 values
+   incl. `interest_posting`/`fee_deduction`), `date: String`, `currency: String`,
+   `runningBalance: Double?`, `note: String?`.
+3. `SavingsLedgerEntryDto` (this file, `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`):
+   still-richer raw-Fineract-SelfService component shape — `id: Long`,
+   `transactionType: {value, code, description}`, `date: List<Int>`, `amount: Double`,
+   `runningBalance: Double`, `currency: {code, displaySymbol}`.
+4. `SavingsStatementEntryDto` (this file, `idea-layer/screens/member-savings-detail/api.yaml#dtos.SavingsTransaction`):
+   companion-normalized statement row — `id: String`, `date: String`,
+   `type: TransactionType` (5 values: `DEPOSIT`/`WITHDRAWAL`/`INTEREST_POSTING`/`FEE_DEDUCTION`/
+   `TRANSFER`), `amount: Double`, `runningBalance: Double`, `reversed: Boolean`.
+
+Each shape was generated from its OWN declaring feature's approved `api.yaml`/kdoc (Hard Rule 5),
+never forced into reuse — resolving the full four-way collision (e.g. renaming (3) to a
+`SavingsLedgerEntry`-family concept distinct from "transaction", or migrating consumers onto a
+single companion shape) is explicitly OUT of this generation's scope and flagged for Station 3.
+
+**`SavingsTab` naming collision (personal-savings vs savings-dashboard, flagged for the
+cross-feature repair station):** `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTab`
+(`[GROUP_LINKED, INDIVIDUAL]`) and `idea-layer/screens/savings-dashboard/api.yaml#dtos.SavingsTab`
+(`[GROUP, INDIVIDUAL]`) declare DIFFERENT value-sets under the SAME bare name. Neither is
+`@Serializable` (pure client-side tab state, no DTO here) — modeled as `SavingsTab`
+(personal-savings) and `SavingsDashboardTab` (savings-dashboard) in `core/model/Savings.kt`;
+see that file's kdoc for the full note. Resolve at Station 3.
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -159,7 +216,25 @@ entry exists for this feature — `api.yaml` is the sole SoT, per PP-1);
 offline `sync_queue` via one atomic Fineract batch call; no dedicated
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
 `api.yaml` is the sole SoT, per PP-1; its own `dtos.SyncQueueItem` block
-diverges from the shipped `SyncQueueItem` Room schema, see note below).
+diverges from the shipped `SyncQueueItem` Room schema, see note below);
+`idea-layer/screens/personal-savings/{api.yaml,ui.yaml}` (`GET
+/self/savingsaccounts/{savingsId}/transactions`, group-linked AND individual accounts, raw
+Fineract self-service ledger, stale-while-revalidate `ttl=300` + offline `use_sqldelight`; no
+dedicated `idea-layer/dtos/{Dto}.yaml` registry entry declares THIS raw shape — `api.yaml` is the
+sole SoT for `SavingsLedgerEntryDto`, per PP-1; see the 4-way `SavingsTransactionDto`
+naming-collision note above);
+`idea-layer/screens/member-savings-detail/api.yaml` (`GET
+/companion/groups/{groupId}/members/{memberId}/savings`, `get_member_savings_detail`,
+offset-paginated `limit`/`offset`, `page_size=20`, stale-while-revalidate `ttl=120` + offline
+`show_cached`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/savings-dashboard/api.yaml` (2 operations: `get_group_savings_summary`
+(`GET /companion/groups/{groupId}/savings`) + `get_individual_savings_summary`
+(`GET /companion/groups/{groupId}/savings/individual`), stale-while-revalidate `ttl=300` + offline
+`show_cached`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its own `dtos.SavingsTab` block collides with
+personal-savings' `dtos.SavingsTab` under the same bare name — see the `SavingsTab` naming-collision
+note above).
 
 **`LoanPurposeDto` extension for loan-request (PP-1 — screen-SoT wins,
 informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`

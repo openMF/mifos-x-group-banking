@@ -35,6 +35,10 @@
 | `LoanApplyApi` | `/loans` | POST | `ApplyLoanRequestDto` | `ApplyLoanResponseDto` | `NetworkResult<ApplyLoanResponseDto, NetworkError>` |
 | `BatchSyncApi` (`org.mifos.groupbanking.core.network.service.batchsync`) | `/fineract-provider/api/v1/batches` | POST | `BatchSyncRequestDto` | `List<BatchSyncResponseItemDto>` (top-level JSON array, no envelope) | `NetworkResult<List<BatchSyncResponseItemDto>, NetworkError>` |
 | `ChangePinApi` (`org.mifos.groupbanking.core.network.service.changepin`) | `/fineract-provider/api/v1/self/user/updatePassword` | PUT (BasicAuth) | `ChangePinRequestDto` | `ChangePinResponseDto` | `NetworkResult<ChangePinResponseDto, NetworkError>` |
+| `SavingsApi` (`org.mifos.groupbanking.core.network.service.savings`) | `/self/savingsaccounts/{savingsId}/transactions` | GET (query `limit`/`offset`, reused for BOTH group-linked and individual accounts) | — | `List<SavingsLedgerEntryDto>` (top-level JSON array) | `NetworkResult<List<SavingsLedgerEntryDto>, NetworkError>` |
+| `SavingsApi` | `/companion/groups/{groupId}/members/{memberId}/savings` | GET (query `limit`/`offset`) | — | `MemberSavingsDetailDto` | `NetworkResult<MemberSavingsDetailDto, NetworkError>` |
+| `SavingsApi` | `/companion/groups/{groupId}/savings` | GET | — | `GroupSavingsSummaryDto` | `NetworkResult<GroupSavingsSummaryDto, NetworkError>` |
+| `SavingsApi` | `/companion/groups/{groupId}/savings/individual` | GET | — | `IndividualSavingsSummaryDto` | `NetworkResult<IndividualSavingsSummaryDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -110,6 +114,20 @@ as `InvitationApi`/`GroupCreateApi`/`MemberAddApi`/`LoanRequestApi`. The wire bo
 has no wire counterpart; Fineract authenticates the caller via the `BasicAuth` header the shared
 `HttpClient` attaches, not a JSON field (see `ChangePinDto.kt`/`ChangePinMappers.kt` KDoc).
 
+Shared savings client stack — built ONCE for the 3 consumers that share Fineract savings shapes:
+personal-savings (`get_group_linked_transactions`/`get_individual_transactions`, both `GET
+/self/savingsaccounts/{savingsId}/transactions`, `SavingsApi.getSavingsTransactions` reused for
+both accounts), member-savings-detail (`get_member_savings_detail`, `GET
+/companion/groups/{groupId}/members/{memberId}/savings`), and savings-dashboard
+(`get_group_savings_summary`/`get_individual_savings_summary`, `GET
+/companion/groups/{groupId}/savings[/individual]`) — see the 3 features' own `api.yaml` +
+`data-flow.yaml`. `SavingsApi` is service-layer only; the parallel-combine composites
+(`loadMemberSavings`, `loadSavingsDashboard`) live in `SavingsRepositoryImpl` (`core/data`) —
+Store5-free TODAY (no `AppStoreRegistry.Savings` entry exists yet; SP-03 `kmp-store-gen` has not
+run for this feature set), same branch as `LoanApplyApi`/`MemberAddApi`. `getSavingsTransactions`
+is a raw Fineract self-service passthrough (like `MemberProfileApi`); the other 3 methods are
+`/companion/…` reads.
+
 ## dtos (core/network/model)
 
 `SelfRegisterRequestDto`, `LoginRequestDto`, `AuthResponseDto`, `UserProfileDto`,
@@ -182,6 +200,11 @@ second engine from this config's `baseUrl`.
 
 `ChangePinApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
 registered for override-surface symmetry; `ChangePinApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
+
+`SavingsApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `SavingsApiImpl` currently reuses the shared
 `HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
 second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

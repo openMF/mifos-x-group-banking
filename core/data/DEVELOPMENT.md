@@ -37,6 +37,11 @@
 - `ChangePinRepository` / `ChangePinRepositoryImpl` — the settings screen's change-PIN mutation
   repository (`changePin`, wraps `ChangePinApi` directly, no read-stream). See
   API.md#repositories.
+- `SavingsRepository` / `SavingsRepositoryImpl` — shared savings repository for personal-savings
+  (`getSavingsTransactions` standalone + `loadMemberSavings` 2-way parallel combine),
+  member-savings-detail (`getMemberSavingsDetail`), and savings-dashboard
+  (`getGroupSavingsSummary`/`getIndividualSavingsSummary` standalone + `loadSavingsDashboard`
+  2-way parallel combine). See API.md#repositories.
 
 ## 3. Consumers
 
@@ -64,7 +69,15 @@ on-mount/on-refresh local reads (`observePending`/`observePendingByType`/`observ
 at the ViewModel layer) / `OnRetryOperation` (`retryItem(itemId)`). The settings ViewModel
 injects `ChangePinRepository` directly — `changePin` on the change-PIN dialog's submit action
 (`OnSubmitPinChange`); `AuthRepository` is a separate injection for session-level concerns and is
-never wrapped/extended by `ChangePinRepository`.
+never wrapped/extended by `ChangePinRepository`. The personal-savings ViewModel injects
+`SavingsRepository` directly — `getSavingsTransactions` (group-linked, default tab) on-mount,
+lazily again (individual `savingsId`) on `OnTabSelected(INDIVIDUAL)`, and on pull-to-refresh/retry
+for whichever tab is active; `loadMemberSavings` is available as a combined-load convenience. The
+member-savings-detail ViewModel injects `SavingsRepository` directly — `getMemberSavingsDetail`
+on-mount/refresh/retry (`offset=0`) and again on `OnLoadMore` (`offset += 20`). The
+savings-dashboard ViewModel injects `SavingsRepository` directly — `loadSavingsDashboard` on
+mount/refresh/retry (both tabs fetched together); `SelectTab` is a pure client-side pane switch,
+no repository call.
 
 ## 4. Boundaries
 
@@ -104,6 +117,13 @@ never wrapped/extended by `ChangePinRepository`.
   `ChangePinRepositoryImpl.changePin` is a plain `when` over `ChangePinApi`'s `NetworkResult`;
   `ChangePinApiImpl` (core/network) is the sole layer allowed to catch exceptions. Deliberately
   separate from `AuthRepository` (not extended/wrapped).
+- `SavingsRepository` is Store5-free TODAY even though all 3 consuming features'
+  `data-flow.yaml#cache_strategy` declares `stale_while_revalidate` — no `AppStoreRegistry.Savings`
+  entry exists yet (SP-03 `kmp-store-gen` has not run for this feature set). No try-catch —
+  `loadMemberSavings`/`loadSavingsDashboard` are `coroutineScope`+`async` 2-way parallel combines
+  with a plain sequential Error-check (no `.catch{}` swallow); `getSavingsTransactions`/
+  `getMemberSavingsDetail`/`getGroupSavingsSummary`/`getIndividualSavingsSummary` are plain `when`
+  chains over `SavingsApi`'s `NetworkResult`.
 
 ## 5. Data
 
@@ -134,7 +154,12 @@ domain→DTO mapping assertion + validation/conflict/server-error passthrough ca
 success/404/empty, `loadTemplate`'s all-5-succeed derived-eligibility assertion plus one
 short-circuit case per read (products/template/savings/corpus/config each independently
 verified to propagate its error), `applyLoan` success/400/500 incl. the
-domain→DTO purpose-id mapping assertion); `SyncQueueRepositoryTest` (in-memory `SyncQueueDao`
+domain→DTO purpose-id mapping assertion); `SavingsRepositoryTest` (uniquely-named `FakeSavingsApi`,
+file-private — avoids the K2 same-package private-declaration collision; 21 cases — `getSavingsTransactions`
+success/empty/error-passthrough, `loadMemberSavings`'s both-succeed/individual-null-skips-read/
+group-fails/individual-fails cases, `getMemberSavingsDetail`/`getGroupSavingsSummary`/
+`getIndividualSavingsSummary` success + empty + error-passthrough cases, `loadSavingsDashboard`'s
+both-succeed-fires-both-in-parallel/group-fails/individual-fails cases); `SyncQueueRepositoryTest` (in-memory `SyncQueueDao`
 fake; enqueue/observePending/observeCounts/markSyncing/markFailed+retryAll coverage plus the
 `observePendingByType`/`observeFailed`/`observeConflictCount`/`getItem` extension methods);
 `SyncManagerTest` (fake `SyncQueueRepository` + fake `BatchSyncApi` + fake `SyncMetadataStore`;
@@ -164,7 +189,10 @@ success/failed/conflict counts) and per-item retry outcome, error on the specifi
 row's/transport failure's status code (not a generic "sync failed" message); no-op retries
 (item not found) are info-logged, not silently dropped. Kermit tag `ChangePinRepository` — debug
 on submit, info on success (with `resourceId`), error on every failure branch (mirrors the
-Service's own logging one layer down).
+Service's own logging one layer down). Kermit tag `SavingsRepository` — debug on each call start
+(incl. both ids on `loadMemberSavings`, `groupId` on `loadSavingsDashboard`), info on success
+(incl. row/member counts), error on the specific read that failed within either 2-way parallel
+combine (not a generic "combine failed" message).
 
 ## 9. Evolution
 

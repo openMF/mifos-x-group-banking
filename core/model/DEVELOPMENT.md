@@ -102,6 +102,20 @@ mappers in `core/network/mapper`.
 | `SyncResult` | `BatchSync.kt` | data class — client-computed rollup of a `/batches` response (`successCount`/`failedCount`/`conflictCount`) |
 | `ChangePinRequest` | `ChangePin.kt` | data class — settings change-PIN dialog submission input (`change_pin`); `currentPin` excluded from the wire body (BasicAuth boundary) |
 | `ChangePinResult` | `ChangePin.kt` | data class — `change_pin` success result |
+| `SavingsTransactionType` | `Savings.kt` | enum (`DEPOSIT`, `WITHDRAWAL`, `INTEREST_POSTING`, `FEE_DEDUCTION`, `TRANSFER`, `UNKNOWN`) — member-savings-detail's statement rows; distinct from `TransactionType` (`SavingsTransaction.kt`), see naming-collision note below |
+| `SavingsLedgerTransactionType` | `Savings.kt` | data class (`value: Int`, `code: String`, `description: String`) — raw Fineract `{value,code,description}` mirror, no invented enum (Hard Rule 4) |
+| `SavingsLedgerEntry` | `Savings.kt` | data class — personal-savings' raw Fineract self-service ledger row |
+| `SavingsTab` | `Savings.kt` | enum (`GROUP_LINKED`, `INDIVIDUAL`) — personal-savings' own-account tab selector; naming collision with `SavingsDashboardTab`, see below |
+| `SavingsDashboardTab` | `Savings.kt` | enum (`GROUP`, `INDIVIDUAL`) — savings-dashboard's own tab selector |
+| `SavingsMember` | `Savings.kt` | data class — member-savings-detail's member identity subset |
+| `SavingsStatementEntry` | `Savings.kt` | data class — member-savings-detail's paginated statement row (richer than `SavingsLedgerEntry`, adds `reversed`) |
+| `MemberSavingsDetail` | `Savings.kt` | data class — composite for `get_member_savings_detail`'s single read; `sparklineData` REUSES `SavingsDataPoint` (`MemberProfile.kt`) outright |
+| `SavingsTransactionFilter` | `Savings.kt` | enum (`ALL`, `DEPOSITS`, `WITHDRAWALS`) — client-side statement-list filter, no wire source |
+| `WeeklyContributionPoint` | `Savings.kt` | data class — savings-dashboard trend-chart point |
+| `MemberGroupSavingsRow` | `Savings.kt` | data class — `get_group_savings_summary` member row |
+| `GroupSavingsSummary` | `Savings.kt` | data class — savings-dashboard group-tab summary |
+| `MemberIndividualSavingsRow` | `Savings.kt` | data class — `get_individual_savings_summary` member row |
+| `IndividualSavingsSummary` | `Savings.kt` | data class — savings-dashboard individual-tab summary |
 
 ## 3. Consumers
 
@@ -169,6 +183,25 @@ mappers in `core/network/mapper`.
 - `core/model` depends only on `core/common` + `kotlinx.datetime` (exposed as
   `api` since `Instant` appears in public model signatures) — no Ktor, no
   kotlinx.serialization runtime dependency leaking into its public surface.
+- **`SavingsTransactionType` vs the EXISTING `TransactionType` naming near-collision (flagged for
+  the cross-feature repair station):** `SavingsTransaction.kt` already declares a compact
+  `TransactionType` enum (`DEPOSIT`/`WITHDRAWAL`/`UNKNOWN`) for personal-dashboard's recent-activity
+  row. `Savings.kt`'s `SavingsTransactionType` (member-savings-detail) is a WIDER, incompatible
+  value-set (adds `INTEREST_POSTING`/`FEE_DEDUCTION`/`TRANSFER`) — NOT unified with `TransactionType`,
+  same "don't force reuse across incompatible value-sets" precedent as `LoanAccountStatus` vs
+  `LoanStatus`. Resolve at Station 3.
+- **`SavingsTab` vs `SavingsDashboardTab` naming collision (flagged for the cross-feature repair
+  station):** personal-savings' `api.yaml#dtos.SavingsTab` (`GROUP_LINKED`/`INDIVIDUAL`) and
+  savings-dashboard's `api.yaml#dtos.SavingsTab` (`GROUP`/`INDIVIDUAL`) declare the SAME bare name
+  with DIFFERENT value-sets — modeled as two distinct enums (`SavingsTab`/`SavingsDashboardTab`) in
+  `Savings.kt` rather than forcing one shape. Resolve at Station 3.
+- **`SavingsLedgerEntry`/`SavingsStatementEntry` vs the EXISTING `SavingsTransaction` naming
+  collision (flagged for the cross-feature repair station, extends the 3-way note on
+  `SavingsTransaction.kt`):** four "savings transaction" shapes now exist across this codebase +
+  the registry — see the full 4-way note in `core/network/model/API.md`. Neither `SavingsLedgerEntry`
+  (personal-savings) nor `SavingsStatementEntry` (member-savings-detail) reuses/forks the EXISTING
+  `SavingsTransaction` domain model — each mirrors its own DTO 1:1, per the same "declaring
+  feature's own contract wins" precedent used throughout this file.
 
 ## 5. Data
 
@@ -486,6 +519,57 @@ mappers in `core/network/mapper`.
 | `ChangePinRequest` | `currentPin` | `String` | non-null |
 | `ChangePinRequest` | `newPin` | `String` | non-null |
 | `ChangePinResult` | `resourceId` | `Long` | non-null |
+| `SavingsLedgerTransactionType` | `value` | `Int` | non-null |
+| `SavingsLedgerTransactionType` | `code` | `String` | non-null |
+| `SavingsLedgerTransactionType` | `description` | `String` | non-null |
+| `SavingsLedgerEntry` | `id` | `Long` | non-null |
+| `SavingsLedgerEntry` | `type` | `SavingsLedgerTransactionType` | non-null |
+| `SavingsLedgerEntry` | `date` | `LocalDate` | non-null |
+| `SavingsLedgerEntry` | `amount` | `Double` | non-null |
+| `SavingsLedgerEntry` | `runningBalance` | `Double` | non-null |
+| `SavingsLedgerEntry` | `currencyCode` | `String` | non-null |
+| `SavingsLedgerEntry` | `currencyDisplaySymbol` | `String` | non-null |
+| `SavingsMember` | `memberId` | `String` | non-null |
+| `SavingsMember` | `displayName` | `String` | non-null |
+| `SavingsMember` | `photoUri` | `String?` | nullable |
+| `SavingsStatementEntry` | `id` | `String` | non-null |
+| `SavingsStatementEntry` | `date` | `LocalDate` | non-null |
+| `SavingsStatementEntry` | `type` | `SavingsTransactionType` | non-null |
+| `SavingsStatementEntry` | `amount` | `Double` | non-null |
+| `SavingsStatementEntry` | `runningBalance` | `Double` | non-null |
+| `SavingsStatementEntry` | `reversed` | `Boolean` | non-null |
+| `MemberSavingsDetail` | `member` | `SavingsMember` | non-null |
+| `MemberSavingsDetail` | `savingsAccountNo` | `String` | non-null |
+| `MemberSavingsDetail` | `savingsBalance` | `Double` | non-null |
+| `MemberSavingsDetail` | `sharesHeld` | `Int?` | nullable (SHARE_BASED_VARIABLE only) |
+| `MemberSavingsDetail` | `shareValue` | `Long?` | nullable (SHARE_BASED_VARIABLE only) |
+| `MemberSavingsDetail` | `sparklineData` | `List<SavingsDataPoint>` | non-null |
+| `MemberSavingsDetail` | `transactions` | `List<SavingsStatementEntry>` | non-null |
+| `MemberSavingsDetail` | `totalTransactions` | `Int` | non-null |
+| `MemberSavingsDetail` | `hasNextPage` | `Boolean` | non-null |
+| `WeeklyContributionPoint` | `weekLabel` | `String` | non-null |
+| `WeeklyContributionPoint` | `groupAmount` | `Long` | non-null |
+| `WeeklyContributionPoint` | `individualAmount` | `Long` | non-null |
+| `MemberGroupSavingsRow` | `memberId` | `String` | non-null |
+| `MemberGroupSavingsRow` | `name` | `String` | non-null |
+| `MemberGroupSavingsRow` | `totalContributed` | `Long` | non-null |
+| `MemberGroupSavingsRow` | `lastContribution` | `Long` | non-null |
+| `MemberGroupSavingsRow` | `meetingsContributed` | `Int` | non-null |
+| `MemberGroupSavingsRow` | `sharesHeld` | `Int?` | nullable (SHARE_BASED_VARIABLE only) |
+| `MemberGroupSavingsRow` | `shareValue` | `Long?` | nullable (SHARE_BASED_VARIABLE only) |
+| `GroupSavingsSummary` | `cycleTarget` | `Long` | non-null |
+| `GroupSavingsSummary` | `cycleCollected` | `Long` | non-null |
+| `GroupSavingsSummary` | `totalCollected` | `Long` | non-null |
+| `GroupSavingsSummary` | `weeklyTrend` | `List<WeeklyContributionPoint>` | non-null |
+| `GroupSavingsSummary` | `memberRows` | `List<MemberGroupSavingsRow>` | non-null |
+| `MemberIndividualSavingsRow` | `memberId` | `String` | non-null |
+| `MemberIndividualSavingsRow` | `name` | `String` | non-null |
+| `MemberIndividualSavingsRow` | `currentBalance` | `Long` | non-null |
+| `MemberIndividualSavingsRow` | `lastTransaction` | `Long?` | nullable |
+| `MemberIndividualSavingsRow` | `lastTransactionDate` | `LocalDate?` | nullable |
+| `IndividualSavingsSummary` | `totalBalance` | `Long` | non-null |
+| `IndividualSavingsSummary` | `weeklyTrend` | `List<WeeklyContributionPoint>` | non-null |
+| `IndividualSavingsSummary` | `memberRows` | `List<MemberIndividualSavingsRow>` | non-null |
 
 ## 6. Errors
 
@@ -581,6 +665,12 @@ field) AND the reverse `ChangePinResponseDto -> ChangePinResult`.
 `LanguageConfigTest.kt` (`core/model/src/commonTest/.../user`) covers the
 added `SWAHILI` entry's `localeName`/`text` plus the settings screen's full
 declared `AppLanguage` value-set (`ENGLISH`/`SWAHILI`/`FRENCH`/`HINDI`).
+`Savings.kt`'s domain models are exercised indirectly via
+`core/network/src/commonTest/.../mapper/SavingsMappersTest.kt` (every DTO -> domain mapper, every
+field, every `SavingsStatementTypeDto -> SavingsTransactionType` enum value, every batch converter
+incl. empty-list, and the `fineractDateComponents` wire-date helper) — `core/model` itself has no
+`commonTest` source set (pure data classes have no independent logic to unit-test beyond the
+mapper round-trip, same precedent as `LoanAccountStatus`/`LoanStatusFilter`).
 
 ## 8. Observability
 
@@ -643,6 +733,12 @@ request/response bodies verbatim; log `requestId`/`statusCode` only.
 NEVER log either field, matching the `LoginCredentials.password` threat
 model. `ChangePinResult` carries no sensitive fields (a Fineract resource ID
 only).
+`SavingsLedgerTransactionType`/`SavingsLedgerEntry`/`SavingsDataPoint`/`SavingsStatementEntry`/
+`WeeklyContributionPoint`/`GroupSavingsSummary`/`IndividualSavingsSummary` carry no PII (amounts,
+dates, and transaction metadata only). `SavingsMember`/`MemberSavingsDetail`/
+`MemberGroupSavingsRow`/`MemberIndividualSavingsRow` carry `displayName`/`name` (display-name PII)
+and `SavingsMember.photoUri` (a CDN URL) — same threat model as `Member.displayName`, avoid
+bulk-logging.
 
 ## 9. Evolution
 
@@ -777,5 +873,15 @@ type. Before generating a future feature that also submits a
 BasicAuth-authenticated Fineract self-service write, reuse the
 "caller-supplied credential excluded from the DTO body" pattern
 (`ChangePinRequest.currentPin`) rather than inventing a request field with no
-wire source.
+wire source. **Shared Savings domain models live in `Savings.kt`**
+(`SavingsTransactionType`, `SavingsLedgerTransactionType`, `SavingsLedgerEntry`, `SavingsTab`,
+`SavingsDashboardTab`, `SavingsMember`, `SavingsStatementEntry`, `MemberSavingsDetail`,
+`SavingsTransactionFilter`, `WeeklyContributionPoint`, `MemberGroupSavingsRow`,
+`GroupSavingsSummary`, `MemberIndividualSavingsRow`, `IndividualSavingsSummary`) — built ONCE for
+personal-savings + member-savings-detail + savings-dashboard rather than 3 per-feature files.
+`MemberSavingsDetail.sparklineData` REUSES the EXISTING `SavingsDataPoint` (`MemberProfile.kt`)
+outright — giving it its first real wire source. Before generating any future feature that touches
+Fineract savings, extend this file rather than introducing a 5th sibling "savings transaction"
+shape; resolve the `SavingsTransactionType`/`TransactionType` and `SavingsTab`/`SavingsDashboardTab`
+naming-collision notes in `## 4. Boundaries` at Station 3 first.
 <!-- kmp-dto-gen:END -->

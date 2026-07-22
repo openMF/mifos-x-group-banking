@@ -42,6 +42,7 @@ import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule
 import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
 import org.mifos.groupbanking.feature.personalloans.di.PersonalLoansModule
+import org.mifos.groupbanking.feature.personalsavings.di.PersonalSavingsModule
 // `org.mifos.groupbanking.feature.settings.di.SettingsModule` — the REAL, now-sole group-banking
 // `settings-screen` MVI module (idea-layer/screens/settings/ui.yaml). The legacy
 // `kpt.feature.settings.SettingsModule`/`SettingsScreen`/`SettingsRoute` shell has been migrated
@@ -93,6 +94,7 @@ object KoinModules {
             SyncStatusModule, // <- added by kmp-viewmodel-gen
             SettingsLogoutDialogModule, // <- added by kmp-viewmodel-gen
             GroupBankingSettingsModule, // <- added by kmp-viewmodel-gen (real settings-screen VM; legacy SettingsModule migrated away)
+            PersonalSavingsModule, // <- added by kmp-viewmodel-gen
         )
     }
 

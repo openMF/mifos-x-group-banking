@@ -91,6 +91,31 @@
 | `SyncResult` | `successCount: Int`, `failedCount: Int`, `conflictCount: Int` | client-computed rollup of a `/batches` response, folded by `statusCode` (`List<BatchSyncResponseItem>.toSyncResult`) |
 | `ChangePinRequest` | `currentPin: String`, `newPin: String` | settings screen's change-PIN dialog submission input (`change_pin`); `currentPin` authenticates via `BasicAuth` at the mapper boundary, excluded from the wire body — see `core/network/model/API.md` |
 | `ChangePinResult` | `resourceId: Long` | `change_pin` success result; mirrors wire `ChangePinResponseDto` 1:1 |
+| `SavingsTransactionType` | enum: `DEPOSIT`, `WITHDRAWAL`, `INTEREST_POSTING`, `FEE_DEDUCTION`, `TRANSFER`, `UNKNOWN` | member-savings-detail's statement enum; distinct from `TransactionType` (`SavingsTransaction.kt`) — see naming-collision note below |
+| `SavingsLedgerTransactionType` | `value: Int`, `code: String`, `description: String` | raw Fineract `{value,code,description}` mirror; no invented enum (Hard Rule 4) |
+| `SavingsLedgerEntry` | `id: Long`, `type: SavingsLedgerTransactionType`, `date: LocalDate`, `amount: Double`, `runningBalance: Double`, `currencyCode: String`, `currencyDisplaySymbol: String` | personal-savings' raw Fineract self-service ledger row (`get_group_linked_transactions`/`get_individual_transactions`) — see naming-collision note below |
+| `SavingsTab` | enum: `GROUP_LINKED`, `INDIVIDUAL` | personal-savings' own-account tab selector; naming collision with `SavingsDashboardTab` — see note below |
+| `SavingsDashboardTab` | enum: `GROUP`, `INDIVIDUAL` | savings-dashboard's own tab selector |
+| `SavingsMember` | `memberId: String`, `displayName: String`, `photoUri: String?` | member-savings-detail's member identity subset |
+| `SavingsStatementEntry` | `id: String`, `date: LocalDate`, `type: SavingsTransactionType`, `amount: Double`, `runningBalance: Double`, `reversed: Boolean` | member-savings-detail's paginated statement row; richer than `SavingsLedgerEntry` (adds `reversed`) |
+| `MemberSavingsDetail` | `member: SavingsMember`, `savingsAccountNo: String`, `savingsBalance: Double`, `sharesHeld: Int?`, `shareValue: Long?`, `sparklineData: List<SavingsDataPoint>`, `transactions: List<SavingsStatementEntry>`, `totalTransactions: Int`, `hasNextPage: Boolean` | `get_member_savings_detail` composite; REUSES the EXISTING `SavingsDataPoint` (`MemberProfile.kt`) outright for `sparklineData` — its first real wire source |
+| `SavingsTransactionFilter` | enum: `ALL`, `DEPOSITS`, `WITHDRAWALS` | client-side statement filter, no wire source |
+| `WeeklyContributionPoint` | `weekLabel: String`, `groupAmount: Long`, `individualAmount: Long` | savings-dashboard trend-chart point; shared by `GroupSavingsSummary`/`IndividualSavingsSummary` |
+| `MemberGroupSavingsRow` | `memberId: String`, `name: String`, `totalContributed: Long`, `lastContribution: Long`, `meetingsContributed: Int`, `sharesHeld: Int?`, `shareValue: Long?` | `get_group_savings_summary` member row |
+| `GroupSavingsSummary` | `cycleTarget: Long`, `cycleCollected: Long`, `totalCollected: Long`, `weeklyTrend: List<WeeklyContributionPoint>`, `memberRows: List<MemberGroupSavingsRow>` | savings-dashboard group-tab summary |
+| `MemberIndividualSavingsRow` | `memberId: String`, `name: String`, `currentBalance: Long`, `lastTransaction: Long?`, `lastTransactionDate: LocalDate?` | `get_individual_savings_summary` member row |
+| `IndividualSavingsSummary` | `totalBalance: Long`, `weeklyTrend: List<WeeklyContributionPoint>`, `memberRows: List<MemberIndividualSavingsRow>` | savings-dashboard individual-tab summary |
+
+**Shared Savings domain layer (`Savings.kt`) — naming-collision notes (flagged for the
+cross-feature repair station):** `SavingsTransactionType` (member-savings-detail, 6 values) is
+NOT unified with the EXISTING `TransactionType` (`SavingsTransaction.kt`, personal-dashboard, 3
+values) — incompatible value-sets. `SavingsLedgerEntry`/`SavingsStatementEntry` are NOT unified
+with the EXISTING `SavingsTransaction` domain model — this extends the 4-way
+`SavingsTransactionDto`-family collision documented in full in `core/network/model/API.md`.
+`SavingsTab` (personal-savings, `GROUP_LINKED`/`INDIVIDUAL`) and `SavingsDashboardTab`
+(savings-dashboard, `GROUP`/`INDIVIDUAL`) declare the same bare `SavingsTab` name on their
+respective `api.yaml#dtos` with different value-sets — modeled as two distinct enums rather than
+one. Resolve all three at Station 3.
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);

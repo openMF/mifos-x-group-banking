@@ -17,6 +17,7 @@
 | `SyncQueueRepository` / `SyncQueueRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `observePending(): Flow<List<SyncQueueItem>>`, `observeCounts(): Flow<SyncQueueCounts>`, `observePendingByType(): Flow<Map<EntityType, Int>>`, `observeFailed(): Flow<List<SyncQueueItem>>`, `observeConflictCount(): Flow<Int>` (documented gap — always `0`, no dedicated `CONFLICT` `SyncStatus` bucket yet), `getItem(id): SyncQueueItem?` | `enqueue(operationType, targetTable, payloadJson): Long`, `markSyncing(id)`, `markSynced(id)`, `markFailed(id, error)`, `retryAll()` | Room-backed WRITE-QUEUE (`sync_queue` table) — NOT a Store5 read-store; the shared offline write-queue every mutation feature enqueues into and the sync-status feature reads |
 | `SyncManager` / `SyncManagerImpl` (`org.mifos.groupbanking.core.data.repository`) | `getLastSyncAt(): Flow<Instant?>` (`SyncMetadataStore`-backed, `core/datastore`) | `triggerSync(): Flow<SyncResult>` (drains the entire `SyncQueueRepository` pending backlog as one `batch_sync` submission), `retryItem(itemId): SyncResult` (single-row retry, suspend — not a `Flow`) | Store5-free — `sync-status`'s `data-flow.yaml` declares every entry `cache.strategy: no_cache`; wraps `BatchSyncApi` (`core/network`) + `SyncQueueRepository` + `SyncMetadataStore`, never `.asScreenStream()`/`.write()` |
 | `ChangePinRepository` / `ChangePinRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | — (no read-stream; a pure fire-and-forget write, no cached entity) | `changePin(ChangePinRequest): NetworkResult<ChangePinResult, NetworkError>` | Store5-free mutation orchestration — `business_logic.kind: crud` (legacy template path, RULE-IDEA-IMPL-INTELLIGENCE-001 AC-03i); wraps `ChangePinApi` (`core/network`) directly, never `.asScreenStream()`/`.write()`. Deliberately separate from `AuthRepository` — does not extend/wrap it. |
+| `SavingsRepository` / `SavingsRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getSavingsTransactions(savingsId, limit=50, offset=0): NetworkResult<List<SavingsLedgerEntry>, NetworkError>`, `loadMemberSavings(groupLinkedSavingsId, individualSavingsId?): NetworkResult<MemberSavingsBundle, NetworkError>` (2-way parallel, `individualSavingsId==null` skips the second read), `getMemberSavingsDetail(groupId, memberId, limit=20, offset=0): NetworkResult<MemberSavingsDetail, NetworkError>`, `getGroupSavingsSummary(groupId): NetworkResult<GroupSavingsSummary, NetworkError>`, `getIndividualSavingsSummary(groupId): NetworkResult<IndividualSavingsSummary, NetworkError>`, `loadSavingsDashboard(groupId): NetworkResult<SavingsDashboardSummary, NetworkError>` (2-way parallel combine) | — (read-only; savings mutations are recorded via the group meeting-record flow, not this repository) | Store5-free TODAY — shared by personal-savings/member-savings-detail/savings-dashboard (`data-flow.yaml#cache_strategy: stale_while_revalidate` on all 3), but no `AppStoreRegistry.Savings` entry exists yet (SP-03 `kmp-store-gen` has not run for this feature set); see notes below |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
@@ -89,13 +90,30 @@ carries ONLY `password`/`repeatPassword` (both set to `ChangePinRequest.newPin`)
 plain `when` chain over `ChangePinApi`'s `NetworkResult` (Mandatory Rule 4); `ChangePinApiImpl`
 is the sole layer allowed to catch exceptions.
 
+Contract refs (SavingsRepository): shared by 3 features that consume Fineract savings shapes —
+personal-savings (`get_group_linked_transactions`/`get_individual_transactions`), member-savings-
+detail (`get_member_savings_detail`), savings-dashboard (`get_group_savings_summary`/
+`get_individual_savings_summary`) — see the 3 features' own `api.yaml` + `data-flow.yaml`.
+`loadMemberSavings`'s 2-way parallel combine (`getSavingsTransactions` fired twice, once per
+account) matches personal-savings' on-mount + lazy individual-tab-load shape; `getSavingsTransactions`
+is ALSO exposed standalone since tab-switch/pull-to-refresh/retry only re-fetch the ACTIVE tab's
+account, never both. `loadSavingsDashboard`'s 2-way parallel combine
+(`getGroupSavingsSummary`+`getIndividualSavingsSummary`) matches savings-dashboard's
+`data-flow.yaml#entries[0]` note: "Both calls run in parallel on mount." First
+`NetworkResult.Error` encountered (fixed declaration order per method) short-circuits the
+composite call; both in-flight reads are still awaited (`coroutineScope` structured concurrency)
+before the function returns. `getMemberSavingsDetail`'s `limit`/`offset` page through the
+statement (`OnLoadMore` increments `offset` by `page_size=20`).
+
 ## Store5 note
 
 `core/data` also hosts Store5-wrapping Repositories for read-stream features (per SP-04 —
 `.asScreenStream()` / `.asPagingScreenStream()` over a `core/store` `Store`/`MutableStore`).
-None exist yet for `login-signup`, `join-with-code`, `group-create`, `loan-apply`, or
-`sync-status` (all out of Store5 scope today — see DEVELOPMENT.md#4). `group-create`'s
-`getOffices` and `loan-apply`'s `loadTemplate` are both candidates pending a future
-`kmp-store-gen` `OfficeStore`/`LoanApplyStore`. `sync-status` is Store5-free BY DESIGN
-(`data-flow.yaml#cache.strategy: no_cache` on every entry) — not a pending-migration candidate.
+None exist yet for `login-signup`, `join-with-code`, `group-create`, `loan-apply`, `sync-status`,
+or `savings` (all out of Store5 scope today — see DEVELOPMENT.md#4). `group-create`'s
+`getOffices`, `loan-apply`'s `loadTemplate`, and `savings`' 3 read methods are all candidates
+pending a future `kmp-store-gen` `OfficeStore`/`LoanApplyStore`/`SavingsStore` even though all 3
+declare a genuine `stale_while_revalidate` cache strategy in their `data-flow.yaml`. `sync-status`
+is Store5-free BY DESIGN (`data-flow.yaml#cache.strategy: no_cache` on every entry) — not a
+pending-migration candidate.
 <!-- kmp-client-gen:END -->

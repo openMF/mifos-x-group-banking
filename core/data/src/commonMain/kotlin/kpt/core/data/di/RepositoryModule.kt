@@ -64,6 +64,8 @@ import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.SavingsRepository
+import org.mifos.groupbanking.core.data.repository.SavingsRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.SyncManager
 import org.mifos.groupbanking.core.data.repository.SyncManagerImpl
 import org.mifos.groupbanking.core.data.repository.SyncQueueRepository
@@ -285,6 +287,16 @@ val DataModule = module {
     // GroupCreateRepository/MemberAddRepository/LoanApplyRepository/LoanRequestRepository above.
     // Deliberately separate from AuthRepository — does not extend or wrap it.
     single<ChangePinRepository> { ChangePinRepositoryImpl(api = get()) }
+
+    // savings — shared repository for the 3 consumers that share Fineract savings shapes:
+    // personal-savings (getSavingsTransactions standalone + loadMemberSavings composite),
+    // member-savings-detail (getMemberSavingsDetail), savings-dashboard (getGroupSavingsSummary +
+    // getIndividualSavingsSummary standalone + loadSavingsDashboard 2-way parallel combine).
+    // Store5-free today (no AppStoreRegistry.Savings entry yet — SP-03 kmp-store-gen has not run
+    // for this feature set), wraps SavingsApi (NetworkModule) directly. Surfaces NetworkResult,
+    // never .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
+    // GroupCreateRepository/MemberAddRepository/LoanApplyRepository above.
+    single<SavingsRepository> { SavingsRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

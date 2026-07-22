@@ -71,6 +71,9 @@ import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileAp
 import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
+import org.mifos.groupbanking.core.network.config.SavingsApiConfig
+import org.mifos.groupbanking.core.network.service.savings.SavingsApi
+import org.mifos.groupbanking.core.network.service.savings.SavingsApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
@@ -301,4 +304,18 @@ val NetworkModule = module {
     // is registered in RepositoryModule.kt.
     single<ChangePinApiConfig> { ChangePinApiConfig() }
     single<ChangePinApi> { ChangePinApiImpl(httpClient = get()) }
+
+    // Shared savings client stack (get_group_linked_transactions/get_individual_transactions —
+    // personal-savings; get_member_savings_detail — member-savings-detail;
+    // get_group_savings_summary/get_individual_savings_summary — savings-dashboard) — built ONCE
+    // for the 3 consumers that share Fineract savings shapes. Reuses the shared HttpClient
+    // singleton above (same companion host, no second engine), even though
+    // getSavingsTransactions is a raw Fineract self-service passthrough rather than a
+    // `/companion/…` one — same convention as MemberProfileApi. The config binding is registered
+    // for override-surface symmetry with CompanionAuthApiConfig even though the shared client is
+    // the one actually dispatching requests today. The Repository consuming SavingsApi (Store5-free
+    // today — no AppStoreRegistry.Savings entry yet, pending a future kmp-store-gen SavingsStore)
+    // is registered in RepositoryModule.kt.
+    single<SavingsApiConfig> { SavingsApiConfig() }
+    single<SavingsApi> { SavingsApiImpl(httpClient = get()) }
 }

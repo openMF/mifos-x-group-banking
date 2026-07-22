@@ -106,6 +106,19 @@ logic, no domain field names.
 | `BatchSyncResponseItemDto` | `BatchSyncDto.kt` | `@Serializable` response row — the `/batches` HTTP body is a TOP-LEVEL JSON ARRAY of this shape, no wrapper envelope |
 | `ChangePinRequestDto` | `ChangePinDto.kt` | `@Serializable` request (`change_pin` `PUT /fineract-provider/api/v1/self/user/updatePassword`) |
 | `ChangePinResponseDto` | `ChangePinDto.kt` | `@Serializable` response (`change_pin` `PUT`) |
+| `SavingsLedgerEntryDto` | `SavingsDto.kt` | `@Serializable` response row (`get_group_linked_transactions`/`get_individual_transactions`, personal-savings raw Fineract self-service ledger) — see `## 4. Boundaries` naming-collision note |
+| `SavingsLedgerTransactionTypeDto` | `SavingsDto.kt` | `@Serializable` nested response DTO, raw `{value, code, description}` (no enum — no declared value-set) |
+| `SavingsLedgerCurrencyDto` | `SavingsDto.kt` | `@Serializable` nested response DTO, raw Fineract currency pair |
+| `SavingsMemberDto` | `SavingsDto.kt` | `@Serializable` nested response DTO (member-savings-detail `member` field) |
+| `SavingsDataPointDto` | `SavingsDto.kt` | `@Serializable` nested response DTO (sparkline point) — maps to the EXISTING `core/model.SavingsDataPoint` |
+| `SavingsStatementTypeDto` | `SavingsDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — wider value-set than `TransactionTypeDto` |
+| `SavingsStatementEntryDto` | `SavingsDto.kt` | `@Serializable` response row (member-savings-detail `transactions[]`) — see `## 4. Boundaries` |
+| `MemberSavingsDetailDto` | `SavingsDto.kt` | `@Serializable` response (`get_member_savings_detail`, `GET /companion/groups/{groupId}/members/{memberId}/savings`) |
+| `WeeklyContributionPointDto` | `SavingsDto.kt` | `@Serializable` nested response DTO (savings-dashboard trend chart point) |
+| `MemberGroupSavingsRowDto` | `SavingsDto.kt` | `@Serializable` nested response DTO (`get_group_savings_summary` member row) |
+| `GroupSavingsSummaryDto` | `SavingsDto.kt` | `@Serializable` response (`get_group_savings_summary`, `GET /companion/groups/{groupId}/savings`) |
+| `MemberIndividualSavingsRowDto` | `SavingsDto.kt` | `@Serializable` nested response DTO (`get_individual_savings_summary` member row) |
+| `IndividualSavingsSummaryDto` | `SavingsDto.kt` | `@Serializable` response (`get_individual_savings_summary`, `GET /companion/groups/{groupId}/savings/individual`) |
 
 ## 3. Consumers
 
@@ -152,7 +165,13 @@ logic, no domain field names.
   → `core/data` `SettingsRepository.changePin(currentPin, newPin)`
   (`PUT /fineract-provider/api/v1/self/user/updatePassword`, `change_pin`,
   BasicAuth) — domain -> DTO for the submitted `ChangePinRequest`, DTO ->
-  domain for the `ChangePinResult`
+  domain for the `ChangePinResult`;
+  `core/network/mapper/SavingsMappers.kt` → the shared Savings domain layer consumed by
+  `core/data` `SavingsRepository` (personal-savings' `get_group_linked_transactions`/
+  `get_individual_transactions`, DTO -> domain), `MemberRepository` (member-savings-detail's
+  `get_member_savings_detail`, DTO -> domain composite), and `SavingsRepository`
+  (savings-dashboard's `get_group_savings_summary`/`get_individual_savings_summary`, DTO -> domain)
+  — built ONCE and shared across all 3 consumers rather than per-feature mapper files
 
 ## 4. Boundaries
 
@@ -318,6 +337,27 @@ logic, no domain field names.
   `ChangePinRequest.newPin` (Fineract's self-service confirmation-pair
   convention). No field carries a default — no `@EncodeDefault` needed
   (contrast `LoanRequestPayloadDto.status`).
+- **Shared Savings domain layer — `SavingsDto.kt` (fourth-way `SavingsTransactionDto` naming
+  collision, flagged for the cross-feature repair station):** built ONCE for the 3 consumers that
+  share Fineract savings shapes (personal-savings, member-savings-detail, savings-dashboard)
+  rather than per-feature files. `SavingsLedgerEntryDto` (personal-savings' raw Fineract
+  self-service ledger, `id: Long`/`transactionType: {value,code,description}`/`date: List<Int>`)
+  is the FOURTH declared shape under the conceptual "savings transaction" name — alongside the
+  EXISTING compact companion `SavingsTransactionDto` (`SavingsTransactionDto.kt`), the
+  `idea-layer/dtos/SavingsTransactionDto.yaml` registry entry, and this file's own
+  `SavingsStatementEntryDto` (member-savings-detail's richer companion statement row, adds
+  `reversed: Boolean` + a 5-value `SavingsStatementTypeDto` vs the compact shape's 2-value
+  `TransactionTypeDto`). None of the four were unified — each was generated from its own declaring
+  feature's approved `api.yaml`/kdoc precedent, matching the established "declaring feature's own
+  contract wins" pattern used throughout this file (`LoanSummaryDto`/`MemberDto`/etc.). Resolve all
+  four at Station 3. `SavingsLedgerEntryDto.transactionType`/`.date` are kept as LITERAL raw
+  Fineract shapes (no invented enum/parsed-date DTO field) per Hard Rule 4.
+  `SavingsDataPointDto` maps to the EXISTING `core/model.SavingsDataPoint` domain model
+  (`MemberProfile.kt`, originally a "no wire source, confirmed gap" model for member-profile) —
+  REUSED outright, not redeclared; this feature finally gives it a real wire source.
+  `SavingsTab`/`SavingsDashboardTab` naming collision (personal-savings vs savings-dashboard, same
+  bare `SavingsTab` name in both `api.yaml#dtos`) is documented on the DOMAIN side
+  (`core/model/Savings.kt` kdoc) since neither is `@Serializable` — pure client-side tab state.
 
 ## 5. Data
 
@@ -659,6 +699,60 @@ logic, no domain field names.
 | `ChangePinRequestDto` | `password` | `password` | `String` | — |
 | `ChangePinRequestDto` | `repeatPassword` | `repeatPassword` | `String` | — |
 | `ChangePinResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `SavingsLedgerEntryDto` | `id` | `id` | `Long` | — |
+| `SavingsLedgerEntryDto` | `transactionType` | `transactionType` | `SavingsLedgerTransactionTypeDto` | — |
+| `SavingsLedgerEntryDto` | `date` | `date` | `List<Int>` | — |
+| `SavingsLedgerEntryDto` | `amount` | `amount` | `Double` | — |
+| `SavingsLedgerEntryDto` | `runningBalance` | `runningBalance` | `Double` | — |
+| `SavingsLedgerEntryDto` | `currency` | `currency` | `SavingsLedgerCurrencyDto` | — |
+| `SavingsLedgerTransactionTypeDto` | `value` | `value` | `Int` | — |
+| `SavingsLedgerTransactionTypeDto` | `code` | `code` | `String` | — |
+| `SavingsLedgerTransactionTypeDto` | `description` | `description` | `String` | — |
+| `SavingsLedgerCurrencyDto` | `code` | `code` | `String` | — |
+| `SavingsLedgerCurrencyDto` | `displaySymbol` | `displaySymbol` | `String` | — |
+| `SavingsMemberDto` | `memberId` | `memberId` | `String` | — |
+| `SavingsMemberDto` | `displayName` | `displayName` | `String` | — |
+| `SavingsMemberDto` | `photoUri` | `photoUri` | `String?` | `null` |
+| `SavingsDataPointDto` | `date` | `date` | `String` | — |
+| `SavingsDataPointDto` | `balance` | `balance` | `Double` | — |
+| `SavingsStatementEntryDto` | `id` | `id` | `String` | — |
+| `SavingsStatementEntryDto` | `date` | `date` | `String` | — |
+| `SavingsStatementEntryDto` | `type` | `type` | `SavingsStatementTypeDto` | `UNKNOWN` |
+| `SavingsStatementEntryDto` | `amount` | `amount` | `Double` | — |
+| `SavingsStatementEntryDto` | `runningBalance` | `runningBalance` | `Double` | — |
+| `SavingsStatementEntryDto` | `reversed` | `reversed` | `Boolean` | — |
+| `MemberSavingsDetailDto` | `member` | `member` | `SavingsMemberDto` | — |
+| `MemberSavingsDetailDto` | `savingsAccountNo` | `savingsAccountNo` | `String` | — |
+| `MemberSavingsDetailDto` | `savingsBalance` | `savingsBalance` | `Double` | — |
+| `MemberSavingsDetailDto` | `sharesHeld` | `sharesHeld` | `Int?` | `null` |
+| `MemberSavingsDetailDto` | `shareValue` | `shareValue` | `Long?` | `null` |
+| `MemberSavingsDetailDto` | `sparklineData` | `sparklineData` | `List<SavingsDataPointDto>` | `emptyList()` |
+| `MemberSavingsDetailDto` | `transactions` | `transactions` | `List<SavingsStatementEntryDto>` | `emptyList()` |
+| `MemberSavingsDetailDto` | `totalTransactions` | `totalTransactions` | `Int` | — |
+| `MemberSavingsDetailDto` | `hasNextPage` | `hasNextPage` | `Boolean` | — |
+| `WeeklyContributionPointDto` | `weekLabel` | `weekLabel` | `String` | — |
+| `WeeklyContributionPointDto` | `groupAmount` | `groupAmount` | `Long` | — |
+| `WeeklyContributionPointDto` | `individualAmount` | `individualAmount` | `Long` | — |
+| `MemberGroupSavingsRowDto` | `memberId` | `memberId` | `String` | — |
+| `MemberGroupSavingsRowDto` | `name` | `name` | `String` | — |
+| `MemberGroupSavingsRowDto` | `totalContributed` | `totalContributed` | `Long` | — |
+| `MemberGroupSavingsRowDto` | `lastContribution` | `lastContribution` | `Long` | — |
+| `MemberGroupSavingsRowDto` | `meetingsContributed` | `meetingsContributed` | `Int` | — |
+| `MemberGroupSavingsRowDto` | `sharesHeld` | `sharesHeld` | `Int?` | `null` |
+| `MemberGroupSavingsRowDto` | `shareValue` | `shareValue` | `Long?` | `null` |
+| `GroupSavingsSummaryDto` | `cycleTarget` | `cycleTarget` | `Long` | — |
+| `GroupSavingsSummaryDto` | `cycleCollected` | `cycleCollected` | `Long` | — |
+| `GroupSavingsSummaryDto` | `totalCollected` | `totalCollected` | `Long` | — |
+| `GroupSavingsSummaryDto` | `weeklyTrend` | `weeklyTrend` | `List<WeeklyContributionPointDto>` | `emptyList()` |
+| `GroupSavingsSummaryDto` | `memberRows` | `memberRows` | `List<MemberGroupSavingsRowDto>` | `emptyList()` |
+| `MemberIndividualSavingsRowDto` | `memberId` | `memberId` | `String` | — |
+| `MemberIndividualSavingsRowDto` | `name` | `name` | `String` | — |
+| `MemberIndividualSavingsRowDto` | `currentBalance` | `currentBalance` | `Long` | — |
+| `MemberIndividualSavingsRowDto` | `lastTransaction` | `lastTransaction` | `Long?` | `null` |
+| `MemberIndividualSavingsRowDto` | `lastTransactionDate` | `lastTransactionDate` | `String?` | `null` |
+| `IndividualSavingsSummaryDto` | `totalBalance` | `totalBalance` | `Long` | — |
+| `IndividualSavingsSummaryDto` | `weeklyTrend` | `weeklyTrend` | `List<WeeklyContributionPointDto>` | `emptyList()` |
+| `IndividualSavingsSummaryDto` | `memberRows` | `memberRows` | `List<MemberIndividualSavingsRowDto>` | `emptyList()` |
 
 ## 6. Errors
 
@@ -815,6 +909,22 @@ fold (mixed 200/201/409/500/400, all-success, empty-list).
 `ChangePinRequest -> ChangePinRequestDto` (`newPin` resolves to BOTH
 `password`/`repeatPassword`, `currentPin` never leaks into either wire
 field) AND the reverse `ChangePinResponseDto -> ChangePinResult`.
+`core/network/src/commonTest/.../model/SavingsDtoTest.kt` covers every DTO declared in
+`SavingsDto.kt` — construction, equality, `SCHEMA_VERSION`, serialization round-trip, the raw
+`List<Int>` Fineract date-component decode + nested `transactionType`/`currency` shapes
+(`SavingsLedgerEntryDto`), every `SavingsStatementTypeDto` known value + `UNKNOWN` fallback (a bare
+top-level decode proving the `unknownFallbackEnumSerializer` wiring), the mutually-exclusive
+nullable SHARE_BASED_VARIABLE (`sharesHeld`/`shareValue`) field groups on both
+`MemberSavingsDetailDto` and `MemberGroupSavingsRowDto`, every list-field default-empty behavior,
+and 2 T7/EC30 cross-version fixtures (a server-added top-level field on `MemberSavingsDetailDto`,
+and a server-added enum value on `SavingsStatementEntryDto.type` — both decoded without crashing).
+`core/network/src/commonTest/.../mapper/SavingsMappersTest.kt` covers the new
+`fineractDateComponents` helper (happy path, extra trailing time-of-day components, and the
+too-few-components failure case), every DTO -> domain mapper declared in `SavingsMappers.kt`
+(every field, including the `SavingsDataPointDto -> SavingsDataPoint` reuse-mapper and every
+`SavingsStatementTypeDto -> SavingsTransactionType` enum value), every batch converter (including
+empty-list), and the `MemberSavingsDetailDto`/`GroupSavingsSummaryDto`/`IndividualSavingsSummaryDto`
+composite mappers.
 
 ## 8. Observability
 
@@ -886,6 +996,14 @@ response bodies; log `requestId`/`statusCode`/`relativeUrl` only.
 material — NEVER log either field, matching
 `SelfRegisterRequestDto.password`'s threat model. `ChangePinResponseDto`
 carries no sensitive fields (a Fineract resource ID only).
+`SavingsLedgerEntryDto`/`SavingsLedgerTransactionTypeDto`/`SavingsLedgerCurrencyDto`/
+`SavingsDataPointDto`/`SavingsStatementEntryDto`/`WeeklyContributionPointDto`/
+`GroupSavingsSummaryDto`/`IndividualSavingsSummaryDto` carry no PII (amounts, dates, and
+transaction metadata only). `SavingsMemberDto`/`MemberSavingsDetailDto`/
+`MemberGroupSavingsRowDto`/`MemberIndividualSavingsRowDto` carry `displayName`/`name` (display-name
+PII, same threat model as `MemberDto.displayName`) and `SavingsMemberDto.photoUri` (a CDN URL, not
+raw image bytes) — avoid bulk-logging the full member-savings-detail identity payload or the
+per-member dashboard rows; balances/shares/contribution amounts are not sensitive.
 
 ## 9. Evolution
 
@@ -1021,5 +1139,18 @@ with no `core/network/model` counterpart at all — see `core/model/DEVELOPMENT.
 §9. Before generating a future BasicAuth-authenticated Fineract self-service
 write, reuse the "caller credential excluded from the request DTO" pattern
 (`ChangePinRequestDto`) rather than inventing a request field with no wire
-source.
+source. **Shared Savings DTOs live in `SavingsDto.kt`** (`SavingsLedgerEntryDto`,
+`SavingsLedgerTransactionTypeDto`, `SavingsLedgerCurrencyDto`, `SavingsMemberDto`,
+`SavingsDataPointDto`, `SavingsStatementTypeDto`, `SavingsStatementEntryDto`,
+`MemberSavingsDetailDto`, `WeeklyContributionPointDto`, `MemberGroupSavingsRowDto`,
+`GroupSavingsSummaryDto`, `MemberIndividualSavingsRowDto`, `IndividualSavingsSummaryDto`) — built
+ONCE for personal-savings + member-savings-detail + savings-dashboard rather than 3 per-feature
+files; `SavingsMappers.kt` is likewise the single shared mapper file. Before generating any future
+feature that touches Fineract savings, extend this file/mapper pair rather than introducing a
+5th sibling shape. Before adding a NEW `SavingsTransactionDto`-adjacent DTO or reusing
+`SavingsDataPoint`, resolve the naming-collision notes in `## 4. Boundaries` at Station 3 first —
+do not silently pick a winner. `SavingsDataPointDto` gave the previously-wire-source-less
+`core/model.SavingsDataPoint` its first real wire contract; if member-profile's own
+`get_client_accounts` ever gains a real sparkline endpoint, reuse `SavingsDataPointDto` there too
+rather than introducing a second sparkline-point DTO.
 <!-- kmp-dto-gen:END -->

@@ -68,6 +68,12 @@ as a library — never edits it.
   See API.md#services.
 - `ChangePinApiConfig` — Koin-injectable base-URL config for the change-PIN endpoint
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `SavingsApi` / `SavingsApiImpl` (`.../service/savings/`) — the shared savings client stack for
+  personal-savings/member-savings-detail/savings-dashboard: `getSavingsTransactions` (reused for
+  BOTH the group-linked and individual accounts), `getMemberSavingsDetail`,
+  `getGroupSavingsSummary`, `getIndividualSavingsSummary`. See API.md#services.
+- `SavingsApiConfig` — Koin-injectable base-URL config for the savings endpoints
+  (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
 
@@ -97,8 +103,13 @@ Store5-free (`sync-status`'s `data-flow.yaml` declares `cache.strategy: no_cache
 entry, no read-stream to cache). `ChangePinRepositoryImpl` (`core/data`) calls
 `ChangePinApi.changePin` directly — Store5-free (`business_logic.kind: crud`, no read-stream to
 cache; change-PIN is a pure fire-and-forget write), same branch as `InvitationRepositoryImpl`/
-`GroupCreateRepositoryImpl`. Feature ViewModels never call a Service directly (Repository/Store
-boundary).
+`GroupCreateRepositoryImpl`. `SavingsRepositoryImpl` (`core/data`) calls all 4 `SavingsApi`
+methods directly — `getSavingsTransactions`/`getMemberSavingsDetail`/`getGroupSavingsSummary`/
+`getIndividualSavingsSummary` are standalone reads; `getSavingsTransactions`+`getSavingsTransactions`
+(twice, per account) and `getGroupSavingsSummary`+`getIndividualSavingsSummary` also fire in
+parallel (`kotlinx.coroutines.coroutineScope`+`async`) inside the `loadMemberSavings`/
+`loadSavingsDashboard` composites — Store5-free (no `AppStoreRegistry.Savings` entry exists yet).
+Feature ViewModels never call a Service directly (Repository/Store boundary).
 
 ## 4. Boundaries
 
@@ -155,13 +166,18 @@ test deps (`ktor-client-mock`, `ktor-client-content-negotiation`, `ktor-serializ
 already declared in `core/network/build.gradle.kts`. `ChangePinApiTest` (6 MockEngine tests, all
 green) covers `changePin`'s success (PUT verb + path assertions) + 400/401/500 status-mapping +
 malformed-JSON→SERIALIZATION + the password/repeatPassword-carry-the-same-new-PIN-value
-assertion.
+assertion. `SavingsApiTest` (24 MockEngine tests, all green) covers all 4 `SavingsApi` methods —
+`getSavingsTransactions`'s default/explicit `limit`/`offset` threading and reuse across both
+group-linked and individual `savingsId` values, `getMemberSavingsDetail`'s pagination-param
+threading, `getGroupSavingsSummary`/`getIndividualSavingsSummary`'s path assertions — each with
+success + empty-list + ≥3 distinct error-status branches (401/403→UNKNOWN/404/500/503→SERVER) +
+malformed-JSON→SERIALIZATION.
 
 ## 8. Observability
 
 Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`,
 `GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`, `LoanApplyApi`,
-`BatchSyncApi`, `ChangePinApi`) — debug on request start (incl. request-row count for
+`BatchSyncApi`, `ChangePinApi`, `SavingsApi`) — debug on request start (incl. request-row count for
 `BatchSyncApi`), info on 2xx, error on every failure branch (status-mapped or
 transport/serialization exception).
 
