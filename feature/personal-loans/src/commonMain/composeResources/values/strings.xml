@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_personal_loans_title">My Loans</string>
+
+    <string name="screens_personal_loans_filter_chips_cd">Filter loans by status</string>
+    <string name="screens_personal_loans_filter_all">All</string>
+    <string name="screens_personal_loans_filter_active">Active</string>
+    <string name="screens_personal_loans_filter_closed">Closed</string>
+
+    <string name="screens_personal_loans_shimmer_cd">Loading loans</string>
+
+    <string name="screens_personal_loans_outstanding_amount_format">KES %1$s</string>
+    <string name="screens_personal_loans_next_repayment_label">Next repayment due %1$s</string>
+    <string name="screens_personal_loans_overdue_cd">Overdue warning</string>
+    <string name="screens_personal_loans_status_chip_cd">Loan status</string>
+    <string name="screens_personal_loans_expand_cd">Expand or collapse loan details</string>
+    <string name="screens_personal_loans_card_cd">%1$s loan, %2$s, outstanding KES %3$s</string>
+
+    <string name="screens_personal_loans_details_label">Loan Details</string>
+    <string name="screens_personal_loans_details_principal_label">Principal: KES %1$s</string>
+    <string name="screens_personal_loans_details_outstanding_label">Outstanding: KES %1$s</string>
+    <string name="screens_personal_loans_details_status_label">Status: %1$s</string>
+    <string name="screens_personal_loans_details_next_due_label">Next due: %1$s</string>
+    <string name="screens_personal_loans_details_overdue_label">Overdue amount: KES %1$s</string>
+
+    <string name="screens_personal_loans_fab_cd">Request a new loan</string>
+    <string name="screens_personal_loans_fab_label">Request Loan</string>
+
+    <string name="screens_personal_loans_empty_icon_cd">No loans available, tap to request a loan</string>
+    <string name="screens_personal_loans_empty_title">No loans yet</string>
+    <string name="screens_personal_loans_empty_body">Apply for a loan of up to 3× your savings balance.</string>
+    <string name="screens_personal_loans_empty_action">Request a Loan</string>
+
+    <string name="screens_personal_loans_error_icon_cd">Failed to load loans, tap Try Again to retry</string>
+    <string name="screens_personal_loans_error_title">Could not load loans</string>
+    <string name="screens_personal_loans_error_network_message">Check your internet connection and try again.</string>
+    <string name="screens_personal_loans_error_server_message">Something went wrong on our end. Please try again.</string>
+    <string name="screens_personal_loans_error_session_message">Your session has expired. Please log in again.</string>
+    <string name="screens_personal_loans_action_retry">Try Again</string>
+</resources>

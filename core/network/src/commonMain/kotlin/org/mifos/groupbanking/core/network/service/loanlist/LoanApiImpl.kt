@@ -22,9 +22,11 @@ import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.network.model.LoanPageDto
+import org.mifos.groupbanking.core.network.model.LoanSummaryDto
 
 private const val TAG = "LoanApi"
 private const val GROUPS_PATH = "/groups"
+private const val CLIENTS_PATH = "/clients"
 
 /**
  * Plain-Ktor implementation of [LoanApi]. This class is the ONLY layer in the loan-list client
@@ -64,6 +66,14 @@ class LoanApiImpl(
                 parameter("offset", offset)
                 loanStatus?.let { parameter("loanStatus", it) }
             }
+        }
+    }
+
+    override suspend fun getClientLoans(clientId: Long): NetworkResult<List<LoanSummaryDto>, NetworkError> {
+        val path = "$CLIENTS_PATH/$clientId/loans"
+        Logger.d(TAG) { "getClientLoans: GET $path" }
+        return requestAsNetworkResult(op = "getClientLoans") {
+            httpClient.get(path)
         }
     }
 }

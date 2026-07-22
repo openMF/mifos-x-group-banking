@@ -114,13 +114,52 @@ class LoanRepositoryTest {
             loansPagingStore = provideLoansPagingStore(api, dao),
             networkMonitor = FakeNetworkMonitor(initial),
             fetchedAtRepository = InMemoryFetchedAtRepository(),
+            loanApi = api,
         )
     }
 
     private companion object {
         const val GROUP = 101L
+        const val CLIENT = 7L
 
         fun key(groupId: Long, pageIndex: Int): Pair<Long, Int> = groupId to pageIndex
+    }
+
+    // ---------- getLoansForClient (GET /clients/{clientId}/loans) ----------
+
+    @Test
+    fun getLoansForClient_success_returnsMappedLoanSummaryList() = runTest {
+        val api = FakeLoanApi(
+            clientLoans = mapOf(CLIENT to listOf(loanDto(1), loanDto(2))),
+        )
+        val repo = repository(api, FakeLoanListDao(), online = true)
+
+        val result = repo.getLoansForClient(CLIENT)
+
+        check(result is NetworkResult.Success)
+        assertEquals(2, result.data.size)
+        assertEquals(1L, result.data.first().id)
+    }
+
+    @Test
+    fun getLoansForClient_empty_returnsSuccessWithEmptyList() = runTest {
+        val api = FakeLoanApi(clientLoans = mapOf(CLIENT to emptyList()))
+        val repo = repository(api, FakeLoanListDao(), online = true)
+
+        val result = repo.getLoansForClient(CLIENT)
+
+        check(result is NetworkResult.Success)
+        assertEquals(emptyList(), result.data)
+    }
+
+    @Test
+    fun getLoansForClient_error_propagatesNetworkError() = runTest {
+        val api = FakeLoanApi(clientLoansError = NetworkError.SERVER)
+        val repo = repository(api, FakeLoanListDao(), online = true)
+
+        val result = repo.getLoansForClient(CLIENT)
+
+        assertEquals(NetworkResult.Error(NetworkError.SERVER), result)
     }
 }
 
@@ -173,6 +212,8 @@ private fun entities(groupId: String, pageIndex: Int, count: Int): List<LoanList
 private class FakeLoanApi(
     private val pages: Map<Pair<Long, Int>, LoanPageDto> = emptyMap(),
     private val error: NetworkError? = null,
+    private val clientLoans: Map<Long, List<LoanSummaryDto>> = emptyMap(),
+    private val clientLoansError: NetworkError? = null,
 ) : LoanApi {
     val calls = mutableListOf<Triple<Long, Int, Int>>()
 
@@ -186,6 +227,11 @@ private class FakeLoanApi(
         error?.let { return NetworkResult.Error(it) }
         val pageIndex = offset / limit
         return NetworkResult.Success(pages[groupId to pageIndex] ?: LoanPageDto(totalFilteredRecords = 0))
+    }
+
+    override suspend fun getClientLoans(clientId: Long): NetworkResult<List<LoanSummaryDto>, NetworkError> {
+        clientLoansError?.let { return NetworkResult.Error(it) }
+        return NetworkResult.Success(clientLoans[clientId] ?: emptyList())
     }
 }
 

@@ -157,11 +157,16 @@ val DataModule = module {
     // offline-first .asPagingScreenStream() read (paged ScreenState<List<LoanSummary>> + load-more +
     // pull-to-refresh, per-group via the groupId threaded into the store key). Status-filter chips
     // filter the accumulated list client-side in the ViewModel — no re-key, no DAO bypass.
+    //
+    // Also wires getLoansForClient (GET /clients/{clientId}/loans) — the personal-loans
+    // member-loans read, ADDITIVE to loansPagingStream. Store5-free direct passthrough over the
+    // ALREADY-REGISTERED LoanApi single below (NetworkModule) — no new store, no new DI binding.
     single<LoanRepository> {
         LoanRepositoryImpl(
             loansPagingStore = get(AppStoreRegistry.LoanList),
             networkMonitor = get(),
             fetchedAtRepository = get(),
+            loanApi = get(),
         )
     }
 

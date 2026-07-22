@@ -48,6 +48,7 @@ kotlin {
             implementation(projects.feature.loanDetail) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanApply) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanRequest) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.personalLoans) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanRepaymentDialog) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanMarkDefaultedDialog) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.syncStatus) // <- added by kmp-viewmodel-gen

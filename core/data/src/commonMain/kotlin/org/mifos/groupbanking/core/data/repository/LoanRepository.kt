@@ -10,6 +10,8 @@
 package org.mifos.groupbanking.core.data.repository
 
 import kotlinx.coroutines.CoroutineScope
+import kpt.core.base.network.NetworkError
+import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.store.screen.FetchPolicy
 import org.mifos.groupbanking.core.model.LoanSummary
@@ -55,4 +57,21 @@ interface LoanRepository {
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     ): PagingScreenStream<LoanSummary>
+
+    /**
+     * Member-loans read for the personal-loans feature (`GET /clients/{clientId}/loans`) —
+     * ADDITIVE to [loansPagingStream], does NOT change its signature. A direct passthrough read
+     * (no Store5 wrap, same Store5-free branch as [LoanRepaymentRepository]/[LoanWriteoffRepository]
+     * above): calls [org.mifos.groupbanking.core.network.service.loanlist.LoanApi.getClientLoans]
+     * and maps the wire [org.mifos.groupbanking.core.network.model.LoanSummaryDto] rows straight to
+     * domain [LoanSummary] — a plain `when` over the wire [NetworkResult], no `try-catch`, no
+     * `Result<T>` envelope. There is no per-client cache/TTL for this read yet (personal-loans'
+     * `data-flow.yaml#cache_strategy` calls for `stale_while_revalidate`/`ttl=180` against a
+     * DIFFERENT `/self/loans` endpoint shape — reconciling the two into a single Store5-backed
+     * `PersonalLoansStore` is flagged for Station 3, same as the `LoanApi.getClientLoans` KDoc
+     * divergence note).
+     *
+     * @param clientId The member/client whose loans to fetch.
+     */
+    suspend fun getLoansForClient(clientId: Long): NetworkResult<List<LoanSummary>, NetworkError>
 }

@@ -181,4 +181,84 @@ class LoanApiTest {
 
         assertEquals(NetworkResult.Error(NetworkError.SERIALIZATION), result)
     }
+
+    // ---------- getClientLoans (member-loans read reusing the LoanSummaryDto shape) ----------
+
+    private val oneClientLoanBody = """
+        [
+          {
+            "id": 501, "memberId": 7, "memberName": "Amara Okafor",
+            "memberPhotoUrl": null, "loanProductName": "Personal Loan - Standard",
+            "principalAmount": 500.0, "outstandingBalance": 320.0, "overdueAmount": 0.0,
+            "status": "ACTIVE", "nextRepaymentDate": "2026-08-01", "isOverdue": false,
+            "fineractLoanId": 9001
+          }
+        ]
+    """.trimIndent()
+
+    @Test
+    fun getClientLoans_success_returnsMappedListAndUsesGetOnClientsLoansPath() = runTest {
+        var capturedUrl: Url? = null
+        var capturedMethod: HttpMethod? = null
+        val api = apiWith(
+            HttpStatusCode.OK,
+            oneClientLoanBody,
+            onRequestUrl = { capturedUrl = it },
+            onRequestMethod = { capturedMethod = it },
+        )
+
+        val result = api.getClientLoans(clientId = 7L)
+
+        check(result is NetworkResult.Success)
+        assertEquals(1, result.data.size)
+        assertEquals(501L, result.data[0].id)
+        assertEquals("/clients/7/loans", capturedUrl?.encodedPath)
+        assertEquals(HttpMethod.Get, capturedMethod)
+    }
+
+    @Test
+    fun getClientLoans_emptyList_returnsSuccessWithEmptyList() = runTest {
+        val api = apiWith(HttpStatusCode.OK, """[]""")
+
+        val result = api.getClientLoans(clientId = 7L)
+
+        check(result is NetworkResult.Success)
+        assertTrue(result.data.isEmpty())
+    }
+
+    @Test
+    fun getClientLoans_clientNotFound404_mapsToNotFoundError() = runTest {
+        val api = apiWith(HttpStatusCode.NotFound, """{"error":"client not found"}""")
+
+        val result = api.getClientLoans(clientId = 99999L)
+
+        assertEquals(NetworkResult.Error(NetworkError.NOT_FOUND), result)
+    }
+
+    @Test
+    fun getClientLoans_unauthorized401_mapsToUnauthorizedError() = runTest {
+        val api = apiWith(HttpStatusCode.Unauthorized, """{"error":"session expired"}""")
+
+        val result = api.getClientLoans(clientId = 7L)
+
+        assertEquals(NetworkResult.Error(NetworkError.UNAUTHORIZED), result)
+    }
+
+    @Test
+    fun getClientLoans_serverError500_mapsToServerError() = runTest {
+        val api = apiWith(HttpStatusCode.InternalServerError, """{"error":"boom"}""")
+
+        val result = api.getClientLoans(clientId = 7L)
+
+        assertEquals(NetworkResult.Error(NetworkError.SERVER), result)
+    }
+
+    @Test
+    fun getClientLoans_malformedJsonBody_mapsToSerializationError() = runTest {
+        val api = apiWith(HttpStatusCode.OK, """not-json""")
+
+        val result = api.getClientLoans(clientId = 7L)
+
+        assertEquals(NetworkResult.Error(NetworkError.SERIALIZATION), result)
+    }
 }

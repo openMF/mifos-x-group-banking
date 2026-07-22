@@ -132,6 +132,7 @@ include(":feature:loan-list") // <- added by kmp-viewmodel-gen
 include(":feature:loan-detail") // <- added by kmp-viewmodel-gen
 include(":feature:loan-apply") // <- added by kmp-viewmodel-gen
 include(":feature:loan-request") // <- added by kmp-viewmodel-gen
+include(":feature:personal-loans") // <- added by kmp-viewmodel-gen
 include(":feature:loan-repayment-dialog") // <- added by kmp-viewmodel-gen
 include(":feature:loan-mark-defaulted-dialog") // <- added by kmp-viewmodel-gen
 include(":feature:sync-status") // <- added by kmp-viewmodel-gen

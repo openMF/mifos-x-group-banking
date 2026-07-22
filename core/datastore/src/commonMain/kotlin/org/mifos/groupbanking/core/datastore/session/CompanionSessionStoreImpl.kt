@@ -7,22 +7,17 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-@file:OptIn(ExperimentalSettingsApi::class, ExperimentalSerializationApi::class)
-
 package org.mifos.groupbanking.core.datastore.session
 
 import co.touchlab.kermit.Logger
-import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.serialization.decodeValueOrNull
-import com.russhwolf.settings.serialization.encodeValue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kpt.core.base.common.manager.DispatcherManager
 import org.mifos.groupbanking.core.model.AuthSession
 
@@ -51,10 +46,16 @@ class CompanionSessionStoreImpl(
     private val dispatcher: DispatcherManager,
 ) : CompanionSessionStore {
 
-    private fun loadPersisted(): PersistedCompanionSession? = secureSettings.decodeValueOrNull(
-        key = SESSION_KEY,
-        serializer = PersistedCompanionSession.serializer(),
-    )
+    private val json = Json { ignoreUnknownKeys = true }
+
+    // Persist as a SINGLE JSON string under one key (not the multiplatform-settings structured
+    // `encodeValue`, which spreads a @Serializable across several `SESSION_KEY.<field>` sub-keys
+    // that `Settings.remove(SESSION_KEY)` cannot fully clear — a partial session would survive
+    // logout). A lone key makes `clear()`'s `remove` exhaustive.
+    private fun loadPersisted(): PersistedCompanionSession? =
+        secureSettings.getStringOrNull(SESSION_KEY)?.let { raw ->
+            json.decodeFromString(PersistedCompanionSession.serializer(), raw)
+        }
 
     private fun PersistedCompanionSession.toDomain(): AuthSession = AuthSession(
         userId = userId,
@@ -74,10 +75,9 @@ class CompanionSessionStoreImpl(
                 sessionToken = sessionToken,
                 tokenExpiresAt = tokenExpiresAt.toString(),
             )
-            secureSettings.encodeValue(
+            secureSettings.putString(
                 key = SESSION_KEY,
-                serializer = PersistedCompanionSession.serializer(),
-                value = record,
+                value = json.encodeToString(PersistedCompanionSession.serializer(), record),
             )
             _session.value = record.toDomain()
             Logger.i(TAG) { "Session saved for userId=$userId" }

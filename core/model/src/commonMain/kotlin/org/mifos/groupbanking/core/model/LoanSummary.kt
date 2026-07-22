@@ -85,3 +85,24 @@ enum class LoanStatusFilter {
     OVERDUE,
     CLOSED,
 }
+
+/**
+ * Client-side predicate for [LoanStatusFilter] — reused by both loan-list AND personal-loans to
+ * filter an already-loaded [LoanSummary] list in memory, with no re-fetch. [LoanStatusFilter.ALL]
+ * matches everything; every other member matches 1:1 against [LoanSummary.status]. Mirrors
+ * `LoanListViewModel.filterByStatus`'s `when` branches exactly so the two features never drift on
+ * filter semantics.
+ *
+ * `ui.yaml#components.filter_chips_row` for personal-loans only renders the `ALL`/`ACTIVE`/`CLOSED`
+ * chips (no `OVERDUE` chip — overdue loans surface inline via [LoanSummary.isOverdue] on the
+ * `ACTIVE` card instead), but the [LoanStatusFilter.OVERDUE] branch is kept here for parity with
+ * loan-list's four-chip row, since both features share this one enum.
+ *
+ * See API.md#models — LoanStatusFilter.
+ */
+fun LoanStatusFilter.matches(loan: LoanSummary): Boolean = when (this) {
+    LoanStatusFilter.ALL -> true
+    LoanStatusFilter.ACTIVE -> loan.status == LoanAccountStatus.ACTIVE
+    LoanStatusFilter.OVERDUE -> loan.status == LoanAccountStatus.OVERDUE
+    LoanStatusFilter.CLOSED -> loan.status == LoanAccountStatus.CLOSED
+}

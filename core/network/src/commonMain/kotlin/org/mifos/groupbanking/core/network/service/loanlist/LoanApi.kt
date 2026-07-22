@@ -12,6 +12,7 @@ package org.mifos.groupbanking.core.network.service.loanlist
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.network.model.LoanPageDto
+import org.mifos.groupbanking.core.network.model.LoanSummaryDto
 
 /**
  * Ktor client for the loan-list feature — the offset-paginated list of loan accounts belonging
@@ -46,4 +47,25 @@ interface LoanApi {
         offset: Int = 0,
         loanStatus: String? = null,
     ): NetworkResult<LoanPageDto, NetworkError>
+
+    /**
+     * `GET /clients/{clientId}/loans` — member-loans read for the personal-loans feature, reusing
+     * the loan-list contract's flat [org.mifos.groupbanking.core.network.model.LoanSummaryDto] row
+     * shape (the same wire shape [getGroupLoans] returns for `GET /groups/{groupId}/loans`) instead
+     * of authoring a second DTO family. Fetches the FULL (non-paginated) list of loan accounts
+     * belonging to a single client/member.
+     *
+     * **Registry divergence flagged for Station 3** (same pattern as the documented divergence on
+     * [org.mifos.groupbanking.core.network.model.LoanSummaryDto]): `idea-layer/screens/personal-loans/api.yaml#api[get_self_loans]`
+     * declares a DIFFERENT self-scoped `GET /self/loans` endpoint (no explicit `clientId` path
+     * param — the client is inferred from the authenticated self-service session) with a DIFFERENT
+     * nested Fineract-native response shape (`LoanDto` with `status`/`repaymentSchedule`/`summary`
+     * sub-objects). This method deliberately reuses the ALREADY-SHIPPED loan-list client stack
+     * (flat `LoanSummaryDto`, [org.mifos.groupbanking.core.network.mapper.toDomainModels]) per an
+     * explicit client-layer reuse directive rather than authoring that second nested DTO family;
+     * reconcile the two `personal-loans` endpoint/DTO declarations at Station 3.
+     *
+     * 404 -> [NetworkError.NOT_FOUND] ("client not found").
+     */
+    suspend fun getClientLoans(clientId: Long): NetworkResult<List<LoanSummaryDto>, NetworkError>
 }
