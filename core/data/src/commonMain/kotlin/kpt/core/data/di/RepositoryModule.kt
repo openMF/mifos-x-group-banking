@@ -48,6 +48,8 @@ import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepository
+import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
 import org.mifos.groupbanking.core.data.repository.MemberAddRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
@@ -176,6 +178,22 @@ val DataModule = module {
     // reads through) so the loan-detail screen re-fetches with the new outstanding balance.
     single<LoanRepaymentRepository> {
         LoanRepaymentRepositoryImpl(
+            api = get(),
+            loanDetailStore = get(AppStoreRegistry.LoanDetail),
+        )
+    }
+
+    // loan-mark-defaulted-dialog (POST /loans/{loanId}/transactions?command=writeoff) —
+    // Store5-free mutation orchestration for writeoffLoan (business_logic.kind: processor, no
+    // read-stream of its own), wraps LoanWriteoffApi (NetworkModule) directly. Surfaces
+    // NetworkResult, never .asScreenStream()/.write() — same branch as LoanRepaymentRepository
+    // above. This mutation is IRREVERSIBLE and has NO offline queue — a failed/offline write is
+    // surfaced immediately, never retried/queued. On success it invalidates the
+    // ALREADY-REGISTERED AppStoreRegistry.LoanDetail store for the defaulted loan (same
+    // Store<Long, LoanDetailResponse> singleton LoanDetailRepositoryImpl reads through) so the
+    // loan-detail screen re-fetches with the now-defaulted status.
+    single<LoanWriteoffRepository> {
+        LoanWriteoffRepositoryImpl(
             api = get(),
             loanDetailStore = get(AppStoreRegistry.LoanDetail),
         )

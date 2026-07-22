@@ -54,6 +54,7 @@ import org.mifos.groupbanking.feature.loandetail.loanDetailScreen
 import org.mifos.groupbanking.feature.loandetail.navigateToLoanDetail
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
+import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialog
 import org.mifos.groupbanking.feature.loanrepaymentdialog.LoanRepaymentDialog
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
 import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
@@ -73,19 +74,18 @@ import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
  * loan-apply, share-out, member-savings-detail, savings) route to [PlaceholderRoute] — a real,
  * navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is marked
  * `TODO(nav)` for replacement when its feature lands. `loan-list` and `loan-detail` are both wired
- * for real (their feature modules now exist) — `loan-detail`'s `loan-mark-defaulted-dialog` onward
- * target is not yet a generated feature component and surfaces an in-screen "coming soon" snackbar
- * instead (see `LoanDetailScreen.kt`'s class KDoc), not a [PlaceholderRoute] destination.
+ * for real (their feature modules now exist).
  *
- * `loan-repayment-dialog` (`archetype: dialog`, `parent_screen: loan-detail`) IS wired for real:
- * this NavHost is the ONLY module that depends on both `feature/loan-detail` and
- * `feature/loan-repayment-dialog` — every other cross-feature wire-up in this codebase happens
- * here, never as a direct feature-to-feature module dependency — so `repaymentDialogTarget` (local
- * `remember { mutableStateOf(...) } ` state, set by `loanDetailScreen`'s `onShowRepaymentDialog`
- * callback) drives rendering [LoanRepaymentDialog] as an overlay on top of the whole `NavHost` Box
- * (a Compose `AlertDialog` renders in its own `Popup`/window regardless of where in the tree it is
- * composed, so its position here — a sibling of the `NavHost` call, not nested inside it — has no
- * visual effect on the overlay).
+ * `loan-repayment-dialog` and `loan-mark-defaulted-dialog` (both `archetype: dialog`,
+ * `parent_screen: loan-detail`) are BOTH wired for real: this NavHost is the ONLY module that
+ * depends on `feature/loan-detail` together with either dialog feature — every other cross-feature
+ * wire-up in this codebase happens here, never as a direct feature-to-feature module dependency —
+ * so `repaymentDialogTarget` / `defaultDialogTarget` (local `remember { mutableStateOf(...) }`
+ * state, set by `loanDetailScreen`'s `onShowRepaymentDialog` / `onShowDefaultDialog` callbacks)
+ * drive rendering [LoanRepaymentDialog] / [LoanMarkDefaultedDialog] as overlays on top of the whole
+ * `NavHost` Box (a Compose `AlertDialog` renders in its own `Popup`/window regardless of where in
+ * the tree it is composed, so their position here — siblings of the `NavHost` call, not nested
+ * inside it — has no visual effect on the overlay).
  */
 @Composable
 fun GroupBankingNavHost(
@@ -97,8 +97,10 @@ fun GroupBankingNavHost(
     // splash can be removed as soon as the NavHost composes.
     LaunchedEffect(Unit) { onSplashScreenRemoved() }
 
-    // See class KDoc "loan-repayment-dialog" note — the one feature<->feature seam in this NavHost.
+    // See class KDoc "loan-repayment-dialog / loan-mark-defaulted-dialog" note — the feature<->
+    // feature seams in this NavHost.
     var repaymentDialogTarget by remember { mutableStateOf<RepaymentDialogTarget?>(null) }
+    var defaultDialogTarget by remember { mutableStateOf<DefaultDialogTarget?>(null) }
 
     Column(
         modifier = modifier
@@ -191,7 +193,7 @@ fun GroupBankingNavHost(
                 )
 
                 // 9. loan-detail → back to loan-list (flow.yaml#navigates_to: [loan-list]) /
-                //    loan-repayment-dialog overlay (see class KDoc)
+                //    loan-repayment-dialog + loan-mark-defaulted-dialog overlays (see class KDoc)
                 loanDetailScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onShowRepaymentDialog = { loanId, memberId, installmentAmount ->
@@ -199,6 +201,13 @@ fun GroupBankingNavHost(
                             loanId = loanId,
                             memberId = memberId,
                             installmentAmount = installmentAmount,
+                        )
+                    },
+                    onShowDefaultDialog = { loanId, memberName, loanAmountKes ->
+                        defaultDialogTarget = DefaultDialogTarget(
+                            loanId = loanId,
+                            memberName = memberName,
+                            loanAmountKes = loanAmountKes,
                         )
                     },
                 )
@@ -217,6 +226,17 @@ fun GroupBankingNavHost(
                     onRepaymentRecorded = { repaymentDialogTarget = null },
                 )
             }
+
+            // loan-mark-defaulted-dialog — overlay on top of loan-detail, see class KDoc.
+            defaultDialogTarget?.let { target ->
+                LoanMarkDefaultedDialog(
+                    loanId = target.loanId,
+                    memberName = target.memberName,
+                    loanAmountKes = target.loanAmountKes,
+                    onDismiss = { defaultDialogTarget = null },
+                    onMarkedDefaulted = { defaultDialogTarget = null },
+                )
+            }
         }
     }
 }
@@ -230,6 +250,17 @@ private data class RepaymentDialogTarget(
     val loanId: Long,
     val memberId: Long,
     val installmentAmount: Double,
+)
+
+/**
+ * Nav-arg bundle carried from `loan-detail`'s `LoanDetailEvent.ShowDefaultConfirmDialog` (resolved
+ * inside `LoanDetailScreen.kt`'s Container — see [GroupBankingNavHost]'s class KDoc) to this
+ * NavHost's [LoanMarkDefaultedDialog] overlay.
+ */
+private data class DefaultDialogTarget(
+    val loanId: Long,
+    val memberName: String,
+    val loanAmountKes: Double,
 )
 
 /**

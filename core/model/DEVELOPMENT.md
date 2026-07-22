@@ -83,6 +83,8 @@ mappers in `core/network/mapper`.
 | `RecordRepaymentRequest` | `RecordRepayment.kt` | data class — loan-repayment-dialog submission input (`make_repayment`) |
 | `RepaymentResult` | `RecordRepayment.kt` | data class — `make_repayment` success result |
 | `PaymentMethod` | `RecordRepayment.kt` | enum (`MPESA`, `CASH`) with `paymentTypeId: Int` property; pure client-side chip state, no wire counterpart |
+| `WriteoffLoanRequest` | `WriteoffLoan.kt` | `data object` — loan-mark-defaulted-dialog confirm-to-writeoff marker (`write_off_loan`); zero domain-meaningful fields |
+| `WriteoffResult` | `WriteoffLoan.kt` | data class — `write_off_loan` success result |
 
 ## 3. Consumers
 
@@ -108,7 +110,12 @@ mappers in `core/network/mapper`.
   `RecordRepaymentMappers.kt` output the same way, BOTH directions — domain ->
   DTO for the submitted `RecordRepaymentRequest`, DTO -> domain for the
   `RepaymentResult` — `LoanRepository`
-  (`POST /loans/{loanId}/transactions?command=repayment`))
+  (`POST /loans/{loanId}/transactions?command=repayment`); the
+  loan-mark-defaulted-dialog submission maps `WriteoffLoanMappers.kt` output
+  the same way, BOTH directions — domain -> DTO for the confirm-marker
+  `WriteoffLoanRequest`, DTO -> domain for the `WriteoffResult` —
+  `LoanRepository.markDefaulted(loanId)`
+  (`POST /loans/{loanId}/transactions?command=writeoff`))
 
 ## 4. Boundaries
 
@@ -375,6 +382,11 @@ mappers in `core/network/mapper`.
 | `RepaymentResult` | `clientId` | `Long` | non-null |
 | `RepaymentResult` | `loanId` | `Long` | non-null |
 | `RepaymentResult` | `resourceId` | `Long` | non-null |
+| `WriteoffLoanRequest` | (none — `data object`) | — | — |
+| `WriteoffResult` | `officeId` | `Int` | non-null |
+| `WriteoffResult` | `clientId` | `Long` | non-null |
+| `WriteoffResult` | `loanId` | `Long` | non-null |
+| `WriteoffResult` | `resourceId` | `Long` | non-null |
 
 ## 6. Errors
 
@@ -421,6 +433,11 @@ paymentTypeId` resolution for both `PaymentMethod` values and the
 blank-`referenceNumber`-to-`null` normalization) AND the reverse
 `RecordRepaymentResponseDto -> RepaymentResult`, plus direct boundary-value
 tests for the `fineractTransactionDate` wire-date helper.
+`WriteoffLoanMappersTest.kt` covers `WriteoffLoanRequest -> WriteoffLoanRequestDto`
+(transactionDate pass-through, locale/dateFormat defaults + override) AND the
+reverse `WriteoffLoanResponseDto -> WriteoffResult` (every field); reuses
+`fineractTransactionDate` (`RecordRepaymentMappers.kt`) rather than defining a
+second wire-date helper.
 
 ## 8. Observability
 
@@ -453,6 +470,11 @@ carry no PII (amounts + dates only). `RecordRepaymentRequest`/`RepaymentResult`
 carry no PII (amounts, an internally-resolved `paymentTypeId`, and Fineract
 resource IDs only — `referenceNumber` is a treasurer-entered reference code,
 not a credential, but avoid bulk-logging it alongside amounts).
+`WriteoffLoanRequest`/`WriteoffResult` carry no PII (zero fields / Fineract
+resource IDs only) — the write-off IS the irreversible destructive event
+itself, so its occurrence is appropriate to log at info level (loanId only,
+per the `docs.yaml` analytics event contract), just not paired with member PII
+from a joined model.
 
 ## 9. Evolution
 
@@ -515,5 +537,11 @@ NOT reused (it models the read-side `get_loan_hist` history row, not
 `make_repayment`'s submit/result shape). Before extending
 `RecordRepaymentRequest`/`RepaymentResult`, resolve the
 `idea-layer/dtos/LoanRepaymentDto.yaml` registry-divergence flagged in
-`core/network/model/API.md` first.
+`core/network/model/API.md` first. **Loan-mark-defaulted-dialog's own domain
+concepts live in `WriteoffLoan.kt`** (`WriteoffLoanRequest`, `WriteoffResult`)
+— `RecordRepaymentRequest`/`RepaymentResult` were NOT reused despite the
+structurally-identical `WriteoffResult`/`RepaymentResult` shapes, matching the
+established per-operation-type precedent (no cross-operation domain-model
+sharing across distinct Fineract transaction commands, even when their
+response envelopes coincide).
 <!-- kmp-dto-gen:END -->

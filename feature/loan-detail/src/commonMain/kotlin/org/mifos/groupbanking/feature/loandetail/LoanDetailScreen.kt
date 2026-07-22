@@ -62,7 +62,6 @@ import org.mifos.groupbanking.feature.loandetail.components.RepaymentScheduleRow
 import org.mifos.groupbanking.feature.loandetail.components.RepaymentTransactionRow
 import org.mifos.groupbanking.feature.loandetail.generated.resources.Res
 import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loan_detail_action_retry
-import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loan_detail_default_confirm_pending
 import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loan_detail_error_auth
 import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loan_detail_error_icon_cd
 import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loan_detail_error_network
@@ -80,16 +79,15 @@ import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loa
  * [LoanDetailViewModel] via Koin `parametersOf(loanId)` (matching `LoanDetailModule`'s single
  * `loanId` declaration).
  *
- * `loan-repayment-dialog` (`ui.yaml#action_buttons_row.content[].on_click.dialog`) is now a
- * generated feature component (`feature/loan-repayment-dialog`) — [LoanDetailEvent.ShowRepaymentDialog]
- * resolves the target loan's `memberId` + next-installment amount from the currently-loaded
- * [LoanDetailState] and forwards them via [onShowRepaymentDialog] (see this Container's own KDoc
- * on that parameter for why the actual `LoanRepaymentDialog` composable is NOT rendered from
- * inside this module). `loan-mark-defaulted-dialog` (the sibling modal target) is NOT yet a
- * generated feature component — [LoanDetailEvent.ShowDefaultConfirmDialog] still surfaces the
- * explicit "coming soon" snackbar (an intentional, documented stub per
- * RULE-PROTO-COMPOSE-DEAD-CLICK-001's intentional-stub convention, not a placeholder invented
- * without justification). See API.md#screen.
+ * `loan-repayment-dialog` (`ui.yaml#action_buttons_row.content[].on_click.dialog`) and
+ * `loan-mark-defaulted-dialog` (the sibling irreversible-confirm modal target) are both now
+ * generated feature components (`feature/loan-repayment-dialog` / `feature/loan-mark-defaulted-dialog`).
+ * [LoanDetailEvent.ShowRepaymentDialog] resolves the target loan's `memberId` + next-installment
+ * amount from the currently-loaded [LoanDetailState] and forwards them via [onShowRepaymentDialog];
+ * [LoanDetailEvent.ShowDefaultConfirmDialog] resolves `memberName` + `totalOutstanding` the same way
+ * and forwards them via [onShowDefaultDialog] (see this Container's own KDoc on both parameters for
+ * why the actual dialog composables are NOT rendered from inside this module — that seam lives at
+ * `cmp-navigation`, see `GroupBankingNavHost.kt`'s class KDoc). See API.md#screen.
  */
 @Composable
 internal fun LoanDetailScreen(
@@ -101,10 +99,15 @@ internal fun LoanDetailScreen(
     // happens at `cmp-navigation`, see `GroupBankingNavHost.kt`'s `repaymentDialogTarget` local
     // state). This callback is the seam: the Container resolves loanId/memberId/installmentAmount
     // from its own state and hands them upward; the caller (ultimately `GroupBankingNavHost.kt`)
-    // owns actually rendering `LoanRepaymentDialog`. Default `= {}` is overridden by both
+    // owns actually rendering `LoanRepaymentDialog`. Default `= { _, _, _ -> }` is overridden by
+    // both `loanDetailScreen()` (`LoanDetailRoute.kt`) and `GroupBankingNavHost.kt` — never left
+    // dead (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3 count-assertion).
+    onShowRepaymentDialog: (loanId: Long, memberId: Long, installmentAmount: Double) -> Unit = { _, _, _ -> },
+    // Sibling seam to onShowRepaymentDialog — see class KDoc "loan-repayment-dialog /
+    // loan-mark-defaulted-dialog" note. Default `= { _, _, _ -> }` is overridden by both
     // `loanDetailScreen()` (`LoanDetailRoute.kt`) and `GroupBankingNavHost.kt` — never left dead
     // (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3 count-assertion).
-    onShowRepaymentDialog: (loanId: Long, memberId: Long, installmentAmount: Double) -> Unit = { _, _, _ -> },
+    onShowDefaultDialog: (loanId: Long, memberName: String, loanAmountKes: Double) -> Unit = { _, _, _ -> },
     viewModel: LoanDetailViewModel = koinViewModel(parameters = { parametersOf(loanId) }),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -117,7 +120,6 @@ internal fun LoanDetailScreen(
     val serverMessage = stringResource(Res.string.screens_loan_detail_error_server)
     val notFoundMessage = stringResource(Res.string.screens_loan_detail_error_not_found)
     val authMessage = stringResource(Res.string.screens_loan_detail_error_auth)
-    val defaultConfirmPendingMessage = stringResource(Res.string.screens_loan_detail_default_confirm_pending)
 
     EventsEffect(viewModel) { event ->
         when (event) {
@@ -134,8 +136,11 @@ internal fun LoanDetailScreen(
                     ?: 0.0
                 onShowRepaymentDialog(loanId, memberId, installmentAmount)
             }
-            LoanDetailEvent.ShowDefaultConfirmDialog ->
-                snackbarHostState.showSnackbar(message = defaultConfirmPendingMessage)
+            LoanDetailEvent.ShowDefaultConfirmDialog -> {
+                val memberName = state.loan?.memberName ?: ""
+                val loanAmountKes = state.loan?.totalOutstanding ?: 0.0
+                onShowDefaultDialog(loanId, memberName, loanAmountKes)
+            }
             is LoanDetailEvent.ShowSnackbar -> snackbarHostState.showSnackbar(
                 message = when (event.message) {
                     "error_network" -> networkMessage

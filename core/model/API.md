@@ -72,6 +72,8 @@
 | `RecordRepaymentRequest` | `amount: Double`, `paymentMethod: PaymentMethod`, `referenceNumber: String?` | loan-repayment-dialog submission input for `make_repayment`; `loanId`/`transactionDate`/`locale`/`dateFormat` deliberately excluded (path param + wire boilerplate, no domain-model counterpart) — see registry-divergence note below |
 | `RepaymentResult` | `officeId: Int`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `make_repayment` success result; mirrors wire `RecordRepaymentResponseDto` 1:1 |
 | `PaymentMethod` | enum: `MPESA(paymentTypeId=1)`, `CASH(paymentTypeId=2)` | pure client-side payment-method chip selection; NEVER serialized to/from the wire (`api.yaml` only ever transmits the resolved `paymentTypeId: Int`) — same "no wire counterpart" precedent as `LoanStatusFilter`, no `UNKNOWN` fallback needed |
+| `WriteoffLoanRequest` | (no fields — `data object`) | loan-mark-defaulted-dialog confirm-to-writeoff marker for `write_off_loan`; `loanId`/`transactionDate`/`locale`/`dateFormat` all excluded (path param + wire boilerplate, no domain-model counterpart — same precedent as `RecordRepaymentRequest`'s excluded fields, taken here to zero remaining fields since `ui.yaml` declares no free-text note/reason input) |
+| `WriteoffResult` | `officeId: Int`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `write_off_loan` success result; mirrors wire `WriteoffLoanResponseDto` 1:1; structurally identical to `RepaymentResult` but kept a distinct per-operation type per established precedent |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -109,7 +111,11 @@ divergence note below);
 /loans/{loanId}/transactions?command=repayment`, `make_repayment`;
 `api.yaml#api[0]` is the sole SoT for the literal request/response shape —
 `idea-layer/dtos/LoanRepaymentDto.yaml` describes the SAME endpoint with a
-different, richer transaction-record shape, see divergence note below).
+different, richer transaction-record shape, see divergence note below);
+`idea-layer/screens/loan-mark-defaulted-dialog/{api.yaml,ui.yaml,docs.yaml}`
+(`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`;
+`api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature).
 
 **`RecordRepaymentRequest`/`RepaymentResult` vs
 `idea-layer/dtos/LoanRepaymentDto.yaml` registry divergence (flagged for the

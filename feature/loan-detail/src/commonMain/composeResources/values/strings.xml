@@ -31,8 +31,6 @@
     <string name="screens_loan_detail_action_mark_defaulted">Mark Defaulted</string>
     <string name="screens_loan_detail_action_retry">Retry</string>
 
-    <string name="screens_loan_detail_default_confirm_pending">Marking a loan defaulted is coming soon.</string>
-
     <string name="screens_loan_detail_error_state_title">Could not load loan</string>
     <string name="screens_loan_detail_error_icon_cd">Error</string>
     <string name="screens_loan_detail_error_network">No internet. Showing cached data.</string>

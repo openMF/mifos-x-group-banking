@@ -72,6 +72,8 @@
 | `LoanDetailResponseDto` | `loan` (`LoanDetailDto`), `repaymentSchedule` (default `[]`), `transactions` (default `[]`) | `loan` required; both lists default empty | composite envelope of `GET /loans/{loanId}?associations=repaymentSchedule,transactions` — inferred (not literally named under `api.yaml#dtos`, same precedent as `LoanPageDto`) |
 | `RecordRepaymentRequestDto` | `transactionDate`, `transactionAmount`, `paymentTypeId`, `receiptNumber` (nullable, default `null`), `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `receiptNumber` nullable; `locale`/`dateFormat` default per `api.yaml`; rest required | `POST /loans/{loanId}/transactions?command=repayment` (`make_repayment`) request; see registry-divergence note below |
 | `RecordRepaymentResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `make_repayment` — literal Fineract resource-create envelope |
+| `WriteoffLoanRequestDto` | `transactionDate`, `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `transactionDate` required; `locale`/`dateFormat` default per `api.yaml` | `POST /loans/{loanId}/transactions?command=writeoff` (`write_off_loan`) request |
+| `WriteoffLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `write_off_loan` — literal Fineract resource-create envelope; structurally identical to `RecordRepaymentResponseDto` but kept a distinct per-operation type per established precedent |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -117,7 +119,11 @@ declares a richer raw-Fineract repayment-transaction shape than
 `api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
 registry entry declares THIS literal request/response shape, though
 `idea-layer/dtos/LoanRepaymentDto.yaml` describes the SAME endpoint with a
-different, richer shape — see divergence note below).
+different, richer shape — see divergence note below);
+`idea-layer/screens/loan-mark-defaulted-dialog/{api.yaml,ui.yaml,docs.yaml}`
+(`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`;
+`api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature, per PP-1).
 
 **`RecordRepaymentRequestDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
 registry divergence (flagged for the cross-feature repair station, same class
@@ -443,7 +449,7 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
 `MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`,
-`RecordRepaymentMappers.kt`.
+`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

@@ -85,6 +85,8 @@ logic, no domain field names.
 | `LoanDetailResponseDto` | `LoanDetailDto.kt` | `@Serializable` composite envelope of `GET /loans/{loanId}`, inferred (not literally under `api.yaml#dtos`) |
 | `RecordRepaymentRequestDto` | `RecordRepaymentDto.kt` | `@Serializable` request (`make_repayment` `POST`) — see `## 4. Boundaries` registry-divergence note |
 | `RecordRepaymentResponseDto` | `RecordRepaymentDto.kt` | `@Serializable` response (`make_repayment` `POST`) |
+| `WriteoffLoanRequestDto` | `WriteoffLoanDto.kt` | `@Serializable` request (`write_off_loan` `POST`) |
+| `WriteoffLoanResponseDto` | `WriteoffLoanDto.kt` | `@Serializable` response (`write_off_loan` `POST`) — structurally identical to `RecordRepaymentResponseDto`, kept a distinct per-operation type |
 
 ## 3. Consumers
 
@@ -109,7 +111,9 @@ logic, no domain field names.
   (`GET /groups/{groupId}/loans`); `core/network/mapper/LoanDetailMappers.kt`
   → `core/data` `LoanRepository` (`GET /loans/{loanId}`);
   `core/network/mapper/RecordRepaymentMappers.kt` → `core/data` `LoanRepository`
-  (`POST /loans/{loanId}/transactions?command=repayment`, `make_repayment`)
+  (`POST /loans/{loanId}/transactions?command=repayment`, `make_repayment`);
+  `core/network/mapper/WriteoffLoanMappers.kt` → `core/data` `LoanRepository`
+  (`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`)
 
 ## 4. Boundaries
 
@@ -478,6 +482,13 @@ logic, no domain field names.
 | `RecordRepaymentResponseDto` | `clientId` | `clientId` | `Long` | — |
 | `RecordRepaymentResponseDto` | `loanId` | `loanId` | `Long` | — |
 | `RecordRepaymentResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `WriteoffLoanRequestDto` | `transactionDate` | `transactionDate` | `String` | — |
+| `WriteoffLoanRequestDto` | `locale` | `locale` | `String` | `"en"` |
+| `WriteoffLoanRequestDto` | `dateFormat` | `dateFormat` | `String` | `"dd MMMM yyyy"` |
+| `WriteoffLoanResponseDto` | `officeId` | `officeId` | `Int` | — |
+| `WriteoffLoanResponseDto` | `clientId` | `clientId` | `Long` | — |
+| `WriteoffLoanResponseDto` | `loanId` | `loanId` | `Long` | — |
+| `WriteoffLoanResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 
 ## 6. Errors
 
@@ -564,6 +575,17 @@ values and the blank-`referenceNumber`-to-`null` normalization),
 `RecordRepaymentResponseDto -> RepaymentResult` (every field), and the
 `fineractTransactionDate` wire-date helper against pinned `Instant` fixtures
 (including single-digit-day zero-padding).
+`core/network/src/commonTest/.../model/WriteoffLoanDtoTest.kt` covers
+`WriteoffLoanRequestDto`/`WriteoffLoanResponseDto` construction,
+`locale`/`dateFormat` default-value behavior, serialization round-trip,
+`SCHEMA_VERSION`, and the T7/EC30 cross-version fixture (server-added field,
+decoded without crashing).
+`core/network/src/commonTest/.../mapper/WriteoffLoanMappersTest.kt` covers
+`WriteoffLoanRequest -> WriteoffLoanRequestDto` (transactionDate pass-through,
+locale/dateFormat defaults + override) AND the reverse
+`WriteoffLoanResponseDto -> WriteoffResult` (every field); reuses
+`fineractTransactionDate` (`RecordRepaymentMappers.kt`), no duplicate
+wire-date helper.
 
 ## 8. Observability
 
@@ -601,6 +623,10 @@ sensitive. `RepaymentScheduleRowDto`/`RepaymentTransactionDto`/
 (amounts, an internally-resolved `paymentTypeId`, and Fineract resource IDs
 only — `receiptNumber` is a treasurer-entered reference code, not a
 credential, but avoid bulk-logging it alongside amounts).
+`WriteoffLoanRequestDto`/`WriteoffLoanResponseDto` carry no PII (wire
+boilerplate + Fineract resource IDs only) — the write-off event itself is
+appropriate to log at info level (loanId only, per `docs.yaml`'s analytics
+event contract).
 
 ## 9. Evolution
 
@@ -664,5 +690,13 @@ reused (it models `get_loan_hist`'s read-side transaction row, not
 literal request/response body) — see the registry-divergence note in
 `## 4. Boundaries` and `## dtos` (API.md). Before extending
 `RecordRepaymentRequestDto`/`RecordRepaymentResponseDto`, resolve that
-divergence at Station 3 first.
+divergence at Station 3 first. **Loan-mark-defaulted-dialog's own DTOs live in
+`WriteoffLoanDto.kt`** (`WriteoffLoanRequestDto`, `WriteoffLoanResponseDto`)
+— `RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` were NOT reused
+despite `WriteoffLoanResponseDto` being structurally identical to
+`RecordRepaymentResponseDto`, matching the established per-operation-type
+precedent (each distinct Fineract transaction `command=` gets its own DTO
+pair, even when response envelopes coincide). No `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature — `api.yaml` is the sole SoT (PP-1),
+so there is no registry divergence to flag.
 <!-- kmp-dto-gen:END -->

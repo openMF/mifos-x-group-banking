@@ -29,19 +29,19 @@ fun NavController.navigateToLoanDetail(loanId: Long, navOptions: NavOptions? = n
 /**
  * Registers [LoanDetailScreen] on the host [NavGraphBuilder]. [onNavigateBack] closes the single
  * [LoanDetailEvent.NavigateBack] navigation branch consumed by the Container, matching
- * `flow.yaml#navigates_to: [loan-list]`. [onShowRepaymentDialog] forwards
- * [LoanDetailScreen]'s `onShowRepaymentDialog` callback up to `cmp-navigation`
- * (`GroupBankingNavHost.kt`), the module that actually depends on
- * `feature/loan-repayment-dialog` and renders `LoanRepaymentDialog` as an overlay — see
- * `LoanDetailScreen.kt`'s class KDoc "loan-repayment-dialog" note. `loan-mark-defaulted-dialog`
- * is still NOT registered here (not-yet-generated feature component; its "coming soon" snackbar
- * fallback is unchanged). DC3 count-assertion: 2 defaults (`onShowRepaymentDialog` here +
- * on [LoanDetailScreen] itself) / 2 overrides (this forwarding call + `GroupBankingNavHost.kt`'s
- * real wiring) / 0 suppressed. See API.md#route.
+ * `flow.yaml#navigates_to: [loan-list]`. [onShowRepaymentDialog] / [onShowDefaultDialog] forward
+ * [LoanDetailScreen]'s identically-named callbacks up to `cmp-navigation`
+ * (`GroupBankingNavHost.kt`), the module that actually depends on `feature/loan-repayment-dialog` /
+ * `feature/loan-mark-defaulted-dialog` and renders both dialogs as overlays — see
+ * `LoanDetailScreen.kt`'s class KDoc "loan-repayment-dialog / loan-mark-defaulted-dialog" note.
+ * DC3 count-assertion: 4 defaults (`onShowRepaymentDialog` + `onShowDefaultDialog` here, and again
+ * on [LoanDetailScreen] itself) / 4 overrides (both forwarding calls here + `GroupBankingNavHost.kt`'s
+ * real wiring for both) / 0 suppressed. See API.md#route.
  */
 fun NavGraphBuilder.loanDetailScreen(
     onNavigateBack: () -> Unit,
     onShowRepaymentDialog: (loanId: Long, memberId: Long, installmentAmount: Double) -> Unit = { _, _, _ -> },
+    onShowDefaultDialog: (loanId: Long, memberName: String, loanAmountKes: Double) -> Unit = { _, _, _ -> },
 ) {
     composableWithRootPushTransitions<LoanDetailRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<LoanDetailRoute>()
@@ -49,6 +49,7 @@ fun NavGraphBuilder.loanDetailScreen(
             loanId = route.loanId,
             onNavigateBack = onNavigateBack,
             onShowRepaymentDialog = onShowRepaymentDialog,
+            onShowDefaultDialog = onShowDefaultDialog,
         )
     }
 }

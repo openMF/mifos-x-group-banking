@@ -26,6 +26,7 @@ import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.config.LoanApiConfig
 import org.mifos.groupbanking.core.network.config.LoanDetailApiConfig
 import org.mifos.groupbanking.core.network.config.LoanRepaymentApiConfig
+import org.mifos.groupbanking.core.network.config.LoanWriteoffApiConfig
 import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
@@ -46,6 +47,8 @@ import org.mifos.groupbanking.core.network.service.loanlist.LoanApi
 import org.mifos.groupbanking.core.network.service.loanlist.LoanApiImpl
 import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApi
 import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApiImpl
+import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApi
+import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApi
@@ -205,6 +208,17 @@ val NetworkModule = module {
     // registered in RepositoryModule.kt.
     single<LoanRepaymentApiConfig> { LoanRepaymentApiConfig() }
     single<LoanRepaymentApi> { LoanRepaymentApiImpl(httpClient = get()) }
+
+    // Loan write-off (write_off_loan) — loan-mark-defaulted-dialog feature client stack. Reuses
+    // the shared HttpClient singleton above (same companion server, no second engine). The
+    // config binding is registered for override-surface symmetry with CompanionAuthApiConfig
+    // even though the shared client is the one actually dispatching requests today. This
+    // mutation is IRREVERSIBLE and has NO offline queue. The Repository consuming LoanWriteoffApi
+    // (Store5-free mutation orchestration — no read-stream of its own, invalidates the
+    // already-registered AppStoreRegistry.LoanDetail store on success) is registered in
+    // RepositoryModule.kt.
+    single<LoanWriteoffApiConfig> { LoanWriteoffApiConfig() }
+    single<LoanWriteoffApi> { LoanWriteoffApiImpl(httpClient = get()) }
 
     // Member profile (get_client / get_client_accounts / get_member_role / update_member_role)
     // — member-profile feature client stack. Reuses the shared HttpClient singleton above (same

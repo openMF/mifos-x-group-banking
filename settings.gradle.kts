@@ -131,6 +131,7 @@ include(":feature:member-add") // <- added by kmp-viewmodel-gen
 include(":feature:loan-list") // <- added by kmp-viewmodel-gen
 include(":feature:loan-detail") // <- added by kmp-viewmodel-gen
 include(":feature:loan-repayment-dialog") // <- added by kmp-viewmodel-gen
+include(":feature:loan-mark-defaulted-dialog") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")
