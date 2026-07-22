@@ -37,6 +37,11 @@ as a library — never edits it.
 - `LoanApplyApi` / `LoanApplyApiImpl` (`.../service/loanapply/`) — the loan-apply form's 7
   endpoints: `getGroupMembers`, `getLoanProducts`, `getLoanTemplate`, `getMemberSavings`,
   `getGroupCorpus`, `getGroupLoanConfig`, `applyLoan`. See API.md#services.
+- `BatchSyncApi` / `BatchSyncApiImpl` (`.../service/batchsync/`) — the sync-status feature's
+  single endpoint: `batchSync`, submitting the entire `SyncQueueRepository` pending backlog as
+  one Fineract Batch API request (`POST /fineract-provider/api/v1/batches`). Response is a
+  top-level JSON array, decoded via Ktor's reified-generic content negotiation. See
+  API.md#services.
 - `SupabaseConfigClient` (`kpt.core.base.network`, wired here) — dynamic server config, inert by
   default.
 - `CompanionAuthApiConfig` — Koin-injectable base-URL config for the companion backend.
@@ -56,6 +61,8 @@ as a library — never edits it.
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 - `LoanApplyApiConfig` — Koin-injectable base-URL config for the loan-apply endpoints
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `BatchSyncApiConfig` — Koin-injectable base-URL config for the sync-status batch-drain
+  endpoint (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
 
@@ -80,7 +87,10 @@ methods directly — `getGroupMembers` is a standalone read; `getLoanProducts`/`
 `getMemberSavings`/`getGroupCorpus`/`getGroupLoanConfig` fire in parallel
 (`kotlinx.coroutines.coroutineScope`+`async`) and fan into the composite `LoanApplyTemplate`
 domain model; `applyLoan` submits the form (Store5-free — no `AppStoreRegistry.LoanApply` entry
-exists yet). Feature ViewModels never call a Service directly (Repository/Store boundary).
+exists yet). `SyncManagerImpl` (`core/data`) calls `BatchSyncApi.batchSync` directly —
+Store5-free (`sync-status`'s `data-flow.yaml` declares `cache.strategy: no_cache` on every
+entry, no read-stream to cache). Feature ViewModels never call a Service directly
+(Repository/Store boundary).
 
 ## 4. Boundaries
 
@@ -129,16 +139,19 @@ query-param threading + missing-`externalId` mapping, and `createGroup` success 
 `getGroupCorpus`/`getGroupAccounts`) incl. path templating for `{groupId}` +
 `/my-role`/`/corpus`/`/accounts` suffixes and success/401/404/500/malformed-JSON branches;
 `LoanDetailApiTest` covers `getLoanDetail`'s single composite read incl. the `associations`
-query-param default threading and success/401/404/500/malformed-JSON branches). Ktor
+query-param default threading and success/401/404/500/malformed-JSON branches).
+`BatchSyncApiTest` (7 MockEngine tests, all green) covers `batchSync`'s success/mixed-status/
+empty-array/400/401/500/malformed-body branches, incl. a non-array-JSON-object 2xx body mapping
+to `SERIALIZATION` (this endpoint's response is array-shaped, not object-shaped). Ktor
 test deps (`ktor-client-mock`, `ktor-client-content-negotiation`, `ktor-serialization-kotlinx-json`)
 already declared in `core/network/build.gradle.kts`.
 
 ## 8. Observability
 
 Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`,
-`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`, `LoanApplyApi`) —
-debug on request start, info on 2xx, error on every failure branch (status-mapped or
-transport/serialization exception).
+`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`, `LoanApplyApi`,
+`BatchSyncApi`) — debug on request start (incl. request-row count for `BatchSyncApi`), info on
+2xx, error on every failure branch (status-mapped or transport/serialization exception).
 
 ## 9. Evolution
 

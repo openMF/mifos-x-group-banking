@@ -51,6 +51,10 @@ interface SyncQueueDao {
     @Query("SELECT * FROM sync_queue ORDER BY createdAtEpochMs ASC")
     fun observeAll(): Flow<List<SyncQueueEntity>>
 
+    /** One-shot lookup of a single row by id — backs the sync-status feature's per-item retry. */
+    @Query("SELECT * FROM sync_queue WHERE id = :id")
+    suspend fun getById(id: Long): SyncQueueEntity?
+
     /** Reactive per-status row count — backs the sync-status feature's badge counters. */
     @Query("SELECT COUNT(*) FROM sync_queue WHERE status = :status")
     fun countByStatus(status: String): Flow<Int>

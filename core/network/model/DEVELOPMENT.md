@@ -101,6 +101,9 @@ logic, no domain field names.
 | `LoanPurposeDto` | `LoanApplyDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — extended by loan-request (PP-1); literally wire-transmitted for `LoanRequestPayloadDto.purpose`, NOT for `create_new_loan` (see `## 4. Boundaries`) |
 | `LoanRequestPayloadDto` | `LoanRequestDto.kt` | `@Serializable` request (`submit_loan_request` `POST /datatables/dt_loan_request`); reuses `LoanPurposeDto` |
 | `LoanRequestResponseDto` | `LoanRequestDto.kt` | `@Serializable` response (`submit_loan_request`) |
+| `BatchOperationDto` | `BatchSyncDto.kt` | `@Serializable` nested request DTO (one `/batches` request row) |
+| `BatchSyncRequestDto` | `BatchSyncDto.kt` | `@Serializable` request (`batch_sync` `POST /fineract-provider/api/v1/batches`) |
+| `BatchSyncResponseItemDto` | `BatchSyncDto.kt` | `@Serializable` response row — the `/batches` HTTP body is a TOP-LEVEL JSON ARRAY of this shape, no wrapper envelope |
 
 ## 3. Consumers
 
@@ -137,7 +140,13 @@ logic, no domain field names.
   the submitted `LoanRequestPayload`, DTO -> domain for the `LoanRequestResult`);
   its `toJsonPayload()`/`loanRequestPayloadDtoFromJson()` pair is additionally
   the serialization SoT for a future `SyncQueueRepository` (out of this
-  generation's scope) queuing the payload offline
+  generation's scope) queuing the payload offline;
+  `core/network/mapper/BatchSyncMappers.kt` → the ALREADY-SHIPPED
+  `core/data` `SyncQueueRepository` / `SyncManager.triggerSync()`
+  (`POST /fineract-provider/api/v1/batches`, `batch_sync`) — domain -> DTO for
+  the submitted `BatchSyncRequest` (built from every pending `SyncQueueItem`
+  via `toBatchOperation`), DTO -> domain for the `/batches` response array,
+  folded into `SyncResult` via `toSyncResult`
 
 ## 4. Boundaries
 
@@ -279,6 +288,22 @@ logic, no domain field names.
   response (omits `principal`/`numberOfRepayments`) — the literal operation
   response wins, per the established `OfficeDto`/`CreateGroupTypeConfigDto`
   precedent.
+- **`BatchSyncResponseItemDto`'s wire envelope is a bare JSON array, no
+  wrapper object**: `api.yaml#dtos.BatchSyncResponse` declares `type: array`
+  at the top level (unlike every other response DTO in this file, which is a
+  JSON object) — decode with `ListSerializer(BatchSyncResponseItemDto.serializer())`,
+  never a synthetic single-field envelope DTO. See `BatchSyncDto.kt` kdoc.
+- **`api.yaml#dtos.SyncQueueItem` vs the ALREADY-SHIPPED `SyncQueueItem`
+  schema divergence** (flagged for the cross-feature repair station, full
+  note in `core/model/API.md`): the registry-equivalent `api.yaml` block
+  models `entityType: EntityType` + `operation: SyncOperation` as first-class
+  columns on the queue row; the shipped `SyncQueueItem` (`core/model/SyncQueue.kt`,
+  REUSED OUTRIGHT by this generation, never redefined) instead stores a
+  single generic `operationType: String` — `SyncClassifier.kt`
+  (`core/model`) bridges the two at read time. No DTO was generated for
+  `api.yaml#dtos.SyncQueueItem` itself — it describes an already-persisted
+  Room row, not a wire payload this feature's own `batch_sync` operation
+  transmits or receives.
 
 ## 5. Data
 
@@ -609,6 +634,14 @@ logic, no domain field names.
 | `LoanRequestResponseDto` | `officeId` | `officeId` | `Long` | — |
 | `LoanRequestResponseDto` | `clientId` | `clientId` | `Long` | — |
 | `LoanRequestResponseDto` | `resourceExternalId` | `resourceExternalId` | `String` | — |
+| `BatchOperationDto` | `requestId` | `requestId` | `Int` | — |
+| `BatchOperationDto` | `relativeUrl` | `relativeUrl` | `String` | — |
+| `BatchOperationDto` | `method` | `method` | `String` | — |
+| `BatchOperationDto` | `body` | `body` | `String` | — |
+| `BatchSyncRequestDto` | `requests` | `requests` | `List<BatchOperationDto>` | `emptyList()` |
+| `BatchSyncResponseItemDto` | `requestId` | `requestId` | `Int` | — |
+| `BatchSyncResponseItemDto` | `statusCode` | `statusCode` | `Int` | — |
+| `BatchSyncResponseItemDto` | `body` | `body` | `String` | — |
 
 ## 6. Errors
 
@@ -740,6 +773,22 @@ default-to-`"PENDING"` and the `purpose` resolution via the reused
 `LoanPurpose.toDto()`) AND the reverse `LoanRequestResponseDto ->
 LoanRequestResult` (every field), plus the `toJsonPayload()`/
 `loanRequestPayloadDtoFromJson()` offline-SyncQueue round-trip.
+`core/network/src/commonTest/.../model/BatchSyncDtoTest.kt` covers
+`BatchOperationDto`/`BatchSyncRequestDto`/`BatchSyncResponseItemDto`
+construction, equality, `SCHEMA_VERSION`, `requests` default-empty behavior,
+the top-level-JSON-ARRAY decode of `BatchSyncResponseItemDto` via
+`ListSerializer` (no wrapper object), and 2 T7/EC30 cross-version fixtures
+(server-added object field + server-added array-element field, both decoded
+without crashing).
+`core/network/src/commonTest/.../mapper/BatchSyncMappersTest.kt` covers
+`SyncQueueItem.toBatchOperation` (`relativeUrl` derivation from
+`targetTable`, hardcoded `method`, verbatim `body`, the caller-supplied
+`requestId` vs. the queue row's own `id`), `BatchOperation <->
+BatchOperationDto` (every field, both directions), `BatchSyncRequest <->
+BatchSyncRequestDto` (batch converter, declaration order preserved),
+`BatchSyncResponseItemDto -> BatchSyncResponseItem` (every field plus the
+batch converter), and `List<BatchSyncResponseItem>.toSyncResult`'s 3-way
+fold (mixed 200/201/409/500/400, all-success, empty-list).
 
 ## 8. Observability
 
@@ -800,6 +849,13 @@ IDs only) — same "amounts/enum/resource-id only" threat model as
 exposure beyond the online path — avoid bulk-logging the queued
 `SyncQueueEntry.payload` string alongside member-identifying context from a
 joined model.
+`BatchOperationDto`/`BatchSyncRequestDto`/`BatchSyncResponseItemDto` carry no
+PII of their own (Fineract routing metadata + status codes only) — `body`
+echoes a queued mutation's `payloadJson`/response content verbatim and MAY
+carry member-identifying fields depending on the originating feature's
+payload shape (e.g. a loan-request's `clientId`), same threat model as
+`LoanRequestPayloadDto`'s queued JSON — avoid bulk-logging batch request/
+response bodies; log `requestId`/`statusCode`/`relativeUrl` only.
 
 ## 9. Evolution
 
@@ -906,5 +962,20 @@ reuse `LoanRequestMappers.kt#toJsonPayload()`/`loanRequestPayloadDtoFromJson()`
 as the payload-serialization convention rather than re-deriving a per-feature
 Json config. No `idea-layer/dtos/{Dto}.yaml` registry entry exists for
 loan-request either — `api.yaml` is the sole SoT (PP-1); no divergence to
-flag.
+flag. **Sync-status's own DTOs live in `BatchSyncDto.kt`**
+(`BatchOperationDto`, `BatchSyncRequestDto`, `BatchSyncResponseItemDto`) —
+no DTO was generated for `api.yaml#dtos.SyncQueueItem` itself (see the
+divergence note in `## 4. Boundaries`) or for `EntityType`/`SyncOperation`/
+`SyncOverallStatus`/`SyncResult` (these are pure client-side classification/
+rollup concepts with no independent wire representation — they live as
+domain-only types in `core/model/BatchSync.kt`, never round-tripped through
+a DTO). Before generating a future feature that also drains an offline
+queue via a Fineract batch call, reuse `BatchOperationDto`/
+`BatchSyncRequestDto`/`BatchSyncResponseItemDto`/`BatchSyncMappers.kt`
+outright rather than introducing a second `/batches` DTO trio — the shape is
+generic Fineract Batch API boilerplate, not sync-status-specific. No
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT (PP-1); the ONE divergence is the
+`api.yaml#dtos.SyncQueueItem` vs. the ALREADY-SHIPPED `SyncQueueItem` schema
+note above.
 <!-- kmp-dto-gen:END -->

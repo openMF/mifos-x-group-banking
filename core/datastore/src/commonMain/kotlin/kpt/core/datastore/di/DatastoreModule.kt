@@ -21,6 +21,8 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
 import org.mifos.groupbanking.core.datastore.session.CompanionSessionStoreImpl
+import org.mifos.groupbanking.core.datastore.sync.SyncMetadataStore
+import org.mifos.groupbanking.core.datastore.sync.SyncMetadataStoreImpl
 
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)
@@ -44,6 +46,17 @@ val DatastoreModule = module {
     single<CompanionSessionStore> {
         CompanionSessionStoreImpl(
             secureSettings = get<Settings>(named("secure")),
+            dispatcher = get(),
+        )
+    }
+
+    // sync-status feature's lastSyncAt persistence (app_settings.last_synced_at,
+    // idea-layer/screens/sync-status/api.yaml#dependencies.local_db) — PLAIN (non-secure)
+    // Settings-backed (non-secret value); see SyncMetadataStore KDoc for why this is NOT Store5.
+    // Written by SyncManagerImpl (core/data) after every batch_sync drain.
+    single<SyncMetadataStore> {
+        SyncMetadataStoreImpl(
+            plainSettings = get<Settings>(named("plain")),
             dispatcher = get(),
         )
     }

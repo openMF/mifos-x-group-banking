@@ -11,12 +11,15 @@ package org.mifos.groupbanking.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.mifos.groupbanking.core.database.syncqueue.dao.SyncQueueDao
 import org.mifos.groupbanking.core.database.syncqueue.entity.SyncQueueEntity
+import org.mifos.groupbanking.core.model.EntityType
 import org.mifos.groupbanking.core.model.SyncQueueCounts
 import org.mifos.groupbanking.core.model.SyncQueueItem
 import org.mifos.groupbanking.core.model.SyncStatus
+import org.mifos.groupbanking.core.model.pendingByType
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -74,6 +77,16 @@ class SyncQueueRepositoryImpl(
     override suspend fun markFailed(id: Long, error: String?) = dao.markFailed(id, nowMs(), error)
 
     override suspend fun retryAll() = dao.retryAllFailed()
+
+    override fun observePendingByType(): Flow<Map<EntityType, Int>> =
+        observePending().map { items -> pendingByType(items) }
+
+    override fun observeFailed(): Flow<List<SyncQueueItem>> =
+        dao.observeByStatus(SyncStatus.FAILED.name).map { rows -> rows.map(SyncQueueEntity::toDomain) }
+
+    override fun observeConflictCount(): Flow<Int> = flowOf(0) // documented gap — see interface KDoc
+
+    override suspend fun getItem(id: Long): SyncQueueItem? = dao.getById(id)?.toDomain()
 }
 
 /** Entity -> domain projection. [SyncStatus.valueOf] is total over the persisted enum names. */

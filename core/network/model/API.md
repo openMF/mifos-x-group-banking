@@ -88,6 +88,9 @@
 | `LoanPurposeDto` | enum `@SerialName`: `MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `SCHOOL_FEES`, `FARMING`, `HOME_IMPROVEMENT`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOT literally wire-transmitted for `create_new_loan` (only sends the resolved `loanPurposeId: Int`), same "chip-selector resolved to an Int" precedent as `PaymentMethod`/`paymentTypeId`; IS literally wire-transmitted for loan-request's `LoanRequestPayloadDto.purpose` (bare `@SerialName` string, no wrapper object) — extended with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT` per PP-1, see note below | shared purpose selector, `api.yaml#dtos.LoanPurpose` (loan-apply) + `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options` (loan-request) |
 | `LoanRequestPayloadDto` | `clientId`, `requested_amount`, `purpose` (reuses `LoanPurposeDto`), `duration_weeks`, `savings_balance_at_request`, `submitted_at`, `status` (default `"PENDING"`) | `status` defaults `"PENDING"`; rest required. `clientId` camelCase, remaining 5 own fields snake_case — raw `dt_loan_request` datatable columns (Hard Rule 5) | `POST /datatables/dt_loan_request` (`submit_loan_request`) request body; offline-queued via `cache.offline: queue_to_syncqueue` when `cmp-network-monitor` reports offline |
 | `LoanRequestResponseDto` | `resourceId`, `officeId`, `clientId`, `resourceExternalId` | all required | response of `submit_loan_request` — literal Fineract datatable resource-create envelope |
+| `BatchOperationDto` | `requestId`, `relativeUrl`, `method`, `body` | all required | field of `BatchSyncRequestDto.requests` — one batched Fineract sub-request |
+| `BatchSyncRequestDto` | `requests` (default `[]`) | `requests` defaults empty | `POST /fineract-provider/api/v1/batches` (`batch_sync`) request body |
+| `BatchSyncResponseItemDto` | `requestId`, `statusCode`, `body` | all required | response ROW of `batch_sync` — the HTTP body itself is a bare `type: array` of this shape, no wrapper object |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -148,7 +151,13 @@ responses, see divergence note below);
 `idea-layer/screens/loan-request/api.yaml` (`POST /datatables/dt_loan_request`,
 `submit_loan_request`, `cache: { ttl: 0, strategy: no-cache, offline:
 queue_to_syncqueue }`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry
-entry exists for this feature — `api.yaml` is the sole SoT, per PP-1).
+entry exists for this feature — `api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/sync-status/api.yaml` (`POST
+/fineract-provider/api/v1/batches`, `batch_sync` — drains the ALREADY-SHIPPED
+offline `sync_queue` via one atomic Fineract batch call; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its own `dtos.SyncQueueItem` block
+diverges from the shipped `SyncQueueItem` Room schema, see note below).
 
 **`LoanPurposeDto` extension for loan-request (PP-1 — screen-SoT wins,
 informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
@@ -549,7 +558,23 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
 `MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`,
-`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`, `LoanApplyMappers.kt`.
+`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`, `LoanApplyMappers.kt`,
+`LoanRequestMappers.kt`, `BatchSyncMappers.kt`.
+
+**`api.yaml#dtos.SyncQueueItem` vs the ALREADY-SHIPPED `SyncQueueItem` Room
+schema divergence (flagged for the cross-feature repair station — full note
+in `core/model/API.md`):** sync-status's `api.yaml#dtos.SyncQueueItem` models
+`entityType: EntityType` + `operation: SyncOperation` as first-class columns;
+the shipped `SyncQueueItem` (`core/model/SyncQueue.kt`, reused outright by
+this generation, never redefined or migrated) instead stores a single
+generic `operationType: String` column. No DTO was generated for
+`api.yaml#dtos.SyncQueueItem` — it describes an already-persisted local Room
+row, not a payload `batch_sync` transmits or receives on the wire;
+`core/model/SyncClassifier.kt`'s `operationTypeToEntityType`/
+`operationTypeToSyncOperation` bridge the two representations at read time.
+Resolve at Station 3: either keep the classifier-bridge permanently, or
+schedule a `sync_queue` migration adding `entityType`/`operation` as
+first-class columns and retire the classifier.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

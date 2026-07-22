@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.mifos.groupbanking.core.database.syncqueue.dao.SyncQueueDao
 import org.mifos.groupbanking.core.database.syncqueue.entity.SyncQueueEntity
+import org.mifos.groupbanking.core.model.EntityType
 import org.mifos.groupbanking.core.model.SyncStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,6 +46,8 @@ private class FakeSyncQueueDao : SyncQueueDao {
 
     override fun observeAll(): Flow<List<SyncQueueEntity>> =
         rows.map { list -> list.sortedBy { it.createdAtEpochMs } }
+
+    override suspend fun getById(id: Long): SyncQueueEntity? = rows.value.firstOrNull { it.id == id }
 
     override fun countByStatus(status: String): Flow<Int> =
         rows.map { list -> list.count { it.status == status } }
@@ -179,5 +182,64 @@ class SyncQueueRepositoryTest {
         val pending = repo.observePending().first().single()
         assertEquals(SyncStatus.PENDING, pending.status)
         assertNull(pending.lastError)
+    }
+
+    // ---------- observePendingByType / observeFailed / observeConflictCount / getItem ----------
+
+    @Test
+    fun observePendingByTypeGroupsPendingRowsByClassifiedEntityType() = runTest {
+        val dao = FakeSyncQueueDao()
+        val repo = repo(dao)
+        repo.enqueue("LOAN_REQUEST", "dt_loan_request", "{}")
+        repo.enqueue("CREATE_MEMBER", "dt_member_role", "{}")
+        val synced = repo.enqueue("CREATE_MEMBER", "dt_member_role", "{}")
+        repo.markSyncing(synced)
+        repo.markSynced(synced)
+
+        val byType = repo.observePendingByType().first()
+
+        assertEquals(1, byType[EntityType.LOAN])
+        assertEquals(1, byType[EntityType.MEMBER])
+    }
+
+    @Test
+    fun observeFailedReturnsOnlyFailedRowsInFifoOrder() = runTest {
+        val dao = FakeSyncQueueDao()
+        val repo = repo(dao)
+        val a = repo.enqueue("LOAN_REQUEST", "dt_loan_request", "{}")
+        repo.enqueue("CREATE_MEMBER", "dt_member_role", "{}")
+        repo.markSyncing(a)
+        repo.markFailed(a, error = "HTTP 500")
+
+        val failed = repo.observeFailed().first()
+
+        assertEquals(1, failed.size)
+        assertEquals(a, failed.single().id)
+        assertEquals("HTTP 500", failed.single().lastError)
+    }
+
+    @Test
+    fun observeConflictCountIsAlwaysZeroDocumentedGap() = runTest {
+        val dao = FakeSyncQueueDao()
+        val repo = repo(dao)
+        val a = repo.enqueue("LOAN_REQUEST", "dt_loan_request", "{}")
+        repo.markSyncing(a)
+        repo.markFailed(a, error = "409 conflict")
+
+        // No CONFLICT SyncStatus bucket exists yet — see interface KDoc for the documented gap.
+        assertEquals(0, repo.observeConflictCount().first())
+    }
+
+    @Test
+    fun getItemReturnsMappedRowByIdOrNullWhenAbsent() = runTest {
+        val dao = FakeSyncQueueDao()
+        val repo = repo(dao)
+        val id = repo.enqueue("LOAN_REQUEST", "dt_loan_request", "{}")
+
+        val found = repo.getItem(id)
+        val missing = repo.getItem(id + 999)
+
+        assertEquals("LOAN_REQUEST", found?.operationType)
+        assertNull(missing)
     }
 }

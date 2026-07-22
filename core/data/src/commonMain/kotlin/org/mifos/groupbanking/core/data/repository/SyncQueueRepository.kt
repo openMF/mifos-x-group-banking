@@ -10,6 +10,7 @@
 package org.mifos.groupbanking.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import org.mifos.groupbanking.core.model.EntityType
 import org.mifos.groupbanking.core.model.SyncQueueCounts
 import org.mifos.groupbanking.core.model.SyncQueueItem
 
@@ -61,4 +62,35 @@ interface SyncQueueRepository {
 
     /** Requeue every FAILED row back to PENDING — the retry-all action. */
     suspend fun retryAll()
+
+    /**
+     * Reactive pending backlog grouped by [EntityType] — backs the sync-status screen's
+     * per-entity pending-count badges (`api.yaml#dependencies.repositories.SyncQueueRepository.getPendingByType`).
+     * Derived from [observePending] via `SyncClassifier.kt#pendingByType` — no second DAO query.
+     */
+    fun observePendingByType(): Flow<Map<EntityType, Int>>
+
+    /**
+     * Reactive FAILED backlog in FIFO order — backs the sync-status screen's failed-operations
+     * list (`api.yaml#dependencies.repositories.SyncQueueRepository.getFailedOperations`).
+     */
+    fun observeFailed(): Flow<List<SyncQueueItem>>
+
+    /**
+     * Reactive conflict-row count — backs the sync-status screen's conflict badge
+     * (`api.yaml#dependencies.repositories.SyncQueueRepository.getConflictCount`). **Documented
+     * gap**: [org.mifos.groupbanking.core.model.SyncStatus] has no dedicated `CONFLICT` bucket
+     * today (a Fineract `409` batch-response row is recorded as [SyncStatus.FAILED] — see
+     * `SyncManagerImpl` KDoc), so this always emits `0` until a `CONFLICT` status is added to the
+     * schema. Kept as its own reactive stream (rather than removed) so the sync-status screen's
+     * per-source read list matches `data-flow.yaml#local_sources` exactly today, and the future
+     * schema change is a pure implementation swap with no interface break.
+     */
+    fun observeConflictCount(): Flow<Int>
+
+    /**
+     * One-shot lookup of a single queue row by id — backs the sync-status screen's per-item retry
+     * (`SyncManagerImpl.retryItem`).
+     */
+    suspend fun getItem(id: Long): SyncQueueItem?
 }

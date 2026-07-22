@@ -50,6 +50,7 @@ kotlin {
             implementation(projects.feature.loanRequest) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanRepaymentDialog) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.loanMarkDefaultedDialog) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.syncStatus) // <- added by kmp-viewmodel-gen
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

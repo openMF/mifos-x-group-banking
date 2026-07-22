@@ -93,6 +93,13 @@ mappers in `core/network/mapper`.
 | `LoanPurpose` | `LoanApply.kt` | enum (`MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `SCHOOL_FEES`, `FARMING`, `HOME_IMPROVEMENT`, `UNKNOWN`) with `fineractPurposeId: Int` property — extended by loan-request (PP-1), see `core/model/API.md` |
 | `LoanRequestPayload` | `LoanRequest.kt` | data class — loan-request member-side submission input (`submit_loan_request`); reuses `LoanPurpose` |
 | `LoanRequestResult` | `LoanRequest.kt` | data class — `submit_loan_request` success result |
+| `EntityType` | `BatchSync.kt` | enum (`MEETING`, `LOAN`, `SAVINGS`, `ATTENDANCE`, `SHARE_OUT`, `MEMBER`) — sync-status classification of a queued write; resolved from `SyncQueueItem.operationType` by `SyncClassifier.kt`, see registry-divergence note below |
+| `SyncOperation` | `BatchSync.kt` | enum (`CREATE`, `UPDATE`, `DELETE`) — sync-status write-kind classification; also resolved from `SyncQueueItem.operationType` by `SyncClassifier.kt` |
+| `SyncOverallStatus` | `BatchSync.kt` | enum (`SYNCED`, `PENDING`, `FAILED`) — sync-status screen rollup badge; client-computed from `SyncQueueCounts`, no direct wire source |
+| `BatchOperation` | `BatchSync.kt` | data class — one Fineract `/batches` request row; domain projection of a `SyncQueueItem` (`BatchSyncMappers.kt#toBatchOperation`) |
+| `BatchSyncRequest` | `BatchSync.kt` | data class — the full `/batches` submission (`requests: List<BatchOperation>`) |
+| `BatchSyncResponseItem` | `BatchSync.kt` | data class — one `/batches` response row |
+| `SyncResult` | `BatchSync.kt` | data class — client-computed rollup of a `/batches` response (`successCount`/`failedCount`/`conflictCount`) |
 
 ## 3. Consumers
 
@@ -135,7 +142,16 @@ mappers in `core/network/mapper`.
   `LoanRequestResult` — `LoanRequestRepository`
   (`POST /datatables/dt_loan_request`); offline, `LoanRequestMappers.kt#toJsonPayload()`
   serializes the resolved `LoanRequestPayloadDto` for `SyncQueueRepository`
-  (out of this generation's scope) to persist as a queued retry row)
+  (out of this generation's scope) to persist as a queued retry row); the
+  sync-status batch-drain maps `BatchSyncMappers.kt` output the same way,
+  BOTH directions — `SyncQueueItem` (already-shipped, `SyncQueueRepository`)
+  -> `BatchOperation` -> DTO for the submitted `BatchSyncRequest`, DTO ->
+  domain for the `/batches` response rows, folded into `SyncResult` —
+  `SyncQueueRepository`/`SyncManager.triggerSync()`
+  (`POST /fineract-provider/api/v1/batches`); `SyncClassifier.kt`'s
+  `pendingByType(items: List<SyncQueueItem>): Map<EntityType, Int>` is the
+  read-side counterpart consumed directly by `SyncQueueRepository.getPendingByType()`
+  (no DTO/mapper involved — pure domain-to-domain classification)
 
 ## 4. Boundaries
 
@@ -450,6 +466,17 @@ mappers in `core/network/mapper`.
 | `LoanRequestResult` | `officeId` | `Long` | non-null |
 | `LoanRequestResult` | `clientId` | `Long` | non-null |
 | `LoanRequestResult` | `resourceExternalId` | `String` | non-null |
+| `BatchOperation` | `requestId` | `Int` | non-null |
+| `BatchOperation` | `relativeUrl` | `String` | non-null |
+| `BatchOperation` | `method` | `String` | non-null |
+| `BatchOperation` | `body` | `String` | non-null |
+| `BatchSyncRequest` | `requests` | `List<BatchOperation>` | non-null (may be empty) |
+| `BatchSyncResponseItem` | `requestId` | `Int` | non-null |
+| `BatchSyncResponseItem` | `statusCode` | `Int` | non-null |
+| `BatchSyncResponseItem` | `body` | `String` | non-null |
+| `SyncResult` | `successCount` | `Int` | non-null |
+| `SyncResult` | `failedCount` | `Int` | non-null |
+| `SyncResult` | `conflictCount` | `Int` | non-null |
 
 ## 6. Errors
 
@@ -521,6 +548,24 @@ the 3 loan-request-added values via the SAME shared mapper pair).
 `LoanPurpose.toDto()`) AND the reverse `LoanRequestResponseDto ->
 LoanRequestResult` (every field), plus the `toJsonPayload()`/
 `loanRequestPayloadDtoFromJson()` offline-SyncQueue serialization round-trip.
+`SyncClassifierTest.kt` (`core/model/src/commonTest`, the FIRST direct
+commonTest suite in this module — `commonTest.dependencies { implementation(libs.kotlin.test) }`
+added to `core/model/build.gradle.kts` for it) covers the full
+`operationTypeToEntityType`/`operationTypeToSyncOperation` known mapping
+table (`LOAN_REQUEST`/`CREATE_MEMBER`/`ASSIGN_MEMBER_ROLE`/`UPLOAD_MEMBER_PHOTO`),
+the prefix-based fallback for each of the 5 other `EntityType` values, the
+documented unknown-operationType fallback (`MEMBER`/`UPDATE`), and
+`pendingByType`'s PENDING-only grouping (multi-row same-type, zero-pending
+map, empty-input map). `BatchSyncMappersTest.kt`
+(`core/network/src/commonTest/.../mapper`) covers `SyncQueueItem.toBatchOperation`
+(every resolved field — `relativeUrl` derivation, hardcoded `method`,
+verbatim `body`, caller-supplied vs. queue-row-id `requestId`),
+`BatchOperation <-> BatchOperationDto` (every field, both directions),
+`BatchSyncRequest <-> BatchSyncRequestDto` (batch converter, declaration
+order), `BatchSyncResponseItemDto -> BatchSyncResponseItem` (every field
+plus the batch converter), and `List<BatchSyncResponseItem>.toSyncResult`'s
+3-way fold (mixed 200/201/409/500/400, all-success, empty-list boundary
+cases).
 
 ## 8. Observability
 
@@ -571,7 +616,14 @@ a week count, an enum purpose, a savings-balance snapshot, and Fineract
 resource IDs only) — same "amounts/enum/resource-id only" threat model as
 `ApplyLoanRequest`/`LoanApplicationResult`; the queued offline JSON
 (`toJsonPayload()`) carries the identical field set, so no additional
-exposure beyond the online path.
+exposure beyond the online path. `EntityType`/`SyncOperation`/
+`SyncOverallStatus`/`BatchOperation`/`BatchSyncRequest`/
+`BatchSyncResponseItem`/`SyncResult` carry no PII — enum classifications,
+Fineract `relativeUrl`/`method`, and status-code counts only; `BatchOperation.body`/
+`BatchSyncResponseItem.body` echo a queued mutation's `payloadJson` and MAY
+carry member-identifying fields (e.g. a loan-request's `clientId`) depending
+on the originating feature's payload shape — avoid bulk-logging batch
+request/response bodies verbatim; log `requestId`/`statusCode` only.
 
 ## 9. Evolution
 
@@ -674,4 +726,20 @@ than re-deriving a per-feature Json config — `SyncQueueEntry`/
 `SyncQueueRepository` themselves remain out of DTO/mapper generation scope
 (declared in `api.yaml#dependencies.repositories`, same "repository lives
 outside this generation step" precedent as `MemberAddRepository`).
+**Sync-status's own domain concepts live in `BatchSync.kt`** (`EntityType`,
+`SyncOperation`, `SyncOverallStatus`, `BatchOperation`, `BatchSyncRequest`,
+`BatchSyncResponseItem`, `SyncResult`) + `SyncClassifier.kt` (the pure
+`operationTypeToEntityType`/`operationTypeToSyncOperation`/`pendingByType`
+functions) — **the ALREADY-SHIPPED `SyncQueueItem`/`SyncStatus`/`SyncQueueCounts`
+(`SyncQueue.kt`) were REUSED OUTRIGHT, not redefined**, per this generation's
+explicit brief. Before extending the sync-status domain surface, resolve the
+`idea-layer/screens/sync-status/api.yaml#dtos.SyncQueueItem` registry
+divergence flagged on `EntityType`'s kdoc (the registry models
+`entityType`/`operation` as first-class `SyncQueueItem` columns; the shipped
+schema keeps the single generic `operationType: String` instead —
+`SyncClassifier.kt` bridges the two without a DB migration). If a future
+`api.yaml` revision needs a genuinely NEW `EntityType`/`SyncOperation` value
+this classifier's prefix-fallback doesn't already cover, extend the enum +
+the KNOWN mapping table in `SyncClassifier.kt`'s kdoc (never invent a second
+classification helper).
 <!-- kmp-dto-gen:END -->

@@ -42,6 +42,7 @@ import org.mifos.groupbanking.feature.memberadd.di.MemberAddModule
 import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule
 import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
+import org.mifos.groupbanking.feature.syncstatus.di.SyncStatusModule
 
 object KoinModules {
     private val dataModule = module {
@@ -81,6 +82,7 @@ object KoinModules {
             LoanRequestModule, // <- added by kmp-viewmodel-gen
             LoanRepaymentDialogModule, // <- added by kmp-viewmodel-gen
             LoanMarkDefaultedDialogModule, // <- added by kmp-viewmodel-gen
+            SyncStatusModule, // <- added by kmp-viewmodel-gen
         )
     }
 

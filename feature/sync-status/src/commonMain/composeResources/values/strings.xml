@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_sync_status_title">Sync Status</string>
+    <string name="screens_sync_status_top_bar_cd">Sync status screen top bar</string>
+
+    <string name="screens_sync_status_status_synced">All Synced</string>
+    <string name="screens_sync_status_status_pending">Sync Pending</string>
+    <string name="screens_sync_status_status_failed">Sync Failed</string>
+    <string name="screens_sync_status_status_icon_cd">Overall sync status indicator</string>
+    <string name="screens_sync_status_last_sync_label">Last synced: %1$s</string>
+    <string name="screens_sync_status_never_synced">Never synced</string>
+
+    <string name="screens_sync_status_conflict_label">%1$d conflict(s) detected — review before syncing</string>
+    <string name="screens_sync_status_conflict_chip_cd">Sync conflicts detected; tap to review</string>
+
+    <string name="screens_sync_status_pending_title">Pending Operations (%1$d)</string>
+    <string name="screens_sync_status_entity_count_cd">Pending operation count for entity</string>
+
+    <string name="screens_sync_status_sync_now">Sync Now</string>
+    <string name="screens_sync_status_sync_now_offline">Offline — Connect to sync</string>
+    <string name="screens_sync_status_sync_now_cd">Start syncing all pending operations now</string>
+
+    <string name="screens_sync_status_failed_title">Failed Operations (%1$d)</string>
+    <string name="screens_sync_status_failed_item_title_format">%1$s — %2$s</string>
+    <string name="screens_sync_status_retry">Retry</string>
+    <string name="screens_sync_status_retry_cd">Retry this failed sync operation</string>
+
+    <string name="screens_sync_status_all_synced_title">All caught up!</string>
+    <string name="screens_sync_status_all_synced_body">No pending or failed operations.</string>
+    <string name="screens_sync_status_all_synced_icon_cd">All operations synced</string>
+
+    <string name="screens_sync_status_error_db">Could not read sync queue from local database.</string>
+    <string name="screens_sync_status_error_sync_failed">Sync failed. Check your connection and try again.</string>
+
+    <string name="screens_sync_status_entity_meeting">Meeting Records</string>
+    <string name="screens_sync_status_entity_loan">Loan Operations</string>
+    <string name="screens_sync_status_entity_savings">Savings Transactions</string>
+    <string name="screens_sync_status_entity_attendance">Attendance Records</string>
+    <string name="screens_sync_status_entity_share_out">Share-Out Records</string>
+    <string name="screens_sync_status_entity_member">Member Updates</string>
+
+    <string name="screens_sync_status_shimmer_cd">Loading sync status</string>
+</resources>

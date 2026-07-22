@@ -82,6 +82,13 @@
 | `LoanPurpose` | enum: `MEDICAL(1)`, `EDUCATION(2)`, `BUSINESS(3)`, `EMERGENCY(4)`, `OTHER(5)`, `SCHOOL_FEES(6)`, `FARMING(7)`, `HOME_IMPROVEMENT(8)`, `UNKNOWN(0)` | loan-apply purpose selector, EXTENDED by loan-request (PP-1) with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT`; `fineractPurposeId` resolves the wire `loanPurposeId: Int` — sequential assignment, `api.yaml` declares no explicit per-value id (confirmed gap; the 3 extension ids are unused placeholders — loan-request never transmits `loanPurposeId`) |
 | `LoanRequestPayload` | `clientId: Long`, `requestedAmount: Double`, `purpose: LoanPurpose`, `durationWeeks: Int`, `savingsBalanceAtRequest: Double` | loan-request member-side submission input (`submit_loan_request`); reuses `LoanPurpose` (extended, not forked); `submittedAt`/`status` deliberately excluded — wire-only fields, see note below |
 | `LoanRequestResult` | `resourceId: Long`, `officeId: Long`, `clientId: Long`, `resourceExternalId: String` | `submit_loan_request` success result; mirrors wire `LoanRequestResponseDto` 1:1 |
+| `EntityType` | enum: `MEETING`, `LOAN`, `SAVINGS`, `ATTENDANCE`, `SHARE_OUT`, `MEMBER` | mirrors `api.yaml#dtos.EntityType` 1:1; resolved from the ALREADY-SHIPPED `SyncQueueItem.operationType` `String` by `SyncClassifier.kt` — see registry-divergence note below |
+| `SyncOperation` | enum: `CREATE`, `UPDATE`, `DELETE` | mirrors `api.yaml#dtos.SyncOperation` 1:1; also resolved from `SyncQueueItem.operationType` by `SyncClassifier.kt` |
+| `SyncOverallStatus` | enum: `SYNCED`, `PENDING`, `FAILED` | mirrors `api.yaml#dtos.SyncOverallStatus` 1:1; sync-status screen rollup badge, client-computed from `SyncQueueCounts` — no direct wire source |
+| `BatchOperation` | `requestId: Int`, `relativeUrl: String`, `method: String`, `body: String` | one `/batches` request row; domain projection of the ALREADY-SHIPPED `SyncQueueItem` (`SyncQueueItem.toBatchOperation`, `BatchSyncMappers.kt`) |
+| `BatchSyncRequest` | `requests: List<BatchOperation>` | the full `POST /fineract-provider/api/v1/batches` submission body |
+| `BatchSyncResponseItem` | `requestId: Int`, `statusCode: Int`, `body: String` | one `/batches` response row; mirrors wire `BatchSyncResponseItemDto` 1:1 |
+| `SyncResult` | `successCount: Int`, `failedCount: Int`, `conflictCount: Int` | client-computed rollup of a `/batches` response, folded by `statusCode` (`List<BatchSyncResponseItem>.toSyncResult`) |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -132,7 +139,34 @@ registry entry exists for this feature);
 `idea-layer/screens/loan-request/api.yaml` (`POST /datatables/dt_loan_request`,
 `submit_loan_request`, offline-capable via `cache.offline: queue_to_syncqueue`;
 no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this
-feature — `api.yaml` is the sole SoT, per PP-1).
+feature — `api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/sync-status/api.yaml` (`POST
+/fineract-provider/api/v1/batches`, `batch_sync` — drains the ALREADY-SHIPPED
+offline `SyncQueue` via a single atomic Fineract batch call; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its own `dtos.SyncQueueItem` block
+diverges from the shipped `SyncQueueItem` schema, see note below).
+
+**`EntityType`/`SyncOperation` vs the ALREADY-SHIPPED `SyncQueueItem` schema
+divergence (flagged for the cross-feature repair station):**
+`idea-layer/screens/sync-status/api.yaml#dtos.SyncQueueItem` models
+`entityType: EntityType` + `operation: SyncOperation` as first-class columns
+on the queue row itself. The queue row THIS generation reuses outright
+(`SyncQueueItem`, `SyncQueue.kt`, already shipped and consumed by
+`SyncQueueRepository`) instead stores a single generic
+`operationType: String` (+ `targetTable: String`) — one column covers every
+mutation feature's enqueue call without a schema migration per new
+entity/operation pair (a deliberate, more-extensible design predating this
+generation). Migrating `SyncQueueItem`/the `sync_queue` table to carry
+`entityType`/`operation` directly was explicitly OUT of this generation's
+scope (per the generation brief: "Do NOT migrate the DB or redefine
+SyncQueueItem"). `EntityType`/`SyncOperation` are declared here as their OWN
+enum types (matching the registry's value-set exactly), and `SyncClassifier.kt`
+bridges `SyncQueueItem.operationType` -> `(EntityType, SyncOperation)` at
+read time — see its kdoc for the full known-mapping table + prefix-fallback
+rule. Resolve at Station 3: either keep the classifier-bridge pattern
+permanently, or schedule a `sync_queue` migration that stores `entityType`/
+`operation` as first-class columns and retires the classifier.
 
 **`LoanPurpose` extension for loan-request (PP-1 — screen-SoT wins,
 informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`

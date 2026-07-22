@@ -62,6 +62,8 @@ import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.SyncManager
+import org.mifos.groupbanking.core.data.repository.SyncManagerImpl
 import org.mifos.groupbanking.core.data.repository.SyncQueueRepository
 import org.mifos.groupbanking.core.data.repository.SyncQueueRepositoryImpl
 
@@ -254,6 +256,20 @@ val DataModule = module {
     // CREATE_MEMBER, loan-request's LOAN_REQUEST) enqueue a serialized payload when offline; the
     // sync-status feature reads observePending()/observeCounts(). Wraps SyncQueueDao (DatabaseModule).
     single<SyncQueueRepository> { SyncQueueRepositoryImpl(dao = get()) }
+
+    // sync-status batch-drain coordinator (batch_sync, Fineract Batch API) — Store5-free
+    // (data-flow.yaml#cache.strategy: no_cache on every entry, no read-stream to cache), wraps
+    // BatchSyncApi (NetworkModule) + the shared SyncQueueRepository (above) + SyncMetadataStore
+    // (DatastoreModule, lastSyncAt persistence). Surfaces triggerSync()/getLastSyncAt() as plain
+    // Flows and retryItem() as a suspend SyncResult — never .asScreenStream()/.write(), same
+    // Store5-free branch as MemberAddRepository/LoanApplyRepository/LoanRequestRepository above.
+    single<SyncManager> {
+        SyncManagerImpl(
+            syncQueueRepository = get(),
+            batchSyncApi = get(),
+            syncMetadataStore = get(),
+        )
+    }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

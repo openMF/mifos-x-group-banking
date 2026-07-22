@@ -135,4 +135,15 @@ class SyncQueueDaoTest {
         dao.deleteSynced()
         assertTrue(dao.observeAll().first().isEmpty())
     }
+
+    @Test
+    fun getByIdReturnsRowOrNullForSyncStatusRetryItem() = runTest {
+        val id = dao.insert(pendingRow("LOAN_REQUEST", "dt_loan_request", createdAt = 100L))
+
+        val found = dao.getById(id)
+        val missing = dao.getById(id + 999)
+
+        assertEquals("LOAN_REQUEST", found?.operationType)
+        assertEquals(null, missing)
+    }
 }

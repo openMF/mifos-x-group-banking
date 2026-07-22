@@ -17,6 +17,7 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.network.config.BatchSyncApiConfig
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
@@ -33,6 +34,8 @@ import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
+import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApi
+import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApiImpl
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
@@ -272,4 +275,16 @@ val NetworkModule = module {
     // to cache) is registered in RepositoryModule.kt.
     single<LoanRequestApiConfig> { LoanRequestApiConfig() }
     single<LoanRequestApi> { LoanRequestApiImpl(httpClient = get()) }
+
+    // sync-status batch-drain (batch_sync, Fineract Batch API) — sync-status feature client
+    // stack. Reuses the shared HttpClient singleton above (same companion host, no second
+    // engine), even though this path is the raw Fineract Batch API rather than a `/companion/…`
+    // one — same convention as MemberAddApi / LoanApplyApi / LoanRequestApi. The config binding
+    // is registered for override-surface symmetry with CompanionAuthApiConfig even though the
+    // shared client is the one actually dispatching requests today. `SyncManager` (Store5-free —
+    // `data-flow.yaml#cache.strategy: no_cache` on every entry, no read-stream to cache), which
+    // consumes BatchSyncApi + the shared SyncQueueRepository + SyncMetadataStore, is registered
+    // in RepositoryModule.kt.
+    single<BatchSyncApiConfig> { BatchSyncApiConfig() }
+    single<BatchSyncApi> { BatchSyncApiImpl(httpClient = get()) }
 }

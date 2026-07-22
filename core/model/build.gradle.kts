@@ -23,5 +23,12 @@ kotlin {
             // mappers, feature ViewModels) need it resolvable on their own classpath.
             api(libs.kotlinx.datetime)
         }
+
+        // sync-status generation (BatchSync + SyncClassifier) is the first core/model type to
+        // ship a direct commonTest suite (pure classifier functions, no mapper indirection) —
+        // wires kotlin.test here for the first time in this module.
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
     }
 }

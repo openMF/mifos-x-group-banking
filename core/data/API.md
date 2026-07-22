@@ -14,6 +14,8 @@
 | `UserDataRepository` / `UserDataRepositoryImpl` (`kpt.core.data.user`) | `userData: StateFlow<UserData>`, theme/language/preference flows | `setLanguage`/`setThemeBrand`/`setIsAuthenticated`/etc. | Template-provided user-preferences repository (unrelated to auth session) |
 | `GroupCreateRepository` / `GroupCreateRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getOffices(orderBy = "name"): NetworkResult<List<Office>, NetworkError>` (plain pass-through today — SC2 gap, see notes) | `createGroup(CreateGroupRequest): NetworkResult<GroupCreationResult, NetworkError>` | Store5-free mutation orchestration for `createGroup` — `business_logic.kind: processor` (see RULE-IMPLEMENT-STORE5-001 scope); `getOffices` is Store5-free TODAY pending a future `kmp-store-gen` `OfficeStore` |
 | `LoanApplyRepository` / `LoanApplyRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getGroupMembers(groupId): NetworkResult<List<GroupMember>, NetworkError>`, `loadTemplate(groupId, clientId, productId): NetworkResult<LoanApplyTemplate, NetworkError>` (5-way parallel combine — `getLoanProducts`+`getLoanTemplate`+`getMemberSavings`+`getGroupCorpus`+`getGroupLoanConfig`) | `applyLoan(ApplyLoanRequest, LoanProduct): NetworkResult<LoanApplicationResult, NetworkError>` | Store5-free TODAY — `business_logic.kind: composite`, but no `AppStoreRegistry.LoanApply` entry exists yet (SP-03 `kmp-store-gen` has not run for this feature); see notes below |
+| `SyncQueueRepository` / `SyncQueueRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `observePending(): Flow<List<SyncQueueItem>>`, `observeCounts(): Flow<SyncQueueCounts>`, `observePendingByType(): Flow<Map<EntityType, Int>>`, `observeFailed(): Flow<List<SyncQueueItem>>`, `observeConflictCount(): Flow<Int>` (documented gap — always `0`, no dedicated `CONFLICT` `SyncStatus` bucket yet), `getItem(id): SyncQueueItem?` | `enqueue(operationType, targetTable, payloadJson): Long`, `markSyncing(id)`, `markSynced(id)`, `markFailed(id, error)`, `retryAll()` | Room-backed WRITE-QUEUE (`sync_queue` table) — NOT a Store5 read-store; the shared offline write-queue every mutation feature enqueues into and the sync-status feature reads |
+| `SyncManager` / `SyncManagerImpl` (`org.mifos.groupbanking.core.data.repository`) | `getLastSyncAt(): Flow<Instant?>` (`SyncMetadataStore`-backed, `core/datastore`) | `triggerSync(): Flow<SyncResult>` (drains the entire `SyncQueueRepository` pending backlog as one `batch_sync` submission), `retryItem(itemId): SyncResult` (single-row retry, suspend — not a `Flow`) | Store5-free — `sync-status`'s `data-flow.yaml` declares every entry `cache.strategy: no_cache`; wraps `BatchSyncApi` (`core/network`) + `SyncQueueRepository` + `SyncMetadataStore`, never `.asScreenStream()`/`.write()` |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
@@ -54,11 +56,36 @@ explicit `product: LoanProduct` param (the screen's already-selected product fro
 per `LoanApplyMappers.kt#ApplyLoanRequest.toDto`; no redundant `getLoanProducts` re-fetch at
 submit time.
 
+Contract refs (SyncQueueRepository / SyncManager): sync-status (`batch_sync`,
+`business_logic.kind` not `crud`/`nav_only` per `api.yaml`, but `data-flow.yaml` declares every
+entry `cache.strategy: no_cache` — a direct-read/direct-submit shape, not a cached network
+projection) — see `idea-layer/screens/sync-status/api.yaml` + `data-flow.yaml`
+(`OnSyncNow`/`OnRetryOperation` triggers). `SyncQueueRepository` is the SHARED offline
+write-queue seam member-add (`CREATE_MEMBER`) and loan-request (`LOAN_REQUEST`) enqueue into
+when offline; `SyncManager.triggerSync()` takes a SNAPSHOT of `observePending()` at call time
+(rows enqueued mid-drain are picked up by the next `triggerSync`, never mid-flight), marks every
+row SYNCING, submits one atomic `batch_sync` request, then correlates each response row back to
+its originating queue row by the CALLER-ASSIGNED `requestId` (1-based position within the
+submission — NOT the queue row's own `id`) to mark SYNCED (2xx) or FAILED (409 conflict —
+recorded as FAILED with a `"Conflict (409): ..."` note, folded into `SyncResult.conflictCount`
+via `toSyncResult()`; anything else — with an `"HTTP {code}: ..."` note). A `NetworkResult.Error`
+(transport failure) marks EVERY drained row FAILED and short-circuits with no `lastSyncAt`
+stamp. `retryItem(itemId)` is the same shape for a single row (`requestId = 1`); a missing
+`itemId` (already pruned) is a no-op returning `SyncResult(0, 0, 0)`, never a network call.
+`getLastSyncAt()` delegates straight to `SyncMetadataStore.lastSyncAt` (`core/datastore`,
+PLAIN-`Settings`-backed epoch-millis `Long`, non-secret). **Documented `api.yaml` gap**:
+`api.yaml#dependencies.repositories.SyncManager.methods` lists only `triggerSync`/
+`getLastSyncAt` — `retryItem` was added to close the `data-flow.yaml#OnRetryOperation` gap (not
+a speculative addition). **Documented schema gap**: `observeConflictCount()` always emits `0` —
+no dedicated `CONFLICT` bucket exists in `org.mifos.groupbanking.core.model.SyncStatus` yet.
+
 ## Store5 note
 
 `core/data` also hosts Store5-wrapping Repositories for read-stream features (per SP-04 —
 `.asScreenStream()` / `.asPagingScreenStream()` over a `core/store` `Store`/`MutableStore`).
-None exist yet for `login-signup`, `join-with-code`, `group-create`, or `loan-apply` (all out
-of Store5 scope today — see DEVELOPMENT.md#4). `group-create`'s `getOffices` and `loan-apply`'s
-`loadTemplate` are both candidates pending a future `kmp-store-gen` `OfficeStore`/`LoanApplyStore`.
+None exist yet for `login-signup`, `join-with-code`, `group-create`, `loan-apply`, or
+`sync-status` (all out of Store5 scope today — see DEVELOPMENT.md#4). `group-create`'s
+`getOffices` and `loan-apply`'s `loadTemplate` are both candidates pending a future
+`kmp-store-gen` `OfficeStore`/`LoanApplyStore`. `sync-status` is Store5-free BY DESIGN
+(`data-flow.yaml#cache.strategy: no_cache` on every entry) — not a pending-migration candidate.
 <!-- kmp-client-gen:END -->
