@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -109,12 +110,17 @@ data class GroupInstanceConfigDto(
  * [ContributionModeDto] (see [GroupInstanceConfigDto] kdoc). [UNKNOWN] fallback per T7/EC30 so a
  * server-added contribution model never crashes an old client.
  */
-@Serializable
+@Serializable(with = GroupContributionModelDto.Serializer::class)
 enum class GroupContributionModelDto {
     @SerialName("FIXED_AMOUNT") FIXED_AMOUNT,
     @SerialName("SHARE_BASED_VARIABLE") SHARE_BASED_VARIABLE,
     @SerialName("FIXED_NEGOTIATED") FIXED_NEGOTIATED,
     @SerialName("UNKNOWN") UNKNOWN,
+    ;
+
+    internal object Serializer : KSerializer<GroupContributionModelDto> by unknownFallbackEnumSerializer(
+        "GroupContributionModelDto", entries, UNKNOWN,
+    )
 }
 
 /**

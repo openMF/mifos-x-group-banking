@@ -22,6 +22,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.serialization.ContentConvertException
 import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
@@ -110,6 +111,14 @@ private suspend inline fun <reified T> requestAsNetworkResult(
             Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
             NetworkResult.Error(NetworkError.SERIALIZATION)
         } catch (e: SerializationException) {
+            Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
+            NetworkResult.Error(NetworkError.SERIALIZATION)
+        } catch (e: ContentConvertException) {
+            // Covers io.ktor.serialization.JsonConvertException (malformed JSON body, e.g.
+            // "not-json") — a ContentConvertException subtype NOT caught by the
+            // SerializationException clauses above; caught here so a malformed 2xx body maps to
+            // NetworkError.SERIALIZATION rather than propagating as an uncaught exception past this
+            // service boundary (Mandatory Rule 4).
             Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
             NetworkResult.Error(NetworkError.SERIALIZATION)
         }

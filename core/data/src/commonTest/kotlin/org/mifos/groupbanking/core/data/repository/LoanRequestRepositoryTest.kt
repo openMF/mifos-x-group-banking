@@ -37,7 +37,7 @@ private class FakeLoanRequestApi(
     }
 }
 
-private class FakeSyncQueueRepository : SyncQueueRepository {
+private class FakeLoanRequestSyncQueueRepository : SyncQueueRepository {
 
     var lastOperationType: String? = null
     var lastTargetTable: String? = null
@@ -59,6 +59,10 @@ private class FakeSyncQueueRepository : SyncQueueRepository {
     override suspend fun markSynced(id: Long) = throw NotImplementedError("not exercised")
     override suspend fun markFailed(id: Long, error: String?) = throw NotImplementedError("not exercised")
     override suspend fun retryAll() = throw NotImplementedError("not exercised")
+    override fun observePendingByType() = throw NotImplementedError("not exercised")
+    override fun observeFailed() = throw NotImplementedError("not exercised")
+    override fun observeConflictCount() = throw NotImplementedError("not exercised")
+    override suspend fun getItem(id: Long) = throw NotImplementedError("not exercised")
 }
 
 /**
@@ -91,7 +95,7 @@ class LoanRequestRepositoryTest {
     @Test
     fun submit_success_mapsApiResponseToDomainResult() = runTest {
         val api = FakeLoanRequestApi(result = NetworkResult.Success(responseDto))
-        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeSyncQueueRepository())
+        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeLoanRequestSyncQueueRepository())
 
         val result = repo.submit(payload)
 
@@ -104,7 +108,7 @@ class LoanRequestRepositoryTest {
     @Test
     fun submit_threadsDomainPayloadFieldsIntoTheRequestDto() = runTest {
         val api = FakeLoanRequestApi(result = NetworkResult.Success(responseDto))
-        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeSyncQueueRepository())
+        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeLoanRequestSyncQueueRepository())
 
         repo.submit(payload)
 
@@ -118,7 +122,7 @@ class LoanRequestRepositoryTest {
     @Test
     fun submit_validationFailure400_returnsErrorUntouched() = runTest {
         val api = FakeLoanRequestApi(result = NetworkResult.Error(NetworkError.BAD_REQUEST))
-        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeSyncQueueRepository())
+        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeLoanRequestSyncQueueRepository())
 
         val result = repo.submit(payload)
 
@@ -132,7 +136,7 @@ class LoanRequestRepositoryTest {
         // informed by NetworkMonitor, is responsible for calling enqueueOffline on this
         // NetworkResult.Error (data-flow.yaml#offline_behavior strategy: enqueue_to_sync_queue).
         val api = FakeLoanRequestApi(result = NetworkResult.Error(NetworkError.SERVER))
-        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeSyncQueueRepository())
+        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeLoanRequestSyncQueueRepository())
 
         val result = repo.submit(payload)
 
@@ -143,7 +147,7 @@ class LoanRequestRepositoryTest {
 
     @Test
     fun enqueueOffline_delegatesToSyncQueueRepositoryWithLoanRequestOperationTypeAndTargetTable() = runTest {
-        val syncQueueRepository = FakeSyncQueueRepository()
+        val syncQueueRepository = FakeLoanRequestSyncQueueRepository()
         val repo = LoanRequestRepositoryImpl(api = FakeLoanRequestApi(), syncQueueRepository = syncQueueRepository)
 
         val id = repo.enqueueOffline(payload)
@@ -156,7 +160,7 @@ class LoanRequestRepositoryTest {
 
     @Test
     fun enqueueOffline_serializesPayloadAsRoundTrippableJson() = runTest {
-        val syncQueueRepository = FakeSyncQueueRepository()
+        val syncQueueRepository = FakeLoanRequestSyncQueueRepository()
         val repo = LoanRequestRepositoryImpl(api = FakeLoanRequestApi(), syncQueueRepository = syncQueueRepository)
 
         repo.enqueueOffline(payload)
@@ -170,7 +174,7 @@ class LoanRequestRepositoryTest {
     @Test
     fun enqueueOffline_neverCallsTheNetworkApi() = runTest {
         val api = FakeLoanRequestApi()
-        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeSyncQueueRepository())
+        val repo = LoanRequestRepositoryImpl(api = api, syncQueueRepository = FakeLoanRequestSyncQueueRepository())
 
         repo.enqueueOffline(payload)
 

@@ -53,8 +53,8 @@ class LoanRepaymentRepositoryTest {
         val repaymentApi = FakeLoanRepaymentApi(
             result = NetworkResult.Success(RecordRepaymentResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 777L)),
         )
-        val loanDetailDao = FakeLoanDetailDao()
-        val repo = repository(repaymentApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanRepaymentDetailDao()
+        val repo = repository(repaymentApi, FakeLoanRepaymentDetailApi(), loanDetailDao)
 
         val result = repo.recordRepayment(loanId = 500L, request = requestDomain)
 
@@ -72,7 +72,7 @@ class LoanRepaymentRepositoryTest {
         val repaymentApi = FakeLoanRepaymentApi(
             result = NetworkResult.Success(RecordRepaymentResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 777L)),
         )
-        val repo = repository(repaymentApi, FakeLoanDetailApi(), FakeLoanDetailDao())
+        val repo = repository(repaymentApi, FakeLoanRepaymentDetailApi(), FakeLoanRepaymentDetailDao())
 
         repo.recordRepayment(
             loanId = 500L,
@@ -89,8 +89,8 @@ class LoanRepaymentRepositoryTest {
             result = NetworkResult.Success(RecordRepaymentResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 777L)),
         )
         // Seed a cached loan-detail row so we can observe the invalidation delete the SoT row.
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(repaymentApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanRepaymentDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(repaymentApi, FakeLoanRepaymentDetailApi(), loanDetailDao)
 
         assertEquals(1, loanDetailDao.currentRows().size, "precondition: a cached loan-detail row exists")
 
@@ -106,8 +106,8 @@ class LoanRepaymentRepositoryTest {
     @Test
     fun recordRepayment_validationFailure_leavesLoanDetailCacheIntactAndSurfacesError() = runTest {
         val repaymentApi = FakeLoanRepaymentApi(result = NetworkResult.Error(NetworkError.BAD_REQUEST))
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(repaymentApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanRepaymentDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(repaymentApi, FakeLoanRepaymentDetailApi(), loanDetailDao)
 
         val result = repo.recordRepayment(loanId = 500L, request = requestDomain)
 
@@ -118,8 +118,8 @@ class LoanRepaymentRepositoryTest {
     @Test
     fun recordRepayment_serverError_surfacesErrorVerbatimAndLeavesCacheIntact() = runTest {
         val repaymentApi = FakeLoanRepaymentApi(result = NetworkResult.Error(NetworkError.SERVER))
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(repaymentApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanRepaymentDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(repaymentApi, FakeLoanRepaymentDetailApi(), loanDetailDao)
 
         val result = repo.recordRepayment(loanId = 500L, request = requestDomain)
 
@@ -162,7 +162,7 @@ private class FakeLoanRepaymentApi(
     }
 }
 
-private class FakeLoanDetailApi(
+private class FakeLoanRepaymentDetailApi(
     private val result: NetworkResult<LoanDetailResponseDto, NetworkError> = NetworkResult.Error(NetworkError.UNKNOWN),
 ) : LoanDetailApi {
     override suspend fun getLoanDetail(
@@ -171,7 +171,7 @@ private class FakeLoanDetailApi(
     ): NetworkResult<LoanDetailResponseDto, NetworkError> = result
 }
 
-private class FakeLoanDetailDao : LoanDetailDao {
+private class FakeLoanRepaymentDetailDao : LoanDetailDao {
     private val rows = MutableStateFlow<List<LoanDetailCacheEntity>>(emptyList())
 
     fun seed(entity: LoanDetailCacheEntity) { rows.value = listOf(entity) }

@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -296,7 +297,7 @@ data class ApplyLoanResponseDto(
  *
  * See API.md#dtos — LoanPurpose.
  */
-@Serializable
+@Serializable(with = LoanPurposeDto.Serializer::class)
 enum class LoanPurposeDto {
     @SerialName("MEDICAL") MEDICAL,
     @SerialName("EDUCATION") EDUCATION,
@@ -307,4 +308,9 @@ enum class LoanPurposeDto {
     @SerialName("FARMING") FARMING,
     @SerialName("HOME_IMPROVEMENT") HOME_IMPROVEMENT,
     @SerialName("UNKNOWN") UNKNOWN,
+    ;
+
+    internal object Serializer : KSerializer<LoanPurposeDto> by unknownFallbackEnumSerializer(
+        "LoanPurposeDto", entries, UNKNOWN,
+    )
 }

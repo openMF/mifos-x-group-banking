@@ -48,7 +48,7 @@ class LoanWriteoffRepositoryTest {
         val writeoffApi = FakeLoanWriteoffApi(
             result = NetworkResult.Success(WriteoffLoanResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 888L)),
         )
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), FakeLoanDetailDao())
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), FakeLoanWriteoffDetailDao())
 
         val result = repo.writeoffLoan(loanId = 500L)
 
@@ -65,7 +65,7 @@ class LoanWriteoffRepositoryTest {
         val writeoffApi = FakeLoanWriteoffApi(
             result = NetworkResult.Success(WriteoffLoanResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 888L)),
         )
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), FakeLoanDetailDao())
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), FakeLoanWriteoffDetailDao())
 
         repo.writeoffLoan(loanId = 500L)
 
@@ -80,8 +80,8 @@ class LoanWriteoffRepositoryTest {
             result = NetworkResult.Success(WriteoffLoanResponseDto(officeId = 1, clientId = 9L, loanId = 500L, resourceId = 888L)),
         )
         // Seed a cached loan-detail row so we can observe the invalidation delete the SoT row.
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanWriteoffDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), loanDetailDao)
 
         assertEquals(1, loanDetailDao.currentRows().size, "precondition: a cached loan-detail row exists")
 
@@ -97,8 +97,8 @@ class LoanWriteoffRepositoryTest {
     @Test
     fun writeoffLoan_notFoundFailure_leavesLoanDetailCacheIntactAndSurfacesError() = runTest {
         val writeoffApi = FakeLoanWriteoffApi(result = NetworkResult.Error(NetworkError.NOT_FOUND))
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanWriteoffDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), loanDetailDao)
 
         val result = repo.writeoffLoan(loanId = 500L)
 
@@ -109,8 +109,8 @@ class LoanWriteoffRepositoryTest {
     @Test
     fun writeoffLoan_serverError_surfacesErrorVerbatimAndLeavesCacheIntact() = runTest {
         val writeoffApi = FakeLoanWriteoffApi(result = NetworkResult.Error(NetworkError.SERVER))
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanWriteoffDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), loanDetailDao)
 
         val result = repo.writeoffLoan(loanId = 500L)
 
@@ -125,8 +125,8 @@ class LoanWriteoffRepositoryTest {
         // NetworkError.UNKNOWN (LoanWriteoffApiImpl's transport-catch branch) and is surfaced
         // immediately, never silently queued/retried.
         val writeoffApi = FakeLoanWriteoffApi(result = NetworkResult.Error(NetworkError.UNKNOWN))
-        val loanDetailDao = FakeLoanDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
-        val repo = repository(writeoffApi, FakeLoanDetailApi(), loanDetailDao)
+        val loanDetailDao = FakeLoanWriteoffDetailDao().apply { seed(cacheEntity(500L, "Asha")) }
+        val repo = repository(writeoffApi, FakeLoanWriteoffDetailApi(), loanDetailDao)
 
         val result = repo.writeoffLoan(loanId = 500L)
 
@@ -168,7 +168,7 @@ private class FakeLoanWriteoffApi(
     }
 }
 
-private class FakeLoanDetailApi(
+private class FakeLoanWriteoffDetailApi(
     private val result: NetworkResult<LoanDetailResponseDto, NetworkError> = NetworkResult.Error(NetworkError.UNKNOWN),
 ) : LoanDetailApi {
     override suspend fun getLoanDetail(
@@ -177,7 +177,7 @@ private class FakeLoanDetailApi(
     ): NetworkResult<LoanDetailResponseDto, NetworkError> = result
 }
 
-private class FakeLoanDetailDao : LoanDetailDao {
+private class FakeLoanWriteoffDetailDao : LoanDetailDao {
     private val rows = MutableStateFlow<List<LoanDetailCacheEntity>>(emptyList())
 
     fun seed(entity: LoanDetailCacheEntity) { rows.value = listOf(entity) }

@@ -7,8 +7,11 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -46,7 +49,12 @@ data class RecordRepaymentRequestDto(
     @SerialName("transactionAmount") val transactionAmount: Double,
     @SerialName("paymentTypeId") val paymentTypeId: Int,
     @SerialName("receiptNumber") val receiptNumber: String? = null,
+    // Fineract requires locale + dateFormat on every date-bearing transaction body to parse
+    // transactionDate; force-encode the defaults so they always reach the wire (kotlinx omits
+    // default-valued fields otherwise — encodeDefaults is off in the production client config).
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("locale") val locale: String = "en",
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("dateFormat") val dateFormat: String = "dd MMMM yyyy",
 ) {
     companion object {

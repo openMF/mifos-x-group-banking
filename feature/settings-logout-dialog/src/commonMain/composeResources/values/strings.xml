@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_settings_logout_dialog_title">Log Out?</string>
+    <string name="screens_settings_logout_dialog_body">You will be logged out of your account. Any unsynced changes will be lost.</string>
+    <string name="screens_settings_logout_dialog_cancel">Cancel</string>
+    <string name="screens_settings_logout_dialog_logout">Log Out</string>
+    <string name="screens_settings_logout_dialog_error_logout_failed">Failed to log out. Please try again.</string>
+    <string name="screens_settings_logout_dialog_a11y_cancel">Cancel logout and dismiss dialog</string>
+    <string name="screens_settings_logout_dialog_a11y_logout">Confirm logout and end session</string>
+
+    <!-- Backfilled by kmp-screen-gen — not declared under ui.yaml#i18n.en, mirrors
+         LoanMarkDefaultedDialog's `_confirm_cd` / LoanRepaymentDialog's `_submit_cd` convention:
+         an in-flight accessible label for the Log Out button while state.isLoggingOut is true. -->
+    <string name="screens_settings_logout_dialog_logout_progress_cd">Logging out</string>
+</resources>

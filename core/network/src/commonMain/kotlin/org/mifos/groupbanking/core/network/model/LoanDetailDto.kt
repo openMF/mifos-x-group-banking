@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -89,13 +90,18 @@ data class RepaymentScheduleRowDto(
  * (`api.yaml#dtos.RepaymentRowStatus` — 4 known values). `UNKNOWN` fallback
  * per T7/EC30 so a server-added value never crashes an old client.
  */
-@Serializable
+@Serializable(with = RepaymentRowStatusDto.Serializer::class)
 enum class RepaymentRowStatusDto {
     @SerialName("PAID") PAID,
     @SerialName("PARTIAL") PARTIAL,
     @SerialName("UPCOMING") UPCOMING,
     @SerialName("OVERDUE") OVERDUE,
     @SerialName("UNKNOWN") UNKNOWN,
+    ;
+
+    internal object Serializer : KSerializer<RepaymentRowStatusDto> by unknownFallbackEnumSerializer(
+        "RepaymentRowStatusDto", entries, UNKNOWN,
+    )
 }
 
 /**

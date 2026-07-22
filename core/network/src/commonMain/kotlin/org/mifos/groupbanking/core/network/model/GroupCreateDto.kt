@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -138,12 +139,17 @@ data class OfficeDto(
  * `GroupTypeConfigDto`) — see [CreateGroupTypeConfigDto] kdoc for the reuse-vs-new-enum
  * rationale. [UNKNOWN] fallback per T7/EC30 so a server-added value never crashes an old client.
  */
-@Serializable
+@Serializable(with = ContributionModelDto.Serializer::class)
 enum class ContributionModelDto {
     @SerialName("FIXED_AMOUNT") FIXED_AMOUNT,
     @SerialName("SHARE_BASED_VARIABLE") SHARE_BASED_VARIABLE,
     @SerialName("FIXED_NEGOTIATED") FIXED_NEGOTIATED,
     @SerialName("UNKNOWN") UNKNOWN,
+    ;
+
+    internal object Serializer : KSerializer<ContributionModelDto> by unknownFallbackEnumSerializer(
+        "ContributionModelDto", entries, UNKNOWN,
+    )
 }
 
 /**
@@ -166,7 +172,7 @@ enum class ShareoutFormulaDto {
  * (`typeConfig.payout_order_method`) — how a lending-enabled group decides who receives the
  * rotating pot / loan next. [UNKNOWN] fallback per T7/EC30.
  */
-@Serializable
+@Serializable(with = PayoutOrderMethodDto.Serializer::class)
 enum class PayoutOrderMethodDto {
     @SerialName("FIXED_ORDER") FIXED_ORDER,
     @SerialName("LOTTERY") LOTTERY,
@@ -174,4 +180,9 @@ enum class PayoutOrderMethodDto {
     @SerialName("NEED_BASED") NEED_BASED,
     @SerialName("NA") NA,
     @SerialName("UNKNOWN") UNKNOWN,
+    ;
+
+    internal object Serializer : KSerializer<PayoutOrderMethodDto> by unknownFallbackEnumSerializer(
+        "PayoutOrderMethodDto", entries, UNKNOWN,
+    )
 }

@@ -12,74 +12,43 @@
 package kpt.core.data.di
 
 import kpt.core.base.store.submit.SubmitOutbox
-import org.koin.core.qualifier.Qualifier
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Verifies that every `SubmitOutbox<T>` declared in [DataModule] is registered
- * under its corresponding [OutboxQualifiers] entry. Catches regressions
- * where a new payload type is added to [OutboxQualifiers] but the matching
- * `single<>` registration is missing — or vice versa.
+ * Verifies the outbox-collision invariant [OutboxQualifiers] documents: every
+ * `SubmitOutbox<*>` `single<>` registered in [DataModule] MUST carry a qualifier.
+ * Koin keys DI entries by erased `KClass`, so two unqualified `single<SubmitOutbox<*>>`
+ * bindings collide under `SubmitOutbox::class` and the last-registered silently wins —
+ * surfacing as a `ClassCastException` at the first `.saveByUniqueKey(payload)` call.
  *
- * Failure mode if not caught: `ClassCastException` at first
- * `.saveByUniqueKey(payload)` call on the mis-registered outbox.
+ * This is the fork-current form of the check. The Money-Toolkit template shipped four
+ * per-type outbox qualifiers (`OutboxQualifiers.{Loan, BillReminder, LoanCalcScenario,
+ * PriceAlert}`) whose demo payload types (and qualifier entries) were removed in the
+ * group-banking fork — the earlier per-type assertions referenced those deleted types and
+ * were stale template debt. The invariant they guarded is preserved here generically:
+ * whatever `SubmitOutbox<*>` bindings the fork registers (zero today), none may be
+ * unqualified. Adding a qualified outbox in future needs no change to this test.
  *
- * Implementation note: we introspect [DataModule]'s `mappings` table (the
- * static registration map) rather than calling `koinApplication { modules(DataModule) }
- * .koin.get<...>()`. Eager-instantiation of the full DataModule graph requires
- * platform actuals (`platformModule`, `platformSecurityModule`, `AppDatabase`)
- * that are not on the classpath in `:core:data:commonTest`. Static introspection
- * checks the exact contract — "is the qualifier wired to a `SubmitOutbox`
- * primary type?" — without paying that cost.
- *
- * NOTE: PriceAlert is still verified — the Alerts archival decision is
- * deferred (see `feature/_archive/alerts/README.md`), so the qualifier and
- * its outbox binding remain active in `RepositoryModule.kt` until the
- * 2026-08-23 deadline.
+ * Implementation note: we introspect [DataModule]'s `mappings` table (the static
+ * registration map) rather than eager-instantiating the graph — that would require
+ * platform actuals (`platformModule`, `platformSecurityModule`, `AppDatabase`) absent from
+ * `:core:data:commonTest`. Static introspection checks the exact contract without that cost.
  */
 class RepositoryModuleVerifyTest {
 
     @Test
-    fun loanOutboxIsRegisteredUnderLoanQualifier() {
-        assertSubmitOutboxBoundUnderQualifier(OutboxQualifiers.Loan)
-    }
-
-    @Test
-    fun billReminderOutboxIsRegisteredUnderBillReminderQualifier() {
-        assertSubmitOutboxBoundUnderQualifier(OutboxQualifiers.BillReminder)
-    }
-
-    @Test
-    fun loanCalcScenarioOutboxIsRegisteredUnderLoanCalcScenarioQualifier() {
-        assertSubmitOutboxBoundUnderQualifier(OutboxQualifiers.LoanCalcScenario)
-    }
-
-    @Test
-    fun priceAlertOutboxIsRegisteredUnderPriceAlertQualifier() {
-        assertSubmitOutboxBoundUnderQualifier(OutboxQualifiers.PriceAlert)
-    }
-
-    /**
-     * Asserts that [DataModule]'s mapping table contains exactly one
-     * `InstanceFactory` whose [org.koin.core.definition.BeanDefinition] has
-     * `primaryType == SubmitOutbox::class` AND `qualifier == expected`.
-     */
-    private fun assertSubmitOutboxBoundUnderQualifier(expected: Qualifier) {
-        val match = DataModule.mappings.values.firstOrNull { factory ->
+    fun everySubmitOutboxBindingIsQualified_noUnqualifiedCollisionRisk() {
+        val unqualified = DataModule.mappings.values.filter { factory ->
             val def = factory.beanDefinition
-            def.primaryType == SubmitOutbox::class && def.qualifier == expected
+            def.primaryType == SubmitOutbox::class && def.qualifier == null
         }
-        assertNotNull(
-            match,
-            "DataModule must register a SubmitOutbox<*> single<> under qualifier $expected — " +
-                "missing or mis-qualified binding. See OutboxQualifiers KDoc.",
-        )
-        // Sanity — the qualifier value matches what callers use (e.g. `get(qualifier = X)`).
         assertTrue(
-            match.beanDefinition.qualifier == expected,
-            "Qualifier mismatch for $expected on bound SubmitOutbox<*>.",
+            unqualified.isEmpty(),
+            "Every SubmitOutbox<*> single<> in DataModule must declare a qualifier " +
+                "(see OutboxQualifiers KDoc) — unqualified bindings collide under " +
+                "SubmitOutbox::class and the last-registered silently wins. Offending: " +
+                unqualified.map { it.beanDefinition },
         )
     }
 }

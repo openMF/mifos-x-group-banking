@@ -7,8 +7,11 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -53,6 +56,10 @@ data class LoanRequestPayloadDto(
     @SerialName("duration_weeks") val durationWeeks: Int,
     @SerialName("savings_balance_at_request") val savingsBalanceAtRequest: Double,
     @SerialName("submitted_at") val submittedAt: String,
+    // Fineract's dt_loan_request row requires an explicit status column on submission; force-encode
+    // the "PENDING" default so the wire payload always carries it (kotlinx omits default-valued
+    // fields otherwise — encodeDefaults is off in the production client config).
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("status") val status: String = "PENDING",
 ) {
     companion object {

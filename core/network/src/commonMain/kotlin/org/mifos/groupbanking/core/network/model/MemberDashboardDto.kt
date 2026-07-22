@@ -7,8 +7,11 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+
 package org.mifos.groupbanking.core.network.model
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -32,8 +35,15 @@ data class MemberDashboardResponseDto(
     @SerialName("poolModel") val poolModel: SavingsMechanismDto = SavingsMechanismDto.UNKNOWN,
     @SerialName("groupLinkedSavingsBalance") val groupLinkedSavingsBalance: Double,
     @SerialName("individualSavingsBalance") val individualSavingsBalance: Double,
+    // The pool-model-dependent projection axes (accumulating share-out vs rotating-payout) are
+    // mutually exclusive per group, so one triad is always null on any given response. Force-encode
+    // them so the wire shape is explicit + stable regardless of pool model (kotlinx omits
+    // default-valued/null fields otherwise — encodeDefaults is off in the production client config).
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("shareOutProjection") val shareOutProjection: Double? = null,
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("rotationPosition") val rotationPosition: Int? = null,
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("nextRecipientEta") val nextRecipientEta: String? = null,
     @SerialName("recentTransactions") val recentTransactions: List<SavingsTransactionDto> = emptyList(),
 ) {

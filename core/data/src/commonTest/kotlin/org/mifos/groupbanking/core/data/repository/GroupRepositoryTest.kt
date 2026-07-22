@@ -209,20 +209,3 @@ private class FakeGroupListDao : GroupListDao {
         rows.value = rows.value.filter { it.fetchedAt >= epochMillis }
     }
 }
-
-private class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor {
-    private val _status = MutableStateFlow(initialStatus)
-    override val networkStatus: StateFlow<NetworkStatus> = _status.asStateFlow()
-    override val isOnline: StateFlow<Boolean> =
-        MutableStateFlow(initialStatus is NetworkStatus.Available).asStateFlow()
-    override val networkChanges: SharedFlow<NetworkChangeEvent> =
-        MutableSharedFlow<NetworkChangeEvent>().asSharedFlow()
-    override fun close() = Unit
-}
-
-@OptIn(ExperimentalTime::class)
-private class InMemoryFetchedAtRepository : FetchedAtRepository {
-    private val map = mutableMapOf<String, Instant>()
-    override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) { map[storeKey] = instant }
-}
