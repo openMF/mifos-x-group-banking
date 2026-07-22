@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_loan_list_title">Group Loans</string>
+    <string name="screens_loan_list_loading_message">Loading loans…</string>
+
+    <string name="screens_loan_list_filter_all">All</string>
+    <string name="screens_loan_list_filter_active">Active</string>
+    <string name="screens_loan_list_filter_overdue">Overdue</string>
+    <string name="screens_loan_list_filter_closed">Closed</string>
+
+    <string name="screens_loan_list_amount_product_label">KES %1$s · %2$s</string>
+    <string name="screens_loan_list_outstanding_label">Outstanding: KES %1$s</string>
+    <string name="screens_loan_list_next_repayment_label">Next: %1$s</string>
+    <string name="screens_loan_list_overdue_label">OVERDUE — KES %1$s</string>
+    <string name="screens_loan_list_card_cd">%1$s, %2$s, outstanding KES %3$s</string>
+
+    <string name="screens_loan_list_fab_cd">Apply for a new group loan</string>
+    <string name="screens_loan_list_action_apply">Apply for Loan</string>
+    <string name="screens_loan_list_action_retry">Retry</string>
+
+    <string name="screens_loan_list_empty_icon_cd">No loans available for the selected filter</string>
+    <string name="screens_loan_list_empty_title">No loans yet</string>
+    <string name="screens_loan_list_empty_body">No loans match the selected filter.</string>
+
+    <string name="screens_loan_list_error_icon_cd">Loan list failed to load</string>
+    <string name="screens_loan_list_error_title">Could not load loans</string>
+    <string name="screens_loan_list_error_network_message">No internet connection. Showing cached data.</string>
+    <string name="screens_loan_list_error_server_message">Server error. Please try again.</string>
+    <string name="screens_loan_list_error_auth_message">Session expired. Please log in again.</string>
+</resources>

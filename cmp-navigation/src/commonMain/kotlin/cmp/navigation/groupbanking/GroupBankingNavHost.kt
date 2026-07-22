@@ -46,6 +46,8 @@ import org.mifos.groupbanking.feature.grouptypepicker.groupTypePickerScreen
 import org.mifos.groupbanking.feature.grouptypepicker.navigateToGroupTypePicker
 import org.mifos.groupbanking.feature.joinwithcode.joinWithCodeScreen
 import org.mifos.groupbanking.feature.joinwithcode.navigateToJoinWithCode
+import org.mifos.groupbanking.feature.loanlist.loanListScreen
+import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
 import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
@@ -57,13 +59,15 @@ import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
  *
  * Start destination is [LoginSignupRoute] (`/auth`); on auth success the login screen routes to
  * the organizer path (group-list), the member path (personal-dashboard), or the group-creation /
- * join-with-code paths. Every inter-feature nav callback declared by the 7 feature `*Route.kt`
+ * join-with-code paths. Every inter-feature nav callback declared by the 8 feature `*Route.kt`
  * extensions is wired here.
  *
  * Onward targets that are not yet generated as feature modules (meeting-calendar, member-list,
- * loan-list, share-out, member-savings-detail, savings) route to [PlaceholderRoute] — a real,
- * navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is marked
- * `TODO(nav)` for replacement when its feature lands.
+ * loan-detail, loan-apply, share-out, member-savings-detail, savings) route to [PlaceholderRoute]
+ * — a real, navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is
+ * marked `TODO(nav)` for replacement when its feature lands. `loan-list` is wired for real (its
+ * feature module now exists) — its own onward targets `loan-detail` / `loan-apply` are still
+ * placeholders.
  */
 @Composable
 fun GroupBankingNavHost(
@@ -141,18 +145,28 @@ fun GroupBankingNavHost(
                     onNavigateToGroupList = { navController.navigateToGroupList() },
                 )
 
-                // 7. group-dashboard → not-yet-built onward targets (placeholders)
+                // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list
                 groupDashboardScreen(
                     // TODO(nav): replace when meeting-calendar feature is implemented
                     onNavigateToMeetingCalendar = { navController.navigateToPlaceholder("Meetings") },
                     // TODO(nav): replace when member-list feature is implemented
                     onNavigateToMemberList = { navController.navigateToPlaceholder("Members") },
-                    // TODO(nav): replace when loan-list feature is implemented
-                    onNavigateToLoanList = { navController.navigateToPlaceholder("Loans") },
+                    onNavigateToLoanList = { groupId ->
+                        navController.navigateToLoanList(groupId = groupId.toLongOrNull() ?: 0L)
+                    },
                     // TODO(nav): replace when share-out feature is implemented
                     onNavigateToShareOut = { _, _ -> navController.navigateToPlaceholder("Share-out") },
                     // TODO(nav): replace when member-savings-detail feature is implemented
                     onNavigateToMemberSavingsDetail = { navController.navigateToPlaceholder("Member savings") },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 8. loan-list → loan-detail / loan-apply (not yet generated feature modules)
+                loanListScreen(
+                    // TODO(nav): replace when loan-detail feature is implemented
+                    onNavigateToLoanDetail = { _ -> navController.navigateToPlaceholder("Loan Detail") },
+                    // TODO(nav): replace when loan-apply feature is implemented
+                    onNavigateToLoanApply = { _ -> navController.navigateToPlaceholder("Apply for Loan") },
                     onNavigateBack = { navController.popBackStack() },
                 )
 

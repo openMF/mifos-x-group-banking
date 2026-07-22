@@ -16,6 +16,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
+import org.mifos.groupbanking.core.store.loanlist.impl.provideLoansPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
 import org.mifos.groupbanking.core.store.memberprofile.impl.provideMemberProfileStore
@@ -116,5 +117,17 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.MemberProfile))
+    }
+
+    // MODULE:LoanList — loan-list PAGINATED store (NETWORK_WITH_CACHE, GET /groups/{groupId}/loans).
+    // Internal to the store seam — exposed to UI only through LoanRepository.asPagingScreenStream().
+    single(AppStoreRegistry.LoanList) {
+        provideLoansPagingStore(api = get(), dao = get())
+    }
+
+    // MODULE:LoanList — register for logout cache clearing (clears in-memory + Room SoT pages).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.LoanList))
     }
 }

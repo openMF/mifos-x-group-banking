@@ -59,6 +59,10 @@
 | `MemberRoleInfo` | `role: MemberRole`, `groupId: Long`, `assignedDate: String` | `get_member_role` datatable row (response is `type: array`); reuses `MemberRole` (no new enum) |
 | `UpdateMemberRoleRequest` | `role: MemberRole`, `groupId: Long`, `assignedDate: String` | `update_member_role` PUT body; reuses `MemberRole` |
 | `UpdateMemberRoleResult` | `resourceId: Long` | `update_member_role` result |
+| `LoanSummary` | `id: Long`, `memberId: Long`, `memberName: String`, `memberPhotoUrl: String?`, `loanProductName: String`, `principalAmount: Double`, `outstandingBalance: Double`, `overdueAmount: Double`, `status: LoanAccountStatus`, `nextRepaymentDate: String?`, `isOverdue: Boolean`, `fineractLoanId: Long` | CANONICAL loan-list row (`GET /groups/{groupId}/loans`), also reused by loan-detail + loan dialogs + personal-loans; see registry-divergence note below |
+| `LoanPage` | `totalFilteredRecords: Int`, `loans: List<LoanSummary>` | offset-paginated envelope (`page_size=20`) |
+| `LoanAccountStatus` | enum: `ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN` | mirrors wire `LoanAccountStatusDto` 1:1; NOT unified with `LoanStatus` (member-list's per-member loan-status chip — mismatched value-set) — see `LoanSummary.kt` kdoc |
+| `LoanStatusFilter` | enum: `ALL`, `ACTIVE`, `OVERDUE`, `CLOSED` | loan-list status-filter chips; pure client-side UI state, no wire counterpart |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -80,7 +84,34 @@ as the generation SoT; see the registry-divergence note below);
 `idea-layer/screens/member-profile/api.yaml` (3 parallel reads — `get_client`,
 `get_client_accounts`, `get_member_role` — + 1 write `update_member_role`; no
 dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature
-— `api.yaml` is the sole SoT, per PP-1).
+— `api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/loan-list/{api.yaml,ui.yaml}` (`GET
+/groups/{groupId}/loans`, offset-paginated, `page_size=20`; `api.yaml#dtos.LoanSummary`
+is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
+entry also exists but describes a different endpoint/consumer set, see
+divergence note below).
+
+**`LoanSummary` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
+(flagged for the cross-feature repair station, same pattern as the `Member`
+divergence above):** the registry entry (v1.0.0) declares a DIFFERENT
+`LoanDto` shape (`principal`, `interestRate`, `status: String` lowercase
+lifecycle values, `disbursedOn`/`expectedMaturityDate`/`amountRepaid`/
+`amountOutstanding`) sourced from `GET /loans/{loanId}` +
+`GET /loans?groupId={groupId}`, with `used_by: loan-management,
+end-user-dashboard` — NOT `loan-list`. `LoanSummary` here was generated from
+loan-list's own approved `api.yaml#dtos.LoanSummary` instead (`GET
+/groups/{groupId}/loans`, a different endpoint) — full note in
+`core/network/model/API.md`.
+
+**`LoanAccountStatus` naming collision with `LoanStatus` (flagged for the
+cross-feature repair station):** member-list's `LoanStatus` (`Member.kt`) is
+a per-member loan-status chip (`ACTIVE`/`NONE`/`OVERDUE`/`UNKNOWN`);
+loan-list's own registry declares a per-loan lifecycle status
+(`ACTIVE`/`OVERDUE`/`CLOSED`/`PENDING`/`REJECTED`). Neither value-set is a
+subset of the other, and the bare name `LoanStatus` was already taken by a
+different concept in the SAME package (`org.mifos.groupbanking.core.model`)
+— `LoanAccountStatus` was introduced instead of forcing reuse or a symbol
+clash. Resolve at Station 3.
 
 **`MemberProfile` vs canonical `Member` field-shape divergence (flagged for
 the cross-feature repair station, same "forcing reuse would require

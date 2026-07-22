@@ -70,6 +70,10 @@ mappers in `core/network/mapper`.
 | `MemberRoleInfo` | `MemberProfile.kt` | data class — `get_member_role` datatable row; reuses `MemberRole` |
 | `UpdateMemberRoleRequest` | `MemberProfile.kt` | data class — `update_member_role` PUT body; reuses `MemberRole` |
 | `UpdateMemberRoleResult` | `MemberProfile.kt` | data class — `update_member_role` result |
+| `LoanSummary` | `LoanSummary.kt` | data class — CANONICAL loan-list row (`GET /groups/{groupId}/loans`); reused by loan-detail + loan dialogs + personal-loans |
+| `LoanPage` | `LoanSummary.kt` | data class — offset-paginated envelope |
+| `LoanAccountStatus` | `LoanSummary.kt` | enum (`ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN`) — deliberately NOT unified with `LoanStatus` (mismatched value-set, symbol-name collision); see `LoanSummary.kt` kdoc |
+| `LoanStatusFilter` | `LoanSummary.kt` | enum (`ALL`, `ACTIVE`, `OVERDUE`, `CLOSED`) — pure client-side filter-chip state, no wire counterpart |
 
 ## 3. Consumers
 
@@ -87,7 +91,9 @@ mappers in `core/network/mapper`.
   same way; the member-profile repository maps `MemberProfileMappers.kt`
   output the same way, BOTH directions — DTO -> domain for `get_client` /
   `get_client_accounts` / `get_member_role`, domain -> DTO for the submitted
-  `UpdateMemberRoleRequest`)
+  `UpdateMemberRoleRequest`; the loan-list repository maps
+  `LoanSummaryMappers.kt` output the same way — `LoanRepository`
+  (`GET /groups/{groupId}/loans`))
 
 ## 4. Boundaries
 
@@ -309,6 +315,20 @@ mappers in `core/network/mapper`.
 | `UpdateMemberRoleRequest` | `groupId` | `Long` | non-null |
 | `UpdateMemberRoleRequest` | `assignedDate` | `String` | non-null |
 | `UpdateMemberRoleResult` | `resourceId` | `Long` | non-null |
+| `LoanSummary` | `id` | `Long` | non-null |
+| `LoanSummary` | `memberId` | `Long` | non-null |
+| `LoanSummary` | `memberName` | `String` | non-null |
+| `LoanSummary` | `memberPhotoUrl` | `String?` | nullable |
+| `LoanSummary` | `loanProductName` | `String` | non-null |
+| `LoanSummary` | `principalAmount` | `Double` | non-null |
+| `LoanSummary` | `outstandingBalance` | `Double` | non-null |
+| `LoanSummary` | `overdueAmount` | `Double` | non-null |
+| `LoanSummary` | `status` | `LoanAccountStatus` | non-null |
+| `LoanSummary` | `nextRepaymentDate` | `String?` | nullable |
+| `LoanSummary` | `isOverdue` | `Boolean` | non-null |
+| `LoanSummary` | `fineractLoanId` | `Long` | non-null |
+| `LoanPage` | `totalFilteredRecords` | `Int` | non-null |
+| `LoanPage` | `loans` | `List<LoanSummary>` | non-null (may be empty) |
 
 ## 6. Errors
 
@@ -340,7 +360,9 @@ plus null-vs-non-null `acceptedAt`). `MemberAccounts`' aggregation logic
 (`savingsBalance` = sum of balances, `activeLoan` = first loan account,
 `savingsHistory` = always empty) has direct boundary-value tests in
 `MemberProfileMappersTest.kt` (multi-account sum, zero-accounts, in-arrears
-vs not-in-arrears, empty-loan-list).
+vs not-in-arrears, empty-loan-list). `LoanSummaryMappersTest.kt` covers
+`LoanSummaryDto -> LoanSummary` (every field), the batch converter, the page
+converter, and every `LoanAccountStatusDto -> LoanAccountStatus` value.
 
 ## 8. Observability
 
@@ -362,7 +384,10 @@ not sensitive. `MemberProfile` carries `displayName`/`firstName`/`lastName`
 (PII display names) and `phone` (PII, a mobile number) — avoid bulk-logging
 member-profile identity data; `MemberAccounts` / `ActiveLoanSummary` /
 `MemberRoleInfo` / `UpdateMemberRoleRequest` / `UpdateMemberRoleResult` carry
-no sensitive fields (balances + role only; no PII).
+no sensitive fields (balances + role only; no PII). `LoanSummary` carries
+`memberName` (display-name PII, same threat model as `Member.displayName`)
+and `memberPhotoUrl` (a CDN URL, not raw image bytes) — avoid bulk-logging
+the full loan-list page; amounts/status/`isOverdue` are not sensitive.
 
 ## 9. Evolution
 
@@ -403,4 +428,14 @@ instruction) because `get_client`'s response genuinely diverges from
 `## models` section (API.md). Before generating member-add / member-invite,
 check whether their identity needs match `MemberProfile` (this feature) or
 `Member` (member-list) rather than introducing a third identity shape.
+**Loan-list's own domain concepts live in `LoanSummary.kt`** (`LoanSummary`,
+`LoanPage`, `LoanAccountStatus`, `LoanStatusFilter`) — `LoanSummary` is
+CANONICAL, intended for reuse by loan-detail, loan dialogs, and
+personal-loans; reuse it outright unless a consumer's operation response
+genuinely diverges (same test as `MemberProfile`/`GroupDetail`). Before
+extending `LoanSummary` itself, resolve the `idea-layer/dtos/LoanDto.yaml`
+registry-divergence flagged in `core/network/model/API.md`. Before
+introducing any further loan-status-adjacent enum, resolve the
+`LoanAccountStatus` vs `LoanStatus` naming-collision note in this file's
+`## models` section (API.md).
 <!-- kmp-dto-gen:END -->

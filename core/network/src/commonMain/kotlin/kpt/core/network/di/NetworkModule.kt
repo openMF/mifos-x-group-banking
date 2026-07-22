@@ -23,6 +23,7 @@ import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
 import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
+import org.mifos.groupbanking.core.network.config.LoanApiConfig
 import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
@@ -37,6 +38,8 @@ import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConf
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
+import org.mifos.groupbanking.core.network.service.loanlist.LoanApi
+import org.mifos.groupbanking.core.network.service.loanlist.LoanApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApi
@@ -167,6 +170,15 @@ val NetworkModule = module {
     // step, not registered here.
     single<MemberApiConfig> { MemberApiConfig() }
     single<MemberApi> { MemberApiImpl(httpClient = get()) }
+
+    // Loan list (get_group_loans) — loan-list feature client stack. Reuses the shared
+    // HttpClient singleton above (same companion server, no second engine). The config binding
+    // is registered for override-surface symmetry with CompanionAuthApiConfig even though the
+    // shared client is the one actually dispatching requests today. The Repository/Store5
+    // wrapper consuming LoanApi is emitted by a downstream kmp-store-gen/kmp-client-gen
+    // generation step, not registered here.
+    single<LoanApiConfig> { LoanApiConfig() }
+    single<LoanApi> { LoanApiImpl(httpClient = get()) }
 
     // Member profile (get_client / get_client_accounts / get_member_role / update_member_role)
     // — member-profile feature client stack. Reuses the shared HttpClient singleton above (same

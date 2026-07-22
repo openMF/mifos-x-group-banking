@@ -75,6 +75,9 @@ logic, no domain field names.
 | `MemberRoleInfoDto` | `MemberProfileDto.kt` | `@Serializable` response row (`get_member_role`); reuses `MemberRoleDto` |
 | `UpdateMemberRoleRequestDto` | `MemberProfileDto.kt` | `@Serializable` request (`update_member_role` `PUT`); reuses `MemberRoleDto` |
 | `UpdateMemberRoleResponseDto` | `MemberProfileDto.kt` | `@Serializable` response (`update_member_role` `PUT`) |
+| `LoanSummaryDto` | `LoanSummaryDto.kt` | `@Serializable` response row (`GET /groups/{groupId}/loans`) — canonical `LoanSummary`; see `## 4. Boundaries` registry-divergence note |
+| `LoanPageDto` | `LoanSummaryDto.kt` | `@Serializable` offset-paginated envelope |
+| `LoanAccountStatusDto` | `LoanSummaryDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — named to avoid collision with `LoanStatusDto` |
 
 ## 3. Consumers
 
@@ -94,7 +97,9 @@ logic, no domain field names.
   `core/network/mapper/MemberMappers.kt` → `core/data` `MemberRepository`
   (`GET /groups/{groupId}/clients`); `core/network/mapper/MemberProfileMappers.kt`
   → `core/data` `MemberRepository` (`get_client` + `get_client_accounts` +
-  `get_member_role`, DTO -> domain; `update_member_role`, domain -> DTO)
+  `get_member_role`, DTO -> domain; `update_member_role`, domain -> DTO);
+  `core/network/mapper/LoanSummaryMappers.kt` → `core/data` `LoanRepository`
+  (`GET /groups/{groupId}/loans`)
 
 ## 4. Boundaries
 
@@ -158,6 +163,19 @@ logic, no domain field names.
   raw `savingsAccounts[]`/`loanAccounts[]` arrays. `MemberAccountsDto` mirrors
   the literal operation response; the aggregation happens in
   `MemberProfileMappers.kt` on the way to the domain `MemberAccounts` — see
+  `## dtos` (API.md).
+- **`LoanSummaryDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence**
+  (flagged for the cross-feature repair station): the registry declares a
+  DIFFERENT, richer per-loan-lifecycle shape for a DIFFERENT endpoint
+  (`GET /loans/{loanId}` / `GET /loans?groupId=`) whose `used_by` does not
+  list `loan-list`. `LoanSummaryDto` here was generated from loan-list's own
+  approved `api.yaml#dtos.LoanSummary` (`GET /groups/{groupId}/loans`)
+  instead — full note in `## dtos` (API.md).
+- **`LoanAccountStatusDto` is NOT `LoanStatusDto`** (flagged for the
+  cross-feature repair station): `LoanStatusDto` (`MemberDto.kt`) is
+  member-list's per-MEMBER loan-status chip; `LoanAccountStatusDto` is
+  loan-list's per-LOAN lifecycle status. Mismatched value-sets AND a bare-name
+  collision in the same package forced the distinct name — full note in
   `## dtos` (API.md).
 
 ## 5. Data
@@ -375,6 +393,20 @@ logic, no domain field names.
 | `UpdateMemberRoleRequestDto` | `groupId` | `groupId` | `Long` | — |
 | `UpdateMemberRoleRequestDto` | `assignedDate` | `assignedDate` | `String` | — |
 | `UpdateMemberRoleResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `LoanSummaryDto` | `id` | `id` | `Long` | — |
+| `LoanSummaryDto` | `memberId` | `memberId` | `Long` | — |
+| `LoanSummaryDto` | `memberName` | `memberName` | `String` | — |
+| `LoanSummaryDto` | `memberPhotoUrl` | `memberPhotoUrl` | `String?` | `null` |
+| `LoanSummaryDto` | `loanProductName` | `loanProductName` | `String` | — |
+| `LoanSummaryDto` | `principalAmount` | `principalAmount` | `Double` | — |
+| `LoanSummaryDto` | `outstandingBalance` | `outstandingBalance` | `Double` | — |
+| `LoanSummaryDto` | `overdueAmount` | `overdueAmount` | `Double` | — |
+| `LoanSummaryDto` | `status` | `status` | `LoanAccountStatusDto` | `LoanAccountStatusDto.UNKNOWN` |
+| `LoanSummaryDto` | `nextRepaymentDate` | `nextRepaymentDate` | `String?` | `null` |
+| `LoanSummaryDto` | `isOverdue` | `isOverdue` | `Boolean` | — |
+| `LoanSummaryDto` | `fineractLoanId` | `fineractLoanId` | `Long` | — |
+| `LoanPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
+| `LoanPageDto` | `pageItems` | `pageItems` | `List<LoanSummaryDto>` | `emptyList()` |
 
 ## 6. Errors
 
@@ -421,6 +453,18 @@ the nested `FineractStatusDto` shape, `MemberAccountsDto`'s raw
 `UpdateMemberRoleRequestDto`/`ResponseDto`, every DTO's `SCHEMA_VERSION`, and
 a T7/EC30 cross-version fixture (server-added field, decoded without
 crashing).
+`core/network/src/commonTest/.../model/LoanSummaryDtoTest.kt` covers
+`LoanSummaryDto`/`LoanPageDto` construction, `memberPhotoUrl`/
+`nextRepaymentDate`/`status` default-value behavior, serialization
+round-trip, every `LoanAccountStatusDto` known value + `UNKNOWN` fallback,
+and the T7/EC30 cross-version fixture (server-added field + unknown status
+value, decoded without crashing).
+`core/network/src/commonTest/.../mapper/LoanSummaryMappersTest.kt` covers
+`LoanSummaryDto -> LoanSummary` (every field, including nullable
+`memberPhotoUrl`/`nextRepaymentDate`), the batch `List<LoanSummaryDto> ->
+List<LoanSummary>` converter (including empty-list), the page converter
+(`LoanPageDto -> LoanPage`), and every `LoanAccountStatusDto` -> `LoanAccountStatus`
+enum value.
 
 ## 8. Observability
 
@@ -445,7 +489,11 @@ member-profile identity payloads. `MemberAccountsDto` / `FineractStatusDto` /
 `MemberSavingsAccountDto` / `MemberLoanAccountDto` /
 `MemberLoanAccountSummaryDto` / `MemberRoleInfoDto` /
 `UpdateMemberRoleRequestDto` / `UpdateMemberRoleResponseDto` carry no
-sensitive fields (balances + role only; no PII).
+sensitive fields (balances + role only; no PII). `LoanSummaryDto` carries
+`memberName` (display-name PII, same threat model as `MemberDto.displayName`)
+and `memberPhotoUrl` (a CDN URL, not raw image bytes) — avoid bulk-logging
+the full loan-list page; `principalAmount`/`outstandingBalance`/
+`overdueAmount`/`status`/`isOverdue` are not sensitive.
 
 ## 9. Evolution
 
@@ -481,5 +529,17 @@ genuinely diverges from `MemberDto`'s wire shape; see the field-shape-
 divergence note in `## 4. Boundaries` and `## dtos` (API.md). Before
 generating member-add / member-invite, check whether their identity needs
 match `MemberProfileDto` (this feature) or `MemberDto` (member-list) rather
-than introducing a third identity DTO shape.
+than introducing a third identity DTO shape. **Loan-list's own DTOs live in
+`LoanSummaryDto.kt`** (`LoanSummaryDto`, `LoanPageDto`,
+`LoanAccountStatusDto`) — `LoanSummaryDto` is CANONICAL, intended for reuse
+by loan-detail, loan dialogs, and personal-loans; before generating those
+features, reuse `LoanSummaryDto`/its mappers outright rather than introducing
+a sibling shape UNLESS their operation response genuinely diverges (same
+"forcing reuse would require fabricating values" test applied to
+`MemberProfileDto`/`GroupDetailDto`). Before extending `LoanSummaryDto`
+itself, resolve the `idea-layer/dtos/LoanDto.yaml` registry-divergence
+flagged in `## 4. Boundaries` and `## dtos` (API.md). Before introducing any
+further loan-status-adjacent enum, resolve the `LoanAccountStatusDto` vs
+`LoanStatusDto` naming-collision note in `## 4. Boundaries` and `## dtos`
+(API.md).
 <!-- kmp-dto-gen:END -->

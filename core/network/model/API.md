@@ -62,6 +62,9 @@
 | `MemberRoleInfoDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `GET /datatables/dt_member_role/{clientId}` (`get_member_role`, response `type: array`) |
 | `UpdateMemberRoleRequestDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `PUT /datatables/dt_member_role/{clientId}` (`update_member_role`) request body |
 | `UpdateMemberRoleResponseDto` | `resourceId` | required | response of `update_member_role` |
+| `LoanSummaryDto` | `id`, `memberId`, `memberName`, `memberPhotoUrl` (nullable, default `null`), `loanProductName`, `principalAmount`, `outstandingBalance`, `overdueAmount`, `status` (default `UNKNOWN`), `nextRepaymentDate` (nullable, default `null`), `isOverdue`, `fineractLoanId` | `memberPhotoUrl`/`nextRepaymentDate` nullable; `status` defaults `UNKNOWN`; rest required | `GET /groups/{groupId}/loans` (loan-list) — CANONICAL `LoanSummary`, reused by loan-detail + loan dialogs + personal-loans; see registry-divergence note below |
+| `LoanPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope of `GET /groups/{groupId}/loans` (`page_size=20`, stale-while-revalidate `ttl=180`) |
+| `LoanAccountStatusDto` | enum `@SerialName`: `ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; named `LoanAccountStatusDto` (not `LoanStatusDto`) to avoid a symbol collision with the EXISTING `LoanStatusDto` (member-list's member-level loan-status chip) — see naming-collision note below | field of `LoanSummaryDto.status` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -86,7 +89,49 @@ the same list endpoint, see divergence note below);
 `GET /clients/{clientId}/accounts` + `GET /datatables/dt_member_role/{clientId}`
 + `PUT /datatables/dt_member_role/{clientId}`; no dedicated
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
-`api.yaml` is the sole SoT, per PP-1).
+`api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/loan-list/{api.yaml,ui.yaml}` (`GET
+/groups/{groupId}/loans`, offset-paginated, `page_size=20`,
+stale-while-revalidate `ttl=180` + offline show-cached; `api.yaml#dtos.LoanSummary`
+is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
+entry also exists but describes a DIFFERENT endpoint/consumer set, see
+divergence note below).
+
+**`LoanSummaryDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
+(flagged for the cross-feature repair station, same class of issue as the
+`GroupDto.yaml` / `MemberDto.yaml` divergences above):** the registry entry
+(v1.0.0, `source.endpoint: GET /loans/{loanId}`,
+`source.list_endpoint: GET /loans?groupId={groupId}`) declares a DIFFERENT
+`LoanDto` shape — `principal: Double`, `interestRate: Double`, `status:
+String` with LOWERCASE values `pending`/`approved`/`disbursed`/`repaid`/
+`defaulted`/`rejected`/`withdrawn`, `disbursedOn: String?`,
+`expectedMaturityDate: String?`, `amountRepaid: Double?`,
+`amountOutstanding: Double?`, `loanProductName: String?` — and its `used_by`
+lists `loan-management` (`get_loan`, `list_all_groups`) + `end-user-dashboard`
+(`list_self_loans`), NOT `loan-list`. `LoanSummaryDto` here was generated
+from loan-list's OWN approved `api.yaml#dtos.LoanSummary` instead (`GET
+/groups/{groupId}/loans` — a DIFFERENT endpoint from the registry's), which
+explicitly declares the flat `memberPhotoUrl`/`outstandingBalance`/
+`overdueAmount`/`isOverdue`/`fineractLoanId` shape `ui.yaml#components.loan_card`
+binds to. Reconcile the two `LoanDto`/`LoanSummaryDto` declarations at
+Station 3 — options include renaming the registry's richer per-loan-lifecycle
+row to `LoanDetailDto`/`LoanAccountDto`, or migrating loan-management /
+end-user-dashboard onto this companion list shape if their consumers turn out
+to be the same wire contract.
+
+**`LoanAccountStatusDto` naming collision with `LoanStatusDto` (flagged for
+the cross-feature repair station — same "near-miss, don't force it"
+precedent as `MemberRoleDto` above):** member-list's `LoanStatusDto`
+(`MemberDto.kt`) is a per-MEMBER loan-status CHIP
+(`ACTIVE`/`NONE`/`OVERDUE`/`UNKNOWN`, 3 known values); loan-list's own
+`api.yaml#dtos.LoanStatus` declares a per-LOAN lifecycle status
+(`ACTIVE`/`OVERDUE`/`CLOSED`/`PENDING`/`REJECTED`, 5 known values). Neither
+value-set is a subset of the other (this enum has no `NONE`; `LoanStatusDto`
+has no `CLOSED`/`PENDING`/`REJECTED`), and re-using the bare name `LoanStatusDto`
+for a second, incompatible shape would be a Kotlin symbol collision (both
+declared in `org.mifos.groupbanking.core.network.model`) — so a new
+`LoanAccountStatusDto` was introduced instead of forcing reuse. Resolve
+whether the two loan-status concepts should be unified at Station 3.
 
 **`MemberProfileDto` vs `MemberDto` field-shape divergence (flagged for the
 cross-feature repair station, same "forcing reuse would require fabricating
@@ -304,7 +349,7 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
-`MemberProfileMappers.kt`.
+`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

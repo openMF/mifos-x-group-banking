@@ -42,6 +42,8 @@ import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanRepository
+import org.mifos.groupbanking.core.data.repository.LoanRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
 import org.mifos.groupbanking.core.data.repository.MemberAddRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
@@ -129,6 +131,19 @@ val DataModule = module {
         MemberProfileRepositoryImpl(
             memberProfileStore = get(AppStoreRegistry.MemberProfile),
             memberProfileApi = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // loan-list (GET /groups/{groupId}/loans) — wraps the PAGINATED NETWORK_WITH_CACHE
+    // LoansPagingStore (bound via AppStoreRegistry.LoanList in appStoreModule) and surfaces the
+    // offline-first .asPagingScreenStream() read (paged ScreenState<List<LoanSummary>> + load-more +
+    // pull-to-refresh, per-group via the groupId threaded into the store key). Status-filter chips
+    // filter the accumulated list client-side in the ViewModel — no re-key, no DAO bypass.
+    single<LoanRepository> {
+        LoanRepositoryImpl(
+            loansPagingStore = get(AppStoreRegistry.LoanList),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
