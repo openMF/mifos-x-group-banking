@@ -156,6 +156,9 @@ fun LoanPurposeDto.toDomainModel(): LoanPurpose = when (this) {
     LoanPurposeDto.BUSINESS -> LoanPurpose.BUSINESS
     LoanPurposeDto.EMERGENCY -> LoanPurpose.EMERGENCY
     LoanPurposeDto.OTHER -> LoanPurpose.OTHER
+    LoanPurposeDto.SCHOOL_FEES -> LoanPurpose.SCHOOL_FEES
+    LoanPurposeDto.FARMING -> LoanPurpose.FARMING
+    LoanPurposeDto.HOME_IMPROVEMENT -> LoanPurpose.HOME_IMPROVEMENT
     LoanPurposeDto.UNKNOWN -> LoanPurpose.UNKNOWN
 }
 
@@ -165,5 +168,8 @@ fun LoanPurpose.toDto(): LoanPurposeDto = when (this) {
     LoanPurpose.BUSINESS -> LoanPurposeDto.BUSINESS
     LoanPurpose.EMERGENCY -> LoanPurposeDto.EMERGENCY
     LoanPurpose.OTHER -> LoanPurposeDto.OTHER
+    LoanPurpose.SCHOOL_FEES -> LoanPurposeDto.SCHOOL_FEES
+    LoanPurpose.FARMING -> LoanPurposeDto.FARMING
+    LoanPurpose.HOME_IMPROVEMENT -> LoanPurposeDto.HOME_IMPROVEMENT
     LoanPurpose.UNKNOWN -> LoanPurposeDto.UNKNOWN
 }

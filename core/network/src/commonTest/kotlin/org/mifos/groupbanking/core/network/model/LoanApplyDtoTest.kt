@@ -355,11 +355,12 @@ class LoanApplyDtoTest {
         assertEquals(responseDto, decoded)
     }
 
-    // ---------- LoanPurposeDto (5 known + UNKNOWN, T7/EC30 fallback) ----------
+    // ---------- LoanPurposeDto (originally 5 known + UNKNOWN; extended to 8 known + UNKNOWN by
+    // loan-request per PP-1 — see LoanApplyDto.kt kdoc) ----------
 
     @Test
-    fun loanPurposeDto_hasExactlySixEntriesIncludingUnknownFallback() {
-        assertEquals(6, LoanPurposeDto.entries.size)
+    fun loanPurposeDto_hasExactlyNineEntriesIncludingUnknownFallback() {
+        assertEquals(9, LoanPurposeDto.entries.size)
         assertTrue(LoanPurposeDto.entries.contains(LoanPurposeDto.UNKNOWN))
     }
 
@@ -371,6 +372,9 @@ class LoanApplyDtoTest {
             "BUSINESS" to LoanPurposeDto.BUSINESS,
             "EMERGENCY" to LoanPurposeDto.EMERGENCY,
             "OTHER" to LoanPurposeDto.OTHER,
+            "SCHOOL_FEES" to LoanPurposeDto.SCHOOL_FEES,
+            "FARMING" to LoanPurposeDto.FARMING,
+            "HOME_IMPROVEMENT" to LoanPurposeDto.HOME_IMPROVEMENT,
         )
         known.forEach { (wire, expected) ->
             assertEquals(expected, json.decodeFromString(LoanPurposeDto.serializer(), "\"$wire\""))
@@ -379,7 +383,9 @@ class LoanApplyDtoTest {
 
     @Test
     fun loanPurposeDto_unknownServerValueCoercesToUnknownFallback_notCrash() {
-        val decoded = json.decodeFromString(LoanPurposeDto.serializer(), "\"HOME_IMPROVEMENT\"")
+        // HOME_IMPROVEMENT is now a REAL known value (loan-request extension) — probe a
+        // genuinely-unmodeled future value instead.
+        val decoded = json.decodeFromString(LoanPurposeDto.serializer(), "\"DEBT_CONSOLIDATION\"")
         assertEquals(LoanPurposeDto.UNKNOWN, decoded)
     }
 

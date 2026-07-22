@@ -235,6 +235,8 @@ class LoanApplyMappersTest {
     }
 
     // ---------- LoanPurpose <-> LoanPurposeDto ----------
+    // (extended by loan-request to 8 known values + UNKNOWN — see LoanApply.kt / LoanApplyDto.kt
+    // kdoc, PP-1 registry-wins precedent)
 
     @Test
     fun loanPurposeDto_toDomainModel_everyKnownValueMapped() {
@@ -243,6 +245,9 @@ class LoanApplyMappersTest {
         assertEquals(LoanPurpose.BUSINESS, LoanPurposeDto.BUSINESS.toDomainModel())
         assertEquals(LoanPurpose.EMERGENCY, LoanPurposeDto.EMERGENCY.toDomainModel())
         assertEquals(LoanPurpose.OTHER, LoanPurposeDto.OTHER.toDomainModel())
+        assertEquals(LoanPurpose.SCHOOL_FEES, LoanPurposeDto.SCHOOL_FEES.toDomainModel())
+        assertEquals(LoanPurpose.FARMING, LoanPurposeDto.FARMING.toDomainModel())
+        assertEquals(LoanPurpose.HOME_IMPROVEMENT, LoanPurposeDto.HOME_IMPROVEMENT.toDomainModel())
         assertEquals(LoanPurpose.UNKNOWN, LoanPurposeDto.UNKNOWN.toDomainModel())
     }
 
@@ -253,6 +258,9 @@ class LoanApplyMappersTest {
         assertEquals(LoanPurposeDto.BUSINESS, LoanPurpose.BUSINESS.toDto())
         assertEquals(LoanPurposeDto.EMERGENCY, LoanPurpose.EMERGENCY.toDto())
         assertEquals(LoanPurposeDto.OTHER, LoanPurpose.OTHER.toDto())
+        assertEquals(LoanPurposeDto.SCHOOL_FEES, LoanPurpose.SCHOOL_FEES.toDto())
+        assertEquals(LoanPurposeDto.FARMING, LoanPurpose.FARMING.toDto())
+        assertEquals(LoanPurposeDto.HOME_IMPROVEMENT, LoanPurpose.HOME_IMPROVEMENT.toDto())
         assertEquals(LoanPurposeDto.UNKNOWN, LoanPurpose.UNKNOWN.toDto())
     }
 
@@ -263,6 +271,9 @@ class LoanApplyMappersTest {
         assertEquals(3, LoanPurpose.BUSINESS.fineractPurposeId)
         assertEquals(4, LoanPurpose.EMERGENCY.fineractPurposeId)
         assertEquals(5, LoanPurpose.OTHER.fineractPurposeId)
+        assertEquals(6, LoanPurpose.SCHOOL_FEES.fineractPurposeId)
+        assertEquals(7, LoanPurpose.FARMING.fineractPurposeId)
+        assertEquals(8, LoanPurpose.HOME_IMPROVEMENT.fineractPurposeId)
         assertEquals(0, LoanPurpose.UNKNOWN.fineractPurposeId)
     }
 }

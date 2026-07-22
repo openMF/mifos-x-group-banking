@@ -85,7 +85,9 @@
 | `GroupLoanConfigDto` | `loan_multiplier`, `max_loan_amount`, `meeting_frequency` | all required | `GET /datatables/dt_group_config/{groupId}` (`get_group_config`); snake_case raw datatable row — distinct from the existing `GroupConfigDto`, see note below |
 | `ApplyLoanRequestDto` | `clientId`, `productId`, `principal`, `loanTermFrequency`, `loanTermFrequencyType` (default `{1,"Weeks"}`), `numberOfRepayments`, `repaymentEvery` (default `1`), `repaymentFrequencyType` (default `{1,"Weeks"}`), `interestRatePerPeriod`, `amortizationType` (default `{1,"Equal installments"}`), `interestType` (default `{0,"Declining Balance"}`), `interestCalculationPeriodType` (default `{1,"Same as repayment period"}`), `transactionProcessingStrategyId` (default `1`), `expectedDisbursementDate`, `submittedOnDate`, `loanPurposeId` | 5 lookup-pair fields + 2 Int constants default to `api.yaml`'s literal values; rest required | `POST /loans` (`create_new_loan`) request; literal Fineract body — see domain `ApplyLoanRequest` simplification note below |
 | `ApplyLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `create_new_loan` — literal Fineract resource-create envelope |
-| `LoanPurposeDto` | enum `@SerialName`: `MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOT literally wire-transmitted today (`create_new_loan` only sends the resolved `loanPurposeId: Int`), same "chip-selector resolved to an Int" precedent as `PaymentMethod`/`paymentTypeId` — see note below | domain-facing purpose selector, `api.yaml#dtos.LoanPurpose` |
+| `LoanPurposeDto` | enum `@SerialName`: `MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `SCHOOL_FEES`, `FARMING`, `HOME_IMPROVEMENT`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOT literally wire-transmitted for `create_new_loan` (only sends the resolved `loanPurposeId: Int`), same "chip-selector resolved to an Int" precedent as `PaymentMethod`/`paymentTypeId`; IS literally wire-transmitted for loan-request's `LoanRequestPayloadDto.purpose` (bare `@SerialName` string, no wrapper object) — extended with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT` per PP-1, see note below | shared purpose selector, `api.yaml#dtos.LoanPurpose` (loan-apply) + `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options` (loan-request) |
+| `LoanRequestPayloadDto` | `clientId`, `requested_amount`, `purpose` (reuses `LoanPurposeDto`), `duration_weeks`, `savings_balance_at_request`, `submitted_at`, `status` (default `"PENDING"`) | `status` defaults `"PENDING"`; rest required. `clientId` camelCase, remaining 5 own fields snake_case — raw `dt_loan_request` datatable columns (Hard Rule 5) | `POST /datatables/dt_loan_request` (`submit_loan_request`) request body; offline-queued via `cache.offline: queue_to_syncqueue` when `cmp-network-monitor` reports offline |
+| `LoanRequestResponseDto` | `resourceId`, `officeId`, `clientId`, `resourceExternalId` | all required | response of `submit_loan_request` — literal Fineract datatable resource-create envelope |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -142,7 +144,36 @@ registry entry exists for this feature, per PP-1);
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
 `api.yaml` is the sole SoT, per PP-1; its OWN in-file `dtos.GroupMember`/
 `dtos.LoanProduct` blocks are abbreviated summaries of the literal operation
-responses, see divergence note below).
+responses, see divergence note below);
+`idea-layer/screens/loan-request/api.yaml` (`POST /datatables/dt_loan_request`,
+`submit_loan_request`, `cache: { ttl: 0, strategy: no-cache, offline:
+queue_to_syncqueue }`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry
+entry exists for this feature — `api.yaml` is the sole SoT, per PP-1).
+
+**`LoanPurposeDto` extension for loan-request (PP-1 — screen-SoT wins,
+informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+declares 7 purpose values — 4 (`MEDICAL`/`BUSINESS`/`EMERGENCY`/`OTHER`)
+already existed on this SHARED enum; `SCHOOL_FEES`/`FARMING`/
+`HOME_IMPROVEMENT` were ADDED to the SAME `LoanPurposeDto` (never forked into
+a second wire enum). `LoanApplyDtoTest.kt`'s unknown-fallback fixture was
+updated to probe `"DEBT_CONSOLIDATION"` instead of the now-real
+`"HOME_IMPROVEMENT"` — the T7/EC30 `UNKNOWN` fallback contract is unaffected,
+only the specific probed value moved.
+
+**`LoanRequestPayloadDto`/`LoanRequestResponseDto` — no `idea-layer/dtos/{Dto}.yaml`
+registry entry (informational, per PP-1):** loan-request declares its wire
+shapes inline in `api.yaml#dtos.{LoanRequestPayload,LoanRequestResponse}` —
+these generated DTOs mirror that block verbatim, plus a
+`SyncQueueEntry`-shaped block also declared in `api.yaml#dtos` that was
+DELIBERATELY NOT generated here: `SyncQueueEntry`/`SyncQueueRepository` are
+shared cross-feature offline infrastructure (declared in
+`api.yaml#dependencies.repositories`, not this feature's own DTO/mapper
+surface), same "repository lives outside this generation step" precedent as
+`MemberAddRepository`'s kdoc. `LoanRequestMappers.kt#toJsonPayload()` /
+`loanRequestPayloadDtoFromJson()` are the serialization SoT a future
+`SyncQueueRepository` implementation should reuse for the queued
+`SyncQueueEntry.payload` `String` field, rather than re-deriving a second
+Json config.
 
 **`GroupMemberDto`/`LoanProductDto` vs `api.yaml#dtos.GroupMember`/
 `.LoanProduct` in-file divergences (flagged for the cross-feature repair

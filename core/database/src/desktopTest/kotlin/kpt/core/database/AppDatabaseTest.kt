@@ -37,28 +37,18 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun databaseExposeAlertDao() {
+    fun databaseExposeSyncQueueDao() {
         database = Room.inMemoryDatabaseBuilder<AppDatabase>()
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()
 
-        assertNotNull(database!!.alertDao)
-    }
-
-    @Test
-    fun databaseExposeInterestRateSeriesDao() {
-        database = Room.inMemoryDatabaseBuilder<AppDatabase>()
-            .setDriver(BundledSQLiteDriver())
-            .setQueryCoroutineContext(Dispatchers.IO)
-            .build()
-
-        assertNotNull(database!!.interestRateSeriesDao)
+        assertNotNull(database!!.syncQueueDao)
     }
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 10 in the v9→v10 migration that added `interest_rate_series`.
+        // Bumped to 10 in the v9→v10 migration that added `sync_queue`.
         // Update this constant when bumping AppDatabase.VERSION so the guardrail
         // stays meaningful.
         assertEquals(10, AppDatabase.VERSION)

@@ -27,6 +27,7 @@ import org.mifos.groupbanking.core.network.config.LoanApiConfig
 import org.mifos.groupbanking.core.network.config.LoanApplyApiConfig
 import org.mifos.groupbanking.core.network.config.LoanDetailApiConfig
 import org.mifos.groupbanking.core.network.config.LoanRepaymentApiConfig
+import org.mifos.groupbanking.core.network.config.LoanRequestApiConfig
 import org.mifos.groupbanking.core.network.config.LoanWriteoffApiConfig
 import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
@@ -50,6 +51,8 @@ import org.mifos.groupbanking.core.network.service.loanlist.LoanApi
 import org.mifos.groupbanking.core.network.service.loanlist.LoanApiImpl
 import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApi
 import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApiImpl
+import org.mifos.groupbanking.core.network.service.loanrequest.LoanRequestApi
+import org.mifos.groupbanking.core.network.service.loanrequest.LoanRequestApiImpl
 import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApi
 import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
@@ -258,4 +261,15 @@ val NetworkModule = module {
     // RepositoryModule.kt.
     single<LoanApplyApiConfig> { LoanApplyApiConfig() }
     single<LoanApplyApi> { LoanApplyApiImpl(httpClient = get()) }
+
+    // Loan-request form (submit_loan_request) — loan-request feature client stack. Reuses the
+    // shared HttpClient singleton above (same companion host, no second engine), even though
+    // this path is a raw Fineract datatable passthrough rather than a `/companion/…` one — same
+    // convention as MemberAddApi / LoanApplyApi. The config binding is registered for
+    // override-surface symmetry with CompanionAuthApiConfig even though the shared client is the
+    // one actually dispatching requests today. The Repository consuming LoanRequestApi (Store5-free
+    // — `business_logic.kind: crud`, offline-queue-backed via SyncQueueRepository, no read-stream
+    // to cache) is registered in RepositoryModule.kt.
+    single<LoanRequestApiConfig> { LoanRequestApiConfig() }
+    single<LoanRequestApi> { LoanRequestApiImpl(httpClient = get()) }
 }

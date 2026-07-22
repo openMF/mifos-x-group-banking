@@ -275,15 +275,24 @@ data class ApplyLoanResponseDto(
 }
 
 /**
- * Wire enum for `api.yaml#dtos.LoanPurpose` (5 known values + [UNKNOWN] fallback).
+ * Wire enum for `api.yaml#dtos.LoanPurpose` (originally 5 known values + [UNKNOWN] fallback).
  *
- * **NOT literally transmitted on the wire today** — `create_new_loan`'s body only ever carries
+ * **NOT literally transmitted on the wire for `create_new_loan`** — that body only ever carries
  * the already-resolved `loanPurposeId: Int` (see [ApplyLoanRequestDto.loanPurposeId]), same
  * "chip-selector resolved to an Int before it hits the wire" precedent as
  * `PaymentMethod`/`paymentTypeId`. Declared `@Serializable` with a full [UNKNOWN] fallback anyway
  * (per this generation brief's explicit request, and for forward-compatibility — a future
  * `GET`-loan-detail response echoing the purpose back would decode safely through this same
  * type). `LoanApplyMappers.kt` bridges this to/from the domain `LoanPurpose`.
+ *
+ * **IS literally transmitted for loan-request** — `idea-layer/screens/loan-request/api.yaml`'s
+ * `LoanRequestPayloadDto.purpose` field carries this enum directly (kotlinx.serialization
+ * encodes an enum by its `@SerialName` string, matching the wire `"purpose": String` contract
+ * with no wrapper object needed). **Extended (PP-1 — screen-SoT wins):** loan-request's
+ * `ui.yaml#components.purpose_dropdown.options` adds [SCHOOL_FEES]/[FARMING]/[HOME_IMPROVEMENT]
+ * to the existing value-set — see `LoanRequestDto.kt` kdoc and the domain `LoanPurpose` kdoc
+ * (`LoanApply.kt`) for the full rationale. `LoanApplyDtoTest.kt`'s unknown-fallback fixture was
+ * updated to probe a genuinely-unmodeled value (no longer `HOME_IMPROVEMENT`, now real).
  *
  * See API.md#dtos — LoanPurpose.
  */
@@ -294,5 +303,8 @@ enum class LoanPurposeDto {
     @SerialName("BUSINESS") BUSINESS,
     @SerialName("EMERGENCY") EMERGENCY,
     @SerialName("OTHER") OTHER,
+    @SerialName("SCHOOL_FEES") SCHOOL_FEES,
+    @SerialName("FARMING") FARMING,
+    @SerialName("HOME_IMPROVEMENT") HOME_IMPROVEMENT,
     @SerialName("UNKNOWN") UNKNOWN,
 }

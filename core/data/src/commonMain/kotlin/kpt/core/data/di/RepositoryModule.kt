@@ -50,6 +50,8 @@ import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanRequestRepository
+import org.mifos.groupbanking.core.data.repository.LoanRequestRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepository
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
@@ -60,6 +62,8 @@ import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.SyncQueueRepository
+import org.mifos.groupbanking.core.data.repository.SyncQueueRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -230,6 +234,26 @@ val DataModule = module {
     // .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
     // GroupCreateRepository/MemberAddRepository above.
     single<LoanApplyRepository> { LoanApplyRepositoryImpl(api = get()) }
+
+    // loan-request form (submit_loan_request) — Store5-free (business_logic.kind: crud, the
+    // legacy template path per RULE-IDEA-IMPL-INTELLIGENCE-001 AC-03i — no read-stream to cache),
+    // wraps LoanRequestApi (NetworkModule) directly plus the shared SyncQueueRepository for the
+    // offline-enqueue seam (data-flow.yaml#offline_behavior strategy: enqueue_to_sync_queue,
+    // entity_type LOAN_REQUEST). Surfaces NetworkResult from submit(), never
+    // .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
+    // GroupCreateRepository/MemberAddRepository/LoanApplyRepository above. The online-vs-offline
+    // decision itself is made by the ViewModel (informed by NetworkMonitor), never here.
+    single<LoanRequestRepository> {
+        LoanRequestRepositoryImpl(api = get(), syncQueueRepository = get())
+    }
+
+    // sync-queue offline write-queue (shared infra) — Room-backed WRITE-QUEUE, NOT a Store5
+    // read-store (no org.mobilenativefoundation.store anywhere in this stack). Concrete backing for
+    // the SyncQueueRepository.enqueue(...) seam declared in MemberAddRepository /
+    // MemberAddViewModel / GroupCreateViewModel KDocs: mutation features (member-add's
+    // CREATE_MEMBER, loan-request's LOAN_REQUEST) enqueue a serialized payload when offline; the
+    // sync-status feature reads observePending()/observeCounts(). Wraps SyncQueueDao (DatabaseModule).
+    single<SyncQueueRepository> { SyncQueueRepositoryImpl(dao = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

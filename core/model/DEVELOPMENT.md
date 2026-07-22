@@ -90,7 +90,9 @@ mappers in `core/network/mapper`.
 | `LoanApplyTemplate` | `LoanApply.kt` | data class — composite loan-apply template (products + defaults + eligibility inputs); reuses `MemberStatus`; `maxEligibleAmount` derived property |
 | `ApplyLoanRequest` | `LoanApply.kt` | data class — simplified loan-apply submission input (`create_new_loan`) |
 | `LoanApplicationResult` | `LoanApply.kt` | data class — `create_new_loan` success result |
-| `LoanPurpose` | `LoanApply.kt` | enum (`MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `UNKNOWN`) with `fineractPurposeId: Int` property |
+| `LoanPurpose` | `LoanApply.kt` | enum (`MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `SCHOOL_FEES`, `FARMING`, `HOME_IMPROVEMENT`, `UNKNOWN`) with `fineractPurposeId: Int` property — extended by loan-request (PP-1), see `core/model/API.md` |
+| `LoanRequestPayload` | `LoanRequest.kt` | data class — loan-request member-side submission input (`submit_loan_request`); reuses `LoanPurpose` |
+| `LoanRequestResult` | `LoanRequest.kt` | data class — `submit_loan_request` success result |
 
 ## 3. Consumers
 
@@ -127,7 +129,13 @@ mappers in `core/network/mapper`.
   (`get_group_members`/`get_loan_products`/`get_loan_template`/
   `get_member_savings`/`get_group_corpus`/`get_group_config`), domain -> DTO
   for the submitted `ApplyLoanRequest` — `LoanRepository`/`MemberRepository`/
-  `GroupRepository` (`POST /loans`))
+  `GroupRepository` (`POST /loans`); the loan-request submission maps
+  `LoanRequestMappers.kt` output the same way, BOTH directions — domain -> DTO
+  for the submitted `LoanRequestPayload`, DTO -> domain for the
+  `LoanRequestResult` — `LoanRequestRepository`
+  (`POST /datatables/dt_loan_request`); offline, `LoanRequestMappers.kt#toJsonPayload()`
+  serializes the resolved `LoanRequestPayloadDto` for `SyncQueueRepository`
+  (out of this generation's scope) to persist as a queued retry row)
 
 ## 4. Boundaries
 
@@ -433,6 +441,15 @@ mappers in `core/network/mapper`.
 | `LoanApplicationResult` | `clientId` | `Long` | non-null |
 | `LoanApplicationResult` | `loanId` | `Long` | non-null |
 | `LoanApplicationResult` | `resourceId` | `Long` | non-null |
+| `LoanRequestPayload` | `clientId` | `Long` | non-null |
+| `LoanRequestPayload` | `requestedAmount` | `Double` | non-null |
+| `LoanRequestPayload` | `purpose` | `LoanPurpose` | non-null |
+| `LoanRequestPayload` | `durationWeeks` | `Int` | non-null |
+| `LoanRequestPayload` | `savingsBalanceAtRequest` | `Double` | non-null |
+| `LoanRequestResult` | `resourceId` | `Long` | non-null |
+| `LoanRequestResult` | `officeId` | `Long` | non-null |
+| `LoanRequestResult` | `clientId` | `Long` | non-null |
+| `LoanRequestResult` | `resourceExternalId` | `String` | non-null |
 
 ## 6. Errors
 
@@ -495,7 +512,15 @@ ApplyLoanRequestDto` against a pinned `kotlin.time.Instant` (every resolved
 field, reusing `fineractTransactionDate` rather than a second wire-date
 helper); `ApplyLoanResponseDto -> LoanApplicationResult` (every field); and
 every `LoanPurposeDto <-> LoanPurpose` value plus
-`LoanPurpose.fineractPurposeId`'s sequential assignment.
+`LoanPurpose.fineractPurposeId`'s sequential assignment (extended by
+`LoanRequestMappersTest.kt`'s own `LoanPurpose`/`LoanPurposeDto` usage to cover
+the 3 loan-request-added values via the SAME shared mapper pair).
+`LoanRequestMappersTest.kt` covers `LoanRequestPayload -> LoanRequestPayloadDto`
+(every field, against a pinned `kotlin.time.Instant`, including the
+`status` default-to-`"PENDING"` and the `purpose` resolution via the reused
+`LoanPurpose.toDto()`) AND the reverse `LoanRequestResponseDto ->
+LoanRequestResult` (every field), plus the `toJsonPayload()`/
+`loanRequestPayloadDtoFromJson()` offline-SyncQueue serialization round-trip.
 
 ## 8. Observability
 
@@ -541,7 +566,12 @@ sensitive. `LoanProduct`/`LoanApplyTemplate` carry no PII (product catalogue
 purpose, and Fineract resource IDs only) — the loan-submission event itself
 is appropriate to log at info level (loanId only, matching the
 `WriteoffResult` precedent above), just not paired with member PII from a
-joined model.
+joined model. `LoanRequestPayload`/`LoanRequestResult` carry no PII (amounts,
+a week count, an enum purpose, a savings-balance snapshot, and Fineract
+resource IDs only) — same "amounts/enum/resource-id only" threat model as
+`ApplyLoanRequest`/`LoanApplicationResult`; the queued offline JSON
+(`toJsonPayload()`) carries the identical field set, so no additional
+exposure beyond the online path.
 
 ## 9. Evolution
 
@@ -628,5 +658,20 @@ re-deriving the `dt_group_config` read. `LoanPurpose.fineractPurposeId`'s
 sequential 1-5 assignment is a confirmed gap (`api.yaml` declares no
 explicit per-value wire id) — if a future `api.yaml` revision declares
 explicit ids, update the enum's constructor arguments in place (no shape
-change, no `SCHEMA_VERSION` bump needed on the domain side).
+change, no `SCHEMA_VERSION` bump needed on the domain side). **Loan-request's
+own domain concepts live in `LoanRequest.kt`** (`LoanRequestPayload`,
+`LoanRequestResult`) — `LoanRequestPayload.purpose` reuses `LoanPurpose`
+outright, EXTENDED with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT` (PP-1,
+`idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+is the value-set SoT) rather than forking a second purpose enum — the 3 new
+`fineractPurposeId` placeholders (`6`/`7`/`8`) continue loan-apply's
+sequential-assignment confirmed gap and are unused by loan-request's own wire
+contract (which transmits the bare enum name as a literal `String`, not an
+`Int` id). Before generating a future feature needing an offline-queue
+serialization helper for a different mutation payload, reuse the
+`toJsonPayload()`/`{...}FromJson()` pattern (`LoanRequestMappers.kt`) rather
+than re-deriving a per-feature Json config — `SyncQueueEntry`/
+`SyncQueueRepository` themselves remain out of DTO/mapper generation scope
+(declared in `api.yaml#dependencies.repositories`, same "repository lives
+outside this generation step" precedent as `MemberAddRepository`).
 <!-- kmp-dto-gen:END -->

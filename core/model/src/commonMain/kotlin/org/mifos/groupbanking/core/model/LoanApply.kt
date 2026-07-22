@@ -120,13 +120,24 @@ data class LoanApplicationResult(
 )
 
 /**
- * Domain enum for the loan-apply form's purpose selector (`api.yaml#dtos.LoanPurpose`, 5 known
- * values plus [UNKNOWN] fallback, mirroring wire `LoanPurposeDto` 1:1). [fineractPurposeId] is
- * the Fineract `loanPurposeId: Int` resolution `LoanApplyMappers.kt` reads to build the wire
- * submit body — sequential 1-5 assignment in `api.yaml#dtos.LoanPurpose.values` declaration
- * order (confirmed gap: `api.yaml` declares no explicit per-value id mapping). [UNKNOWN] carries
- * a sentinel `0` — never actually submitted (the loan-apply purpose dropdown never offers an
+ * Domain enum for the loan-apply form's purpose selector (`api.yaml#dtos.LoanPurpose`, originally
+ * 5 known values plus [UNKNOWN] fallback, mirroring wire `LoanPurposeDto` 1:1). [fineractPurposeId]
+ * is the Fineract `loanPurposeId: Int` resolution `LoanApplyMappers.kt` reads to build the wire
+ * submit body — sequential assignment in `api.yaml#dtos.LoanPurpose.values` declaration order
+ * (confirmed gap: `api.yaml` declares no explicit per-value id mapping). [UNKNOWN] carries a
+ * sentinel `0` — never actually submitted (the loan-apply purpose dropdown never offers an
  * "unknown" choice).
+ *
+ * **Extended by loan-request (PP-1 — registry/screen-SoT wins over the narrower hand-written
+ * shape):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+ * declares 7 purpose values — `SCHOOL_FEES`/`MEDICAL`/`BUSINESS`/`FARMING`/`HOME_IMPROVEMENT`/
+ * `EMERGENCY`/`OTHER` — 4 of which (`MEDICAL`/`BUSINESS`/`EMERGENCY`/`OTHER`) already existed
+ * here; [SCHOOL_FEES]/[FARMING]/[HOME_IMPROVEMENT] were ADDED (never forked into a second
+ * purpose enum) with `fineractPurposeId` continuing the sequential assignment at `6`/`7`/`8`
+ * (loan-request's wire body never actually reads `fineractPurposeId` — it transmits the enum's
+ * bare name as a literal `String` — so these 3 ids are placeholders pending a real Fineract
+ * `loanPurposeId` mapping, same confirmed-gap class as the original 1-5 assignment).
+ * `EDUCATION` (loan-apply-only, not in loan-request's dropdown) is UNCHANGED.
  *
  * See API.md#models — LoanPurpose.
  */
@@ -136,5 +147,8 @@ enum class LoanPurpose(val fineractPurposeId: Int) {
     BUSINESS(3),
     EMERGENCY(4),
     OTHER(5),
+    SCHOOL_FEES(6),
+    FARMING(7),
+    HOME_IMPROVEMENT(8),
     UNKNOWN(0),
 }

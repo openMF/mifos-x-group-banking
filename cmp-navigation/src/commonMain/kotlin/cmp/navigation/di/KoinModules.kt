@@ -36,6 +36,7 @@ import org.mifos.groupbanking.feature.loandetail.di.LoanDetailModule
 import org.mifos.groupbanking.feature.loanlist.di.LoanListModule
 import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.di.LoanMarkDefaultedDialogModule
 import org.mifos.groupbanking.feature.loanrepaymentdialog.di.LoanRepaymentDialogModule
+import org.mifos.groupbanking.feature.loanrequest.di.LoanRequestModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
 import org.mifos.groupbanking.feature.memberadd.di.MemberAddModule
 import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
@@ -77,6 +78,7 @@ object KoinModules {
             LoanListModule, // <- added by kmp-viewmodel-gen
             LoanDetailModule, // <- added by kmp-viewmodel-gen
             LoanApplyModule, // <- added by kmp-viewmodel-gen
+            LoanRequestModule, // <- added by kmp-viewmodel-gen
             LoanRepaymentDialogModule, // <- added by kmp-viewmodel-gen
             LoanMarkDefaultedDialogModule, // <- added by kmp-viewmodel-gen
         )

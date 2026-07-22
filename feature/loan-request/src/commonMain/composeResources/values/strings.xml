@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_loan_request_topbar_title">Request a Loan</string>
+    <string name="screens_loan_request_back_cd">Back to personal loans</string>
+
+    <string name="screens_loan_request_offline_banner">You are offline. Your request will be saved and sent when you reconnect.</string>
+    <string name="screens_loan_request_offline_banner_cd">Offline mode banner: your loan request will be queued and submitted when you reconnect.</string>
+
+    <string name="screens_loan_request_currency_prefix">KES</string>
+    <string name="screens_loan_request_kes_amount_format">KES %1$s</string>
+
+    <string name="screens_loan_request_savings_balance_label">Your savings balance</string>
+    <string name="screens_loan_request_savings_icon_cd">Savings balance icon</string>
+    <string name="screens_loan_request_max_loan_label">Maximum you can borrow</string>
+    <string name="screens_loan_request_max_loan_icon_cd">Maximum loan amount icon</string>
+    <string name="screens_loan_request_loan_multiplier_hint">(3× your savings)</string>
+
+    <string name="screens_loan_request_amount_label">Loan Amount (KES)</string>
+    <string name="screens_loan_request_amount_supporting_text">Enter amount between KES 500 and your maximum</string>
+    <string name="screens_loan_request_amount_cd">Loan amount input field in Kenyan shillings</string>
+    <string name="screens_loan_request_amount_icon_cd">Currency amount icon</string>
+
+    <string name="screens_loan_request_purpose_label">Loan Purpose</string>
+    <string name="screens_loan_request_purpose_cd">Loan purpose selector dropdown</string>
+    <string name="screens_loan_request_purpose_school_fees">School Fees</string>
+    <string name="screens_loan_request_purpose_medical">Medical Emergency</string>
+    <string name="screens_loan_request_purpose_business">Business</string>
+    <string name="screens_loan_request_purpose_farming">Farming / Agriculture</string>
+    <string name="screens_loan_request_purpose_home_improvement">Home Improvement</string>
+    <string name="screens_loan_request_purpose_emergency">Emergency</string>
+    <string name="screens_loan_request_purpose_other">Other</string>
+
+    <string name="screens_loan_request_duration_label">Repayment Duration</string>
+    <string name="screens_loan_request_duration_cd">Repayment duration slider in weeks</string>
+    <string name="screens_loan_request_duration_weeks_value">%1$d weeks</string>
+    <string name="screens_loan_request_repayment_estimate_label">Weekly repayment estimate</string>
+
+    <string name="screens_loan_request_principal_label">Principal</string>
+    <string name="screens_loan_request_interest_label">Interest (group rate)</string>
+    <string name="screens_loan_request_total_repayment_label">Total to repay</string>
+
+    <string name="screens_loan_request_submit_button">Submit Application</string>
+    <string name="screens_loan_request_submit_cd">Submit loan application</string>
+    <string name="screens_loan_request_submitting_cd">Submitting loan application</string>
+
+    <string name="screens_loan_request_success_online_title">Request Submitted!</string>
+    <string name="screens_loan_request_success_online_body">Your loan request has been submitted. It will be reviewed by the group at the next meeting.</string>
+    <string name="screens_loan_request_success_offline_title">Request Saved!</string>
+    <string name="screens_loan_request_success_offline_body">You are offline. Your loan request has been saved and will be submitted automatically when you reconnect.</string>
+    <string name="screens_loan_request_success_icon_cd">Success checkmark icon</string>
+    <string name="screens_loan_request_success_dialog_cd">Loan request submission success dialog</string>
+    <string name="screens_loan_request_ok_button">OK</string>
+    <string name="screens_loan_request_ok_cd">Acknowledge success and return to dashboard</string>
+
+    <string name="screens_loan_request_retry_button">Retry</string>
+    <string name="screens_loan_request_retry_cd">Retry loan request submission</string>
+    <string name="screens_loan_request_error_icon_cd">Submission error icon</string>
+
+    <string name="screens_loan_request_error_network_queued">No internet. Your request has been saved for later.</string>
+    <string name="screens_loan_request_error_server">Server error. Please try again.</string>
+    <string name="screens_loan_request_error_validation">Please check all fields and try again.</string>
+    <string name="screens_loan_request_error_session_expired">Session expired. Please login again.</string>
+</resources>

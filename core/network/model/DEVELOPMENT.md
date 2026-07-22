@@ -98,7 +98,9 @@ logic, no domain field names.
 | `GroupLoanConfigDto` | `LoanApplyDto.kt` | `@Serializable` response (`get_group_config`), snake_case — distinct from `GroupConfigDto` |
 | `ApplyLoanRequestDto` | `LoanApplyDto.kt` | `@Serializable` request (`create_new_loan` `POST /loans`); reuses `FineractStatusDto` |
 | `ApplyLoanResponseDto` | `LoanApplyDto.kt` | `@Serializable` response (`create_new_loan` `POST /loans`) |
-| `LoanPurposeDto` | `LoanApplyDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — not literally wire-transmitted today (see `## 4. Boundaries`) |
+| `LoanPurposeDto` | `LoanApplyDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — extended by loan-request (PP-1); literally wire-transmitted for `LoanRequestPayloadDto.purpose`, NOT for `create_new_loan` (see `## 4. Boundaries`) |
+| `LoanRequestPayloadDto` | `LoanRequestDto.kt` | `@Serializable` request (`submit_loan_request` `POST /datatables/dt_loan_request`); reuses `LoanPurposeDto` |
+| `LoanRequestResponseDto` | `LoanRequestDto.kt` | `@Serializable` response (`submit_loan_request`) |
 
 ## 3. Consumers
 
@@ -129,7 +131,13 @@ logic, no domain field names.
   `core/network/mapper/LoanApplyMappers.kt` → `core/data` `LoanRepository` /
   `MemberRepository` / `GroupRepository` (`get_group_members` + `get_loan_products`
   + `get_loan_template` + `get_member_savings` + `get_group_corpus` +
-  `get_group_config`, DTO -> domain composite; `create_new_loan`, domain -> DTO)
+  `get_group_config`, DTO -> domain composite; `create_new_loan`, domain -> DTO);
+  `core/network/mapper/LoanRequestMappers.kt` → `core/data` `LoanRequestRepository`
+  (`submit_loan_request`, `POST /datatables/dt_loan_request`, domain -> DTO for
+  the submitted `LoanRequestPayload`, DTO -> domain for the `LoanRequestResult`);
+  its `toJsonPayload()`/`loanRequestPayloadDtoFromJson()` pair is additionally
+  the serialization SoT for a future `SyncQueueRepository` (out of this
+  generation's scope) queuing the payload offline
 
 ## 4. Boundaries
 
@@ -241,13 +249,28 @@ logic, no domain field names.
   — named distinctly (`GroupCorpusRowDto`/`GroupLoanConfigDto`) to avoid the
   Kotlin class-name clash, same "avoid the clash, flag the collision"
   precedent as `GroupInstanceConfigDto` vs `GroupTypeConfigDto`.
-- **`LoanPurposeDto` has no literal wire round-trip today**: `create_new_loan`
-  only ever transmits the resolved `loanPurposeId: Int`
+- **`LoanPurposeDto` has no literal wire round-trip for `create_new_loan`**:
+  that body only ever transmits the resolved `loanPurposeId: Int`
   (`ApplyLoanRequestDto.loanPurposeId`) — same "chip-selector resolved to an
   Int before it hits the wire" precedent as `PaymentMethod`/`paymentTypeId`.
   Declared `@Serializable` with a full `UNKNOWN` fallback per this
   generation's explicit brief plus forward-compatibility (a future GET
-  response echoing the purpose back decodes safely).
+  response echoing the purpose back decodes safely). **DOES literally
+  round-trip for loan-request** — `LoanRequestPayloadDto.purpose` transmits
+  this enum's bare `@SerialName` string directly, satisfying `api.yaml`'s
+  `purpose: String` contract with no wrapper object.
+- **`LoanPurposeDto` extended for loan-request (PP-1 — screen-SoT wins,
+  informational)**: `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT` were ADDED to
+  this SHARED enum (never forked) — `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+  is the 7-value SoT, 4 of which already existed here. Full note in `## dtos`
+  (API.md).
+- **`LoanRequestPayloadDto` is mixed-case** (`clientId` camelCase — the
+  standard Fineract client identifier, not a datatable column — alongside 5
+  snake_case `dt_loan_request` columns) — same mixed-case pattern precedent
+  as `MarkAcceptedRequestDto`/`InvitationRowDto` declaring raw datatable
+  columns snake_case while the surrounding companion-bridge convention stays
+  camelCase; `LoanRequestResponseDto` is the usual companion-bridge camelCase
+  (literal Fineract resource-create envelope).
 - **`api.yaml#dtos.GroupMember`/`.LoanProduct` in-file divergences** (flagged
   for the cross-feature repair station): `dtos.GroupMember` additionally
   declares `fineractClientId: Long` with no separate wire source on
@@ -575,6 +598,17 @@ logic, no domain field names.
 | `ApplyLoanResponseDto` | `clientId` | `clientId` | `Long` | — |
 | `ApplyLoanResponseDto` | `loanId` | `loanId` | `Long` | — |
 | `ApplyLoanResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `LoanRequestPayloadDto` | `clientId` | `clientId` | `Long` | — |
+| `LoanRequestPayloadDto` | `requestedAmount` | `requested_amount` | `Double` | — |
+| `LoanRequestPayloadDto` | `purpose` | `purpose` | `LoanPurposeDto` | — |
+| `LoanRequestPayloadDto` | `durationWeeks` | `duration_weeks` | `Int` | — |
+| `LoanRequestPayloadDto` | `savingsBalanceAtRequest` | `savings_balance_at_request` | `Double` | — |
+| `LoanRequestPayloadDto` | `submittedAt` | `submitted_at` | `String` | — |
+| `LoanRequestPayloadDto` | `status` | `status` | `String` | `"PENDING"` |
+| `LoanRequestResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `LoanRequestResponseDto` | `officeId` | `officeId` | `Long` | — |
+| `LoanRequestResponseDto` | `clientId` | `clientId` | `Long` | — |
+| `LoanRequestResponseDto` | `resourceExternalId` | `resourceExternalId` | `String` | — |
 
 ## 6. Errors
 
@@ -689,7 +723,23 @@ ApplyLoanRequestDto` against a pinned `kotlin.time.Instant` (every resolved
 field, including the literal `api.yaml` lookup-pair constants);
 `ApplyLoanResponseDto -> LoanApplicationResult` (every field); and every
 `LoanPurposeDto <-> LoanPurpose` value plus `LoanPurpose.fineractPurposeId`'s
-sequential assignment.
+sequential assignment (both extended to cover the 3 loan-request-added
+values via the SAME shared mapper pair).
+`core/network/src/commonTest/.../model/LoanRequestDtoTest.kt` covers
+`LoanRequestPayloadDto`/`LoanRequestResponseDto` construction, equality,
+`SCHEMA_VERSION`, the `status` default-to-`"PENDING"` behavior + override,
+serialization round-trip (asserting the `purpose` field encodes as the bare
+enum `@SerialName` string, not a nested object), a T7/EC30 cross-version
+fixture (server-added field, decoded without crashing), and an
+unknown-server-purpose-value fixture (coerces to `LoanPurposeDto.UNKNOWN`,
+never crashes).
+`core/network/src/commonTest/.../mapper/LoanRequestMappersTest.kt` covers
+`LoanRequestPayload -> LoanRequestPayloadDto` against a pinned
+`kotlin.time.Instant` (every field, including the `status`
+default-to-`"PENDING"` and the `purpose` resolution via the reused
+`LoanPurpose.toDto()`) AND the reverse `LoanRequestResponseDto ->
+LoanRequestResult` (every field), plus the `toJsonPayload()`/
+`loanRequestPayloadDtoFromJson()` offline-SyncQueue round-trip.
 
 ## 8. Observability
 
@@ -742,6 +792,14 @@ config only). `ApplyLoanRequestDto`/`ApplyLoanResponseDto` carry no PII
 `loanPurposeId` only) — the loan-submission event itself is appropriate to
 log at info level (loanId only, matching the `write_off_loan` precedent
 above), just not paired with member PII from a joined model.
+`LoanRequestPayloadDto`/`LoanRequestResponseDto` carry no PII (amounts, a
+week count, a purpose enum, a savings-balance snapshot, and Fineract resource
+IDs only) — same "amounts/enum/resource-id only" threat model as
+`ApplyLoanRequestDto`/`ApplyLoanResponseDto`; the queued offline JSON
+(`toJsonPayload()`) carries the identical field set, so no additional
+exposure beyond the online path — avoid bulk-logging the queued
+`SyncQueueEntry.payload` string alongside member-identifying context from a
+joined model.
 
 ## 9. Evolution
 
@@ -831,5 +889,22 @@ third `dt_group_config` DTO. No `idea-layer/dtos/{Dto}.yaml` registry entry
 exists for this feature — `api.yaml` is the sole SoT (PP-1); the ONLY
 divergences are the two in-file `dtos.GroupMember`/`dtos.LoanProduct`
 abbreviations noted in `## 4. Boundaries`, resolved in favor of the literal
-operation responses per Hard Rule 5.
+operation responses per Hard Rule 5. **Loan-request's own DTOs live in
+`LoanRequestDto.kt`** (`LoanRequestPayloadDto`, `LoanRequestResponseDto`) —
+`LoanRequestPayloadDto.purpose` reuses the SHARED `LoanPurposeDto`
+(`LoanApplyDto.kt`), EXTENDED with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT`
+(PP-1 — `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+is the value-set SoT) rather than forking a second wire enum for this
+feature. `SyncQueueEntry` (also declared in `api.yaml#dtos`, `payload: String`
++ `entityType`/`status`/`createdAt`/`retryCount`) was deliberately NOT
+generated here — it is shared cross-feature offline-queue infrastructure
+(`api.yaml#dependencies.repositories: [SyncQueueRepository, ...]`), out of
+this feature's own DTO/mapper generation scope, same "repository lives
+outside this generation step" precedent as `MemberAddRepository`'s kdoc.
+Before generating that shared `SyncQueueRepository`/`SyncQueueEntry` surface,
+reuse `LoanRequestMappers.kt#toJsonPayload()`/`loanRequestPayloadDtoFromJson()`
+as the payload-serialization convention rather than re-deriving a per-feature
+Json config. No `idea-layer/dtos/{Dto}.yaml` registry entry exists for
+loan-request either — `api.yaml` is the sole SoT (PP-1); no divergence to
+flag.
 <!-- kmp-dto-gen:END -->

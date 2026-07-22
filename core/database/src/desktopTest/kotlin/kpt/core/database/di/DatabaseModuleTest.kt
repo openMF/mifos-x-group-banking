@@ -40,14 +40,14 @@ class DatabaseModuleTest : KoinTest {
     }
 
     @Test
-    fun databaseModuleProvidesAlertDao() {
+    fun databaseModuleProvidesSyncQueueDao() {
         val database: AppDatabase = get()
-        assertNotNull(database.alertDao)
+        assertNotNull(database.syncQueueDao)
     }
 
     @Test
-    fun alertDaoComesFromDatabase() {
+    fun syncQueueDaoComesFromDatabase() {
         val database: AppDatabase = get()
-        assertNotNull(database.alertDao)
+        assertNotNull(database.syncQueueDao)
     }
 }

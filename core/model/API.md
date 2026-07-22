@@ -79,7 +79,9 @@
 | `LoanApplyTemplate` | `products: List<LoanProduct>`, `principal: Double`, `numberOfRepayments: Int`, `interestRatePerPeriod: Double`, `interestType: MemberStatus`, `amortizationType: MemberStatus`, `repaymentEvery: Int`, `memberSavingsBalance: Double`, `groupCorpusBalance: Double`, `loanMultiplier: Double`, `maxLoanAmount: Double` | composite loan-apply template, NOT returned by a single endpoint (5-way parallel read fan-in); reuses `MemberStatus` for the 2 lookup-pair fields; `maxEligibleAmount` derived property = `min(memberSavingsBalance * loanMultiplier, maxLoanAmount)` |
 | `ApplyLoanRequest` | `memberId: Long`, `productId: Long`, `amount: Double`, `durationWeeks: Int`, `purpose: LoanPurpose`, `groupId: Long` | simplified loan-apply submission input (`api.yaml#dtos.LoanApplicationRequest`), deliberately NOT the literal `create_new_loan` Fineract body — see note below |
 | `LoanApplicationResult` | `officeId: Long`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `create_new_loan` success result; mirrors wire `ApplyLoanResponseDto` 1:1 |
-| `LoanPurpose` | enum: `MEDICAL(1)`, `EDUCATION(2)`, `BUSINESS(3)`, `EMERGENCY(4)`, `OTHER(5)`, `UNKNOWN(0)` | loan-apply purpose selector; `fineractPurposeId` resolves the wire `loanPurposeId: Int` — sequential assignment, `api.yaml` declares no explicit per-value id (confirmed gap) |
+| `LoanPurpose` | enum: `MEDICAL(1)`, `EDUCATION(2)`, `BUSINESS(3)`, `EMERGENCY(4)`, `OTHER(5)`, `SCHOOL_FEES(6)`, `FARMING(7)`, `HOME_IMPROVEMENT(8)`, `UNKNOWN(0)` | loan-apply purpose selector, EXTENDED by loan-request (PP-1) with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT`; `fineractPurposeId` resolves the wire `loanPurposeId: Int` — sequential assignment, `api.yaml` declares no explicit per-value id (confirmed gap; the 3 extension ids are unused placeholders — loan-request never transmits `loanPurposeId`) |
+| `LoanRequestPayload` | `clientId: Long`, `requestedAmount: Double`, `purpose: LoanPurpose`, `durationWeeks: Int`, `savingsBalanceAtRequest: Double` | loan-request member-side submission input (`submit_loan_request`); reuses `LoanPurpose` (extended, not forked); `submittedAt`/`status` deliberately excluded — wire-only fields, see note below |
+| `LoanRequestResult` | `resourceId: Long`, `officeId: Long`, `clientId: Long`, `resourceExternalId: String` | `submit_loan_request` success result; mirrors wire `LoanRequestResponseDto` 1:1 |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -126,7 +128,27 @@ registry entry exists for this feature);
 `get_loan_products`, `get_loan_template`, `get_member_savings`,
 `get_group_corpus`, `get_group_config`, `create_new_loan`; no dedicated
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
-`api.yaml` is the sole SoT, per PP-1).
+`api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/loan-request/api.yaml` (`POST /datatables/dt_loan_request`,
+`submit_loan_request`, offline-capable via `cache.offline: queue_to_syncqueue`;
+no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this
+feature — `api.yaml` is the sole SoT, per PP-1).
+
+**`LoanPurpose` extension for loan-request (PP-1 — screen-SoT wins,
+informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+declares 7 purpose values, 4 of which (`MEDICAL`/`BUSINESS`/`EMERGENCY`/`OTHER`)
+already existed on loan-apply's `LoanPurpose`; `SCHOOL_FEES`/`FARMING`/
+`HOME_IMPROVEMENT` were ADDED to the SAME enum (never forked into a second
+purpose type) — see `LoanApply.kt` kdoc for the full rationale and
+`LoanApplyDtoTest.kt`'s updated fixtures. `LoanRequestPayload.purpose` reuses
+`LoanPurpose` outright.
+
+**`LoanRequestPayload.submittedAt`/`.status` exclusion (informational, same
+"wire-only field excluded from the pure domain model" precedent as
+`RecordRepaymentRequest.transactionDate`):** `submittedAt` is caller-supplied
+at the mapper boundary via `kotlin.time.Clock` (`LoanRequestMappers.kt#toDto`);
+`status` always starts at the wire's literal `"PENDING"` default
+(`LoanRequestPayloadDto.status`) — neither is a member-entered form field.
 
 **`GroupMember` vs canonical `Member` field-shape divergence (flagged for the
 cross-feature repair station, same "forcing reuse would require fabricating

@@ -61,6 +61,10 @@ val DatabaseModule = module {
 
     // group-banking domain — loan-detail single-key composite cache (SourceOfTruth DAO, GET /loans/{loanId})
     single { get<AppDatabase>().loanDetailDao }
+
+    // group-banking domain — offline write-queue shared infra DAO (member-add/loan-request enqueue,
+    // sync-status read; NOT a Store5 SourceOfTruth)
+    single { get<AppDatabase>().syncQueueDao }
 }
 
 /**
