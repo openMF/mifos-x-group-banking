@@ -22,6 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +54,7 @@ import org.mifos.groupbanking.feature.loandetail.loanDetailScreen
 import org.mifos.groupbanking.feature.loandetail.navigateToLoanDetail
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
+import org.mifos.groupbanking.feature.loanrepaymentdialog.LoanRepaymentDialog
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
 import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
@@ -68,10 +73,19 @@ import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
  * loan-apply, share-out, member-savings-detail, savings) route to [PlaceholderRoute] — a real,
  * navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is marked
  * `TODO(nav)` for replacement when its feature lands. `loan-list` and `loan-detail` are both wired
- * for real (their feature modules now exist) — `loan-detail`'s own onward targets
- * (`loan-repayment-dialog` / `loan-mark-defaulted-dialog`) are not yet generated feature
- * components and surface an in-screen "coming soon" snackbar instead (see
- * `LoanDetailScreen.kt`'s class KDoc), not a [PlaceholderRoute] destination.
+ * for real (their feature modules now exist) — `loan-detail`'s `loan-mark-defaulted-dialog` onward
+ * target is not yet a generated feature component and surfaces an in-screen "coming soon" snackbar
+ * instead (see `LoanDetailScreen.kt`'s class KDoc), not a [PlaceholderRoute] destination.
+ *
+ * `loan-repayment-dialog` (`archetype: dialog`, `parent_screen: loan-detail`) IS wired for real:
+ * this NavHost is the ONLY module that depends on both `feature/loan-detail` and
+ * `feature/loan-repayment-dialog` — every other cross-feature wire-up in this codebase happens
+ * here, never as a direct feature-to-feature module dependency — so `repaymentDialogTarget` (local
+ * `remember { mutableStateOf(...) } ` state, set by `loanDetailScreen`'s `onShowRepaymentDialog`
+ * callback) drives rendering [LoanRepaymentDialog] as an overlay on top of the whole `NavHost` Box
+ * (a Compose `AlertDialog` renders in its own `Popup`/window regardless of where in the tree it is
+ * composed, so its position here — a sibling of the `NavHost` call, not nested inside it — has no
+ * visual effect on the overlay).
  */
 @Composable
 fun GroupBankingNavHost(
@@ -82,6 +96,9 @@ fun GroupBankingNavHost(
     // No auth/passcode gate in this journey build — the login screen IS the start, so the Android
     // splash can be removed as soon as the NavHost composes.
     LaunchedEffect(Unit) { onSplashScreenRemoved() }
+
+    // See class KDoc "loan-repayment-dialog" note — the one feature<->feature seam in this NavHost.
+    var repaymentDialogTarget by remember { mutableStateOf<RepaymentDialogTarget?>(null) }
 
     Column(
         modifier = modifier
@@ -173,17 +190,47 @@ fun GroupBankingNavHost(
                     onNavigateBack = { navController.popBackStack() },
                 )
 
-                // 9. loan-detail → back to loan-list (flow.yaml#navigates_to: [loan-list])
+                // 9. loan-detail → back to loan-list (flow.yaml#navigates_to: [loan-list]) /
+                //    loan-repayment-dialog overlay (see class KDoc)
                 loanDetailScreen(
                     onNavigateBack = { navController.popBackStack() },
+                    onShowRepaymentDialog = { loanId, memberId, installmentAmount ->
+                        repaymentDialogTarget = RepaymentDialogTarget(
+                            loanId = loanId,
+                            memberId = memberId,
+                            installmentAmount = installmentAmount,
+                        )
+                    },
                 )
 
                 // Shared "Coming soon" destination for every not-yet-built onward target.
                 placeholderDestination()
             }
+
+            // loan-repayment-dialog — overlay on top of loan-detail, see class KDoc.
+            repaymentDialogTarget?.let { target ->
+                LoanRepaymentDialog(
+                    loanId = target.loanId,
+                    memberId = target.memberId,
+                    installmentAmount = target.installmentAmount,
+                    onDismiss = { repaymentDialogTarget = null },
+                    onRepaymentRecorded = { repaymentDialogTarget = null },
+                )
+            }
         }
     }
 }
+
+/**
+ * Nav-arg bundle carried from `loan-detail`'s `LoanDetailEvent.ShowRepaymentDialog` (resolved
+ * inside `LoanDetailScreen.kt`'s Container — see [GroupBankingNavHost]'s class KDoc) to this
+ * NavHost's [LoanRepaymentDialog] overlay.
+ */
+private data class RepaymentDialogTarget(
+    val loanId: Long,
+    val memberId: Long,
+    val installmentAmount: Double,
+)
 
 /**
  * A real, navigable placeholder destination for onward targets whose feature module has not yet

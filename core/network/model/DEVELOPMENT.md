@@ -83,6 +83,8 @@ logic, no domain field names.
 | `RepaymentRowStatusDto` | `LoanDetailDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `RepaymentTransactionDto` | `LoanDetailDto.kt` | `@Serializable` nested response DTO (repayment-history row) — see `## 4. Boundaries` registry-divergence note |
 | `LoanDetailResponseDto` | `LoanDetailDto.kt` | `@Serializable` composite envelope of `GET /loans/{loanId}`, inferred (not literally under `api.yaml#dtos`) |
+| `RecordRepaymentRequestDto` | `RecordRepaymentDto.kt` | `@Serializable` request (`make_repayment` `POST`) — see `## 4. Boundaries` registry-divergence note |
+| `RecordRepaymentResponseDto` | `RecordRepaymentDto.kt` | `@Serializable` response (`make_repayment` `POST`) |
 
 ## 3. Consumers
 
@@ -105,7 +107,9 @@ logic, no domain field names.
   `get_member_role`, DTO -> domain; `update_member_role`, domain -> DTO);
   `core/network/mapper/LoanSummaryMappers.kt` → `core/data` `LoanRepository`
   (`GET /groups/{groupId}/loans`); `core/network/mapper/LoanDetailMappers.kt`
-  → `core/data` `LoanRepository` (`GET /loans/{loanId}`)
+  → `core/data` `LoanRepository` (`GET /loans/{loanId}`);
+  `core/network/mapper/RecordRepaymentMappers.kt` → `core/data` `LoanRepository`
+  (`POST /loans/{loanId}/transactions?command=repayment`, `make_repayment`)
 
 ## 4. Boundaries
 
@@ -195,6 +199,16 @@ logic, no domain field names.
   `LoanDetailDto`/`RepaymentTransactionDto` here were generated from
   loan-detail's own approved `api.yaml#dtos` instead — full note in
   `## dtos` (API.md).
+- **`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` vs
+  `idea-layer/dtos/LoanRepaymentDto.yaml` registry divergence** (flagged for
+  the cross-feature repair station): the registry declares a post-hoc
+  transaction-RECORD shape for the SAME `POST
+  /loans/{loanId}/transactions?command=repayment` endpoint (and explicitly
+  names loan-repayment-dialog in its `used_by`), but that shape does not
+  match the literal request/response body loan-repayment-dialog's own
+  `api.yaml#api[0]` declares. `RecordRepaymentRequestDto`/
+  `RecordRepaymentResponseDto` here mirror the literal operation contract
+  instead — full note in `## dtos` (API.md).
 - **`LoanDetailResponseDto` is an inferred composite envelope**, not literally
   declared under `api.yaml#dtos` — bundles `LoanDetailDto` +
   `List<RepaymentScheduleRowDto>` + `List<RepaymentTransactionDto>` to model
@@ -454,6 +468,16 @@ logic, no domain field names.
 | `LoanDetailResponseDto` | `loan` | `loan` | `LoanDetailDto` | — |
 | `LoanDetailResponseDto` | `repaymentSchedule` | `repaymentSchedule` | `List<RepaymentScheduleRowDto>` | `emptyList()` |
 | `LoanDetailResponseDto` | `transactions` | `transactions` | `List<RepaymentTransactionDto>` | `emptyList()` |
+| `RecordRepaymentRequestDto` | `transactionDate` | `transactionDate` | `String` | — |
+| `RecordRepaymentRequestDto` | `transactionAmount` | `transactionAmount` | `Double` | — |
+| `RecordRepaymentRequestDto` | `paymentTypeId` | `paymentTypeId` | `Int` | — |
+| `RecordRepaymentRequestDto` | `receiptNumber` | `receiptNumber` | `String?` | `null` |
+| `RecordRepaymentRequestDto` | `locale` | `locale` | `String` | `"en"` |
+| `RecordRepaymentRequestDto` | `dateFormat` | `dateFormat` | `String` | `"dd MMMM yyyy"` |
+| `RecordRepaymentResponseDto` | `officeId` | `officeId` | `Int` | — |
+| `RecordRepaymentResponseDto` | `clientId` | `clientId` | `Long` | — |
+| `RecordRepaymentResponseDto` | `loanId` | `loanId` | `Long` | — |
+| `RecordRepaymentResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 
 ## 6. Errors
 
@@ -528,6 +552,18 @@ plus the batch converter including empty-list), `LoanDetailResponseDto ->
 LoanDetailResponse` (the `transactions` -> `repaymentHistory` rename, plus
 empty-schedule/empty-transactions), and every `RepaymentRowStatusDto` ->
 `RepaymentRowStatus` enum value.
+`core/network/src/commonTest/.../model/RecordRepaymentDtoTest.kt` covers
+`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` construction,
+`receiptNumber`/`locale`/`dateFormat` default-value behavior, serialization
+round-trip, `SCHEMA_VERSION`, and the T7/EC30 cross-version fixture
+(server-added field, decoded without crashing).
+`core/network/src/commonTest/.../mapper/RecordRepaymentMappersTest.kt` covers
+`RecordRepaymentRequest -> RecordRepaymentRequestDto` (every field, including
+the `paymentMethod -> paymentTypeId` resolution for both `PaymentMethod`
+values and the blank-`referenceNumber`-to-`null` normalization),
+`RecordRepaymentResponseDto -> RepaymentResult` (every field), and the
+`fineractTransactionDate` wire-date helper against pinned `Instant` fixtures
+(including single-digit-day zero-padding).
 
 ## 8. Observability
 
@@ -561,6 +597,10 @@ carries `memberName` (display-name PII, same threat model as
 `LoanSummaryDto.memberName`) — avoid bulk-logging; amounts/`status` are not
 sensitive. `RepaymentScheduleRowDto`/`RepaymentTransactionDto`/
 `LoanDetailResponseDto` carry no PII (amounts + dates only).
+`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` carry no PII
+(amounts, an internally-resolved `paymentTypeId`, and Fineract resource IDs
+only — `receiptNumber` is a treasurer-entered reference code, not a
+credential, but avoid bulk-logging it alongside amounts).
 
 ## 9. Evolution
 
@@ -614,9 +654,15 @@ further loan-status-adjacent enum, resolve the `LoanAccountStatusDto` vs
 reuses `LoanAccountStatusDto` outright (no new enum). Before extending
 `LoanDetailDto`/`RepaymentTransactionDto`, resolve the
 `idea-layer/dtos/LoanDto.yaml`/`LoanRepaymentDto.yaml` registry-divergences
-flagged in `## 4. Boundaries` and `## dtos` (API.md). Before generating
-loan-repayment-dialog (which submits a repayment against a loan), check
-whether its request/response shape should reuse `RepaymentTransactionDto` or
-needs the richer `idea-layer/dtos/LoanRepaymentDto.yaml` registry shape
-(`principalPortion`/`interestPortion`/`outstandingAfter`) instead.
+flagged in `## 4. Boundaries` and `## dtos` (API.md). **Loan-repayment-dialog's
+own DTOs live in `RecordRepaymentDto.kt`** (`RecordRepaymentRequestDto`,
+`RecordRepaymentResponseDto`) — resolved: `RepaymentTransactionDto` was NOT
+reused (it models `get_loan_hist`'s read-side transaction row, not
+`make_repayment`'s request/response shape) and the richer
+`idea-layer/dtos/LoanRepaymentDto.yaml` registry shape was NOT adopted either
+(post-hoc transaction-record fields with no wire source in this operation's
+literal request/response body) — see the registry-divergence note in
+`## 4. Boundaries` and `## dtos` (API.md). Before extending
+`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto`, resolve that
+divergence at Station 3 first.
 <!-- kmp-dto-gen:END -->

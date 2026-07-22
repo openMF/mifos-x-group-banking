@@ -44,6 +44,8 @@ import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanDetailRepository
 import org.mifos.groupbanking.core.data.repository.LoanDetailRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepository
+import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
@@ -162,6 +164,20 @@ val DataModule = module {
             loanDetailStore = get(AppStoreRegistry.LoanDetail),
             networkMonitor = get(),
             fetchedAtRepository = get(),
+        )
+    }
+
+    // loan-repayment-dialog (POST /loans/{loanId}/transactions?command=repayment) — Store5-free
+    // mutation orchestration for recordRepayment (business_logic.kind: processor, no read-stream
+    // of its own), wraps LoanRepaymentApi (NetworkModule) directly. Surfaces NetworkResult, never
+    // .asScreenStream()/.write() — same branch as InvitationRepository/GroupCreateRepository
+    // above. On success it invalidates the ALREADY-REGISTERED AppStoreRegistry.LoanDetail store
+    // for the paid loan (same Store<Long, LoanDetailResponse> singleton LoanDetailRepositoryImpl
+    // reads through) so the loan-detail screen re-fetches with the new outstanding balance.
+    single<LoanRepaymentRepository> {
+        LoanRepaymentRepositoryImpl(
+            api = get(),
+            loanDetailStore = get(AppStoreRegistry.LoanDetail),
         )
     }
 

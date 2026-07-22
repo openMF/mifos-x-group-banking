@@ -70,6 +70,8 @@
 | `RepaymentRowStatusDto` | enum `@SerialName`: `PAID`, `PARTIAL`, `UPCOMING`, `OVERDUE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `RepaymentScheduleRowDto.status` |
 | `RepaymentTransactionDto` | `id`, `type` (raw `String`, no declared value-set), `date`, `amount` | all required | field of `LoanDetailResponseDto.transactions` |
 | `LoanDetailResponseDto` | `loan` (`LoanDetailDto`), `repaymentSchedule` (default `[]`), `transactions` (default `[]`) | `loan` required; both lists default empty | composite envelope of `GET /loans/{loanId}?associations=repaymentSchedule,transactions` — inferred (not literally named under `api.yaml#dtos`, same precedent as `LoanPageDto`) |
+| `RecordRepaymentRequestDto` | `transactionDate`, `transactionAmount`, `paymentTypeId`, `receiptNumber` (nullable, default `null`), `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `receiptNumber` nullable; `locale`/`dateFormat` default per `api.yaml`; rest required | `POST /loans/{loanId}/transactions?command=repayment` (`make_repayment`) request; see registry-divergence note below |
+| `RecordRepaymentResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `make_repayment` — literal Fineract resource-create envelope |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -109,7 +111,36 @@ is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
 entry for the SAME `GET /loans/{loanId}` endpoint also exists, see
 divergence note below; `idea-layer/dtos/LoanRepaymentDto.yaml` likewise
 declares a richer raw-Fineract repayment-transaction shape than
-`RepaymentTransactionDto` here, same class of divergence).
+`RepaymentTransactionDto` here, same class of divergence);
+`idea-layer/screens/loan-repayment-dialog/{api.yaml,ui.yaml}` (`POST
+/loans/{loanId}/transactions?command=repayment`, `make_repayment`;
+`api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry declares THIS literal request/response shape, though
+`idea-layer/dtos/LoanRepaymentDto.yaml` describes the SAME endpoint with a
+different, richer shape — see divergence note below).
+
+**`RecordRepaymentRequestDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
+registry divergence (flagged for the cross-feature repair station, same class
+of issue as the `LoanDetailDto`/`RepaymentTransactionDto` divergence above —
+this time the registry's OWN declared `source.endpoint` is the SAME `POST
+/loans/{loanId}/transactions?command=repayment` this DTO wires, and its
+`used_by` explicitly names "loan-repayment-dialog submits this"):** despite
+that direct `used_by` reference, the registry entry (v1.0.0) declares a
+post-hoc transaction-RECORD view (`id: Long`, `loanId: Long`, `amount:
+Double`, `date: String`, `type: String` with values `repayment`/
+`partial_repayment`/`waiver`/`fee_payment`/`interest_waiver`, `currency:
+String`, `principalPortion: Double?`, `interestPortion: Double?`,
+`outstandingAfter: Double?`) — NOT the literal request body
+(`transactionDate`/`transactionAmount`/`paymentTypeId`/`receiptNumber`/
+`locale`/`dateFormat`) or response body (`officeId`/`clientId`/`loanId`/
+`resourceId`) loan-repayment-dialog's OWN `api.yaml#api[0]` declares.
+`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` here were generated
+from the literal operation contract instead (Hard Rule 5: wire truth over the
+registry summary), the same precedent already established for
+`RepaymentTransactionDto` (`LoanDetailDto.kt`) against this SAME registry
+entry. Reconcile at Station 3 — the registry's richer transaction-record shape
+may fit `get_loan_hist` (loan-detail's repayment-history tab, already modeled
+by `RepaymentTransactionDto`) better than either request/response pair here.
 
 **`LoanDetailDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
 (flagged for the cross-feature repair station, same pattern as the
@@ -411,7 +442,8 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
-`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`.
+`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`,
+`RecordRepaymentMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

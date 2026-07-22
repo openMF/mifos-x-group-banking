@@ -80,6 +80,9 @@ mappers in `core/network/mapper`.
 | `RepaymentTransaction` | `LoanDetail.kt` | data class — single posted repayment-history row; `type` raw `String` |
 | `LoanDetailResponse` | `LoanDetail.kt` | data class — composite Store5 read result (`loan` + `repaymentSchedule` + `repaymentHistory`) |
 | `LoanDetailTab` | `LoanDetail.kt` | enum (`SCHEDULE`, `HISTORY`) — pure client-side tab-selector state, no wire counterpart |
+| `RecordRepaymentRequest` | `RecordRepayment.kt` | data class — loan-repayment-dialog submission input (`make_repayment`) |
+| `RepaymentResult` | `RecordRepayment.kt` | data class — `make_repayment` success result |
+| `PaymentMethod` | `RecordRepayment.kt` | enum (`MPESA`, `CASH`) with `paymentTypeId: Int` property; pure client-side chip state, no wire counterpart |
 
 ## 3. Consumers
 
@@ -101,7 +104,11 @@ mappers in `core/network/mapper`.
   `LoanSummaryMappers.kt` output the same way — `LoanRepository`
   (`GET /groups/{groupId}/loans`); the loan-detail repository maps
   `LoanDetailMappers.kt` output the same way — `LoanRepository`
-  (`GET /loans/{loanId}`))
+  (`GET /loans/{loanId}`); the loan-repayment-dialog submission maps
+  `RecordRepaymentMappers.kt` output the same way, BOTH directions — domain ->
+  DTO for the submitted `RecordRepaymentRequest`, DTO -> domain for the
+  `RepaymentResult` — `LoanRepository`
+  (`POST /loans/{loanId}/transactions?command=repayment`))
 
 ## 4. Boundaries
 
@@ -361,6 +368,13 @@ mappers in `core/network/mapper`.
 | `LoanDetailResponse` | `loan` | `LoanDetail` | non-null |
 | `LoanDetailResponse` | `repaymentSchedule` | `List<RepaymentScheduleRow>` | non-null (may be empty) |
 | `LoanDetailResponse` | `repaymentHistory` | `List<RepaymentTransaction>` | non-null (may be empty) |
+| `RecordRepaymentRequest` | `amount` | `Double` | non-null |
+| `RecordRepaymentRequest` | `paymentMethod` | `PaymentMethod` | non-null |
+| `RecordRepaymentRequest` | `referenceNumber` | `String?` | nullable |
+| `RepaymentResult` | `officeId` | `Int` | non-null |
+| `RepaymentResult` | `clientId` | `Long` | non-null |
+| `RepaymentResult` | `loanId` | `Long` | non-null |
+| `RepaymentResult` | `resourceId` | `Long` | non-null |
 
 ## 6. Errors
 
@@ -401,6 +415,12 @@ batch converter), `RepaymentTransactionDto -> RepaymentTransaction` (every
 field plus batch converter), the `LoanDetailResponseDto -> LoanDetailResponse`
 composite conversion (including the `transactions` -> `repaymentHistory`
 rename), and every `RepaymentRowStatusDto -> RepaymentRowStatus` value.
+`RecordRepaymentMappersTest.kt` covers `RecordRepaymentRequest ->
+RecordRepaymentRequestDto` (every field, including the `paymentMethod ->
+paymentTypeId` resolution for both `PaymentMethod` values and the
+blank-`referenceNumber`-to-`null` normalization) AND the reverse
+`RecordRepaymentResponseDto -> RepaymentResult`, plus direct boundary-value
+tests for the `fineractTransactionDate` wire-date helper.
 
 ## 8. Observability
 
@@ -429,7 +449,10 @@ the full loan-list page; amounts/status/`isOverdue` are not sensitive.
 `LoanDetail` carries `memberName` (display-name PII, same threat model as
 `LoanSummary.memberName`) — avoid bulk-logging; amounts/`status` are not
 sensitive. `RepaymentScheduleRow`/`RepaymentTransaction`/`LoanDetailResponse`
-carry no PII (amounts + dates only).
+carry no PII (amounts + dates only). `RecordRepaymentRequest`/`RepaymentResult`
+carry no PII (amounts, an internally-resolved `paymentTypeId`, and Fineract
+resource IDs only — `referenceNumber` is a treasurer-entered reference code,
+not a credential, but avoid bulk-logging it alongside amounts).
 
 ## 9. Evolution
 
@@ -485,5 +508,12 @@ introducing any further loan-status-adjacent enum, resolve the
 `LoanDetail.status` reuses `LoanAccountStatus` outright (no new enum). Before
 extending `LoanDetail`/`RepaymentTransaction`, resolve the
 `idea-layer/dtos/LoanDto.yaml`/`LoanRepaymentDto.yaml` registry-divergences
-flagged in `core/network/model/API.md`.
+flagged in `core/network/model/API.md`. **Loan-repayment-dialog's own domain
+concepts live in `RecordRepayment.kt`** (`RecordRepaymentRequest`,
+`RepaymentResult`, `PaymentMethod`) — `RepaymentTransaction` (loan-detail) was
+NOT reused (it models the read-side `get_loan_hist` history row, not
+`make_repayment`'s submit/result shape). Before extending
+`RecordRepaymentRequest`/`RepaymentResult`, resolve the
+`idea-layer/dtos/LoanRepaymentDto.yaml` registry-divergence flagged in
+`core/network/model/API.md` first.
 <!-- kmp-dto-gen:END -->

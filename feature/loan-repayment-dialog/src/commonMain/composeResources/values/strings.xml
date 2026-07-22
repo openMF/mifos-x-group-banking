@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_loan_repayment_dialog_title">Record Repayment</string>
+    <string name="screens_loan_repayment_dialog_amount_label">Amount (KES)</string>
+    <string name="screens_loan_repayment_dialog_amount_placeholder">0.00</string>
+    <string name="screens_loan_repayment_dialog_payment_method_label">Payment Method</string>
+    <string name="screens_loan_repayment_dialog_mpesa_label">M-Pesa</string>
+    <string name="screens_loan_repayment_dialog_cash_label">Cash</string>
+    <string name="screens_loan_repayment_dialog_reference_label">Reference Number (optional)</string>
+    <string name="screens_loan_repayment_dialog_reference_placeholder">e.g. QJZ7X9A1BK</string>
+    <string name="screens_loan_repayment_dialog_cancel">Cancel</string>
+    <string name="screens_loan_repayment_dialog_submit">Record Repayment</string>
+    <string name="screens_loan_repayment_dialog_submit_cd">Submitting repayment</string>
+
+    <!-- data-flow.yaml#entries[OnSubmit].error_paths message keys — backfilled by kmp-screen-gen;
+         referenced by LoanRepaymentDialogViewModel.validateAmount / toLoanRepaymentMessageKey but
+         NOT declared under ui.yaml#i18n.en (see that ViewModel's class KDoc "i18n gap" note). -->
+    <string name="screens_loan_repayment_dialog_error_amount_required">Please enter a repayment amount.</string>
+    <string name="screens_loan_repayment_dialog_error_amount_invalid">Amount must be a valid positive number.</string>
+    <string name="screens_loan_repayment_dialog_error_amount_exceeds">Amount cannot exceed the outstanding balance.</string>
+    <string name="screens_loan_repayment_dialog_error_server">Could not record repayment. Please try again.</string>
+    <string name="screens_loan_repayment_dialog_error_offline_no_queue">No internet connection. Repayments cannot be queued offline — please try again once you are back online.</string>
+    <string name="screens_loan_repayment_dialog_error_insufficient_role">You do not have permission to record repayments for this group.</string>
+    <string name="screens_loan_repayment_dialog_error_loan_not_found">This loan could not be found. It may have been removed.</string>
+    <string name="screens_loan_repayment_dialog_error_auth">Session expired. Please log in again.</string>
+</resources>

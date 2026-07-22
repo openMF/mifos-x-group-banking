@@ -69,6 +69,9 @@
 | `RepaymentTransaction` | `id: Long`, `type: String`, `date: String`, `amount: Double` | single posted repayment-history row; `type` stays raw `String` (no declared value-set) — see registry-divergence note below |
 | `LoanDetailResponse` | `loan: LoanDetail`, `repaymentSchedule: List<RepaymentScheduleRow>`, `repaymentHistory: List<RepaymentTransaction>` | composite Store5 read result for the single `GET /loans/{loanId}` call; mirrors wire `LoanDetailResponseDto` (wire's `transactions` renamed to `repaymentHistory`) |
 | `LoanDetailTab` | enum: `SCHEDULE`, `HISTORY` | loan-detail schedule/history tab selector; pure client-side UI state, no wire counterpart |
+| `RecordRepaymentRequest` | `amount: Double`, `paymentMethod: PaymentMethod`, `referenceNumber: String?` | loan-repayment-dialog submission input for `make_repayment`; `loanId`/`transactionDate`/`locale`/`dateFormat` deliberately excluded (path param + wire boilerplate, no domain-model counterpart) — see registry-divergence note below |
+| `RepaymentResult` | `officeId: Int`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `make_repayment` success result; mirrors wire `RecordRepaymentResponseDto` 1:1 |
+| `PaymentMethod` | enum: `MPESA(paymentTypeId=1)`, `CASH(paymentTypeId=2)` | pure client-side payment-method chip selection; NEVER serialized to/from the wire (`api.yaml` only ever transmits the resolved `paymentTypeId: Int`) — same "no wire counterpart" precedent as `LoanStatusFilter`, no `UNKNOWN` fallback needed |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -101,7 +104,25 @@ divergence note below);
 RepaymentScheduleRow, RepaymentRowStatus, RepaymentTransaction, LoanDetailTab}`
 is the SoT used here — the SAME `idea-layer/dtos/LoanDto.yaml` registry entry
 that diverges from `LoanSummary` also diverges here (same endpoint), see
-divergence note below).
+divergence note below);
+`idea-layer/screens/loan-repayment-dialog/{api.yaml,ui.yaml}` (`POST
+/loans/{loanId}/transactions?command=repayment`, `make_repayment`;
+`api.yaml#api[0]` is the sole SoT for the literal request/response shape —
+`idea-layer/dtos/LoanRepaymentDto.yaml` describes the SAME endpoint with a
+different, richer transaction-record shape, see divergence note below).
+
+**`RecordRepaymentRequest`/`RepaymentResult` vs
+`idea-layer/dtos/LoanRepaymentDto.yaml` registry divergence (flagged for the
+cross-feature repair station, same class of issue as the `LoanDetail`/
+`RepaymentTransaction` divergence below — the registry's OWN `used_by`
+explicitly names "loan-repayment-dialog submits this"):** despite that direct
+reference, the registry entry declares a post-hoc transaction-record shape
+(`id`, `loanId`, `amount`, `date`, `type`, `currency`, `principalPortion?`,
+`interestPortion?`, `outstandingAfter?`) that does not match the literal
+`make_repayment` request/response body loan-repayment-dialog's own `api.yaml`
+declares. `RecordRepaymentRequest`/`RepaymentResult` here mirror the DTO
+mappers built from the literal operation contract instead — full note in
+`core/network/model/API.md`.
 
 **`LoanSummary` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
 (flagged for the cross-feature repair station, same pattern as the `Member`
