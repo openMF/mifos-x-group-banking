@@ -14,7 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cmp.navigation.rootnav.RootNavScreen
+import cmp.navigation.groupbanking.GroupBankingNavHost
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.KptTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -55,7 +55,11 @@ fun ComposeApp(
         androidTheme = uiState.isAndroidTheme,
         useDynamicColor = uiState.isDynamicColorsEnabled,
     ) {
-        RootNavScreen(
+        // Group-banking journey NavHost: login-signup is the start destination and the
+        // full group-creation journey is navigable. Replaces the template's RootNavScreen
+        // (which routes off the demo auth state-machine to the bottom-nav shell) so the app
+        // launches straight into login-first. RootNavScreen/RootNavViewModel are left intact.
+        GroupBankingNavHost(
             modifier = modifier,
             onSplashScreenRemoved = onSplashScreenRemoved,
         )
