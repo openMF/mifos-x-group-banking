@@ -16,6 +16,7 @@
 | `LoanApplyRepository` / `LoanApplyRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getGroupMembers(groupId): NetworkResult<List<GroupMember>, NetworkError>`, `loadTemplate(groupId, clientId, productId): NetworkResult<LoanApplyTemplate, NetworkError>` (5-way parallel combine — `getLoanProducts`+`getLoanTemplate`+`getMemberSavings`+`getGroupCorpus`+`getGroupLoanConfig`) | `applyLoan(ApplyLoanRequest, LoanProduct): NetworkResult<LoanApplicationResult, NetworkError>` | Store5-free TODAY — `business_logic.kind: composite`, but no `AppStoreRegistry.LoanApply` entry exists yet (SP-03 `kmp-store-gen` has not run for this feature); see notes below |
 | `SyncQueueRepository` / `SyncQueueRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `observePending(): Flow<List<SyncQueueItem>>`, `observeCounts(): Flow<SyncQueueCounts>`, `observePendingByType(): Flow<Map<EntityType, Int>>`, `observeFailed(): Flow<List<SyncQueueItem>>`, `observeConflictCount(): Flow<Int>` (documented gap — always `0`, no dedicated `CONFLICT` `SyncStatus` bucket yet), `getItem(id): SyncQueueItem?` | `enqueue(operationType, targetTable, payloadJson): Long`, `markSyncing(id)`, `markSynced(id)`, `markFailed(id, error)`, `retryAll()` | Room-backed WRITE-QUEUE (`sync_queue` table) — NOT a Store5 read-store; the shared offline write-queue every mutation feature enqueues into and the sync-status feature reads |
 | `SyncManager` / `SyncManagerImpl` (`org.mifos.groupbanking.core.data.repository`) | `getLastSyncAt(): Flow<Instant?>` (`SyncMetadataStore`-backed, `core/datastore`) | `triggerSync(): Flow<SyncResult>` (drains the entire `SyncQueueRepository` pending backlog as one `batch_sync` submission), `retryItem(itemId): SyncResult` (single-row retry, suspend — not a `Flow`) | Store5-free — `sync-status`'s `data-flow.yaml` declares every entry `cache.strategy: no_cache`; wraps `BatchSyncApi` (`core/network`) + `SyncQueueRepository` + `SyncMetadataStore`, never `.asScreenStream()`/`.write()` |
+| `ChangePinRepository` / `ChangePinRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | — (no read-stream; a pure fire-and-forget write, no cached entity) | `changePin(ChangePinRequest): NetworkResult<ChangePinResult, NetworkError>` | Store5-free mutation orchestration — `business_logic.kind: crud` (legacy template path, RULE-IDEA-IMPL-INTELLIGENCE-001 AC-03i); wraps `ChangePinApi` (`core/network`) directly, never `.asScreenStream()`/`.write()`. Deliberately separate from `AuthRepository` — does not extend/wrap it. |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
@@ -78,6 +79,15 @@ PLAIN-`Settings`-backed epoch-millis `Long`, non-secret). **Documented `api.yaml
 `getLastSyncAt` — `retryItem` was added to close the `data-flow.yaml#OnRetryOperation` gap (not
 a speculative addition). **Documented schema gap**: `observeConflictCount()` always emits `0` —
 no dedicated `CONFLICT` bucket exists in `org.mifos.groupbanking.core.model.SyncStatus` yet.
+
+Contract refs (ChangePinRepository): settings change-PIN (`change_pin`) — see
+`idea-layer/screens/settings/api.yaml` + `ui.yaml#business_logic` (`kind: crud`). The wire body
+carries ONLY `password`/`repeatPassword` (both set to `ChangePinRequest.newPin`) —
+`ChangePinRequest.currentPin` has no wire counterpart; Fineract authenticates the caller via the
+`BasicAuth` header the shared `HttpClient` (`core/network`) attaches, not a JSON field (see
+`ChangePinDto.kt`/`ChangePinMappers.kt` KDoc). No try-catch in `ChangePinRepositoryImpl` — a
+plain `when` chain over `ChangePinApi`'s `NetworkResult` (Mandatory Rule 4); `ChangePinApiImpl`
+is the sole layer allowed to catch exceptions.
 
 ## Store5 note
 

@@ -89,6 +89,8 @@
 | `BatchSyncRequest` | `requests: List<BatchOperation>` | the full `POST /fineract-provider/api/v1/batches` submission body |
 | `BatchSyncResponseItem` | `requestId: Int`, `statusCode: Int`, `body: String` | one `/batches` response row; mirrors wire `BatchSyncResponseItemDto` 1:1 |
 | `SyncResult` | `successCount: Int`, `failedCount: Int`, `conflictCount: Int` | client-computed rollup of a `/batches` response, folded by `statusCode` (`List<BatchSyncResponseItem>.toSyncResult`) |
+| `ChangePinRequest` | `currentPin: String`, `newPin: String` | settings screen's change-PIN dialog submission input (`change_pin`); `currentPin` authenticates via `BasicAuth` at the mapper boundary, excluded from the wire body — see `core/network/model/API.md` |
+| `ChangePinResult` | `resourceId: Long` | `change_pin` success result; mirrors wire `ChangePinResponseDto` 1:1 |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -145,7 +147,16 @@ feature — `api.yaml` is the sole SoT, per PP-1);
 offline `SyncQueue` via a single atomic Fineract batch call; no dedicated
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
 `api.yaml` is the sole SoT, per PP-1; its own `dtos.SyncQueueItem` block
-diverges from the shipped `SyncQueueItem` schema, see note below).
+diverges from the shipped `SyncQueueItem` schema, see note below);
+`idea-layer/screens/settings/{api.yaml,ui.yaml}` (`PUT
+/fineract-provider/api/v1/self/user/updatePassword`, `change_pin`; no
+dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this
+feature — `api.yaml` is the sole SoT, per PP-1; `LanguageConfig`
+(`kpt.core.model.user`, pre-existing template enum) was EXTENDED with a
+`SWAHILI` entry rather than forked — see `core/model/DEVELOPMENT.md` §9;
+`AppTheme` was NOT generated as a new enum — `ui.yaml#state_model.selectedTheme`'s
+3-value set (`LIGHT`/`DARK`/`SYSTEM`) maps 1:1 onto the pre-existing
+`DarkThemeConfig` (`SYSTEM` <-> `FOLLOW_SYSTEM`), reused outright).
 
 **`EntityType`/`SyncOperation` vs the ALREADY-SHIPPED `SyncQueueItem` schema
 divergence (flagged for the cross-feature repair station):**

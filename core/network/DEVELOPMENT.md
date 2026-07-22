@@ -63,6 +63,11 @@ as a library — never edits it.
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 - `BatchSyncApiConfig` — Koin-injectable base-URL config for the sync-status batch-drain
   endpoint (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `ChangePinApi` / `ChangePinApiImpl` (`.../service/changepin/`) — the settings screen's single
+  endpoint: `changePin` (`PUT /fineract-provider/api/v1/self/user/updatePassword`, BasicAuth).
+  See API.md#services.
+- `ChangePinApiConfig` — Koin-injectable base-URL config for the change-PIN endpoint
+  (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
 
@@ -89,8 +94,11 @@ methods directly — `getGroupMembers` is a standalone read; `getLoanProducts`/`
 domain model; `applyLoan` submits the form (Store5-free — no `AppStoreRegistry.LoanApply` entry
 exists yet). `SyncManagerImpl` (`core/data`) calls `BatchSyncApi.batchSync` directly —
 Store5-free (`sync-status`'s `data-flow.yaml` declares `cache.strategy: no_cache` on every
-entry, no read-stream to cache). Feature ViewModels never call a Service directly
-(Repository/Store boundary).
+entry, no read-stream to cache). `ChangePinRepositoryImpl` (`core/data`) calls
+`ChangePinApi.changePin` directly — Store5-free (`business_logic.kind: crud`, no read-stream to
+cache; change-PIN is a pure fire-and-forget write), same branch as `InvitationRepositoryImpl`/
+`GroupCreateRepositoryImpl`. Feature ViewModels never call a Service directly (Repository/Store
+boundary).
 
 ## 4. Boundaries
 
@@ -144,14 +152,18 @@ query-param default threading and success/401/404/500/malformed-JSON branches).
 empty-array/400/401/500/malformed-body branches, incl. a non-array-JSON-object 2xx body mapping
 to `SERIALIZATION` (this endpoint's response is array-shaped, not object-shaped). Ktor
 test deps (`ktor-client-mock`, `ktor-client-content-negotiation`, `ktor-serialization-kotlinx-json`)
-already declared in `core/network/build.gradle.kts`.
+already declared in `core/network/build.gradle.kts`. `ChangePinApiTest` (6 MockEngine tests, all
+green) covers `changePin`'s success (PUT verb + path assertions) + 400/401/500 status-mapping +
+malformed-JSON→SERIALIZATION + the password/repeatPassword-carry-the-same-new-PIN-value
+assertion.
 
 ## 8. Observability
 
 Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`,
 `GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`, `LoanApplyApi`,
-`BatchSyncApi`) — debug on request start (incl. request-row count for `BatchSyncApi`), info on
-2xx, error on every failure branch (status-mapped or transport/serialization exception).
+`BatchSyncApi`, `ChangePinApi`) — debug on request start (incl. request-row count for
+`BatchSyncApi`), info on 2xx, error on every failure branch (status-mapped or
+transport/serialization exception).
 
 ## 9. Evolution
 

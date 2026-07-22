@@ -34,6 +34,9 @@
 - `SyncManager` / `SyncManagerImpl` — the sync-status feature's `batch_sync` drain coordinator
   (`triggerSync`/`getLastSyncAt`/`retryItem`), wraps `BatchSyncApi` + `SyncQueueRepository` +
   `SyncMetadataStore`. See API.md#repositories.
+- `ChangePinRepository` / `ChangePinRepositoryImpl` — the settings screen's change-PIN mutation
+  repository (`changePin`, wraps `ChangePinApi` directly, no read-stream). See
+  API.md#repositories.
 
 ## 3. Consumers
 
@@ -58,7 +61,10 @@ feature's risk policy). The sync-status ViewModel injects `SyncQueueRepository` 
 on-mount/on-refresh local reads (`observePending`/`observePendingByType`/`observeFailed`/
 `observeConflictCount` — no network call, per `data-flow.yaml#cache.strategy: no_cache`) and
 `SyncManager` for `OnSyncNow` (`triggerSync`, gated on `NetworkMonitor.isOnline && !isSyncing`
-at the ViewModel layer) / `OnRetryOperation` (`retryItem(itemId)`).
+at the ViewModel layer) / `OnRetryOperation` (`retryItem(itemId)`). The settings ViewModel
+injects `ChangePinRepository` directly — `changePin` on the change-PIN dialog's submit action
+(`OnSubmitPinChange`); `AuthRepository` is a separate injection for session-level concerns and is
+never wrapped/extended by `ChangePinRepository`.
 
 ## 4. Boundaries
 
@@ -92,6 +98,12 @@ at the ViewModel layer) / `OnRetryOperation` (`retryItem(itemId)`).
   `core/store/SyncStatusStore.kt` to wrap (RULE-IMPLEMENT-STORE5-001 §7). No try-catch in either
   — `SyncQueueRepositoryImpl` is plain Room delegation (local writes never throw for this
   schema); `SyncManagerImpl` only branches on `BatchSyncApi`'s `NetworkResult`, never catches.
+- `ChangePinRepository` is on the legacy/mutation path — settings' `business_logic.kind: crud`
+  (RULE-IDEA-IMPL-INTELLIGENCE-001 AC-03i zero-regression), Store5-free (a pure fire-and-forget
+  write, no cached entity to back with `.asScreenStream()`). No try-catch —
+  `ChangePinRepositoryImpl.changePin` is a plain `when` over `ChangePinApi`'s `NetworkResult`;
+  `ChangePinApiImpl` (core/network) is the sole layer allowed to catch exceptions. Deliberately
+  separate from `AuthRepository` (not extended/wrapped).
 
 ## 5. Data
 
@@ -104,7 +116,9 @@ persistence). Domain types (`AuthSession`, `UserProfile`, `LoginCredentials`,
 
 `AuthRepository` methods return `NetworkResult<T, NetworkError>` unchanged from the Service on
 the error branch — no re-wrapping, no swallowing. `currentSession` has no error channel (local
-prefs read only); absence is represented as `null`, never an exception.
+prefs read only); absence is represented as `null`, never an exception. `ChangePinRepository`
+likewise returns `NetworkResult<ChangePinResult, NetworkError>` unchanged from `ChangePinApi` on
+the error branch — no re-wrapping, no swallowing.
 
 ## 7. Testing
 
@@ -127,7 +141,10 @@ fake; enqueue/observePending/observeCounts/markSyncing/markFailed+retryAll cover
 covers `triggerSync`'s empty-backlog short-circuit, mark-syncing-before-submit ordering,
 all-success + mixed-200/409/500 + network-error drain paths (incl. `lastSyncAt` stamped only on
 a successful drain), `getLastSyncAt` delegation, and `retryItem`'s success/failure/network-error/
-item-not-found cases).
+item-not-found cases); `ChangePinRepositoryTest` (uniquely-named `FakeChangePinApi`, file-private
+— avoids the K2 same-package private-declaration collision `RepositoryTestFakes.kt` documents;
+5 cases — success mapping, new-PIN-threaded-into-both-wire-fields assertion, and 400/401/500
+error-passthrough).
 
 ## 8. Observability
 
@@ -145,7 +162,9 @@ on `loadTemplate`, `loanId` on `applyLoan`), error on the specific read that fai
 — debug on drain start (pending-row count) and per-row retry, info on drain completion (folded
 success/failed/conflict counts) and per-item retry outcome, error on the specific failed
 row's/transport failure's status code (not a generic "sync failed" message); no-op retries
-(item not found) are info-logged, not silently dropped.
+(item not found) are info-logged, not silently dropped. Kermit tag `ChangePinRepository` — debug
+on submit, info on success (with `resourceId`), error on every failure branch (mirrors the
+Service's own logging one layer down).
 
 ## 9. Evolution
 

@@ -1,48 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Copyright 2022 Mifos Initiative
-
-    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-    If a copy of the MPL was not distributed with this file,
-    You can obtain one at https://mozilla.org/MPL/2.0/.
-
-    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
--->
 <resources>
-    <string name="feature_settings_top_app_bar_action_icon_description">Settings</string>
-    <string name="feature_settings_top_app_bar_navigation_icon_description">Search</string>
-    <string name="feature_settings_title">Settings</string>
-    <string name="feature_settings_loading">Loading…</string>
-    <string name="feature_settings_privacy_policy">Privacy policy</string>
-    <string name="feature_settings_licenses">Licenses</string>
-    <string name="feature_settings_brand_guidelines">Brand Guidelines</string>
-    <string name="feature_settings_feedback">Feedback</string>
-    <string name="feature_settings_theme">Theme</string>
-    <string name="feature_settings_brand_default">Default</string>
-    <string name="feature_settings_brand_android">Android</string>
-    <string name="feature_settings_dark_mode_preference">Dark mode preference</string>
-    <string name="feature_settings_dark_mode_config_system_default">System default</string>
-    <string name="feature_settings_dark_mode_config_light">Light</string>
-    <string name="feature_settings_dark_mode_config_dark">Dark</string>
-    <string name="feature_settings_dynamic_color_preference">Use Dynamic Color</string>
-    <string name="feature_settings_dynamic_color_yes">Yes</string>
-    <string name="feature_settings_dynamic_color_no">No</string>
-    <string name="feature_settings_dismiss_dialog_button_text">OK</string>
-    <string name="feature_settings_change_theme_text">Change Theme</string>
-    <string name="feature_settings_change_theme_placeholder_text">Change Theme</string>
-    <string name="feature_settings_change_language_text">Change Language</string>
-    <string name="feature_settings_change_language_placeholder_text">Change Language</string>
-    <string name="feature_settings_language_preference">Language</string>
+    <string name="screens_settings_title">Settings</string>
+    <string name="screens_settings_a11y_top_bar">Settings screen top bar</string>
 
-    <!-- ===== RULE-IMPL-NO-HARDCODED-STRING-001 backfill (W2-6 store5-superbrain-v2) ===== -->
-    <!-- SettingsScreen — dev-tools sheet + app-info row -->
-    <string name="feature_settings_dev_tools_title">Dev tools</string>
-    <string name="feature_settings_dev_transition_gallery">Transition Gallery</string>
-    <string name="feature_settings_dev_state_gallery">State Gallery</string>
-    <string name="feature_settings_dev_close">Close</string>
-    <string name="feature_settings_app_name">Money Toolkit</string>
+    <string name="screens_settings_section_language">Language</string>
+    <string name="screens_settings_section_appearance">Appearance</string>
+    <string name="screens_settings_section_security">Security</string>
+    <string name="screens_settings_section_notifications">Notifications</string>
+    <string name="screens_settings_section_about">About</string>
 
-    <!-- NotificationScreen — empty state -->
-    <string name="feature_settings_notifications_empty_title">No notifications yet</string>
-    <string name="feature_settings_notifications_empty_message">You\'ll see bill reminders and rate alerts here.</string>
+    <string name="screens_settings_a11y_language_group">App language selector</string>
+    <string name="screens_settings_lang_english">English</string>
+    <string name="screens_settings_lang_swahili">Kiswahili</string>
+    <string name="screens_settings_lang_french">Français</string>
+    <string name="screens_settings_lang_hindi">हिन्दी</string>
+    <string name="screens_settings_a11y_lang_english">Select English language</string>
+    <string name="screens_settings_a11y_lang_swahili">Select Kiswahili language</string>
+    <string name="screens_settings_a11y_lang_french">Select French language</string>
+    <string name="screens_settings_a11y_lang_hindi">Select Hindi language</string>
+
+    <string name="screens_settings_a11y_theme_group">App appearance theme selector</string>
+    <string name="screens_settings_theme_light">Light</string>
+    <string name="screens_settings_theme_dark">Dark</string>
+    <string name="screens_settings_theme_system">System Default</string>
+    <string name="screens_settings_a11y_theme_light">Select Light theme</string>
+    <string name="screens_settings_a11y_theme_dark">Select Dark theme</string>
+    <string name="screens_settings_a11y_theme_system">Follow system theme</string>
+
+    <string name="screens_settings_biometric_label">Biometric Unlock</string>
+    <string name="screens_settings_biometric_sublabel">Use fingerprint or face ID to log in</string>
+    <string name="screens_settings_biometric_unavailable">Biometric hardware not available on this device</string>
+    <string name="screens_settings_a11y_biometric_row">Biometric unlock preference row</string>
+    <string name="screens_settings_a11y_biometric_switch">Toggle biometric unlock</string>
+
+    <string name="screens_settings_change_pin_label">Change PIN</string>
+    <string name="screens_settings_change_pin_sublabel">Update your 4-digit security PIN</string>
+    <string name="screens_settings_a11y_change_pin_row">Open change PIN dialog</string>
+    <string name="screens_settings_a11y_chevron_right">Open</string>
+
+    <string name="screens_settings_notifications_label">Push Notifications</string>
+    <string name="screens_settings_notifications_sublabel">Receive alerts for meetings, repayments, and sync events</string>
+    <string name="screens_settings_a11y_notifications_row">Push notifications preference row</string>
+    <string name="screens_settings_a11y_notifications_switch">Toggle push notifications</string>
+
+    <string name="screens_settings_version_label">App Version</string>
+
+    <string name="screens_settings_logout_button">Logout</string>
+    <string name="screens_settings_a11y_logout_button">Log out of the app</string>
+    <string name="screens_settings_a11y_logout_progress_cd">Logging out</string>
+
+    <string name="screens_settings_dialog_title">Change PIN</string>
+    <string name="screens_settings_current_pin">Current PIN</string>
+    <string name="screens_settings_new_pin">New PIN (min 4 digits)</string>
+    <string name="screens_settings_dialog_cancel">Cancel</string>
+    <string name="screens_settings_dialog_confirm">Update PIN</string>
+    <string name="screens_settings_a11y_change_pin_dialog">Change PIN dialog</string>
+    <string name="screens_settings_a11y_current_pin_field">Enter your current PIN</string>
+    <string name="screens_settings_a11y_new_pin_field">Enter new PIN, minimum 4 digits</string>
+    <string name="screens_settings_a11y_dialog_cancel">Cancel PIN change</string>
+    <string name="screens_settings_a11y_dialog_confirm">Submit new PIN</string>
+
+    <string name="screens_settings_error_pin_change">PIN change failed. Check your current PIN and try again.</string>
 </resources>

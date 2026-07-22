@@ -26,6 +26,12 @@ data class UserData(
     val enableScreenCapture: Boolean,
     val isPasscodeEnabled: Boolean,
     val isBiometricsEnabled: Boolean,
+    // Additive field for the `settings` feature's push-notifications toggle
+    // (idea-layer/screens/settings/ui.yaml#state_model.SettingsViewModel.state.isNotificationsEnabled).
+    // Default `true` mirrors the ui.yaml-declared field default. Kept with a Kotlin parameter
+    // default so the sole existing construction call site (`DEFAULT` below, all named args) keeps
+    // compiling unchanged — purely additive, no existing signature broken.
+    val enableNotifications: Boolean = true,
 ) {
     companion object {
         val DEFAULT = UserData(
@@ -42,6 +48,7 @@ data class UserData(
             showOnboarding = false,
             firstTimeUser = false,
             enableScreenCapture = false,
+            enableNotifications = true,
         )
     }
 }

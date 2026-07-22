@@ -22,7 +22,6 @@ import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
 import kpt.feature.home.di.HomeModule
-import kpt.feature.settings.SettingsModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -42,6 +41,13 @@ import org.mifos.groupbanking.feature.memberadd.di.MemberAddModule
 import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule
 import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
+// `org.mifos.groupbanking.feature.settings.di.SettingsModule` — the REAL, now-sole group-banking
+// `settings-screen` MVI module (idea-layer/screens/settings/ui.yaml). The legacy
+// `kpt.feature.settings.SettingsModule`/`SettingsScreen`/`SettingsRoute` shell has been migrated
+// away (Screen/Route/TestTags/DI all superseded — see `feature/settings/src/commonMain/kotlin/
+// kpt/feature/settings/*` removal notes); the `GroupBankingSettingsModule` alias is kept so this
+// import line and the `includes(...)` call site below don't need touching again.
+import org.mifos.groupbanking.feature.settings.di.SettingsModule as GroupBankingSettingsModule
 import org.mifos.groupbanking.feature.settingslogoutdialog.di.SettingsLogoutDialogModule
 import org.mifos.groupbanking.feature.syncstatus.di.SyncStatusModule
 
@@ -66,7 +72,6 @@ object KoinModules {
         includes(
             // shell (framework) — kept
             HomeModule,
-            SettingsModule,
             LoginSignupModule,
             GroupTypePickerModule,
             GroupListModule,
@@ -85,6 +90,7 @@ object KoinModules {
             LoanMarkDefaultedDialogModule, // <- added by kmp-viewmodel-gen
             SyncStatusModule, // <- added by kmp-viewmodel-gen
             SettingsLogoutDialogModule, // <- added by kmp-viewmodel-gen
+            GroupBankingSettingsModule, // <- added by kmp-viewmodel-gen (real settings-screen VM; legacy SettingsModule migrated away)
         )
     }
 

@@ -156,6 +156,13 @@ enum class LanguageConfig(
         localeName = "sv",
         text = "svenska",
     ),
+    // Added for the settings feature (idea-layer/screens/settings/{api,ui}.yaml#dtos.AppLanguage
+    // + i18n.lang_swahili "Kiswahili") — this app's language selector explicitly offers Swahili
+    // per FR-010, alongside English/French/Hindi (already present above).
+    SWAHILI(
+        localeName = "sw",
+        text = "Kiswahili",
+    ),
     THAI(
         localeName = "th",
         text = "ไทย",

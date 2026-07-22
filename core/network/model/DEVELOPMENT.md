@@ -104,6 +104,8 @@ logic, no domain field names.
 | `BatchOperationDto` | `BatchSyncDto.kt` | `@Serializable` nested request DTO (one `/batches` request row) |
 | `BatchSyncRequestDto` | `BatchSyncDto.kt` | `@Serializable` request (`batch_sync` `POST /fineract-provider/api/v1/batches`) |
 | `BatchSyncResponseItemDto` | `BatchSyncDto.kt` | `@Serializable` response row — the `/batches` HTTP body is a TOP-LEVEL JSON ARRAY of this shape, no wrapper envelope |
+| `ChangePinRequestDto` | `ChangePinDto.kt` | `@Serializable` request (`change_pin` `PUT /fineract-provider/api/v1/self/user/updatePassword`) |
+| `ChangePinResponseDto` | `ChangePinDto.kt` | `@Serializable` response (`change_pin` `PUT`) |
 
 ## 3. Consumers
 
@@ -146,7 +148,11 @@ logic, no domain field names.
   (`POST /fineract-provider/api/v1/batches`, `batch_sync`) — domain -> DTO for
   the submitted `BatchSyncRequest` (built from every pending `SyncQueueItem`
   via `toBatchOperation`), DTO -> domain for the `/batches` response array,
-  folded into `SyncResult` via `toSyncResult`
+  folded into `SyncResult` via `toSyncResult`; `core/network/mapper/ChangePinMappers.kt`
+  → `core/data` `SettingsRepository.changePin(currentPin, newPin)`
+  (`PUT /fineract-provider/api/v1/self/user/updatePassword`, `change_pin`,
+  BasicAuth) — domain -> DTO for the submitted `ChangePinRequest`, DTO ->
+  domain for the `ChangePinResult`
 
 ## 4. Boundaries
 
@@ -304,6 +310,14 @@ logic, no domain field names.
   `api.yaml#dtos.SyncQueueItem` itself — it describes an already-persisted
   Room row, not a wire payload this feature's own `batch_sync` operation
   transmits or receives.
+- **`ChangePinRequestDto` has no `currentPin` field**: the domain
+  `ChangePinRequest.currentPin` authenticates the request via the `BasicAuth`
+  header `api.yaml#api[0].auth: BasicAuth` declares, never the JSON body —
+  same "wire-only field excluded" precedent as `RecordRepaymentRequestDto`'s
+  excluded path params. `password`/`repeatPassword` both resolve to the SAME
+  `ChangePinRequest.newPin` (Fineract's self-service confirmation-pair
+  convention). No field carries a default — no `@EncodeDefault` needed
+  (contrast `LoanRequestPayloadDto.status`).
 
 ## 5. Data
 
@@ -642,6 +656,9 @@ logic, no domain field names.
 | `BatchSyncResponseItemDto` | `requestId` | `requestId` | `Int` | — |
 | `BatchSyncResponseItemDto` | `statusCode` | `statusCode` | `Int` | — |
 | `BatchSyncResponseItemDto` | `body` | `body` | `String` | — |
+| `ChangePinRequestDto` | `password` | `password` | `String` | — |
+| `ChangePinRequestDto` | `repeatPassword` | `repeatPassword` | `String` | — |
+| `ChangePinResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 
 ## 6. Errors
 
@@ -789,6 +806,15 @@ BatchSyncRequestDto` (batch converter, declaration order preserved),
 `BatchSyncResponseItemDto -> BatchSyncResponseItem` (every field plus the
 batch converter), and `List<BatchSyncResponseItem>.toSyncResult`'s 3-way
 fold (mixed 200/201/409/500/400, all-success, empty-list).
+`core/network/src/commonTest/.../model/ChangePinDtoTest.kt` covers
+`ChangePinRequestDto`/`ChangePinResponseDto` construction, equality,
+`SCHEMA_VERSION`, serialization round-trip (asserting the literal
+`password`/`repeatPassword` wire keys), and a T7/EC30 cross-version fixture
+(server-added `changes` field, decoded without crashing).
+`core/network/src/commonTest/.../mapper/ChangePinMappersTest.kt` covers
+`ChangePinRequest -> ChangePinRequestDto` (`newPin` resolves to BOTH
+`password`/`repeatPassword`, `currentPin` never leaks into either wire
+field) AND the reverse `ChangePinResponseDto -> ChangePinResult`.
 
 ## 8. Observability
 
@@ -856,6 +882,10 @@ carry member-identifying fields depending on the originating feature's
 payload shape (e.g. a loan-request's `clientId`), same threat model as
 `LoanRequestPayloadDto`'s queued JSON — avoid bulk-logging batch request/
 response bodies; log `requestId`/`statusCode`/`relativeUrl` only.
+`ChangePinRequestDto.password`/`.repeatPassword` are BOTH sensitive PIN
+material — NEVER log either field, matching
+`SelfRegisterRequestDto.password`'s threat model. `ChangePinResponseDto`
+carries no sensitive fields (a Fineract resource ID only).
 
 ## 9. Evolution
 
@@ -977,5 +1007,19 @@ generic Fineract Batch API boilerplate, not sync-status-specific. No
 `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
 `api.yaml` is the sole SoT (PP-1); the ONE divergence is the
 `api.yaml#dtos.SyncQueueItem` vs. the ALREADY-SHIPPED `SyncQueueItem` schema
-note above.
+note above. **Settings' own DTOs live in `ChangePinDto.kt`**
+(`ChangePinRequestDto`, `ChangePinResponseDto`) — no
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature,
+`api.yaml` is the sole SoT (PP-1), no divergence to flag. `AppLanguage`/
+`AppTheme` (`api.yaml#dtos` / `ui.yaml#state_model`) were deliberately NOT
+generated as DTOs here — both are LOCAL preferences persisted via
+`UserPreferencesRepository` (multiplatform-settings key-value storage), never
+serialized over the wire; `AppLanguage`'s domain counterpart
+(`LanguageConfig`, gained a `SWAHILI` entry) and `AppTheme`'s (the
+pre-existing `DarkThemeConfig`, reused outright) both live in `core/model`
+with no `core/network/model` counterpart at all — see `core/model/DEVELOPMENT.md`
+§9. Before generating a future BasicAuth-authenticated Fineract self-service
+write, reuse the "caller credential excluded from the request DTO" pattern
+(`ChangePinRequestDto`) rather than inventing a request field with no wire
+source.
 <!-- kmp-dto-gen:END -->

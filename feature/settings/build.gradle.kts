@@ -16,19 +16,33 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.data)
             implementation(projects.core.model)
+            implementation(projects.core.datastore) // <- added by kmp-viewmodel-gen (UserPreferencesRepository)
+            implementation(projects.core.analytics) // <- added by kmp-viewmodel-gen (KptAnalyticsTracker)
             implementation(projects.coreBase.ui)
+            implementation(projects.coreBase.network) // <- added by kmp-viewmodel-gen (NetworkResult/NetworkError)
+            implementation(projects.coreBase.security) // <- added by kmp-viewmodel-gen (BiometricAuthenticator)
+            implementation(projects.coreBase.observability) // <- added by kmp-viewmodel-gen (CrashReporter)
+
+            implementation(libs.kermit.logging) // <- added by kmp-viewmodel-gen
 
             implementation(compose.ui)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended) // <- added by kmp-screen-gen (Icons.AutoMirrored.Filled.ArrowBack)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+        }
+
+        commonTest.dependencies { // <- added by kmp-viewmodel-gen
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
     }
 }
 
 compose {
     resources {
-        packageOfResClass = "kpt.feature.settings.generated.resources"
+        packageOfResClass = "org.mifos.groupbanking.feature.settings.generated.resources"
     }
 }

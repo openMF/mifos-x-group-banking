@@ -119,6 +119,9 @@ class UserPreferencesRepositoryImpl(
     override val observeScreenCapturePreference: Flow<Boolean>
         get() = _userData.map { it.enableScreenCapture }
 
+    override val observeNotificationsEnabled: Flow<Boolean>
+        get() = _userData.map { it.enableNotifications }
+
     private suspend fun updatePreference(transform: (UserData) -> UserData) {
         withContext(dispatcher.io) {
             val current = loadCombinedUserData()
@@ -160,6 +163,9 @@ class UserPreferencesRepositoryImpl(
 
     override suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean) =
         updatePreference { it.copy(enableScreenCapture = isScreenCaptureEnabled) }
+
+    override suspend fun setNotificationsEnabled(isEnabled: Boolean) =
+        updatePreference { it.copy(enableNotifications = isEnabled) }
 
     override suspend fun clearUserData() {
         setIsAuthenticated(false)

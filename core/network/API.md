@@ -34,6 +34,7 @@
 | `LoanApplyApi` | `/datatables/dt_group_config/{groupId}` | GET | — | `GroupLoanConfigDto` | `NetworkResult<GroupLoanConfigDto, NetworkError>` |
 | `LoanApplyApi` | `/loans` | POST | `ApplyLoanRequestDto` | `ApplyLoanResponseDto` | `NetworkResult<ApplyLoanResponseDto, NetworkError>` |
 | `BatchSyncApi` (`org.mifos.groupbanking.core.network.service.batchsync`) | `/fineract-provider/api/v1/batches` | POST | `BatchSyncRequestDto` | `List<BatchSyncResponseItemDto>` (top-level JSON array, no envelope) | `NetworkResult<List<BatchSyncResponseItemDto>, NetworkError>` |
+| `ChangePinApi` (`org.mifos.groupbanking.core.network.service.changepin`) | `/fineract-provider/api/v1/self/user/updatePassword` | PUT (BasicAuth) | `ChangePinRequestDto` | `ChangePinResponseDto` | `NetworkResult<ChangePinResponseDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -99,6 +100,15 @@ at the top level, no envelope) — decoded directly via Ktor's reified-generic c
 (`List<BatchSyncResponseItemDto>`), no manual `ListSerializer` wiring needed at the call site.
 `sync-status`'s `data-flow.yaml` declares every entry `cache.strategy: no_cache`, so there is no
 Store5 store for this feature — see `core/data/API.md`'s `SyncManager` row.
+
+Settings change-PIN (`change_pin`) — see `idea-layer/screens/settings/api.yaml`.
+`ChangePinApi.changePin` backs a **Store5-free mutation orchestration flow**
+(`business_logic.kind: crud`, no cached read-stream — change-PIN is a pure fire-and-forget
+write) — `ChangePinRepositoryImpl` (`core/data`) surfaces `NetworkResult` directly, same branch
+as `InvitationApi`/`GroupCreateApi`/`MemberAddApi`/`LoanRequestApi`. The wire body carries ONLY
+`password`/`repeatPassword` (both set to the new PIN) — the domain `ChangePinRequest.currentPin`
+has no wire counterpart; Fineract authenticates the caller via the `BasicAuth` header the shared
+`HttpClient` attaches, not a JSON field (see `ChangePinDto.kt`/`ChangePinMappers.kt` KDoc).
 
 ## dtos (core/network/model)
 
@@ -167,6 +177,11 @@ second engine from this config's `baseUrl`.
 
 `BatchSyncApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
 registered for override-surface symmetry; `BatchSyncApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
+
+`ChangePinApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `ChangePinApiImpl` currently reuses the shared
 `HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
 second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

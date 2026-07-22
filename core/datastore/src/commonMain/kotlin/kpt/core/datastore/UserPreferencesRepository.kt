@@ -39,6 +39,13 @@ interface UserPreferencesRepository {
 
     val observeScreenCapturePreference: Flow<Boolean>
 
+    /**
+     * Additive preference for the `settings` feature (`ui.yaml#state_model.state.isNotificationsEnabled`)
+     * — mirrors [observeScreenCapturePreference]'s shape exactly. No existing member signature
+     * changed.
+     */
+    val observeNotificationsEnabled: Flow<Boolean>
+
     suspend fun setLanguage(language: LanguageConfig)
 
     suspend fun setThemeBrand(themeBrand: ThemeBrand)
@@ -62,6 +69,9 @@ interface UserPreferencesRepository {
     suspend fun setPasscode(passcode: String)
 
     suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean)
+
+    /** Additive setter paired with [observeNotificationsEnabled]. */
+    suspend fun setNotificationsEnabled(isEnabled: Boolean)
 
     suspend fun clearUserData()
 }

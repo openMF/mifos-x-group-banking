@@ -18,6 +18,7 @@ import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.BatchSyncApiConfig
+import org.mifos.groupbanking.core.network.config.ChangePinApiConfig
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
@@ -36,6 +37,8 @@ import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
 import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApi
 import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApiImpl
+import org.mifos.groupbanking.core.network.service.changepin.ChangePinApi
+import org.mifos.groupbanking.core.network.service.changepin.ChangePinApiImpl
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
@@ -287,4 +290,15 @@ val NetworkModule = module {
     // in RepositoryModule.kt.
     single<BatchSyncApiConfig> { BatchSyncApiConfig() }
     single<BatchSyncApi> { BatchSyncApiImpl(httpClient = get()) }
+
+    // Change-PIN (change_pin) — settings screen client stack. Reuses the shared HttpClient
+    // singleton above (same companion host, no second engine), even though this path is a raw
+    // Fineract self-service passthrough (`/fineract-provider/api/v1/self/user/updatePassword`)
+    // rather than a `/companion/…` one — same convention as MemberProfileApi / MemberAddApi. The
+    // config binding is registered for override-surface symmetry with CompanionAuthApiConfig even
+    // though the shared client is the one actually dispatching requests today. The Repository
+    // consuming ChangePinApi (Store5-free — `business_logic.kind: crud`, no read-stream to cache)
+    // is registered in RepositoryModule.kt.
+    single<ChangePinApiConfig> { ChangePinApiConfig() }
+    single<ChangePinApi> { ChangePinApiImpl(httpClient = get()) }
 }

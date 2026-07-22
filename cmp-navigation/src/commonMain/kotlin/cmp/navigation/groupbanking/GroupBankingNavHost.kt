@@ -61,6 +61,8 @@ import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
 import org.mifos.groupbanking.feature.personaldashboard.navigateToPersonalDashboard
 import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
+import org.mifos.groupbanking.feature.settings.settingsScreen
+import org.mifos.groupbanking.feature.settingslogoutdialog.SettingsLogoutDialog
 
 /**
  * App-level NavHost for the mifos-x group-banking journey.
@@ -86,6 +88,20 @@ import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
  * `NavHost` Box (a Compose `AlertDialog` renders in its own `Popup`/window regardless of where in
  * the tree it is composed, so their position here — siblings of the `NavHost` call, not nested
  * inside it — has no visual effect on the overlay).
+ *
+ * `settings` (migrated off the legacy `kpt.feature.settings` template shell onto
+ * `org.mifos.groupbanking.feature.settings`, `idea-layer/screens/settings/ui.yaml`) is wired the
+ * same way: `settingsScreen(...)`'s `onShowLogoutDialog` flips `showSettingsLogoutDialog` (local
+ * `remember { mutableStateOf(false) }` state, same convention as `repaymentDialogTarget` above)
+ * which renders [SettingsLogoutDialog] as an overlay; `onNavigateToLogin` routes straight to
+ * [navigateToLoginSignup] (the session-expired-mid-PIN-change path, `data-flow.yaml`'s `401 ->
+ * navigate: login`). **Known gap:** no screen in this NavHost currently calls
+ * `navController.navigateToSettings()` — `ui.yaml#entry_points[0]` declares a `bottom_nav` trigger
+ * that does not exist in this app's current live navigation shell (no bottom nav / tab bar is
+ * wired here yet). The destination is registered and fully reachable via
+ * `navController.navigateToSettings()`, but no in-app affordance calls it yet; flagged as a
+ * residual follow-up rather than inventing an unrequested settings entry point on an unrelated
+ * screen.
  */
 @Composable
 fun GroupBankingNavHost(
@@ -101,6 +117,7 @@ fun GroupBankingNavHost(
     // feature seams in this NavHost.
     var repaymentDialogTarget by remember { mutableStateOf<RepaymentDialogTarget?>(null) }
     var defaultDialogTarget by remember { mutableStateOf<DefaultDialogTarget?>(null) }
+    var showSettingsLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -212,8 +229,27 @@ fun GroupBankingNavHost(
                     },
                 )
 
+                // 10. settings -- migrated off the legacy `kpt.feature.settings` template shell
+                // (see class KDoc "settings" note). Reachable via `navController.navigateToSettings()`.
+                settingsScreen(
+                    onNavigateToLogin = { navController.navigateToLoginSignup() },
+                    onShowLogoutDialog = { showSettingsLogoutDialog = true },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
                 // Shared "Coming soon" destination for every not-yet-built onward target.
                 placeholderDestination()
+            }
+
+            // settings-logout-dialog -- overlay on top of settings, see class KDoc "settings" note.
+            if (showSettingsLogoutDialog) {
+                SettingsLogoutDialog(
+                    onDismiss = { showSettingsLogoutDialog = false },
+                    onNavigateToLogin = {
+                        showSettingsLogoutDialog = false
+                        navController.navigateToLoginSignup()
+                    },
+                )
             }
 
             // loan-repayment-dialog — overlay on top of loan-detail, see class KDoc.

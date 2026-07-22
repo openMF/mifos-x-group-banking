@@ -32,6 +32,8 @@ import org.koin.dsl.module
 import kpt.core.store.AppStoreRegistry
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.ChangePinRepository
+import org.mifos.groupbanking.core.data.repository.ChangePinRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepository
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupDashboardRepository
@@ -270,6 +272,14 @@ val DataModule = module {
             syncMetadataStore = get(),
         )
     }
+
+    // settings change-PIN (change_pin) — Store5-free (business_logic.kind: crud, the legacy
+    // template path per RULE-IDEA-IMPL-INTELLIGENCE-001 AC-03i — no read-stream to cache), wraps
+    // ChangePinApi (NetworkModule) directly. Surfaces NetworkResult, never
+    // .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
+    // GroupCreateRepository/MemberAddRepository/LoanApplyRepository/LoanRequestRepository above.
+    // Deliberately separate from AuthRepository — does not extend or wrap it.
+    single<ChangePinRepository> { ChangePinRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

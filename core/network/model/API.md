@@ -91,6 +91,8 @@
 | `BatchOperationDto` | `requestId`, `relativeUrl`, `method`, `body` | all required | field of `BatchSyncRequestDto.requests` — one batched Fineract sub-request |
 | `BatchSyncRequestDto` | `requests` (default `[]`) | `requests` defaults empty | `POST /fineract-provider/api/v1/batches` (`batch_sync`) request body |
 | `BatchSyncResponseItemDto` | `requestId`, `statusCode`, `body` | all required | response ROW of `batch_sync` — the HTTP body itself is a bare `type: array` of this shape, no wrapper object |
+| `ChangePinRequestDto` | `password`, `repeatPassword` | both required, no defaults (`api.yaml` declares neither field as optional, so no `@EncodeDefault` is needed, unlike `LoanRequestPayloadDto.status`) | `PUT /fineract-provider/api/v1/self/user/updatePassword` (`change_pin`) request; both fields resolve to the SAME domain `ChangePinRequest.newPin` — see `## 4. Boundaries` |
+| `ChangePinResponseDto` | `resourceId` | required | response of `change_pin` — standard Fineract self-service `updatePassword` command-processing envelope |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -592,4 +594,27 @@ group-list screen's own `api.yaml`/`docs.yaml`/`data-flow.yaml`, NOT from the
 stale registry entry. The registry's `list_endpoint` + field set should be
 reconciled against COMP-GRP-001 (or re-scoped to the admin/staff
 `group-management` endpoints it still accurately describes) at Station 3.
+
+**`ChangePinRequestDto`/`ChangePinResponseDto` — settings screen change-PIN
+(informational, per PP-1):** `idea-layer/screens/settings/api.yaml#dtos.{ChangePinRequest,ChangePinResponse}`
+is the sole SoT (no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature). `ChangePinRequestDto.password`/`.repeatPassword`
+both resolve to the SAME domain `ChangePinRequest.newPin` value — Fineract's
+self-service `updatePassword` confirmation-pair convention, matching the
+member entering their new PIN once in `change_pin_dialog`
+(`idea-layer/screens/settings/ui.yaml#components.change_pin_dialog`).
+`ChangePinRequest.currentPin` (the domain input) is NOT a DTO field — it
+authenticates the request via the `BasicAuth` header
+(`api.yaml#api[0].auth: BasicAuth`), same "wire-only field excluded from the
+request DTO" precedent as `RecordRepaymentRequestDto`'s excluded path
+params. `core/network/mapper/ChangePinMappers.kt` is the DTO<->domain
+boundary. Settings also reuses two pre-existing enums outright rather than
+forking new wire types: `LanguageConfig` (`kpt.core.model.user`, domain-only,
+no DTO — see `core/model/DEVELOPMENT.md` §9) gained a `SWAHILI` entry for
+`api.yaml#dtos.AppLanguage`'s 4-value set; `ui.yaml#state_model.selectedTheme`'s
+`AppTheme` (`LIGHT`/`DARK`/`SYSTEM`) was NOT generated as a new DTO/enum at
+all — it maps 1:1 onto the pre-existing `DarkThemeConfig` domain enum
+(`SYSTEM` <-> `FOLLOW_SYSTEM`), which is persisted locally via
+`UserPreferencesRepository` (multiplatform-settings key-value storage, no
+network round-trip) — out of this DTO/mapper generation's scope entirely.
 <!-- kmp-dto-gen:END -->

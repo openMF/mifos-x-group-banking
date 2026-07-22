@@ -100,6 +100,8 @@ mappers in `core/network/mapper`.
 | `BatchSyncRequest` | `BatchSync.kt` | data class — the full `/batches` submission (`requests: List<BatchOperation>`) |
 | `BatchSyncResponseItem` | `BatchSync.kt` | data class — one `/batches` response row |
 | `SyncResult` | `BatchSync.kt` | data class — client-computed rollup of a `/batches` response (`successCount`/`failedCount`/`conflictCount`) |
+| `ChangePinRequest` | `ChangePin.kt` | data class — settings change-PIN dialog submission input (`change_pin`); `currentPin` excluded from the wire body (BasicAuth boundary) |
+| `ChangePinResult` | `ChangePin.kt` | data class — `change_pin` success result |
 
 ## 3. Consumers
 
@@ -151,7 +153,11 @@ mappers in `core/network/mapper`.
   (`POST /fineract-provider/api/v1/batches`); `SyncClassifier.kt`'s
   `pendingByType(items: List<SyncQueueItem>): Map<EntityType, Int>` is the
   read-side counterpart consumed directly by `SyncQueueRepository.getPendingByType()`
-  (no DTO/mapper involved — pure domain-to-domain classification)
+  (no DTO/mapper involved — pure domain-to-domain classification); the
+  settings change-PIN submission maps `ChangePinMappers.kt` output the same
+  way, BOTH directions — domain -> DTO for the submitted `ChangePinRequest`,
+  DTO -> domain for the `ChangePinResult` — `SettingsRepository.changePin(...)`
+  (`PUT /fineract-provider/api/v1/self/user/updatePassword`)
 
 ## 4. Boundaries
 
@@ -477,6 +483,9 @@ mappers in `core/network/mapper`.
 | `SyncResult` | `successCount` | `Int` | non-null |
 | `SyncResult` | `failedCount` | `Int` | non-null |
 | `SyncResult` | `conflictCount` | `Int` | non-null |
+| `ChangePinRequest` | `currentPin` | `String` | non-null |
+| `ChangePinRequest` | `newPin` | `String` | non-null |
+| `ChangePinResult` | `resourceId` | `Long` | non-null |
 
 ## 6. Errors
 
@@ -565,7 +574,13 @@ verbatim `body`, caller-supplied vs. queue-row-id `requestId`),
 order), `BatchSyncResponseItemDto -> BatchSyncResponseItem` (every field
 plus the batch converter), and `List<BatchSyncResponseItem>.toSyncResult`'s
 3-way fold (mixed 200/201/409/500/400, all-success, empty-list boundary
-cases).
+cases). `ChangePinMappersTest.kt` (`core/network/src/commonTest/.../mapper`)
+covers `ChangePinRequest -> ChangePinRequestDto` (`newPin` resolves to BOTH
+`password`/`repeatPassword`, `currentPin` never leaks into either wire
+field) AND the reverse `ChangePinResponseDto -> ChangePinResult`.
+`LanguageConfigTest.kt` (`core/model/src/commonTest/.../user`) covers the
+added `SWAHILI` entry's `localeName`/`text` plus the settings screen's full
+declared `AppLanguage` value-set (`ENGLISH`/`SWAHILI`/`FRENCH`/`HINDI`).
 
 ## 8. Observability
 
@@ -624,6 +639,10 @@ Fineract `relativeUrl`/`method`, and status-code counts only; `BatchOperation.bo
 carry member-identifying fields (e.g. a loan-request's `clientId`) depending
 on the originating feature's payload shape — avoid bulk-logging batch
 request/response bodies verbatim; log `requestId`/`statusCode` only.
+`ChangePinRequest.currentPin`/`.newPin` are BOTH sensitive PIN material —
+NEVER log either field, matching the `LoginCredentials.password` threat
+model. `ChangePinResult` carries no sensitive fields (a Fineract resource ID
+only).
 
 ## 9. Evolution
 
@@ -741,5 +760,22 @@ schema keeps the single generic `operationType: String` instead —
 `api.yaml` revision needs a genuinely NEW `EntityType`/`SyncOperation` value
 this classifier's prefix-fallback doesn't already cover, extend the enum +
 the KNOWN mapping table in `SyncClassifier.kt`'s kdoc (never invent a second
-classification helper).
+classification helper). **Settings' own domain concepts live in `ChangePin.kt`**
+(`ChangePinRequest`, `ChangePinResult`) — settings otherwise REUSES two
+pre-existing enums rather than forking new ones: `LanguageConfig`
+(`kpt/core/model/user/LanguageConfig.kt`, a pre-existing template enum, NOT a
+`kmp-dto-gen`-owned file) gained a `SWAHILI` entry (`localeName = "sw"`,
+`text = "Kiswahili"`) for `api.yaml#dtos.AppLanguage`; no exhaustive
+`when (LanguageConfig)` branch needed updating (`LanguageDialog.kt` iterates
+`LanguageConfig.entries.forEach { ... }`, not a `when`). `DarkThemeConfig`
+(`kpt/core/model/user/DarkThemeConfig.kt`) was NOT extended or forked —
+`ui.yaml#state_model.selectedTheme`'s `AppTheme` (`LIGHT`/`DARK`/`SYSTEM`)
+maps 1:1 onto its existing 3 values (`SYSTEM` <-> `FOLLOW_SYSTEM`); the
+settings ViewModel should read/write `DarkThemeConfig` directly via
+`UserPreferencesRepository` rather than introducing a parallel `AppTheme`
+type. Before generating a future feature that also submits a
+BasicAuth-authenticated Fineract self-service write, reuse the
+"caller-supplied credential excluded from the DTO body" pattern
+(`ChangePinRequest.currentPin`) rather than inventing a request field with no
+wire source.
 <!-- kmp-dto-gen:END -->
