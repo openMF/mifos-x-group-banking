@@ -65,6 +65,11 @@
 | `LoanSummaryDto` | `id`, `memberId`, `memberName`, `memberPhotoUrl` (nullable, default `null`), `loanProductName`, `principalAmount`, `outstandingBalance`, `overdueAmount`, `status` (default `UNKNOWN`), `nextRepaymentDate` (nullable, default `null`), `isOverdue`, `fineractLoanId` | `memberPhotoUrl`/`nextRepaymentDate` nullable; `status` defaults `UNKNOWN`; rest required | `GET /groups/{groupId}/loans` (loan-list) — CANONICAL `LoanSummary`, reused by loan-detail + loan dialogs + personal-loans; see registry-divergence note below |
 | `LoanPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope of `GET /groups/{groupId}/loans` (`page_size=20`, stale-while-revalidate `ttl=180`) |
 | `LoanAccountStatusDto` | enum `@SerialName`: `ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; named `LoanAccountStatusDto` (not `LoanStatusDto`) to avoid a symbol collision with the EXISTING `LoanStatusDto` (member-list's member-level loan-status chip) — see naming-collision note below | field of `LoanSummaryDto.status` |
+| `LoanDetailDto` | `id`, `memberId`, `memberName`, `loanProductName`, `principalAmount`, `disbursedDate`, `interestRatePercent`, `totalOutstanding`, `totalOverdue`, `status` (default `UNKNOWN`, REUSES `LoanAccountStatusDto`), `fineractLoanId` | `status` defaults `UNKNOWN`; rest required | `GET /loans/{loanId}` (loan-detail header) — see registry-divergence note below |
+| `RepaymentScheduleRowDto` | `weekNumber`, `dueDate`, `dueAmount`, `paidAmount`, `balance`, `status` (default `UNKNOWN`) | `status` defaults `UNKNOWN`; rest required | field of `LoanDetailResponseDto.repaymentSchedule` |
+| `RepaymentRowStatusDto` | enum `@SerialName`: `PAID`, `PARTIAL`, `UPCOMING`, `OVERDUE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `RepaymentScheduleRowDto.status` |
+| `RepaymentTransactionDto` | `id`, `type` (raw `String`, no declared value-set), `date`, `amount` | all required | field of `LoanDetailResponseDto.transactions` |
+| `LoanDetailResponseDto` | `loan` (`LoanDetailDto`), `repaymentSchedule` (default `[]`), `transactions` (default `[]`) | `loan` required; both lists default empty | composite envelope of `GET /loans/{loanId}?associations=repaymentSchedule,transactions` — inferred (not literally named under `api.yaml#dtos`, same precedent as `LoanPageDto`) |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -95,7 +100,64 @@ the same list endpoint, see divergence note below);
 stale-while-revalidate `ttl=180` + offline show-cached; `api.yaml#dtos.LoanSummary`
 is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
 entry also exists but describes a DIFFERENT endpoint/consumer set, see
-divergence note below).
+divergence note below);
+`idea-layer/screens/loan-detail/api.yaml` (`GET /loans/{loanId}`,
+`associations=repaymentSchedule,transactions`, stale-while-revalidate
+`ttl=120` + offline show-cached; `api.yaml#dtos.{LoanDetail,
+RepaymentScheduleRow, RepaymentRowStatus, RepaymentTransaction, LoanDetailTab}`
+is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
+entry for the SAME `GET /loans/{loanId}` endpoint also exists, see
+divergence note below; `idea-layer/dtos/LoanRepaymentDto.yaml` likewise
+declares a richer raw-Fineract repayment-transaction shape than
+`RepaymentTransactionDto` here, same class of divergence).
+
+**`LoanDetailDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
+(flagged for the cross-feature repair station, same pattern as the
+`LoanSummaryDto` divergence above — this time the registry's OWN declared
+`source.endpoint` is the SAME `GET /loans/{loanId}` this DTO wires):** the
+registry entry (v1.0.0) declares a DIFFERENT `LoanDto` shape —
+`principal: Double`, `interestRate: Double`, `status: String` with LOWERCASE
+lifecycle values `pending`/`approved`/`disbursed`/`repaid`/`defaulted`/
+`rejected`/`withdrawn`, `disbursedOn: String?`, `expectedMaturityDate: String?`,
+`amountRepaid: Double?`, `amountOutstanding: Double?` — and its `used_by`
+lists `loan-management` (`get_loan`), NOT `loan-detail`. `LoanDetailDto` here
+was generated from loan-detail's OWN approved `api.yaml#dtos.LoanDetail`
+instead (same precedent established by `LoanSummaryDto`: the declaring
+feature's own approved contract wins over a registry entry whose `used_by`
+does not list the feature). Reconcile at Station 3 — options include renaming
+the registry's richer per-loan-lifecycle row to `LoanAccountDto`, or migrating
+loan-management onto this companion shape if their consumers turn out to be
+the same wire contract.
+
+**`RepaymentTransactionDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
+registry divergence (flagged for the cross-feature repair station, same
+class of issue):** the registry entry (v1.0.0, `history_endpoint: GET
+/loans/{loanId}/transactions`) declares a richer raw-Fineract shape —
+`loanId: Long`, `type: String` with values `repayment`/`partial_repayment`/
+`waiver`/`fee_payment`/`interest_waiver`, `currency: String`,
+`principalPortion: Double?`, `interestPortion: Double?`,
+`outstandingAfter: Double?` — and lists `loan-management` (`make_repayment`,
+`get_loan_hist`) as its consumer. `RepaymentTransactionDto` here was
+generated from loan-detail's OWN approved `api.yaml#dtos.RepaymentTransaction`
+instead (`id`/`type`/`date`/`amount` only). Reconcile at Station 3 — resolve
+whether loan-detail's repayment-history tab should eventually consume the
+richer registry shape (e.g. for `principalPortion`/`interestPortion` display).
+
+**`LoanDetailResponseDto` composite-envelope design decision (flagged for
+Station 3, informational — not a registry conflict):** `api.yaml#api[0]
+(get_loan_detail)`'s literal Fineract response nests `repaymentSchedule` as
+`{ periods: [...] }` (one level deeper) and raw `{id,value}` status pairs /
+`List<Int>` date arrays throughout — none of which this DTO models directly
+(same "companion bridge normalizes Fineract's raw response" assumption
+`LoanSummaryDto` makes for loan-list). `LoanDetailResponseDto` instead bundles
+the THREE `api.yaml#dtos`-declared shapes (`LoanDetail`,
+`List<RepaymentScheduleRow>`, `List<RepaymentTransaction>`) into one composite
+envelope, inferred from the fact that `get_loan_detail` is a SINGLE endpoint
+returning header + schedule + history together — same "envelope inferred from
+the operation's top-level response shape, not literally declared under
+`dtos:`" precedent as loan-list's `LoanPageDto`. If a future repository
+generator finds the companion bridge actually returns these as separate calls
+or a different envelope shape, this composite should be revisited.
 
 **`LoanSummaryDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
 (flagged for the cross-feature repair station, same class of issue as the
@@ -349,7 +411,7 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
-`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`.
+`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

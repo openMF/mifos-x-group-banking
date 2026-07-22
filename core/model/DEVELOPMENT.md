@@ -74,6 +74,12 @@ mappers in `core/network/mapper`.
 | `LoanPage` | `LoanSummary.kt` | data class — offset-paginated envelope |
 | `LoanAccountStatus` | `LoanSummary.kt` | enum (`ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN`) — deliberately NOT unified with `LoanStatus` (mismatched value-set, symbol-name collision); see `LoanSummary.kt` kdoc |
 | `LoanStatusFilter` | `LoanSummary.kt` | enum (`ALL`, `ACTIVE`, `OVERDUE`, `CLOSED`) — pure client-side filter-chip state, no wire counterpart |
+| `LoanDetail` | `LoanDetail.kt` | data class — loan-detail header (`GET /loans/{loanId}`); reuses `LoanAccountStatus` |
+| `RepaymentScheduleRow` | `LoanDetail.kt` | data class — single installment period |
+| `RepaymentRowStatus` | `LoanDetail.kt` | enum (`PAID`, `PARTIAL`, `UPCOMING`, `OVERDUE`, `UNKNOWN`) |
+| `RepaymentTransaction` | `LoanDetail.kt` | data class — single posted repayment-history row; `type` raw `String` |
+| `LoanDetailResponse` | `LoanDetail.kt` | data class — composite Store5 read result (`loan` + `repaymentSchedule` + `repaymentHistory`) |
+| `LoanDetailTab` | `LoanDetail.kt` | enum (`SCHEDULE`, `HISTORY`) — pure client-side tab-selector state, no wire counterpart |
 
 ## 3. Consumers
 
@@ -93,7 +99,9 @@ mappers in `core/network/mapper`.
   `get_client_accounts` / `get_member_role`, domain -> DTO for the submitted
   `UpdateMemberRoleRequest`; the loan-list repository maps
   `LoanSummaryMappers.kt` output the same way — `LoanRepository`
-  (`GET /groups/{groupId}/loans`))
+  (`GET /groups/{groupId}/loans`); the loan-detail repository maps
+  `LoanDetailMappers.kt` output the same way — `LoanRepository`
+  (`GET /loans/{loanId}`))
 
 ## 4. Boundaries
 
@@ -329,6 +337,30 @@ mappers in `core/network/mapper`.
 | `LoanSummary` | `fineractLoanId` | `Long` | non-null |
 | `LoanPage` | `totalFilteredRecords` | `Int` | non-null |
 | `LoanPage` | `loans` | `List<LoanSummary>` | non-null (may be empty) |
+| `LoanDetail` | `id` | `Long` | non-null |
+| `LoanDetail` | `memberId` | `Long` | non-null |
+| `LoanDetail` | `memberName` | `String` | non-null |
+| `LoanDetail` | `loanProductName` | `String` | non-null |
+| `LoanDetail` | `principalAmount` | `Double` | non-null |
+| `LoanDetail` | `disbursedDate` | `String` | non-null |
+| `LoanDetail` | `interestRatePercent` | `Double` | non-null |
+| `LoanDetail` | `totalOutstanding` | `Double` | non-null |
+| `LoanDetail` | `totalOverdue` | `Double` | non-null |
+| `LoanDetail` | `status` | `LoanAccountStatus` | non-null |
+| `LoanDetail` | `fineractLoanId` | `Long` | non-null |
+| `RepaymentScheduleRow` | `weekNumber` | `Int` | non-null |
+| `RepaymentScheduleRow` | `dueDate` | `String` | non-null |
+| `RepaymentScheduleRow` | `dueAmount` | `Double` | non-null |
+| `RepaymentScheduleRow` | `paidAmount` | `Double` | non-null |
+| `RepaymentScheduleRow` | `balance` | `Double` | non-null |
+| `RepaymentScheduleRow` | `status` | `RepaymentRowStatus` | non-null |
+| `RepaymentTransaction` | `id` | `Long` | non-null |
+| `RepaymentTransaction` | `type` | `String` | non-null |
+| `RepaymentTransaction` | `date` | `String` | non-null |
+| `RepaymentTransaction` | `amount` | `Double` | non-null |
+| `LoanDetailResponse` | `loan` | `LoanDetail` | non-null |
+| `LoanDetailResponse` | `repaymentSchedule` | `List<RepaymentScheduleRow>` | non-null (may be empty) |
+| `LoanDetailResponse` | `repaymentHistory` | `List<RepaymentTransaction>` | non-null (may be empty) |
 
 ## 6. Errors
 
@@ -363,6 +395,12 @@ plus null-vs-non-null `acceptedAt`). `MemberAccounts`' aggregation logic
 vs not-in-arrears, empty-loan-list). `LoanSummaryMappersTest.kt` covers
 `LoanSummaryDto -> LoanSummary` (every field), the batch converter, the page
 converter, and every `LoanAccountStatusDto -> LoanAccountStatus` value.
+`LoanDetailMappersTest.kt` covers `LoanDetailDto -> LoanDetail` (every
+field), `RepaymentScheduleRowDto -> RepaymentScheduleRow` (every field plus
+batch converter), `RepaymentTransactionDto -> RepaymentTransaction` (every
+field plus batch converter), the `LoanDetailResponseDto -> LoanDetailResponse`
+composite conversion (including the `transactions` -> `repaymentHistory`
+rename), and every `RepaymentRowStatusDto -> RepaymentRowStatus` value.
 
 ## 8. Observability
 
@@ -388,6 +426,10 @@ no sensitive fields (balances + role only; no PII). `LoanSummary` carries
 `memberName` (display-name PII, same threat model as `Member.displayName`)
 and `memberPhotoUrl` (a CDN URL, not raw image bytes) — avoid bulk-logging
 the full loan-list page; amounts/status/`isOverdue` are not sensitive.
+`LoanDetail` carries `memberName` (display-name PII, same threat model as
+`LoanSummary.memberName`) — avoid bulk-logging; amounts/`status` are not
+sensitive. `RepaymentScheduleRow`/`RepaymentTransaction`/`LoanDetailResponse`
+carry no PII (amounts + dates only).
 
 ## 9. Evolution
 
@@ -437,5 +479,11 @@ extending `LoanSummary` itself, resolve the `idea-layer/dtos/LoanDto.yaml`
 registry-divergence flagged in `core/network/model/API.md`. Before
 introducing any further loan-status-adjacent enum, resolve the
 `LoanAccountStatus` vs `LoanStatus` naming-collision note in this file's
-`## models` section (API.md).
+`## models` section (API.md). **Loan-detail's own domain concepts live in
+`LoanDetail.kt`** (`LoanDetail`, `RepaymentScheduleRow`, `RepaymentRowStatus`,
+`RepaymentTransaction`, `LoanDetailResponse`, `LoanDetailTab`) —
+`LoanDetail.status` reuses `LoanAccountStatus` outright (no new enum). Before
+extending `LoanDetail`/`RepaymentTransaction`, resolve the
+`idea-layer/dtos/LoanDto.yaml`/`LoanRepaymentDto.yaml` registry-divergences
+flagged in `core/network/model/API.md`.
 <!-- kmp-dto-gen:END -->

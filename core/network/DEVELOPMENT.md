@@ -31,6 +31,9 @@ as a library — never edits it.
   `getGroup` (identity + embedded `typeConfig`), `getViewerRole` (authenticated user's role),
   `getGroupCorpus` (balance/rotation state), `getGroupAccounts` (savings/loan summary +
   recent-activity feed) (COMP-GRP-001). See API.md#services.
+- `LoanDetailApi` / `LoanDetailApiImpl` (`.../service/loandetail/`) — `getLoanDetail`, the single
+  composite read bundling the loan header, repayment schedule, and transaction history
+  (`get_loan_detail`/`get_loan`). See API.md#services.
 - `SupabaseConfigClient` (`kpt.core.base.network`, wired here) — dynamic server config, inert by
   default.
 - `CompanionAuthApiConfig` — Koin-injectable base-URL config for the companion backend.
@@ -45,6 +48,8 @@ as a library — never edits it.
 - `MemberDashboardApiConfig` — Koin-injectable base-URL config for the personal-dashboard
   endpoint (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 - `GroupDashboardApiConfig` — Koin-injectable base-URL config for the group-dashboard endpoints
+  (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `LoanDetailApiConfig` — Koin-injectable base-URL config for the loan-detail endpoint
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
@@ -62,8 +67,11 @@ orchestration); `getOffices` is likewise a direct pass-through today pending a f
 API.md#services). The personal-dashboard feature's Store5 store (downstream `kmp-store-gen`
 generation step) will call `MemberDashboardApi`. The group-dashboard feature's Store5 store
 (downstream `kmp-store-gen` generation step) will call all 4 `GroupDashboardApi` methods in
-parallel and fan them into the composite dashboard model, surfaced via `.asScreenStream()`.
-Feature ViewModels never call a Service directly (Repository/Store boundary).
+parallel and fan them into the composite dashboard model, surfaced via `.asScreenStream()`. The
+loan-detail feature's Store5 store (downstream `kmp-store-gen` generation step) will call
+`LoanDetailApi.getLoanDetail` and surface it via `.asScreenStream()` (`stale_while_revalidate`
+cache strategy, ttl=120). Feature ViewModels never call a Service directly (Repository/Store
+boundary).
 
 ## 4. Boundaries
 
@@ -94,7 +102,7 @@ returning — no silent failures.
 ## 7. Testing
 
 `commonTest` — `CompanionAuthApiTest`, `GroupTypeConfigApiTest`, `GroupApiTest`, `InvitationApiTest`,
-`GroupCreateApiTest`, `MemberDashboardApiTest`, `GroupDashboardApiTest`
+`GroupCreateApiTest`, `MemberDashboardApiTest`, `GroupDashboardApiTest`, `LoanDetailApiTest`
 (MockEngine-backed; ≥3 cases per method: success + at least two distinct error-status branches;
 `GroupApiTest` also covers default/explicit `paged`/`limit`/`offset` query-param threading;
 `InvitationApiTest` covers all 4 `InvitationApi` methods incl. path templating for
@@ -105,15 +113,18 @@ query-param threading + missing-`externalId` mapping, and `createGroup` success 
 `MemberDashboardApiTest` covers `selectedGroupId` present/null query-param threading;
 `GroupDashboardApiTest` covers all 4 `GroupDashboardApi` methods (`getGroup`/`getViewerRole`/
 `getGroupCorpus`/`getGroupAccounts`) incl. path templating for `{groupId}` +
-`/my-role`/`/corpus`/`/accounts` suffixes and success/401/404/500/malformed-JSON branches). Ktor
+`/my-role`/`/corpus`/`/accounts` suffixes and success/401/404/500/malformed-JSON branches;
+`LoanDetailApiTest` covers `getLoanDetail`'s single composite read incl. the `associations`
+query-param default threading and success/401/404/500/malformed-JSON branches). Ktor
 test deps (`ktor-client-mock`, `ktor-client-content-negotiation`, `ktor-serialization-kotlinx-json`)
 already declared in `core/network/build.gradle.kts`.
 
 ## 8. Observability
 
 Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`,
-`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`) — debug on request start, info on
-2xx, error on every failure branch (status-mapped or transport/serialization exception).
+`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`) — debug on request
+start, info on 2xx, error on every failure branch (status-mapped or transport/serialization
+exception).
 
 ## 9. Evolution
 

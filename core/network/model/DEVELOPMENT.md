@@ -78,6 +78,11 @@ logic, no domain field names.
 | `LoanSummaryDto` | `LoanSummaryDto.kt` | `@Serializable` response row (`GET /groups/{groupId}/loans`) — canonical `LoanSummary`; see `## 4. Boundaries` registry-divergence note |
 | `LoanPageDto` | `LoanSummaryDto.kt` | `@Serializable` offset-paginated envelope |
 | `LoanAccountStatusDto` | `LoanSummaryDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — named to avoid collision with `LoanStatusDto` |
+| `LoanDetailDto` | `LoanDetailDto.kt` | `@Serializable` response row (`GET /loans/{loanId}`); reuses `LoanAccountStatusDto` — see `## 4. Boundaries` registry-divergence note |
+| `RepaymentScheduleRowDto` | `LoanDetailDto.kt` | `@Serializable` nested response DTO (repayment-schedule row) |
+| `RepaymentRowStatusDto` | `LoanDetailDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `RepaymentTransactionDto` | `LoanDetailDto.kt` | `@Serializable` nested response DTO (repayment-history row) — see `## 4. Boundaries` registry-divergence note |
+| `LoanDetailResponseDto` | `LoanDetailDto.kt` | `@Serializable` composite envelope of `GET /loans/{loanId}`, inferred (not literally under `api.yaml#dtos`) |
 
 ## 3. Consumers
 
@@ -99,7 +104,8 @@ logic, no domain field names.
   → `core/data` `MemberRepository` (`get_client` + `get_client_accounts` +
   `get_member_role`, DTO -> domain; `update_member_role`, domain -> DTO);
   `core/network/mapper/LoanSummaryMappers.kt` → `core/data` `LoanRepository`
-  (`GET /groups/{groupId}/loans`)
+  (`GET /groups/{groupId}/loans`); `core/network/mapper/LoanDetailMappers.kt`
+  → `core/data` `LoanRepository` (`GET /loans/{loanId}`)
 
 ## 4. Boundaries
 
@@ -177,6 +183,23 @@ logic, no domain field names.
   loan-list's per-LOAN lifecycle status. Mismatched value-sets AND a bare-name
   collision in the same package forced the distinct name — full note in
   `## dtos` (API.md).
+- **`LoanDetailDto` reuses `LoanAccountStatusDto` outright** (no new
+  loan-status enum): `api.yaml#dtos.LoanDetail.status` declares the bare type
+  `LoanStatus` with no local value-set override — the same per-loan-lifecycle
+  concept `LoanAccountStatusDto` already models.
+- **`LoanDetailDto` / `RepaymentTransactionDto` vs `idea-layer/dtos/LoanDto.yaml`
+  / `LoanRepaymentDto.yaml` registry divergences** (flagged for the
+  cross-feature repair station): both registry entries declare richer
+  raw-Fineract shapes for the SAME `GET /loans/{loanId}` endpoint / its
+  transactions sub-resource, but neither lists `loan-detail` as a consumer.
+  `LoanDetailDto`/`RepaymentTransactionDto` here were generated from
+  loan-detail's own approved `api.yaml#dtos` instead — full note in
+  `## dtos` (API.md).
+- **`LoanDetailResponseDto` is an inferred composite envelope**, not literally
+  declared under `api.yaml#dtos` — bundles `LoanDetailDto` +
+  `List<RepaymentScheduleRowDto>` + `List<RepaymentTransactionDto>` to model
+  the single `GET /loans/{loanId}` response, same "inferred envelope"
+  precedent as loan-list's `LoanPageDto` — full note in `## dtos` (API.md).
 
 ## 5. Data
 
@@ -407,6 +430,30 @@ logic, no domain field names.
 | `LoanSummaryDto` | `fineractLoanId` | `fineractLoanId` | `Long` | — |
 | `LoanPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
 | `LoanPageDto` | `pageItems` | `pageItems` | `List<LoanSummaryDto>` | `emptyList()` |
+| `LoanDetailDto` | `id` | `id` | `Long` | — |
+| `LoanDetailDto` | `memberId` | `memberId` | `Long` | — |
+| `LoanDetailDto` | `memberName` | `memberName` | `String` | — |
+| `LoanDetailDto` | `loanProductName` | `loanProductName` | `String` | — |
+| `LoanDetailDto` | `principalAmount` | `principalAmount` | `Double` | — |
+| `LoanDetailDto` | `disbursedDate` | `disbursedDate` | `String` | — |
+| `LoanDetailDto` | `interestRatePercent` | `interestRatePercent` | `Double` | — |
+| `LoanDetailDto` | `totalOutstanding` | `totalOutstanding` | `Double` | — |
+| `LoanDetailDto` | `totalOverdue` | `totalOverdue` | `Double` | — |
+| `LoanDetailDto` | `status` | `status` | `LoanAccountStatusDto` | `LoanAccountStatusDto.UNKNOWN` |
+| `LoanDetailDto` | `fineractLoanId` | `fineractLoanId` | `Long` | — |
+| `RepaymentScheduleRowDto` | `weekNumber` | `weekNumber` | `Int` | — |
+| `RepaymentScheduleRowDto` | `dueDate` | `dueDate` | `String` | — |
+| `RepaymentScheduleRowDto` | `dueAmount` | `dueAmount` | `Double` | — |
+| `RepaymentScheduleRowDto` | `paidAmount` | `paidAmount` | `Double` | — |
+| `RepaymentScheduleRowDto` | `balance` | `balance` | `Double` | — |
+| `RepaymentScheduleRowDto` | `status` | `status` | `RepaymentRowStatusDto` | `RepaymentRowStatusDto.UNKNOWN` |
+| `RepaymentTransactionDto` | `id` | `id` | `Long` | — |
+| `RepaymentTransactionDto` | `type` | `type` | `String` | — |
+| `RepaymentTransactionDto` | `date` | `date` | `String` | — |
+| `RepaymentTransactionDto` | `amount` | `amount` | `Double` | — |
+| `LoanDetailResponseDto` | `loan` | `loan` | `LoanDetailDto` | — |
+| `LoanDetailResponseDto` | `repaymentSchedule` | `repaymentSchedule` | `List<RepaymentScheduleRowDto>` | `emptyList()` |
+| `LoanDetailResponseDto` | `transactions` | `transactions` | `List<RepaymentTransactionDto>` | `emptyList()` |
 
 ## 6. Errors
 
@@ -465,6 +512,22 @@ value, decoded without crashing).
 List<LoanSummary>` converter (including empty-list), the page converter
 (`LoanPageDto -> LoanPage`), and every `LoanAccountStatusDto` -> `LoanAccountStatus`
 enum value.
+`core/network/src/commonTest/.../model/LoanDetailDtoTest.kt` covers
+`LoanDetailDto`/`RepaymentScheduleRowDto`/`RepaymentTransactionDto`/
+`LoanDetailResponseDto` construction, `status` default-value behavior
+(`LoanDetailDto`/`RepaymentScheduleRowDto`), serialization round-trip, every
+`RepaymentRowStatusDto` known value + `UNKNOWN` fallback, the composite
+envelope's schedule/transactions default-empty behavior, and the T7/EC30
+cross-version fixture (server-added field + unknown status value, decoded
+without crashing).
+`core/network/src/commonTest/.../mapper/LoanDetailMappersTest.kt` covers
+`LoanDetailDto -> LoanDetail` (every field), `RepaymentScheduleRowDto ->
+RepaymentScheduleRow` (every field, plus the batch converter including
+empty-list), `RepaymentTransactionDto -> RepaymentTransaction` (every field,
+plus the batch converter including empty-list), `LoanDetailResponseDto ->
+LoanDetailResponse` (the `transactions` -> `repaymentHistory` rename, plus
+empty-schedule/empty-transactions), and every `RepaymentRowStatusDto` ->
+`RepaymentRowStatus` enum value.
 
 ## 8. Observability
 
@@ -493,7 +556,11 @@ sensitive fields (balances + role only; no PII). `LoanSummaryDto` carries
 `memberName` (display-name PII, same threat model as `MemberDto.displayName`)
 and `memberPhotoUrl` (a CDN URL, not raw image bytes) — avoid bulk-logging
 the full loan-list page; `principalAmount`/`outstandingBalance`/
-`overdueAmount`/`status`/`isOverdue` are not sensitive.
+`overdueAmount`/`status`/`isOverdue` are not sensitive. `LoanDetailDto`
+carries `memberName` (display-name PII, same threat model as
+`LoanSummaryDto.memberName`) — avoid bulk-logging; amounts/`status` are not
+sensitive. `RepaymentScheduleRowDto`/`RepaymentTransactionDto`/
+`LoanDetailResponseDto` carry no PII (amounts + dates only).
 
 ## 9. Evolution
 
@@ -541,5 +608,15 @@ itself, resolve the `idea-layer/dtos/LoanDto.yaml` registry-divergence
 flagged in `## 4. Boundaries` and `## dtos` (API.md). Before introducing any
 further loan-status-adjacent enum, resolve the `LoanAccountStatusDto` vs
 `LoanStatusDto` naming-collision note in `## 4. Boundaries` and `## dtos`
-(API.md).
+(API.md). **Loan-detail's own DTOs live in `LoanDetailDto.kt`**
+(`LoanDetailDto`, `RepaymentScheduleRowDto`, `RepaymentRowStatusDto`,
+`RepaymentTransactionDto`, `LoanDetailResponseDto`) — `LoanDetailDto.status`
+reuses `LoanAccountStatusDto` outright (no new enum). Before extending
+`LoanDetailDto`/`RepaymentTransactionDto`, resolve the
+`idea-layer/dtos/LoanDto.yaml`/`LoanRepaymentDto.yaml` registry-divergences
+flagged in `## 4. Boundaries` and `## dtos` (API.md). Before generating
+loan-repayment-dialog (which submits a repayment against a loan), check
+whether its request/response shape should reuse `RepaymentTransactionDto` or
+needs the richer `idea-layer/dtos/LoanRepaymentDto.yaml` registry shape
+(`principalPortion`/`interestPortion`/`outstandingAfter`) instead.
 <!-- kmp-dto-gen:END -->

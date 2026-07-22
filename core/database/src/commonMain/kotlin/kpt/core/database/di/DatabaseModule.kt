@@ -58,6 +58,9 @@ val DatabaseModule = module {
 
     // group-banking domain — loan-list paginated per-group cache (SourceOfTruth DAO, GET /groups/{groupId}/loans)
     single { get<AppDatabase>().loanListDao }
+
+    // group-banking domain — loan-detail single-key composite cache (SourceOfTruth DAO, GET /loans/{loanId})
+    single { get<AppDatabase>().loanDetailDao }
 }
 
 /**

@@ -42,6 +42,8 @@ import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanDetailRepository
+import org.mifos.groupbanking.core.data.repository.LoanDetailRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanRepository
 import org.mifos.groupbanking.core.data.repository.LoanRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
@@ -144,6 +146,20 @@ val DataModule = module {
     single<LoanRepository> {
         LoanRepositoryImpl(
             loansPagingStore = get(AppStoreRegistry.LoanList),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // loan-detail (GET /loans/{loanId}?associations=repaymentSchedule,transactions) — wraps the
+    // single-key composite NETWORK_WITH_CACHE LoanDetailStore (bound via AppStoreRegistry.LoanDetail
+    // in appStoreModule) and surfaces the offline-first .asScreenStream() read (per-loan
+    // ScreenState<LoanDetailResponse> = loan header + repayment schedule + transaction history). NEW
+    // repository — deliberately separate from the paginated LoanRepository (loan-list) so the
+    // single-key composite read never overloads the paged list surface.
+    single<LoanDetailRepository> {
+        LoanDetailRepositoryImpl(
+            loanDetailStore = get(AppStoreRegistry.LoanDetail),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

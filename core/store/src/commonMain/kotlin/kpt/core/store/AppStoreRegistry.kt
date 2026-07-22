@@ -64,6 +64,9 @@ object AppStoreRegistry : StoreRegistry() {
     // REGISTRY:LoanList — loan-list paginated store (PAGINATED NETWORK_WITH_CACHE, GET /groups/{groupId}/loans)
     val LoanList = store("loanList")
 
+    // REGISTRY:LoanDetail — loan-detail single-key composite store (NETWORK_WITH_CACHE, GET /loans/{loanId})
+    val LoanDetail = store("loanDetail")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
@@ -95,6 +98,11 @@ object AppStoreRegistry : StoreRegistry() {
         // a group's loan accounts + per-row outstanding/overdue amounts rotate frequently, so a
         // short TTL revalidates aggressively.
         val LOAN_LIST: Duration = 3.minutes
+
+        // REGISTRY:LoanDetail — 2m matches data-flow.yaml cache_strategy:stale_while_revalidate ttl:120;
+        // a loan's outstanding/overdue balances + repayment schedule/history rotate as repayments post,
+        // so a short TTL revalidates aggressively.
+        val LOAN_DETAIL: Duration = 2.minutes
     }
 
     /**
@@ -117,5 +125,7 @@ object AppStoreRegistry : StoreRegistry() {
         "memberProfile" to Ttl.MEMBER_PROFILE,
         // REGISTRY:LoanList
         "loanList" to Ttl.LOAN_LIST,
+        // REGISTRY:LoanDetail
+        "loanDetail" to Ttl.LOAN_DETAIL,
     )
 }

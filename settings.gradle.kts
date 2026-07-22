@@ -129,6 +129,7 @@ include(":feature:member-list") // <- added by kmp-viewmodel-gen
 include(":feature:member-profile") // <- added by kmp-viewmodel-gen
 include(":feature:member-add") // <- added by kmp-viewmodel-gen
 include(":feature:loan-list") // <- added by kmp-viewmodel-gen
+include(":feature:loan-detail") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")

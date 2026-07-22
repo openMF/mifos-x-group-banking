@@ -16,6 +16,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
+import org.mifos.groupbanking.core.store.loandetail.impl.provideLoanDetailStore
 import org.mifos.groupbanking.core.store.loanlist.impl.provideLoansPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
@@ -129,5 +130,17 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.LoanList))
+    }
+
+    // MODULE:LoanDetail — loan-detail single-key COMPOSITE store (NETWORK_WITH_CACHE, GET /loans/{loanId}).
+    // Internal to the store seam — exposed to UI only through LoanDetailRepository.asScreenStream().
+    single(AppStoreRegistry.LoanDetail) {
+        provideLoanDetailStore(api = get(), dao = get())
+    }
+
+    // MODULE:LoanDetail — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.LoanDetail))
     }
 }

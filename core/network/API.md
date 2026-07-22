@@ -25,6 +25,7 @@
 | `GroupDashboardApi` | `/companion/groups/{groupId}/my-role` | GET | — | `ViewerRoleInfoDto` | `NetworkResult<ViewerRoleInfoDto, NetworkError>` |
 | `GroupDashboardApi` | `/companion/groups/{groupId}/corpus` | GET | — | `GroupCorpusDto` | `NetworkResult<GroupCorpusDto, NetworkError>` |
 | `GroupDashboardApi` | `/companion/groups/{groupId}/accounts` | GET | — | `GroupAccountsDto` | `NetworkResult<GroupAccountsDto, NetworkError>` |
+| `LoanDetailApi` (`org.mifos.groupbanking.core.network.service.loandetail`) | `/loans/{loanId}` | GET (query `associations`, default `repaymentSchedule,transactions`) | — | `LoanDetailResponseDto` | `NetworkResult<LoanDetailResponseDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -60,7 +61,14 @@ concurrent coroutines on mount/refresh/retry, each with its own `cache_strategy`
 `network-first` for `get_group_corpus`). `GroupDashboardApi` is service-layer only; the 4-way
 parallel-combine into the composite `GroupDashboardResponseDto`/domain `GroupDashboard` model
 and the Store5 wrapper (`.asScreenStream()`) are owned by a downstream
-`kmp-store-gen`/`kmp-client-gen` generation step, not by `core/network`.
+`kmp-store-gen`/`kmp-client-gen` generation step, not by `core/network`. Loan detail
+(`get_loan_detail`/`get_loan` — single composite read bundling the loan header,
+repayment schedule, and transaction history in one payload) — see
+`idea-layer/screens/loan-detail/api.yaml` + `data-flow.yaml#cache_strategy`
+(`stale_while_revalidate`, ttl=120, offline `show_cached_data`). `LoanDetailApi` is
+service-layer only; the Store5 store + Repository consuming it (`.asScreenStream()`) are
+owned by a downstream `kmp-store-gen`/`kmp-client-gen` generation step, not by
+`core/network`.
 
 ## dtos (core/network/model)
 
@@ -110,6 +118,11 @@ second engine from this config's `baseUrl`.
 
 `GroupDashboardApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
 registered for override-surface symmetry; `GroupDashboardApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
+
+`LoanDetailApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `LoanDetailApiImpl` currently reuses the shared
 `HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
 second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

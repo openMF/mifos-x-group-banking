@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_loan_detail_title">Loan Detail</string>
+    <string name="screens_loan_detail_refresh_cd">Refresh loan data</string>
+
+    <string name="screens_loan_detail_amount_kes">KES %1$s</string>
+    <string name="screens_loan_detail_principal_label">Principal: KES %1$s</string>
+    <string name="screens_loan_detail_disbursed_label">Disbursed: %1$s</string>
+    <string name="screens_loan_detail_interest_label">Interest: %1$s%% per week</string>
+    <string name="screens_loan_detail_outstanding_label">Outstanding</string>
+    <string name="screens_loan_detail_overdue_label">Overdue</string>
+
+    <string name="screens_loan_detail_tab_schedule">Schedule</string>
+    <string name="screens_loan_detail_tab_history">Repayment History</string>
+
+    <string name="screens_loan_detail_schedule_header_week">Wk</string>
+    <string name="screens_loan_detail_schedule_header_due_date">Due Date</string>
+    <string name="screens_loan_detail_schedule_header_due">Due (KES)</string>
+    <string name="screens_loan_detail_schedule_header_paid">Paid (KES)</string>
+    <string name="screens_loan_detail_schedule_header_balance">Balance</string>
+    <string name="screens_loan_detail_schedule_header_status">Status</string>
+
+    <string name="screens_loan_detail_status_paid">Paid</string>
+    <string name="screens_loan_detail_status_partial">Partial</string>
+    <string name="screens_loan_detail_status_upcoming">Upcoming</string>
+    <string name="screens_loan_detail_status_overdue">Overdue</string>
+
+    <string name="screens_loan_detail_history_empty_message">No repayments recorded yet.</string>
+
+    <string name="screens_loan_detail_action_record_repayment">Record Repayment</string>
+    <string name="screens_loan_detail_action_mark_defaulted">Mark Defaulted</string>
+    <string name="screens_loan_detail_action_retry">Retry</string>
+
+    <string name="screens_loan_detail_repayment_dialog_pending">Repayment recording is coming soon.</string>
+    <string name="screens_loan_detail_default_confirm_pending">Marking a loan defaulted is coming soon.</string>
+
+    <string name="screens_loan_detail_error_state_title">Could not load loan</string>
+    <string name="screens_loan_detail_error_icon_cd">Error</string>
+    <string name="screens_loan_detail_error_network">No internet. Showing cached data.</string>
+    <string name="screens_loan_detail_error_server">Server error. Please try again.</string>
+    <string name="screens_loan_detail_error_not_found">Loan not found.</string>
+    <string name="screens_loan_detail_error_auth">Session expired. Please log in again.</string>
+</resources>

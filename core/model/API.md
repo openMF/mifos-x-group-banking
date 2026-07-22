@@ -63,6 +63,12 @@
 | `LoanPage` | `totalFilteredRecords: Int`, `loans: List<LoanSummary>` | offset-paginated envelope (`page_size=20`) |
 | `LoanAccountStatus` | enum: `ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN` | mirrors wire `LoanAccountStatusDto` 1:1; NOT unified with `LoanStatus` (member-list's per-member loan-status chip — mismatched value-set) — see `LoanSummary.kt` kdoc |
 | `LoanStatusFilter` | enum: `ALL`, `ACTIVE`, `OVERDUE`, `CLOSED` | loan-list status-filter chips; pure client-side UI state, no wire counterpart |
+| `LoanDetail` | `id: Long`, `memberId: Long`, `memberName: String`, `loanProductName: String`, `principalAmount: Double`, `disbursedDate: String`, `interestRatePercent: Double`, `totalOutstanding: Double`, `totalOverdue: Double`, `status: LoanAccountStatus`, `fineractLoanId: Long` | loan-detail header (`GET /loans/{loanId}`); reuses `LoanAccountStatus` (no new status enum) — see registry-divergence note below |
+| `RepaymentScheduleRow` | `weekNumber: Int`, `dueDate: String`, `dueAmount: Double`, `paidAmount: Double`, `balance: Double`, `status: RepaymentRowStatus` | single installment period on the loan-detail repayment schedule |
+| `RepaymentRowStatus` | enum: `PAID`, `PARTIAL`, `UPCOMING`, `OVERDUE`, `UNKNOWN` | mirrors wire `RepaymentRowStatusDto` 1:1 |
+| `RepaymentTransaction` | `id: Long`, `type: String`, `date: String`, `amount: Double` | single posted repayment-history row; `type` stays raw `String` (no declared value-set) — see registry-divergence note below |
+| `LoanDetailResponse` | `loan: LoanDetail`, `repaymentSchedule: List<RepaymentScheduleRow>`, `repaymentHistory: List<RepaymentTransaction>` | composite Store5 read result for the single `GET /loans/{loanId}` call; mirrors wire `LoanDetailResponseDto` (wire's `transactions` renamed to `repaymentHistory`) |
+| `LoanDetailTab` | enum: `SCHEDULE`, `HISTORY` | loan-detail schedule/history tab selector; pure client-side UI state, no wire counterpart |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -89,6 +95,12 @@ dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature
 /groups/{groupId}/loans`, offset-paginated, `page_size=20`; `api.yaml#dtos.LoanSummary`
 is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
 entry also exists but describes a different endpoint/consumer set, see
+divergence note below);
+`idea-layer/screens/loan-detail/api.yaml` (`GET /loans/{loanId}`,
+`associations=repaymentSchedule,transactions`; `api.yaml#dtos.{LoanDetail,
+RepaymentScheduleRow, RepaymentRowStatus, RepaymentTransaction, LoanDetailTab}`
+is the SoT used here — the SAME `idea-layer/dtos/LoanDto.yaml` registry entry
+that diverges from `LoanSummary` also diverges here (same endpoint), see
 divergence note below).
 
 **`LoanSummary` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
@@ -200,6 +212,14 @@ OWN `api.yaml`, matching the established precedent of trusting the
 declaring feature's approved contract over a registry entry that neither
 matches its fields nor lists the feature as a consumer — resolve the two
 `MemberDto` declarations at Station 3.
+
+**`LoanDetail`/`RepaymentTransaction` vs `idea-layer/dtos/LoanDto.yaml` /
+`LoanRepaymentDto.yaml` registry divergences (flagged for the cross-feature
+repair station):** both registry entries (`GET /loans/{loanId}` +
+`/transactions` sub-resource) declare richer raw-Fineract shapes whose
+`used_by` does not list `loan-detail`. `LoanDetail`/`RepaymentTransaction`
+here were generated from loan-detail's own approved `api.yaml#dtos` instead
+— full note in `core/network/model/API.md`.
 
 Wire counterparts + `@SerialName` mapping: see `core/network/model/API.md`
 (includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`, a

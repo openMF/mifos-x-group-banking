@@ -46,6 +46,8 @@ import org.mifos.groupbanking.feature.grouptypepicker.groupTypePickerScreen
 import org.mifos.groupbanking.feature.grouptypepicker.navigateToGroupTypePicker
 import org.mifos.groupbanking.feature.joinwithcode.joinWithCodeScreen
 import org.mifos.groupbanking.feature.joinwithcode.navigateToJoinWithCode
+import org.mifos.groupbanking.feature.loandetail.loanDetailScreen
+import org.mifos.groupbanking.feature.loandetail.navigateToLoanDetail
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
@@ -63,11 +65,13 @@ import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
  * extensions is wired here.
  *
  * Onward targets that are not yet generated as feature modules (meeting-calendar, member-list,
- * loan-detail, loan-apply, share-out, member-savings-detail, savings) route to [PlaceholderRoute]
- * — a real, navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is
- * marked `TODO(nav)` for replacement when its feature lands. `loan-list` is wired for real (its
- * feature module now exists) — its own onward targets `loan-detail` / `loan-apply` are still
- * placeholders.
+ * loan-apply, share-out, member-savings-detail, savings) route to [PlaceholderRoute] — a real,
+ * navigable "Coming soon" destination, never a no-op that breaks the back stack. Each is marked
+ * `TODO(nav)` for replacement when its feature lands. `loan-list` and `loan-detail` are both wired
+ * for real (their feature modules now exist) — `loan-detail`'s own onward targets
+ * (`loan-repayment-dialog` / `loan-mark-defaulted-dialog`) are not yet generated feature
+ * components and surface an in-screen "coming soon" snackbar instead (see
+ * `LoanDetailScreen.kt`'s class KDoc), not a [PlaceholderRoute] destination.
  */
 @Composable
 fun GroupBankingNavHost(
@@ -161,12 +165,16 @@ fun GroupBankingNavHost(
                     onNavigateBack = { navController.popBackStack() },
                 )
 
-                // 8. loan-list → loan-detail / loan-apply (not yet generated feature modules)
+                // 8. loan-list → loan-detail (wired for real, its feature module now exists) / loan-apply
                 loanListScreen(
-                    // TODO(nav): replace when loan-detail feature is implemented
-                    onNavigateToLoanDetail = { _ -> navController.navigateToPlaceholder("Loan Detail") },
+                    onNavigateToLoanDetail = { loanId -> navController.navigateToLoanDetail(loanId = loanId) },
                     // TODO(nav): replace when loan-apply feature is implemented
                     onNavigateToLoanApply = { _ -> navController.navigateToPlaceholder("Apply for Loan") },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 9. loan-detail → back to loan-list (flow.yaml#navigates_to: [loan-list])
+                loanDetailScreen(
                     onNavigateBack = { navController.popBackStack() },
                 )
 
