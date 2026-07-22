@@ -41,6 +41,7 @@ kotlin {
             implementation(projects.feature.personalDashboard) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.groupCreate) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.groupDashboard) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.memberList) // <- added by kmp-viewmodel-gen
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

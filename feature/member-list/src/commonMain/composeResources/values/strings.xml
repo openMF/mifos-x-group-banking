@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_member_list_title">Members</string>
+    <string name="screens_member_list_title_with_group">Members · %1$s</string>
+    <string name="screens_member_list_loading_message">Loading members…</string>
+
+    <string name="screens_member_list_savings_label">Savings: KES %1$s</string>
+    <string name="screens_member_list_row_cd">%1$s, %2$s, savings KES %3$s</string>
+
+    <string name="screens_member_list_role_chairperson">Chairperson</string>
+    <string name="screens_member_list_role_treasurer">Treasurer</string>
+    <string name="screens_member_list_role_secretary">Secretary</string>
+    <string name="screens_member_list_role_member">Member</string>
+
+    <string name="screens_member_list_loan_active">Active</string>
+    <string name="screens_member_list_loan_overdue">Overdue</string>
+
+    <string name="screens_member_list_load_more_message">Loading more members…</string>
+
+    <string name="screens_member_list_fab_cd">Add member to group</string>
+    <string name="screens_member_list_action_add_member">Add Member</string>
+
+    <string name="screens_member_list_empty_icon_cd">No members</string>
+    <string name="screens_member_list_empty_title">No members yet</string>
+    <string name="screens_member_list_empty_body">Add the first member to this group.</string>
+
+    <string name="screens_member_list_error_icon_cd">Error</string>
+    <string name="screens_member_list_error_title">Could not load members</string>
+    <string name="screens_member_list_error_network_message">No internet. Showing cached members.</string>
+    <string name="screens_member_list_error_server_message">Server error. Please retry.</string>
+    <string name="screens_member_list_error_auth_message">Session expired.</string>
+    <string name="screens_member_list_action_retry">Retry</string>
+</resources>

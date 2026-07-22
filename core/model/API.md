@@ -47,6 +47,10 @@
 | `ActivityType` | enum: `MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN` | mirrors wire `ActivityTypeDto` 1:1 |
 | `GroupAccounts` | `savingsBalance: Double`, `loansOutstanding: Double`, `activeLoanCount: Int`, `shareOutProjection: Double?`, `recentActivity: List<ActivityItem>` | `get_group_accounts` result; `shareOutProjection` populated for ACCUMULATING pool models only |
 | `GroupConfig` | `shareValue: Double?`, `shareMin: Int?`, `shareMax: Int?`, `contributionAmount: Double?`, `loanMultiplier: Double?`, `interestRate: Double?`, `cycleLengthMonths: Int`, `fineAmount: Double?`, `minimumDisbursementThreshold: Double?` | client-side-constructed savings/loan rule set (`savings_summary_card`); repository-layer merge of `GroupInstanceConfig` + catalogue `GroupTypeConfig`, out of DTO/mapper scope; `shareMin`/`shareMax`/`minimumDisbursementThreshold` have NO wire source (confirmed gap) |
+| `Member` | `id: String`, `fineractClientId: Long`, `displayName: String`, `photoUri: String?`, `role: MemberRole`, `savingsBalance: Double`, `loanStatus: LoanStatus` | CANONICAL member-list row (`GET /groups/{groupId}/clients`), also reused by member-profile + member-add + member-invite; see registry-divergence note below |
+| `MemberPage` | `totalFilteredRecords: Int`, `members: List<Member>` | offset-paginated envelope (`page_size=20`) |
+| `MemberRole` | enum: `CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN` | mirrors wire `MemberRoleDto` 1:1; NOT unified with `GroupRole` (missing `CHAIRPERSON`) or `ViewerRole` (extra `ORGANIZER` not in this feature's declared value-set) — see `Member.kt` kdoc |
+| `LoanStatus` | enum: `ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN` | mirrors wire `LoanStatusDto` 1:1; no pre-existing loan-status enum found to reuse |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -60,7 +64,11 @@ exists for this feature — `api.yaml` is the sole SoT);
 `idea-layer/screens/group-dashboard/{api.yaml,ui.yaml,docs.yaml}` (COMP-GRP-001
 4-way parallel fan-in: `get_group` + `get_viewer_role` + `get_group_corpus` +
 `get_group_accounts`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
-exists for this feature — `api.yaml` is the sole SoT, per PP-1).
+exists for this feature — `api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/member-list/api.yaml` (`GET /groups/{groupId}/clients`,
+offset-paginated, `dtos.Member` — a DIFFERENT, richer `idea-layer/dtos/MemberDto.yaml`
+registry entry (v2.0.0) also exists for the SAME list endpoint but was NOT used
+as the generation SoT; see the registry-divergence note below).
 
 **`GroupDetail` vs `Group` field-shape divergence (flagged for the
 cross-feature repair station):** `idea-layer/screens/group-dashboard/ui.yaml#state_model`
@@ -100,12 +108,32 @@ two are declared independently on unrelated features' `api.yaml`s with no
 shared source-of-truth reference between them — flagged for Station 3 to
 evaluate whether `ContributionModel` should be reused here instead.
 
+**`Member` vs `idea-layer/dtos/MemberDto.yaml` registry divergence (flagged
+for the cross-feature repair station — same pattern as the `GroupDto.yaml`
+and `SavingsTransactionDto.yaml` divergences above):** the registry entry
+(v2.0.0) declares a DIFFERENT `MemberDto` shape (`id: Long`, `roleInGroup:
+String` with lowercase values `organizer`/`treasurer`/`chairperson`/`secretary`/`member`,
+`status: String` Fineract client status, `imageId: Long?`, `savingsAccountId:
+Long?`, `joinedDate: String?`) sourced from `GET /clients/{clientId}` +
+`list_endpoint: GET /groups/{groupId}/clients` (the SAME list endpoint as
+this feature), yet its `used_by` lists only `member-onboarding` +
+`meeting-lifecycle` — NOT `member-list`. It carries no `loanStatus`/
+`savingsBalance`/role-badge concept at all, whereas member-list's own
+approved `api.yaml#dtos.Member` explicitly declares `role: MemberRole` +
+`loanStatus: LoanStatus` (the role-badge + loan-status shape this feature's
+generation brief requested). `Member` here was generated from member-list's
+OWN `api.yaml`, matching the established precedent of trusting the
+declaring feature's approved contract over a registry entry that neither
+matches its fields nor lists the feature as a consumer — resolve the two
+`MemberDto` declarations at Station 3.
+
 Wire counterparts + `@SerialName` mapping: see `core/network/model/API.md`
 (includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`, a
 THREE-way naming-collision note re: `SavingsTransaction` /
 `idea-layer/dtos/SavingsTransactionDto.yaml` /
 `idea-layer/screens/personal-savings/api.yaml`, the group-create enum
 reuse-vs-new-enum rationale + `OfficeDto.externalId` / `PayoutOrderMethodDto`
-value-set notes, and the group-dashboard `GroupDetail`/`GroupInstanceConfig`
-divergence + collision notes above).
+value-set notes, the group-dashboard `GroupDetail`/`GroupInstanceConfig`
+divergence + collision notes above, and the `idea-layer/dtos/MemberDto.yaml`
+registry-divergence note for `Member`).
 <!-- kmp-dto-gen:END -->

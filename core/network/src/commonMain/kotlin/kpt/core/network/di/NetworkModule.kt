@@ -23,6 +23,7 @@ import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
 import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
+import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
@@ -36,6 +37,8 @@ import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
+import org.mifos.groupbanking.core.network.service.memberlist.MemberApi
+import org.mifos.groupbanking.core.network.service.memberlist.MemberApiImpl
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
@@ -149,4 +152,13 @@ val NetworkModule = module {
     // not registered here.
     single<GroupDashboardApiConfig> { GroupDashboardApiConfig() }
     single<GroupDashboardApi> { GroupDashboardApiImpl(httpClient = get()) }
+
+    // Member list (get_group_members) — member-list feature client stack. Reuses the shared
+    // HttpClient singleton above (same companion server, no second engine). The config binding is
+    // registered for override-surface symmetry with CompanionAuthApiConfig even though the shared
+    // client is the one actually dispatching requests today. The Repository/Store5 wrapper
+    // consuming MemberApi is emitted by a downstream kmp-store-gen/kmp-client-gen generation
+    // step, not registered here.
+    single<MemberApiConfig> { MemberApiConfig() }
+    single<MemberApi> { MemberApiImpl(httpClient = get()) }
 }

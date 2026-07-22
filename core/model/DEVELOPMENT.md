@@ -58,6 +58,10 @@ mappers in `core/network/mapper`.
 | `ActivityType` | `GroupDashboard.kt` | enum (`MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN`) |
 | `GroupAccounts` | `GroupDashboard.kt` | data class — `get_group_accounts` result |
 | `GroupConfig` | `GroupDashboard.kt` | data class — client-side-constructed savings/loan rule set; repository-layer merge, out of DTO/mapper scope |
+| `Member` | `Member.kt` | data class — canonical member-list row (`GET /groups/{groupId}/clients`), also used by member-profile + member-add + member-invite; see `core/network/model/API.md` for the `idea-layer/dtos/MemberDto.yaml` registry-divergence note |
+| `MemberPage` | `Member.kt` | data class — offset-paginated envelope |
+| `MemberRole` | `Member.kt` | enum (`CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN`) — deliberately NOT unified with `GroupRole` or `ViewerRole` (near-miss value-sets); see `MemberDto.kt` kdoc |
+| `LoanStatus` | `Member.kt` | enum (`ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN`) |
 
 ## 3. Consumers
 
@@ -257,6 +261,15 @@ mappers in `core/network/mapper`.
 | `GroupConfig` | `cycleLengthMonths` | `Int` | non-null |
 | `GroupConfig` | `fineAmount` | `Double?` | nullable |
 | `GroupConfig` | `minimumDisbursementThreshold` | `Double?` | nullable (no wire source — confirmed gap) |
+| `Member` | `id` | `String` | non-null |
+| `Member` | `fineractClientId` | `Long` | non-null |
+| `Member` | `displayName` | `String` | non-null |
+| `Member` | `photoUri` | `String?` | nullable |
+| `Member` | `role` | `MemberRole` | non-null |
+| `Member` | `savingsBalance` | `Double` | non-null |
+| `Member` | `loanStatus` | `LoanStatus` | non-null |
+| `MemberPage` | `totalFilteredRecords` | `Int` | non-null |
+| `MemberPage` | `members` | `List<Member>` | non-null (may be empty) |
 
 ## 6. Errors
 
@@ -272,7 +285,7 @@ suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
 `GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
 `JoinWithCodeMappersTest.kt`, `MemberDashboardMappersTest.kt`,
 `SavingsTransactionMappersTest.kt`, `GroupCreateMappersTest.kt`,
-`GroupDashboardMappersTest.kt`), which
+`GroupDashboardMappersTest.kt`, `MemberMappersTest.kt`), which
 assert every field is mapped and equality holds end to end, in BOTH
 directions where a request is submitted (`GroupCreateMappersTest.kt` covers
 `CreateGroupRequestDto -> CreateGroupRequest` AND the reverse
@@ -294,7 +307,11 @@ model, but avoid logging full transaction history in bulk).
 `GroupInstanceConfig` / `ViewerRoleInfo` / `GroupCorpus` / `ActivityItem` /
 `GroupAccounts` / `GroupConfig` carry no sensitive fields (balances + group
 config only; no PII) — `ActivityItem.memberName` is a display name, not a
-credential, but avoid bulk-logging the full activity feed.
+credential, but avoid bulk-logging the full activity feed. `Member` carries
+`displayName` (PII-adjacent display name, same threat model as
+`ActivityItem.memberName`) and `photoUri` (a CDN URL, not raw image bytes) —
+avoid bulk-logging the full member-list page; balances/role/loanStatus are
+not sensitive.
 
 ## 9. Evolution
 
@@ -320,5 +337,9 @@ repository-layer merge documented on `GroupConfig`'s kdoc rather than
 duplicating the derivation. Before generating `group-edit` or any feature
 that also embeds a per-group `group_type_config` datatable row, resolve the
 `GroupInstanceConfig`/`GroupTypeConfig` naming collision flagged in
-`core/network/model/API.md`.
+`core/network/model/API.md`. Member-list's domain concepts live in `Member.kt`
+(`Member`, `MemberPage`, `MemberRole`, `LoanStatus`) — reuse `Member` outright
+for member-profile / member-add / member-invite rather than duplicating it;
+before extending it, resolve the `idea-layer/dtos/MemberDto.yaml`
+registry-divergence flagged in `core/network/model/API.md`.
 <!-- kmp-dto-gen:END -->

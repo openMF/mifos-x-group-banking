@@ -17,6 +17,7 @@ import org.koin.dsl.module
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
+import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
 import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
 
 /**
@@ -88,5 +89,17 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.GroupDashboard))
+    }
+
+    // MODULE:MemberList — member-list PAGINATED store (NETWORK_WITH_CACHE, GET /groups/{groupId}/clients).
+    // Internal to the store seam — exposed to UI only through MemberRepository.asPagingScreenStream().
+    single(AppStoreRegistry.MemberList) {
+        provideMembersPagingStore(api = get(), dao = get())
+    }
+
+    // MODULE:MemberList — register for logout cache clearing (clears in-memory + Room SoT pages).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MemberList))
     }
 }

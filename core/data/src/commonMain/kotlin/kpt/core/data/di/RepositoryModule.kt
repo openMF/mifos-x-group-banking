@@ -44,6 +44,8 @@ import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MemberRepository
+import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -95,6 +97,18 @@ val DataModule = module {
     single<GroupDashboardRepository> {
         GroupDashboardRepositoryImpl(
             groupDashboardStore = get(AppStoreRegistry.GroupDashboard),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // member-list (GET /groups/{groupId}/clients) — wraps the PAGINATED NETWORK_WITH_CACHE
+    // MembersPagingStore (bound via AppStoreRegistry.MemberList in appStoreModule) and surfaces the
+    // offline-first .asPagingScreenStream() read (paged ScreenState<List<Member>> + load-more +
+    // pull-to-refresh, per-group via the groupId threaded into the store key).
+    single<MemberRepository> {
+        MemberRepositoryImpl(
+            membersPagingStore = get(AppStoreRegistry.MemberList),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

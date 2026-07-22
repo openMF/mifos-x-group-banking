@@ -32,6 +32,7 @@ import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
 import org.mifos.groupbanking.feature.joinwithcode.di.JoinWithCodeModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
+import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
 
 object KoinModules {
@@ -63,6 +64,7 @@ object KoinModules {
             PersonalDashboardModule, // <- added by kmp-viewmodel-gen
             GroupCreateModule, // <- added by kmp-viewmodel-gen
             GroupDashboardModule, // <- added by kmp-viewmodel-gen
+            MemberListModule, // <- added by kmp-viewmodel-gen
         )
     }
 

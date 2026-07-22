@@ -62,6 +62,10 @@ logic, no domain field names.
 | `ActivityTypeDto` | `GroupDashboardDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `GroupAccountsDto` | `GroupDashboardDto.kt` | `@Serializable` response (`get_group_accounts`) |
 | `GroupConfigDto` | `GroupDashboardDto.kt` | `@Serializable` client-constructed shape, not returned by any endpoint |
+| `MemberDto` | `MemberDto.kt` | `@Serializable` response row (`GET /groups/{groupId}/clients`) — canonical `Member`; see `## 4. Boundaries` registry-divergence note |
+| `MemberPageDto` | `MemberDto.kt` | `@Serializable` offset-paginated envelope |
+| `MemberRoleDto` | `MemberDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `LoanStatusDto` | `MemberDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 
 ## 3. Consumers
 
@@ -77,7 +81,9 @@ logic, no domain field names.
   `MemberDashboardRepository`; `core/network/mapper/GroupCreateMappers.kt` →
   `core/data` group-create repository (offices list + submit);
   `core/network/mapper/GroupDashboardMappers.kt` → `core/data`
-  `GroupDashboardRepository` (COMP-GRP-001 4-way parallel fan-in)
+  `GroupDashboardRepository` (COMP-GRP-001 4-way parallel fan-in);
+  `core/network/mapper/MemberMappers.kt` → `core/data` `MemberRepository`
+  (`GET /groups/{groupId}/clients`)
 
 ## 4. Boundaries
 
@@ -121,6 +127,12 @@ logic, no domain field names.
   UNRELATED camelCase catalogue `GroupTypeConfigDto` — flagged for Station 3,
   full note in `## dtos` (API.md). Every OTHER DTO in `GroupDashboardDto.kt`
   is companion-bridge camelCase as usual.
+- **`MemberDto` vs `idea-layer/dtos/MemberDto.yaml` registry divergence**
+  (flagged for the cross-feature repair station): the registry (v2.0.0)
+  declares a DIFFERENT shape for the SAME `GET /groups/{groupId}/clients`
+  list endpoint and does not list `member-list` as a consumer. `MemberDto`
+  here was generated from member-list's own approved `api.yaml#dtos.Member`
+  instead — full note in `## dtos` (API.md).
 
 ## 5. Data
 
@@ -295,6 +307,15 @@ logic, no domain field names.
 | `GroupConfigDto` | `cycleLengthMonths` | `cycleLengthMonths` | `Int` | — |
 | `GroupConfigDto` | `fineAmount` | `fineAmount` | `Double?` | `null` |
 | `GroupConfigDto` | `minimumDisbursementThreshold` | `minimumDisbursementThreshold` | `Double?` | `null` |
+| `MemberDto` | `id` | `id` | `String` | — |
+| `MemberDto` | `fineractClientId` | `fineractClientId` | `Long` | — |
+| `MemberDto` | `displayName` | `displayName` | `String` | — |
+| `MemberDto` | `photoUri` | `photoUri` | `String?` | `null` |
+| `MemberDto` | `role` | `role` | `MemberRoleDto` | `MemberRoleDto.UNKNOWN` |
+| `MemberDto` | `savingsBalance` | `savingsBalance` | `Double` | — |
+| `MemberDto` | `loanStatus` | `loanStatus` | `LoanStatusDto` | `LoanStatusDto.UNKNOWN` |
+| `MemberPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
+| `MemberPageDto` | `pageItems` | `pageItems` | `List<MemberDto>` | `emptyList()` |
 
 ## 6. Errors
 
@@ -327,6 +348,11 @@ additionally covers `GroupInstanceConfigDto`'s snake_case `@SerialName` wire
 casing, the mutually-exclusive nullable ACCUMULATING vs ROTATING_PAYOUT
 `GroupCorpusDto` field groups, and the full composite's cross-version
 tolerance (server-added top-level field, decoded without crashing).
+`core/network/src/commonTest/.../model/MemberDtoTest.kt` covers `MemberDto` /
+`MemberPageDto` construction, `photoUri`/`role`/`loanStatus` default-value
+behavior, serialization round-trip, every `MemberRoleDto`/`LoanStatusDto`
+known value + `UNKNOWN` fallback, and the T7/EC30 cross-version fixture
+(server-added field + unknown role value, decoded without crashing).
 
 ## 8. Observability
 
@@ -341,7 +367,10 @@ carry no sensitive fields (balances only; no PII). `CreateGroupRequestDto` /
 sensitive fields. `GroupDashboardResponseDto` / `GroupDetailDto` /
 `GroupInstanceConfigDto` / `ViewerRoleInfoDto` / `GroupCorpusDto` /
 `ActivityItemDto` / `GroupAccountsDto` / `GroupConfigDto` carry no sensitive
-fields (balances + group config only; no PII).
+fields (balances + group config only; no PII). `MemberDto` carries
+`displayName` (display-name PII, same threat model as `ActivityItemDto.memberName`)
+and `photoUri` (a CDN URL, not raw image bytes) — avoid bulk-logging the full
+member-list page; `savingsBalance`/`role`/`loanStatus` are not sensitive.
 
 ## 9. Evolution
 
@@ -361,5 +390,9 @@ Group-dashboard's DTOs live in `GroupDashboardDto.kt`; before generating a
 feature that needs the fully-merged `GroupConfigDto` (catalogue defaults +
 per-group overrides), resolve the repository-layer merge documented on
 `GroupConfigDto`'s kdoc rather than duplicating the derivation logic in a new
-DTO.
+DTO. Member-list's DTOs live in `MemberDto.kt` (`MemberDto`, `MemberPageDto`,
+`MemberRoleDto`, `LoanStatusDto`); reuse `MemberDto` outright for
+member-profile / member-add / member-invite rather than duplicating it.
+Before extending `MemberDto`, resolve the `idea-layer/dtos/MemberDto.yaml`
+registry-divergence flagged in `## 4. Boundaries` and `## dtos` (API.md).
 <!-- kmp-dto-gen:END -->
