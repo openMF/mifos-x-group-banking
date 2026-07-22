@@ -42,6 +42,8 @@ import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MemberAddRepository
+import org.mifos.groupbanking.core.data.repository.MemberAddRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
@@ -146,6 +148,13 @@ val DataModule = module {
     // stale-while-revalidate cache_strategy (SC2) — see GroupCreateRepository KDoc; not
     // half-built here, this repo's getOffices is a plain pass-through today.
     single<GroupCreateRepository> { GroupCreateRepositoryImpl(api = get()) }
+
+    // member-add create-chain (create_client -> assign_member_role -> optional upload_photo) —
+    // Store5-free mutation orchestration (business_logic.kind: processor, offline-queue-backed,
+    // no read-stream to cache), wraps MemberAddApi (NetworkModule) directly. Surfaces
+    // NetworkResult, never .asScreenStream()/.write() — same branch as
+    // AuthRepository/InvitationRepository/GroupCreateRepository above.
+    single<MemberAddRepository> { MemberAddRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

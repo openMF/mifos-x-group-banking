@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_member_add_topbar_title">Add Member</string>
+    <string name="screens_member_add_close_cd">Close and discard form</string>
+
+    <string name="screens_member_add_photo_add">Add Photo</string>
+    <string name="screens_member_add_photo_camera">Take Photo</string>
+    <string name="screens_member_add_photo_gallery">Choose from Gallery</string>
+    <string name="screens_member_add_photo_area_cd">Member photo picker; tap to add photo</string>
+    <string name="screens_member_add_photo_preview_cd">Selected member photo</string>
+    <string name="screens_member_add_photo_remove_cd">Remove selected photo</string>
+    <string name="screens_member_add_photo_camera_cd">Take photo with camera</string>
+    <string name="screens_member_add_photo_gallery_cd">Choose photo from gallery</string>
+
+    <string name="screens_member_add_field_first_name_label">First Name</string>
+    <string name="screens_member_add_field_first_name_placeholder">e.g. Amina</string>
+    <string name="screens_member_add_field_first_name_cd">First name input</string>
+
+    <string name="screens_member_add_field_last_name_label">Last Name</string>
+    <string name="screens_member_add_field_last_name_placeholder">e.g. Wanjiru</string>
+    <string name="screens_member_add_field_last_name_cd">Last name input</string>
+
+    <string name="screens_member_add_field_phone_label">Phone Number</string>
+    <string name="screens_member_add_field_phone_placeholder">+254712345678</string>
+    <string name="screens_member_add_field_phone_helper">Kenyan number: +254 or 07XXXXXXXX</string>
+    <string name="screens_member_add_field_phone_cd">Kenyan phone number input</string>
+
+    <string name="screens_member_add_field_role_label">Role</string>
+    <string name="screens_member_add_field_role_cd">Select member role</string>
+    <string name="screens_member_add_role_chairperson">Chairperson</string>
+    <string name="screens_member_add_role_treasurer">Treasurer</string>
+    <string name="screens_member_add_role_secretary">Secretary</string>
+    <string name="screens_member_add_role_member">Member</string>
+
+    <string name="screens_member_add_offline_notice">You are offline. This member will be added when you reconnect.</string>
+    <string name="screens_member_add_offline_banner_cd">Offline notice</string>
+
+    <string name="screens_member_add_action_save">Save Member</string>
+    <string name="screens_member_add_action_save_cd">Save member and submit form</string>
+    <string name="screens_member_add_action_saving">Saving…</string>
+    <string name="screens_member_add_action_saving_cd">Saving member, please wait</string>
+
+    <string name="screens_member_add_error_validation">Please fix the highlighted fields.</string>
+    <string name="screens_member_add_error_phone_format">Enter a valid Kenyan phone number.</string>
+    <string name="screens_member_add_error_phone_exists">A member with this phone number already exists.</string>
+    <string name="screens_member_add_error_network">No internet. Member queued for sync.</string>
+    <string name="screens_member_add_error_server">Server error. Please retry.</string>
+    <string name="screens_member_add_error_auth">Session expired.</string>
+    <string name="screens_member_add_error_banner_title">Couldn\'t add member</string>
+    <string name="screens_member_add_error_banner_icon_cd">Error</string>
+
+    <string name="screens_member_add_action_retry">Retry</string>
+    <string name="screens_member_add_action_retry_cd">Retry saving the member</string>
+
+    <string name="screens_member_add_success_message">Member added</string>
+    <string name="screens_member_add_success_icon_cd">Success</string>
+
+    <string name="screens_member_add_offline_dialog_title">Saved offline</string>
+    <string name="screens_member_add_offline_dialog_message">You\'re offline right now. This member will be created automatically once your connection is back.</string>
+    <string name="screens_member_add_offline_dialog_confirm">Got it</string>
+</resources>

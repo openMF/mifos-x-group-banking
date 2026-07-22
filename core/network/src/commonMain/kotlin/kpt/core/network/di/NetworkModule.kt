@@ -23,6 +23,7 @@ import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
 import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
+import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
@@ -38,6 +39,8 @@ import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
+import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApi
+import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApiImpl
 import org.mifos.groupbanking.core.network.service.memberlist.MemberApi
 import org.mifos.groupbanking.core.network.service.memberlist.MemberApiImpl
 import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApi
@@ -175,4 +178,16 @@ val NetworkModule = module {
     // a downstream kmp-store-gen/kmp-client-gen generation step, not registered here.
     single<MemberProfileApiConfig> { MemberProfileApiConfig() }
     single<MemberProfileApi> { MemberProfileApiImpl(httpClient = get()) }
+
+    // member-add create-chain (create_client -> assign_member_role -> optional upload_photo) —
+    // member-add feature client stack. Reuses the shared HttpClient singleton above (same
+    // companion host, no second engine), even though every path here is a raw Fineract
+    // passthrough rather than a `/companion/…` one — same convention as
+    // GroupCreateApi.getOffices / MemberProfileApi. The config binding is registered for
+    // override-surface symmetry with CompanionAuthApiConfig even though the shared client is the
+    // one actually dispatching requests today. The Repository consuming MemberAddApi (Store5-free
+    // mutation orchestration — offline-queue-backed create-chain, no read-stream to cache) is
+    // registered in RepositoryModule.kt.
+    single<MemberAddApiConfig> { MemberAddApiConfig() }
+    single<MemberAddApi> { MemberAddApiImpl(httpClient = get()) }
 }
