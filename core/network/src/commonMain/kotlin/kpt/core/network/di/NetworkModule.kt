@@ -24,6 +24,7 @@ import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.config.LoanApiConfig
+import org.mifos.groupbanking.core.network.config.LoanApplyApiConfig
 import org.mifos.groupbanking.core.network.config.LoanDetailApiConfig
 import org.mifos.groupbanking.core.network.config.LoanRepaymentApiConfig
 import org.mifos.groupbanking.core.network.config.LoanWriteoffApiConfig
@@ -43,6 +44,8 @@ import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
 import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApi
 import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApiImpl
+import org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApi
+import org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApiImpl
 import org.mifos.groupbanking.core.network.service.loanlist.LoanApi
 import org.mifos.groupbanking.core.network.service.loanlist.LoanApiImpl
 import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApi
@@ -242,4 +245,17 @@ val NetworkModule = module {
     // registered in RepositoryModule.kt.
     single<MemberAddApiConfig> { MemberAddApiConfig() }
     single<MemberAddApi> { MemberAddApiImpl(httpClient = get()) }
+
+    // Loan-apply form (get_group_members / get_loan_products / get_loan_template /
+    // get_member_savings / get_group_corpus / get_group_config / create_new_loan) — loan-apply
+    // feature client stack. Reuses the shared HttpClient singleton above (same companion host, no
+    // second engine), even though every path here is a raw Fineract passthrough rather than a
+    // `/companion/…` one — same convention as GroupCreateApi.getOffices / MemberAddApi. The
+    // config binding is registered for override-surface symmetry with CompanionAuthApiConfig even
+    // though the shared client is the one actually dispatching requests today. The Repository
+    // consuming LoanApplyApi (Store5-free today — `business_logic.kind: composite` with no
+    // AppStoreRegistry entry yet, pending a future kmp-store-gen LoanApplyStore) is registered in
+    // RepositoryModule.kt.
+    single<LoanApplyApiConfig> { LoanApplyApiConfig() }
+    single<LoanApplyApi> { LoanApplyApiImpl(httpClient = get()) }
 }

@@ -42,6 +42,8 @@ import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LoanApplyRepository
+import org.mifos.groupbanking.core.data.repository.LoanApplyRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanDetailRepository
 import org.mifos.groupbanking.core.data.repository.LoanDetailRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanRepaymentRepository
@@ -220,6 +222,14 @@ val DataModule = module {
     // NetworkResult, never .asScreenStream()/.write() — same branch as
     // AuthRepository/InvitationRepository/GroupCreateRepository above.
     single<MemberAddRepository> { MemberAddRepositoryImpl(api = get()) }
+
+    // loan-apply form (get_group_members + 5-way parallel combine into LoanApplyTemplate +
+    // create_new_loan submit) — Store5-free today (business_logic.kind: composite, no
+    // AppStoreRegistry entry yet — pending a future kmp-store-gen LoanApplyStore), wraps
+    // LoanApplyApi (NetworkModule) directly. Surfaces NetworkResult, never
+    // .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
+    // GroupCreateRepository/MemberAddRepository above.
+    single<LoanApplyRepository> { LoanApplyRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

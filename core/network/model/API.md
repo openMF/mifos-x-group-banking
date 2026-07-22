@@ -74,6 +74,18 @@
 | `RecordRepaymentResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `make_repayment` — literal Fineract resource-create envelope |
 | `WriteoffLoanRequestDto` | `transactionDate`, `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `transactionDate` required; `locale`/`dateFormat` default per `api.yaml` | `POST /loans/{loanId}/transactions?command=writeoff` (`write_off_loan`) request |
 | `WriteoffLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `write_off_loan` — literal Fineract resource-create envelope; structurally identical to `RecordRepaymentResponseDto` but kept a distinct per-operation type per established precedent |
+| `GroupMemberDto` | `id`, `displayName`, `imagePresent` | all required | `GET /groups/{groupId}?associations=clientMembers` (`get_group_members`, cache `ttl=3600`, `cache-first`) — loan-apply member selector; see in-file `dtos.GroupMember` divergence note below |
+| `GroupMembersResponseDto` | `clientMembers` (default `[]`) | `clientMembers` defaults empty | envelope of `get_group_members` |
+| `LoanProductDto` | `id`, `name`, `shortName`, `principal`, `minPrincipal`, `maxPrincipal`, `numberOfRepayments`, `interestRatePerPeriod` | all required | `GET /loanproducts` (`get_loan_products`, cache `ttl=3600`, `cache-first`); literal operation response — richer than the abbreviated `dtos.LoanProduct` block, see note below |
+| `LoanApplyTemplateDto` | `principal`, `numberOfRepayments`, `interestRatePerPeriod`, `interestType` (reuses `FineractStatusDto`), `amortizationType` (reuses `FineractStatusDto`), `repaymentEvery` | all required | `GET /loans/template` (`get_loan_template`) |
+| `MemberSavingsAccountRowDto` | `id`, `accountBalance`, `status` (`SavingsAccountStatusDto`) | all required | field of `get_member_savings`'s `savingsAccounts[]` |
+| `SavingsAccountStatusDto` | `value` | required | value-only status pair — distinct from `FineractStatusDto` (`{id, value}`) |
+| `MemberSavingsResponseDto` | `savingsAccounts` (default `[]`) | defaults empty | `GET /clients/{clientId}/accounts` (`get_member_savings`) |
+| `GroupCorpusRowDto` | `corpus_balance`, `last_updated` | both required | `GET /datatables/dt_group_corpus/{groupId}` (`get_group_corpus`); snake_case raw datatable row — distinct from the existing `GroupCorpusDto`, see note below |
+| `GroupLoanConfigDto` | `loan_multiplier`, `max_loan_amount`, `meeting_frequency` | all required | `GET /datatables/dt_group_config/{groupId}` (`get_group_config`); snake_case raw datatable row — distinct from the existing `GroupConfigDto`, see note below |
+| `ApplyLoanRequestDto` | `clientId`, `productId`, `principal`, `loanTermFrequency`, `loanTermFrequencyType` (default `{1,"Weeks"}`), `numberOfRepayments`, `repaymentEvery` (default `1`), `repaymentFrequencyType` (default `{1,"Weeks"}`), `interestRatePerPeriod`, `amortizationType` (default `{1,"Equal installments"}`), `interestType` (default `{0,"Declining Balance"}`), `interestCalculationPeriodType` (default `{1,"Same as repayment period"}`), `transactionProcessingStrategyId` (default `1`), `expectedDisbursementDate`, `submittedOnDate`, `loanPurposeId` | 5 lookup-pair fields + 2 Int constants default to `api.yaml`'s literal values; rest required | `POST /loans` (`create_new_loan`) request; literal Fineract body — see domain `ApplyLoanRequest` simplification note below |
+| `ApplyLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `create_new_loan` — literal Fineract resource-create envelope |
+| `LoanPurposeDto` | enum `@SerialName`: `MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOT literally wire-transmitted today (`create_new_loan` only sends the resolved `loanPurposeId: Int`), same "chip-selector resolved to an Int" precedent as `PaymentMethod`/`paymentTypeId` — see note below | domain-facing purpose selector, `api.yaml#dtos.LoanPurpose` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -123,7 +135,64 @@ different, richer shape — see divergence note below);
 `idea-layer/screens/loan-mark-defaulted-dialog/{api.yaml,ui.yaml,docs.yaml}`
 (`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`;
 `api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
-registry entry exists for this feature, per PP-1).
+registry entry exists for this feature, per PP-1);
+`idea-layer/screens/loan-apply/api.yaml` (7 operations: `get_group_members`,
+`get_loan_products`, `get_loan_template`, `get_member_savings`,
+`get_group_corpus`, `get_group_config`, `create_new_loan`; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its OWN in-file `dtos.GroupMember`/
+`dtos.LoanProduct` blocks are abbreviated summaries of the literal operation
+responses, see divergence note below).
+
+**`GroupMemberDto`/`LoanProductDto` vs `api.yaml#dtos.GroupMember`/
+`.LoanProduct` in-file divergences (flagged for the cross-feature repair
+station, same "literal operation response wins over the abbreviated dtos
+summary" precedent as `OfficeDto`/`CreateGroupTypeConfigDto`):**
+`dtos.GroupMember` additionally declares `fineractClientId: Long` with NO
+separate wire source anywhere on `get_group_members`'s literal response
+(`id`/`displayName`/`imagePresent` only) — modeled as a client-side-derived
+domain field (`GroupMember.fineractClientId = id`) rather than an invented
+wire field (Hard Rule 4). `dtos.LoanProduct` is narrower than
+`get_loan_products`'s literal response (declares only `id`/`name`/
+`shortName`/`minPrincipal`/`maxPrincipal`/`interestRatePerPeriod`, omitting
+`principal`/`numberOfRepayments` the operation actually returns) —
+`LoanProductDto` carries the FULL literal response per Hard Rule 5.
+
+**`GroupCorpusRowDto`/`GroupLoanConfigDto` bare-name collisions (flagged for
+the cross-feature repair station, same class of issue as the
+`GroupInstanceConfigDto` vs `GroupTypeConfigDto` collision above):**
+loan-apply's `get_group_corpus` (`GET /datatables/dt_group_corpus/{groupId}`,
+fields `corpus_balance`/`last_updated`) and `get_group_config` (`GET
+/datatables/dt_group_config/{groupId}`, fields `loan_multiplier`/
+`max_loan_amount`/`meeting_frequency`) are raw snake_case datatable rows —
+DIFFERENT wire shapes, DIFFERENT endpoints from the existing companion
+`GroupCorpusDto` (`GET /companion/groups/{groupId}/corpus`, camelCase, much
+richer) and `GroupConfigDto` (client-side-constructed, not returned by any
+endpoint). Named `GroupCorpusRowDto`/`GroupLoanConfigDto` to avoid the Kotlin
+class-name clash while flagging the shared-concept collision for Station 3.
+
+**`RecordRepaymentRequestDto`-style domain/wire split for `ApplyLoanRequest`
+(informational, not a registry conflict):** the domain `ApplyLoanRequest`
+(`memberId`/`productId`/`amount`/`durationWeeks`/`purpose`/`groupId`, per
+`api.yaml#dtos.LoanApplicationRequest`) is deliberately NOT the same shape as
+`ApplyLoanRequestDto` (the literal `create_new_loan` Fineract body) — same
+"domain simplified input, wire literal boilerplate" precedent as
+`RecordRepaymentRequest`/`RecordRepaymentRequestDto`. `LoanApplyMappers.kt`
+resolves `interestRatePerPeriod` from the selected `LoanProduct`,
+`submittedOnDate`/`expectedDisbursementDate` via the SHARED
+`fineractTransactionDate` helper (reused from `RecordRepaymentMappers.kt`,
+not duplicated), and `loanPurposeId` from `LoanPurpose.fineractPurposeId`
+(sequential 1-5 assignment — `api.yaml` declares no explicit per-value wire
+id, confirmed gap).
+
+**`LoanPurposeDto` — declared despite no literal wire round-trip today
+(informational):** `create_new_loan`'s body only ever transmits the
+already-resolved `loanPurposeId: Int`, same "chip-selector resolved to an
+Int before it hits the wire" precedent as `PaymentMethod`/`paymentTypeId`
+(`RecordRepayment.kt`). Declared `@Serializable` with a full `UNKNOWN`
+fallback per this generation's explicit brief plus forward-compatibility (a
+future `GET`-loan-detail response echoing the purpose back would decode
+safely through this same type).
 
 **`RecordRepaymentRequestDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
 registry divergence (flagged for the cross-feature repair station, same class
@@ -449,7 +518,7 @@ mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
 `GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
 `MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`,
-`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`.
+`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`, `LoanApplyMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_loan_apply_topbar_title">Apply for Loan</string>
+    <string name="screens_loan_apply_back_cd">Back</string>
+    <string name="screens_loan_apply_loading_cd">Loading loan application form</string>
+
+    <string name="screens_loan_apply_member_label">Select Member</string>
+    <string name="screens_loan_apply_member_placeholder">Choose a group member</string>
+    <string name="screens_loan_apply_member_cd">Select Member</string>
+
+    <string name="screens_loan_apply_eligibility_savings">Savings balance: KES %1$s</string>
+    <string name="screens_loan_apply_eligibility_max">Max eligible: KES %1$s (%2$s× savings)</string>
+    <string name="screens_loan_apply_eligibility_cd">Eligibility details</string>
+
+    <string name="screens_loan_apply_amount_label">Requested Amount (KES)</string>
+    <string name="screens_loan_apply_amount_placeholder">e.g. 1500</string>
+    <string name="screens_loan_apply_amount_cd">Requested loan amount</string>
+    <string name="screens_loan_apply_amount_icon_cd">Currency</string>
+
+    <string name="screens_loan_apply_corpus_warning">Warning: Disbursing this amount will reduce the group corpus below 10%% buffer. Current balance: KES %1$s.</string>
+    <string name="screens_loan_apply_corpus_warning_cd">Corpus balance warning</string>
+
+    <string name="screens_loan_apply_duration_label">Loan Duration</string>
+    <string name="screens_loan_apply_duration_cd">Select loan duration</string>
+    <string name="screens_loan_apply_duration_4w">4 weeks</string>
+    <string name="screens_loan_apply_duration_8w">8 weeks</string>
+    <string name="screens_loan_apply_duration_12w">12 weeks</string>
+    <string name="screens_loan_apply_duration_24w">24 weeks</string>
+    <string name="screens_loan_apply_duration_52w">52 weeks (1 year)</string>
+
+    <string name="screens_loan_apply_purpose_label">Loan Purpose</string>
+    <string name="screens_loan_apply_purpose_cd">Select loan purpose</string>
+    <string name="screens_loan_apply_purpose_medical">Medical</string>
+    <string name="screens_loan_apply_purpose_education">Education</string>
+    <string name="screens_loan_apply_purpose_business">Business</string>
+    <string name="screens_loan_apply_purpose_emergency">Emergency</string>
+    <string name="screens_loan_apply_purpose_other">Other</string>
+
+    <string name="screens_loan_apply_product_label">Loan Product</string>
+    <string name="screens_loan_apply_product_placeholder">Choose a loan product</string>
+    <string name="screens_loan_apply_product_cd">Select loan product</string>
+
+    <string name="screens_loan_apply_action_submit">Submit Application</string>
+    <string name="screens_loan_apply_action_submit_cd">Submit loan application</string>
+    <string name="screens_loan_apply_action_submitting">Submitting…</string>
+    <string name="screens_loan_apply_action_submitting_cd">Submitting application, please wait</string>
+
+    <string name="screens_loan_apply_error_title">Couldn\'t submit application</string>
+    <string name="screens_loan_apply_error_icon_cd">Error</string>
+    <string name="screens_loan_apply_action_retry">Retry</string>
+    <string name="screens_loan_apply_action_retry_cd">Retry submitting the application</string>
+
+    <string name="screens_loan_apply_error_network">No internet. Application will be queued offline.</string>
+    <string name="screens_loan_apply_error_server">Server error. Please try again.</string>
+    <string name="screens_loan_apply_error_amount_exceeds">Amount exceeds eligible limit.</string>
+    <string name="screens_loan_apply_error_corpus">Corpus balance too low to support this disbursement.</string>
+    <string name="screens_loan_apply_error_auth">Session expired. Please log in again.</string>
+
+    <string name="screens_loan_apply_success_message">Application submitted</string>
+    <string name="screens_loan_apply_success_icon_cd">Success</string>
+</resources>

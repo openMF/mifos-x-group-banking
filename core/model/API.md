@@ -74,6 +74,12 @@
 | `PaymentMethod` | enum: `MPESA(paymentTypeId=1)`, `CASH(paymentTypeId=2)` | pure client-side payment-method chip selection; NEVER serialized to/from the wire (`api.yaml` only ever transmits the resolved `paymentTypeId: Int`) — same "no wire counterpart" precedent as `LoanStatusFilter`, no `UNKNOWN` fallback needed |
 | `WriteoffLoanRequest` | (no fields — `data object`) | loan-mark-defaulted-dialog confirm-to-writeoff marker for `write_off_loan`; `loanId`/`transactionDate`/`locale`/`dateFormat` all excluded (path param + wire boilerplate, no domain-model counterpart — same precedent as `RecordRepaymentRequest`'s excluded fields, taken here to zero remaining fields since `ui.yaml` declares no free-text note/reason input) |
 | `WriteoffResult` | `officeId: Int`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `write_off_loan` success result; mirrors wire `WriteoffLoanResponseDto` 1:1; structurally identical to `RepaymentResult` but kept a distinct per-operation type per established precedent |
+| `GroupMember` | `id: Long`, `displayName: String`, `imagePresent: Boolean`, `fineractClientId: Long` | loan-apply member-selector row (`get_group_members`); deliberately NOT the canonical `Member` — see field-shape-divergence note below; `fineractClientId` is client-side derived (`= id`) |
+| `LoanProduct` | `id: Long`, `name: String`, `shortName: String`, `principal: Double`, `minPrincipal: Double`, `maxPrincipal: Double`, `numberOfRepayments: Int`, `interestRatePerPeriod: Double` | loan-apply product catalogue row (`get_loan_products`); mirrors the LITERAL operation response, not the abbreviated `api.yaml#dtos.LoanProduct` block |
+| `LoanApplyTemplate` | `products: List<LoanProduct>`, `principal: Double`, `numberOfRepayments: Int`, `interestRatePerPeriod: Double`, `interestType: MemberStatus`, `amortizationType: MemberStatus`, `repaymentEvery: Int`, `memberSavingsBalance: Double`, `groupCorpusBalance: Double`, `loanMultiplier: Double`, `maxLoanAmount: Double` | composite loan-apply template, NOT returned by a single endpoint (5-way parallel read fan-in); reuses `MemberStatus` for the 2 lookup-pair fields; `maxEligibleAmount` derived property = `min(memberSavingsBalance * loanMultiplier, maxLoanAmount)` |
+| `ApplyLoanRequest` | `memberId: Long`, `productId: Long`, `amount: Double`, `durationWeeks: Int`, `purpose: LoanPurpose`, `groupId: Long` | simplified loan-apply submission input (`api.yaml#dtos.LoanApplicationRequest`), deliberately NOT the literal `create_new_loan` Fineract body — see note below |
+| `LoanApplicationResult` | `officeId: Long`, `clientId: Long`, `loanId: Long`, `resourceId: Long` | `create_new_loan` success result; mirrors wire `ApplyLoanResponseDto` 1:1 |
+| `LoanPurpose` | enum: `MEDICAL(1)`, `EDUCATION(2)`, `BUSINESS(3)`, `EMERGENCY(4)`, `OTHER(5)`, `UNKNOWN(0)` | loan-apply purpose selector; `fineractPurposeId` resolves the wire `loanPurposeId: Int` — sequential assignment, `api.yaml` declares no explicit per-value id (confirmed gap) |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -115,7 +121,23 @@ different, richer transaction-record shape, see divergence note below);
 `idea-layer/screens/loan-mark-defaulted-dialog/{api.yaml,ui.yaml,docs.yaml}`
 (`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`;
 `api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
-registry entry exists for this feature).
+registry entry exists for this feature);
+`idea-layer/screens/loan-apply/api.yaml` (7 operations: `get_group_members`,
+`get_loan_products`, `get_loan_template`, `get_member_savings`,
+`get_group_corpus`, `get_group_config`, `create_new_loan`; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1).
+
+**`GroupMember` vs canonical `Member` field-shape divergence (flagged for the
+cross-feature repair station, same "forcing reuse would require fabricating
+values" precedent as `MemberProfile`/`GroupDetail` above):** `Member`
+requires non-null `role`/`savingsBalance`/`loanStatus` (none of which
+`get_group_members` returns) and its `id` is a companion-bridge synthetic
+`String`, while `get_group_members`'s `id` is the raw Fineract numeric
+client id (`Long`). `GroupMember` was introduced instead, matching
+`api.yaml#dtos.GroupMember`'s declared shape exactly (minus the
+in-file-abbreviated `fineractClientId`, resolved as a client-side derivation
+— see `core/network/model/API.md`).
 
 **`RecordRepaymentRequest`/`RepaymentResult` vs
 `idea-layer/dtos/LoanRepaymentDto.yaml` registry divergence (flagged for the

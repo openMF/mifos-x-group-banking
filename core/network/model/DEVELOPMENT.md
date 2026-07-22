@@ -87,6 +87,18 @@ logic, no domain field names.
 | `RecordRepaymentResponseDto` | `RecordRepaymentDto.kt` | `@Serializable` response (`make_repayment` `POST`) |
 | `WriteoffLoanRequestDto` | `WriteoffLoanDto.kt` | `@Serializable` request (`write_off_loan` `POST`) |
 | `WriteoffLoanResponseDto` | `WriteoffLoanDto.kt` | `@Serializable` response (`write_off_loan` `POST`) — structurally identical to `RecordRepaymentResponseDto`, kept a distinct per-operation type |
+| `GroupMemberDto` | `LoanApplyDto.kt` | `@Serializable` response row (`get_group_members`) — loan-apply member selector |
+| `GroupMembersResponseDto` | `LoanApplyDto.kt` | `@Serializable` envelope (`get_group_members`) |
+| `LoanProductDto` | `LoanApplyDto.kt` | `@Serializable` response row (`get_loan_products`) |
+| `LoanApplyTemplateDto` | `LoanApplyDto.kt` | `@Serializable` response (`get_loan_template`); reuses `FineractStatusDto` |
+| `MemberSavingsAccountRowDto` | `LoanApplyDto.kt` | `@Serializable` nested response DTO (`get_member_savings`) |
+| `SavingsAccountStatusDto` | `LoanApplyDto.kt` | `@Serializable` value-only status pair (distinct from `FineractStatusDto`) |
+| `MemberSavingsResponseDto` | `LoanApplyDto.kt` | `@Serializable` envelope (`get_member_savings`) |
+| `GroupCorpusRowDto` | `LoanApplyDto.kt` | `@Serializable` response (`get_group_corpus`), snake_case — distinct from `GroupCorpusDto` |
+| `GroupLoanConfigDto` | `LoanApplyDto.kt` | `@Serializable` response (`get_group_config`), snake_case — distinct from `GroupConfigDto` |
+| `ApplyLoanRequestDto` | `LoanApplyDto.kt` | `@Serializable` request (`create_new_loan` `POST /loans`); reuses `FineractStatusDto` |
+| `ApplyLoanResponseDto` | `LoanApplyDto.kt` | `@Serializable` response (`create_new_loan` `POST /loans`) |
+| `LoanPurposeDto` | `LoanApplyDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — not literally wire-transmitted today (see `## 4. Boundaries`) |
 
 ## 3. Consumers
 
@@ -113,7 +125,11 @@ logic, no domain field names.
   `core/network/mapper/RecordRepaymentMappers.kt` → `core/data` `LoanRepository`
   (`POST /loans/{loanId}/transactions?command=repayment`, `make_repayment`);
   `core/network/mapper/WriteoffLoanMappers.kt` → `core/data` `LoanRepository`
-  (`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`)
+  (`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`);
+  `core/network/mapper/LoanApplyMappers.kt` → `core/data` `LoanRepository` /
+  `MemberRepository` / `GroupRepository` (`get_group_members` + `get_loan_products`
+  + `get_loan_template` + `get_member_savings` + `get_group_corpus` +
+  `get_group_config`, DTO -> domain composite; `create_new_loan`, domain -> DTO)
 
 ## 4. Boundaries
 
@@ -218,6 +234,28 @@ logic, no domain field names.
   `List<RepaymentScheduleRowDto>` + `List<RepaymentTransactionDto>` to model
   the single `GET /loans/{loanId}` response, same "inferred envelope"
   precedent as loan-list's `LoanPageDto` — full note in `## dtos` (API.md).
+- **`GroupCorpusRowDto`/`GroupLoanConfigDto` bare-name collisions** (flagged
+  for the cross-feature repair station): loan-apply's `get_group_corpus`/
+  `get_group_config` raw-datatable rows are DIFFERENT wire shapes from the
+  existing companion `GroupCorpusDto`/`GroupConfigDto` (`GroupDashboardDto.kt`)
+  — named distinctly (`GroupCorpusRowDto`/`GroupLoanConfigDto`) to avoid the
+  Kotlin class-name clash, same "avoid the clash, flag the collision"
+  precedent as `GroupInstanceConfigDto` vs `GroupTypeConfigDto`.
+- **`LoanPurposeDto` has no literal wire round-trip today**: `create_new_loan`
+  only ever transmits the resolved `loanPurposeId: Int`
+  (`ApplyLoanRequestDto.loanPurposeId`) — same "chip-selector resolved to an
+  Int before it hits the wire" precedent as `PaymentMethod`/`paymentTypeId`.
+  Declared `@Serializable` with a full `UNKNOWN` fallback per this
+  generation's explicit brief plus forward-compatibility (a future GET
+  response echoing the purpose back decodes safely).
+- **`api.yaml#dtos.GroupMember`/`.LoanProduct` in-file divergences** (flagged
+  for the cross-feature repair station): `dtos.GroupMember` additionally
+  declares `fineractClientId: Long` with no separate wire source on
+  `get_group_members` (derived client-side as `= id`, see `GroupMemberDto`
+  kdoc); `dtos.LoanProduct` is narrower than the literal `get_loan_products`
+  response (omits `principal`/`numberOfRepayments`) — the literal operation
+  response wins, per the established `OfficeDto`/`CreateGroupTypeConfigDto`
+  precedent.
 
 ## 5. Data
 
@@ -489,6 +527,54 @@ logic, no domain field names.
 | `WriteoffLoanResponseDto` | `clientId` | `clientId` | `Long` | — |
 | `WriteoffLoanResponseDto` | `loanId` | `loanId` | `Long` | — |
 | `WriteoffLoanResponseDto` | `resourceId` | `resourceId` | `Long` | — |
+| `GroupMemberDto` | `id` | `id` | `Long` | — |
+| `GroupMemberDto` | `displayName` | `displayName` | `String` | — |
+| `GroupMemberDto` | `imagePresent` | `imagePresent` | `Boolean` | — |
+| `GroupMembersResponseDto` | `clientMembers` | `clientMembers` | `List<GroupMemberDto>` | `emptyList()` |
+| `LoanProductDto` | `id` | `id` | `Long` | — |
+| `LoanProductDto` | `name` | `name` | `String` | — |
+| `LoanProductDto` | `shortName` | `shortName` | `String` | — |
+| `LoanProductDto` | `principal` | `principal` | `Double` | — |
+| `LoanProductDto` | `minPrincipal` | `minPrincipal` | `Double` | — |
+| `LoanProductDto` | `maxPrincipal` | `maxPrincipal` | `Double` | — |
+| `LoanProductDto` | `numberOfRepayments` | `numberOfRepayments` | `Int` | — |
+| `LoanProductDto` | `interestRatePerPeriod` | `interestRatePerPeriod` | `Double` | — |
+| `LoanApplyTemplateDto` | `principal` | `principal` | `Double` | — |
+| `LoanApplyTemplateDto` | `numberOfRepayments` | `numberOfRepayments` | `Int` | — |
+| `LoanApplyTemplateDto` | `interestRatePerPeriod` | `interestRatePerPeriod` | `Double` | — |
+| `LoanApplyTemplateDto` | `interestType` | `interestType` | `FineractStatusDto` | — |
+| `LoanApplyTemplateDto` | `amortizationType` | `amortizationType` | `FineractStatusDto` | — |
+| `LoanApplyTemplateDto` | `repaymentEvery` | `repaymentEvery` | `Int` | — |
+| `MemberSavingsAccountRowDto` | `id` | `id` | `Long` | — |
+| `MemberSavingsAccountRowDto` | `accountBalance` | `accountBalance` | `Double` | — |
+| `MemberSavingsAccountRowDto` | `status` | `status` | `SavingsAccountStatusDto` | — |
+| `SavingsAccountStatusDto` | `value` | `value` | `String` | — |
+| `MemberSavingsResponseDto` | `savingsAccounts` | `savingsAccounts` | `List<MemberSavingsAccountRowDto>` | `emptyList()` |
+| `GroupCorpusRowDto` | `corpusBalance` | `corpus_balance` | `Double` | — |
+| `GroupCorpusRowDto` | `lastUpdated` | `last_updated` | `String` | — |
+| `GroupLoanConfigDto` | `loanMultiplier` | `loan_multiplier` | `Double` | — |
+| `GroupLoanConfigDto` | `maxLoanAmount` | `max_loan_amount` | `Double` | — |
+| `GroupLoanConfigDto` | `meetingFrequency` | `meeting_frequency` | `String` | — |
+| `ApplyLoanRequestDto` | `clientId` | `clientId` | `Long` | — |
+| `ApplyLoanRequestDto` | `productId` | `productId` | `Long` | — |
+| `ApplyLoanRequestDto` | `principal` | `principal` | `Double` | — |
+| `ApplyLoanRequestDto` | `loanTermFrequency` | `loanTermFrequency` | `Int` | — |
+| `ApplyLoanRequestDto` | `loanTermFrequencyType` | `loanTermFrequencyType` | `FineractStatusDto` | `{1,"Weeks"}` |
+| `ApplyLoanRequestDto` | `numberOfRepayments` | `numberOfRepayments` | `Int` | — |
+| `ApplyLoanRequestDto` | `repaymentEvery` | `repaymentEvery` | `Int` | `1` |
+| `ApplyLoanRequestDto` | `repaymentFrequencyType` | `repaymentFrequencyType` | `FineractStatusDto` | `{1,"Weeks"}` |
+| `ApplyLoanRequestDto` | `interestRatePerPeriod` | `interestRatePerPeriod` | `Double` | — |
+| `ApplyLoanRequestDto` | `amortizationType` | `amortizationType` | `FineractStatusDto` | `{1,"Equal installments"}` |
+| `ApplyLoanRequestDto` | `interestType` | `interestType` | `FineractStatusDto` | `{0,"Declining Balance"}` |
+| `ApplyLoanRequestDto` | `interestCalculationPeriodType` | `interestCalculationPeriodType` | `FineractStatusDto` | `{1,"Same as repayment period"}` |
+| `ApplyLoanRequestDto` | `transactionProcessingStrategyId` | `transactionProcessingStrategyId` | `Int` | `1` |
+| `ApplyLoanRequestDto` | `expectedDisbursementDate` | `expectedDisbursementDate` | `String` | — |
+| `ApplyLoanRequestDto` | `submittedOnDate` | `submittedOnDate` | `String` | — |
+| `ApplyLoanRequestDto` | `loanPurposeId` | `loanPurposeId` | `Int` | — |
+| `ApplyLoanResponseDto` | `officeId` | `officeId` | `Long` | — |
+| `ApplyLoanResponseDto` | `clientId` | `clientId` | `Long` | — |
+| `ApplyLoanResponseDto` | `loanId` | `loanId` | `Long` | — |
+| `ApplyLoanResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 
 ## 6. Errors
 
@@ -586,6 +672,24 @@ locale/dateFormat defaults + override) AND the reverse
 `WriteoffLoanResponseDto -> WriteoffResult` (every field); reuses
 `fineractTransactionDate` (`RecordRepaymentMappers.kt`), no duplicate
 wire-date helper.
+`core/network/src/commonTest/.../model/LoanApplyDtoTest.kt` covers every DTO
+declared in `LoanApplyDto.kt` — construction, equality, `SCHEMA_VERSION`,
+serialization round-trip, `GroupCorpusRowDto`/`GroupLoanConfigDto`'s
+snake_case wire casing, every `LoanPurposeDto` known value + `UNKNOWN`
+fallback, and a T7/EC30 cross-version fixture (server-added field, decoded
+without crashing).
+`core/network/src/commonTest/.../mapper/LoanApplyMappersTest.kt` covers
+`GroupMemberDto -> GroupMember` (`fineractClientId` derived from `id`) plus
+the batch + envelope converters; `LoanProductDto -> LoanProduct` (every
+field) plus the batch converter; the composite `LoanApplyTemplateDto ->
+LoanApplyTemplate` conversion (products + summed savings balance + corpus +
+config, every field); `LoanApplyTemplate.maxEligibleAmount`'s two boundary
+cases (multiplier-capped vs `maxLoanAmount`-capped); `ApplyLoanRequest ->
+ApplyLoanRequestDto` against a pinned `kotlin.time.Instant` (every resolved
+field, including the literal `api.yaml` lookup-pair constants);
+`ApplyLoanResponseDto -> LoanApplicationResult` (every field); and every
+`LoanPurposeDto <-> LoanPurpose` value plus `LoanPurpose.fineractPurposeId`'s
+sequential assignment.
 
 ## 8. Observability
 
@@ -627,6 +731,17 @@ credential, but avoid bulk-logging it alongside amounts).
 boilerplate + Fineract resource IDs only) — the write-off event itself is
 appropriate to log at info level (loanId only, per `docs.yaml`'s analytics
 event contract).
+`GroupMemberDto`/`GroupMembersResponseDto` carry `displayName` (display-name
+PII, same threat model as `MemberDto.displayName`) — avoid bulk-logging the
+full member-selector list; `imagePresent`/`id` are not sensitive.
+`LoanProductDto`/`LoanApplyTemplateDto`/`MemberSavingsAccountRowDto`/
+`SavingsAccountStatusDto`/`MemberSavingsResponseDto`/`GroupCorpusRowDto`/
+`GroupLoanConfigDto` carry no PII (product catalogue + balances + eligibility
+config only). `ApplyLoanRequestDto`/`ApplyLoanResponseDto` carry no PII
+(amounts, dates, Fineract resource IDs, and an internally-resolved
+`loanPurposeId` only) — the loan-submission event itself is appropriate to
+log at info level (loanId only, matching the `write_off_loan` precedent
+above), just not paired with member PII from a joined model.
 
 ## 9. Evolution
 
@@ -698,5 +813,23 @@ despite `WriteoffLoanResponseDto` being structurally identical to
 precedent (each distinct Fineract transaction `command=` gets its own DTO
 pair, even when response envelopes coincide). No `idea-layer/dtos/{Dto}.yaml`
 registry entry exists for this feature — `api.yaml` is the sole SoT (PP-1),
-so there is no registry divergence to flag.
+so there is no registry divergence to flag. **Loan-apply's own DTOs live in
+`LoanApplyDto.kt`** (`GroupMemberDto`, `GroupMembersResponseDto`,
+`LoanProductDto`, `LoanApplyTemplateDto`, `MemberSavingsAccountRowDto`,
+`SavingsAccountStatusDto`, `MemberSavingsResponseDto`, `GroupCorpusRowDto`,
+`GroupLoanConfigDto`, `ApplyLoanRequestDto`, `ApplyLoanResponseDto`,
+`LoanPurposeDto`) — `LoanApplyTemplateDto`/`ApplyLoanRequestDto` reuse the
+SHARED `FineractStatusDto` (`MemberProfileDto.kt`) for every `{id, value}`
+lookup pair rather than introducing new nested types. `GroupCorpusRowDto`/
+`GroupLoanConfigDto` were introduced instead of reusing `GroupCorpusDto`/
+`GroupConfigDto` (`GroupDashboardDto.kt`) — different wire shapes, different
+endpoints, same bare-name-collision-avoidance precedent as
+`GroupInstanceConfigDto`. Before generating a future feature that also needs
+the group's loan-eligibility policy (`loan_multiplier`/`max_loan_amount`),
+reuse `GroupLoanConfigDto`/`LoanApplyMappers.kt` rather than introducing a
+third `dt_group_config` DTO. No `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature — `api.yaml` is the sole SoT (PP-1); the ONLY
+divergences are the two in-file `dtos.GroupMember`/`dtos.LoanProduct`
+abbreviations noted in `## 4. Boundaries`, resolved in favor of the literal
+operation responses per Hard Rule 5.
 <!-- kmp-dto-gen:END -->

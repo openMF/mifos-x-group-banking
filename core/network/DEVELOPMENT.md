@@ -34,6 +34,9 @@ as a library — never edits it.
 - `LoanDetailApi` / `LoanDetailApiImpl` (`.../service/loandetail/`) — `getLoanDetail`, the single
   composite read bundling the loan header, repayment schedule, and transaction history
   (`get_loan_detail`/`get_loan`). See API.md#services.
+- `LoanApplyApi` / `LoanApplyApiImpl` (`.../service/loanapply/`) — the loan-apply form's 7
+  endpoints: `getGroupMembers`, `getLoanProducts`, `getLoanTemplate`, `getMemberSavings`,
+  `getGroupCorpus`, `getGroupLoanConfig`, `applyLoan`. See API.md#services.
 - `SupabaseConfigClient` (`kpt.core.base.network`, wired here) — dynamic server config, inert by
   default.
 - `CompanionAuthApiConfig` — Koin-injectable base-URL config for the companion backend.
@@ -50,6 +53,8 @@ as a library — never edits it.
 - `GroupDashboardApiConfig` — Koin-injectable base-URL config for the group-dashboard endpoints
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 - `LoanDetailApiConfig` — Koin-injectable base-URL config for the loan-detail endpoint
+  (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
+- `LoanApplyApiConfig` — Koin-injectable base-URL config for the loan-apply endpoints
   (override-surface symmetry; the implementation reuses the shared `HttpClient` today).
 
 ## 3. Consumers
@@ -70,8 +75,12 @@ generation step) will call `MemberDashboardApi`. The group-dashboard feature's S
 parallel and fan them into the composite dashboard model, surfaced via `.asScreenStream()`. The
 loan-detail feature's Store5 store (downstream `kmp-store-gen` generation step) will call
 `LoanDetailApi.getLoanDetail` and surface it via `.asScreenStream()` (`stale_while_revalidate`
-cache strategy, ttl=120). Feature ViewModels never call a Service directly (Repository/Store
-boundary).
+cache strategy, ttl=120). `LoanApplyRepositoryImpl` (`core/data`) calls all 7 `LoanApplyApi`
+methods directly — `getGroupMembers` is a standalone read; `getLoanProducts`/`getLoanTemplate`/
+`getMemberSavings`/`getGroupCorpus`/`getGroupLoanConfig` fire in parallel
+(`kotlinx.coroutines.coroutineScope`+`async`) and fan into the composite `LoanApplyTemplate`
+domain model; `applyLoan` submits the form (Store5-free — no `AppStoreRegistry.LoanApply` entry
+exists yet). Feature ViewModels never call a Service directly (Repository/Store boundary).
 
 ## 4. Boundaries
 
@@ -102,7 +111,12 @@ returning — no silent failures.
 ## 7. Testing
 
 `commonTest` — `CompanionAuthApiTest`, `GroupTypeConfigApiTest`, `GroupApiTest`, `InvitationApiTest`,
-`GroupCreateApiTest`, `MemberDashboardApiTest`, `GroupDashboardApiTest`, `LoanDetailApiTest`
+`GroupCreateApiTest`, `MemberDashboardApiTest`, `GroupDashboardApiTest`, `LoanDetailApiTest`,
+`LoanApplyApiTest` (24 MockEngine tests, all green — success + ≥2 error branches per method
+across all 7 `LoanApplyApi` methods, incl. `applyLoan`'s 400/403(→UNKNOWN)/500/malformed-JSON
+matrix; malformed-JSON coverage required catching `io.ktor.serialization.ContentConvertException`
+in this Service's local `requestAsNetworkResult` helper — a gap the `LoanApi`/`MemberAddApi`
+precedent's copy of the same helper does NOT close, flagged for a future upstream fix)
 (MockEngine-backed; ≥3 cases per method: success + at least two distinct error-status branches;
 `GroupApiTest` also covers default/explicit `paged`/`limit`/`offset` query-param threading;
 `InvitationApiTest` covers all 4 `InvitationApi` methods incl. path templating for
@@ -122,9 +136,9 @@ already declared in `core/network/build.gradle.kts`.
 ## 8. Observability
 
 Kermit tag per Service (`CompanionAuthApi`, `GroupTypeConfigApi`, `GroupApi`, `InvitationApi`,
-`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`) — debug on request
-start, info on 2xx, error on every failure branch (status-mapped or transport/serialization
-exception).
+`GroupCreateApi`, `MemberDashboardApi`, `GroupDashboardApi`, `LoanDetailApi`, `LoanApplyApi`) —
+debug on request start, info on 2xx, error on every failure branch (status-mapped or
+transport/serialization exception).
 
 ## 9. Evolution
 

@@ -23,6 +23,9 @@
 - `GroupCreateRepository` / `GroupCreateRepositoryImpl` — group-create wizard repository
   (`getOffices` office dropdown + `createGroup` companion orchestration, COMP-GRP-001). See
   API.md#repositories.
+- `LoanApplyRepository` / `LoanApplyRepositoryImpl` — loan-apply form repository
+  (`getGroupMembers` standalone read, `loadTemplate` 5-way parallel combine into
+  `LoanApplyTemplate`, `applyLoan` submit). See API.md#repositories.
 
 ## 3. Consumers
 
@@ -38,7 +41,12 @@ wizard ViewModel injects `GroupCreateRepository` directly — `getOffices` on-mo
 dropdown, `createGroup` on `OnSubmit` wrapped in a `viewModelScope.draftSubmitHandler<
 CreateGroupRequest, GroupCreationResult>(...)` (this project's offline-resilient input-screen
 convention) so a network failure at submit time persists the payload to the outbox instead of
-losing it — see API.md's offline-queue note.
+losing it — see API.md's offline-queue note. The loan-apply ViewModel injects
+`LoanApplyRepository` directly — `getGroupMembers` on-mount alongside the group-scoped inputs
+`loadTemplate` needs, `loadTemplate` fired once a member AND product are both selected
+(`OnMemberSelected`/`OnProductSelected`), `applyLoan` on `OnSubmit` (blocked while offline —
+`NetworkMonitor`-gated at the ViewModel layer, no offline queue for loan submissions per this
+feature's risk policy).
 
 ## 4. Boundaries
 
@@ -60,6 +68,11 @@ losing it — see API.md's offline-queue note.
   `NetworkResult`. `getOffices` has a DECLARED SC2 cache strategy it does not yet honour (no
   `OfficeStore` in `AppStoreRegistry` today) — flagged, not silently ignored; see API.md's
   KNOWN SC2 GAP note.
+- `LoanApplyRepository` is Store5-free TODAY even though `business_logic.kind: composite` —
+  no `AppStoreRegistry.LoanApply` entry exists yet (SP-03 `kmp-store-gen` has not run for this
+  feature). No try-catch — `loadTemplate` is a `coroutineScope`+`async` 5-way parallel combine
+  with a plain sequential Error-check (no `.catch{}` swallow); `getGroupMembers`/`applyLoan` are
+  plain `when` chains over `LoanApplyApi`'s `NetworkResult`.
 
 ## 5. Data
 
@@ -83,7 +96,12 @@ prefs read only); absence is represented as `null`, never an exception.
 associate-failure short-circuit, and the mark-accepted-failure-is-non-fatal case);
 `GroupCreateRepositoryTest` (fake `GroupCreateApi`; ≥5 cases per method incl. `getOffices`'
 default-orderBy/empty-list/error-passthrough cases and `createGroup`'s
-domain→DTO mapping assertion + validation/conflict/server-error passthrough cases).
+domain→DTO mapping assertion + validation/conflict/server-error passthrough cases);
+`LoanApplyRepositoryTest` (fake `LoanApplyApi`; 12 cases, all green — `getGroupMembers`
+success/404/empty, `loadTemplate`'s all-5-succeed derived-eligibility assertion plus one
+short-circuit case per read (products/template/savings/corpus/config each independently
+verified to propagate its error), `applyLoan` success/400/500 incl. the
+domain→DTO purpose-id mapping assertion).
 
 ## 8. Observability
 
@@ -94,7 +112,10 @@ failure branch (mirrors the Service's own logging one layer down). Kermit tag
 error on every failure branch including the non-fatal mark-accepted failure (still logged, does
 not fail the call). Kermit tag `GroupCreateRepository` — debug on each call start (incl.
 `name`/`officeId` on `createGroup`), info on success (incl. `groupId`/office count), error on
-every failure branch.
+every failure branch. Kermit tag `LoanApplyRepository` — debug on each call start (incl.
+`groupId`/`clientId`/`productId` on `loadTemplate`), info on success (incl. `maxEligibleAmount`
+on `loadTemplate`, `loanId` on `applyLoan`), error on the specific read that failed within the
+5-way `loadTemplate` combine (not a generic "combine failed" message).
 
 ## 9. Evolution
 
@@ -107,4 +128,11 @@ Repository's mutation shape onto a read-stream feature. `GroupCreateRepository.g
 the concrete example of this boundary: once `kmp-store-gen` emits `core/store/OfficeStore.kt` +
 registers `AppStoreRegistry.Office`, upgrade its body to `officeStore.asScreenStream(...)`
 (mirroring `GroupTypeConfigRepositoryImpl`) instead of leaving the plain pass-through in place.
+`LoanApplyRepository.loadTemplate` is the SAME upgrade-pending shape for a `composite`
+`business_logic.kind` one-shot form-prefill combine (as opposed to `getOffices`' simple
+pass-through) — once `kmp-store-gen` emits a composite `LoanApplyStore` (mirroring
+`GroupDashboardStore`/`MemberProfileStore`'s dynamic-key `NETWORK_WITH_CACHE` pattern) and
+registers `AppStoreRegistry.LoanApply`, upgrade `loadTemplate`'s body to
+`loanApplyStore.asScreenStream(key)` and move the 5-way parallel-combine logic into that store's
+fetcher.
 <!-- kmp-client-gen:END -->

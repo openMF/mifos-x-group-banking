@@ -13,6 +13,7 @@
 | `InvitationRepository` / `InvitationRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | — (no read-stream; `validateCode`/`fetchGroupPreview` are one-shot no-cache reads) | `validateCode(code): NetworkResult<Invitation, NetworkError>`, `fetchGroupPreview(groupId): NetworkResult<GroupPreview, NetworkError>`, `joinGroup(groupId, clientId, role, code, rowId): NetworkResult<JoinGroupResult, NetworkError>` (associates then best-effort marks the invite accepted — non-fatal on mark-accepted failure) | Store5-free mutation orchestration — `business_logic.kind: processor`, `cache_strategy: no-cache` throughout (see RULE-IMPLEMENT-STORE5-001 scope) |
 | `UserDataRepository` / `UserDataRepositoryImpl` (`kpt.core.data.user`) | `userData: StateFlow<UserData>`, theme/language/preference flows | `setLanguage`/`setThemeBrand`/`setIsAuthenticated`/etc. | Template-provided user-preferences repository (unrelated to auth session) |
 | `GroupCreateRepository` / `GroupCreateRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getOffices(orderBy = "name"): NetworkResult<List<Office>, NetworkError>` (plain pass-through today — SC2 gap, see notes) | `createGroup(CreateGroupRequest): NetworkResult<GroupCreationResult, NetworkError>` | Store5-free mutation orchestration for `createGroup` — `business_logic.kind: processor` (see RULE-IMPLEMENT-STORE5-001 scope); `getOffices` is Store5-free TODAY pending a future `kmp-store-gen` `OfficeStore` |
+| `LoanApplyRepository` / `LoanApplyRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getGroupMembers(groupId): NetworkResult<List<GroupMember>, NetworkError>`, `loadTemplate(groupId, clientId, productId): NetworkResult<LoanApplyTemplate, NetworkError>` (5-way parallel combine — `getLoanProducts`+`getLoanTemplate`+`getMemberSavings`+`getGroupCorpus`+`getGroupLoanConfig`) | `applyLoan(ApplyLoanRequest, LoanProduct): NetworkResult<LoanApplicationResult, NetworkError>` | Store5-free TODAY — `business_logic.kind: composite`, but no `AppStoreRegistry.LoanApply` entry exists yet (SP-03 `kmp-store-gen` has not run for this feature); see notes below |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
@@ -37,11 +38,27 @@ wired at the ViewModel layer via `DraftSubmitHandler` wrapping this repository's
 call (this project's `core-base/store` convention — see `GroupCreateRepository` KDoc), NOT
 inside the repository itself.
 
+Contract refs (LoanApplyRepository): loan-apply form (`business_logic.kind: composite`) — see
+`idea-layer/screens/loan-apply/api.yaml` + `data-flow.yaml#entries`. `loadTemplate`'s 5-way
+parallel combine matches `LoanApplyMappers.kt#LoanApplyTemplateDto.toDomainModel`'s receiver
++ 4-param contract EXACTLY: `getLoanProducts` ([groupId]-scoped catalogue), `getLoanTemplate`
+([clientId]+[productId]-scoped defaults — receiver), `getMemberSavings` ([clientId]-scoped
+eligibility input), `getGroupCorpus`/`getGroupLoanConfig` ([groupId]-scoped eligibility
+inputs). `getGroupMembers` is a SEPARATE standalone read (the member selector) — NOT part of
+the 5-way combine, since `LoanApplyTemplate` carries no member list. First
+`NetworkResult.Error` encountered (fixed declaration order: products, template, savings,
+corpus, config) short-circuits `loadTemplate`; all 5 in-flight reads are still awaited
+(`coroutineScope` structured concurrency) before the function returns. `applyLoan` takes an
+explicit `product: LoanProduct` param (the screen's already-selected product from
+`loadTemplate`'s `products` list) — needed to resolve `ApplyLoanRequestDto.interestRatePerPeriod`
+per `LoanApplyMappers.kt#ApplyLoanRequest.toDto`; no redundant `getLoanProducts` re-fetch at
+submit time.
+
 ## Store5 note
 
 `core/data` also hosts Store5-wrapping Repositories for read-stream features (per SP-04 —
 `.asScreenStream()` / `.asPagingScreenStream()` over a `core/store` `Store`/`MutableStore`).
-None exist yet for `login-signup`, `join-with-code`, or `group-create` (all out of Store5 scope
-today — see DEVELOPMENT.md#4). `group-create`'s `getOffices` is the one candidate pending a
-future `kmp-store-gen` `OfficeStore`.
+None exist yet for `login-signup`, `join-with-code`, `group-create`, or `loan-apply` (all out
+of Store5 scope today — see DEVELOPMENT.md#4). `group-create`'s `getOffices` and `loan-apply`'s
+`loadTemplate` are both candidates pending a future `kmp-store-gen` `OfficeStore`/`LoanApplyStore`.
 <!-- kmp-client-gen:END -->

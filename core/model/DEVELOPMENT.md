@@ -85,6 +85,12 @@ mappers in `core/network/mapper`.
 | `PaymentMethod` | `RecordRepayment.kt` | enum (`MPESA`, `CASH`) with `paymentTypeId: Int` property; pure client-side chip state, no wire counterpart |
 | `WriteoffLoanRequest` | `WriteoffLoan.kt` | `data object` — loan-mark-defaulted-dialog confirm-to-writeoff marker (`write_off_loan`); zero domain-meaningful fields |
 | `WriteoffResult` | `WriteoffLoan.kt` | data class — `write_off_loan` success result |
+| `GroupMember` | `LoanApply.kt` | data class — loan-apply member selector row (`get_group_members`); deliberately NOT `Member` (field-shape divergence, see `core/network/model/API.md`) |
+| `LoanProduct` | `LoanApply.kt` | data class — loan-apply product catalogue row (`get_loan_products`) |
+| `LoanApplyTemplate` | `LoanApply.kt` | data class — composite loan-apply template (products + defaults + eligibility inputs); reuses `MemberStatus`; `maxEligibleAmount` derived property |
+| `ApplyLoanRequest` | `LoanApply.kt` | data class — simplified loan-apply submission input (`create_new_loan`) |
+| `LoanApplicationResult` | `LoanApply.kt` | data class — `create_new_loan` success result |
+| `LoanPurpose` | `LoanApply.kt` | enum (`MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `UNKNOWN`) with `fineractPurposeId: Int` property |
 
 ## 3. Consumers
 
@@ -115,7 +121,13 @@ mappers in `core/network/mapper`.
   the same way, BOTH directions — domain -> DTO for the confirm-marker
   `WriteoffLoanRequest`, DTO -> domain for the `WriteoffResult` —
   `LoanRepository.markDefaulted(loanId)`
-  (`POST /loans/{loanId}/transactions?command=writeoff`))
+  (`POST /loans/{loanId}/transactions?command=writeoff`); the loan-apply
+  repositories map `LoanApplyMappers.kt` output the same way, BOTH
+  directions — DTO -> domain composite for the 6 parallel reads
+  (`get_group_members`/`get_loan_products`/`get_loan_template`/
+  `get_member_savings`/`get_group_corpus`/`get_group_config`), domain -> DTO
+  for the submitted `ApplyLoanRequest` — `LoanRepository`/`MemberRepository`/
+  `GroupRepository` (`POST /loans`))
 
 ## 4. Boundaries
 
@@ -387,6 +399,40 @@ mappers in `core/network/mapper`.
 | `WriteoffResult` | `clientId` | `Long` | non-null |
 | `WriteoffResult` | `loanId` | `Long` | non-null |
 | `WriteoffResult` | `resourceId` | `Long` | non-null |
+| `GroupMember` | `id` | `Long` | non-null |
+| `GroupMember` | `displayName` | `String` | non-null |
+| `GroupMember` | `imagePresent` | `Boolean` | non-null |
+| `GroupMember` | `fineractClientId` | `Long` | non-null (derived, = `id`) |
+| `LoanProduct` | `id` | `Long` | non-null |
+| `LoanProduct` | `name` | `String` | non-null |
+| `LoanProduct` | `shortName` | `String` | non-null |
+| `LoanProduct` | `principal` | `Double` | non-null |
+| `LoanProduct` | `minPrincipal` | `Double` | non-null |
+| `LoanProduct` | `maxPrincipal` | `Double` | non-null |
+| `LoanProduct` | `numberOfRepayments` | `Int` | non-null |
+| `LoanProduct` | `interestRatePerPeriod` | `Double` | non-null |
+| `LoanApplyTemplate` | `products` | `List<LoanProduct>` | non-null (may be empty) |
+| `LoanApplyTemplate` | `principal` | `Double` | non-null |
+| `LoanApplyTemplate` | `numberOfRepayments` | `Int` | non-null |
+| `LoanApplyTemplate` | `interestRatePerPeriod` | `Double` | non-null |
+| `LoanApplyTemplate` | `interestType` | `MemberStatus` | non-null |
+| `LoanApplyTemplate` | `amortizationType` | `MemberStatus` | non-null |
+| `LoanApplyTemplate` | `repaymentEvery` | `Int` | non-null |
+| `LoanApplyTemplate` | `memberSavingsBalance` | `Double` | non-null |
+| `LoanApplyTemplate` | `groupCorpusBalance` | `Double` | non-null |
+| `LoanApplyTemplate` | `loanMultiplier` | `Double` | non-null |
+| `LoanApplyTemplate` | `maxLoanAmount` | `Double` | non-null |
+| `LoanApplyTemplate` | `maxEligibleAmount` | `Double` | non-null (derived, `min(savings*multiplier, maxLoanAmount)`) |
+| `ApplyLoanRequest` | `memberId` | `Long` | non-null |
+| `ApplyLoanRequest` | `productId` | `Long` | non-null |
+| `ApplyLoanRequest` | `amount` | `Double` | non-null |
+| `ApplyLoanRequest` | `durationWeeks` | `Int` | non-null |
+| `ApplyLoanRequest` | `purpose` | `LoanPurpose` | non-null |
+| `ApplyLoanRequest` | `groupId` | `Long` | non-null |
+| `LoanApplicationResult` | `officeId` | `Long` | non-null |
+| `LoanApplicationResult` | `clientId` | `Long` | non-null |
+| `LoanApplicationResult` | `loanId` | `Long` | non-null |
+| `LoanApplicationResult` | `resourceId` | `Long` | non-null |
 
 ## 6. Errors
 
@@ -438,6 +484,18 @@ tests for the `fineractTransactionDate` wire-date helper.
 reverse `WriteoffLoanResponseDto -> WriteoffResult` (every field); reuses
 `fineractTransactionDate` (`RecordRepaymentMappers.kt`) rather than defining a
 second wire-date helper.
+`LoanApplyMappersTest.kt` covers `GroupMemberDto -> GroupMember` (`fineractClientId`
+derived from `id`) plus the batch + envelope converters; `LoanProductDto ->
+LoanProduct` (every field) plus the batch converter; the composite
+`LoanApplyTemplateDto -> LoanApplyTemplate` conversion (products + summed
+savings balance + corpus + config, every field) plus
+`LoanApplyTemplate.maxEligibleAmount`'s two boundary cases
+(multiplier-capped vs `maxLoanAmount`-capped); `ApplyLoanRequest ->
+ApplyLoanRequestDto` against a pinned `kotlin.time.Instant` (every resolved
+field, reusing `fineractTransactionDate` rather than a second wire-date
+helper); `ApplyLoanResponseDto -> LoanApplicationResult` (every field); and
+every `LoanPurposeDto <-> LoanPurpose` value plus
+`LoanPurpose.fineractPurposeId`'s sequential assignment.
 
 ## 8. Observability
 
@@ -474,7 +532,16 @@ not a credential, but avoid bulk-logging it alongside amounts).
 resource IDs only) — the write-off IS the irreversible destructive event
 itself, so its occurrence is appropriate to log at info level (loanId only,
 per the `docs.yaml` analytics event contract), just not paired with member PII
-from a joined model.
+from a joined model. `GroupMember` carries `displayName` (display-name PII,
+same threat model as `Member.displayName`) — avoid bulk-logging the full
+member-selector list; `imagePresent`/`id`/`fineractClientId` are not
+sensitive. `LoanProduct`/`LoanApplyTemplate` carry no PII (product catalogue
++ balances + eligibility config only). `ApplyLoanRequest`/
+`LoanApplicationResult` carry no PII (amounts, a week count, an enum
+purpose, and Fineract resource IDs only) — the loan-submission event itself
+is appropriate to log at info level (loanId only, matching the
+`WriteoffResult` precedent above), just not paired with member PII from a
+joined model.
 
 ## 9. Evolution
 
@@ -543,5 +610,23 @@ concepts live in `WriteoffLoan.kt`** (`WriteoffLoanRequest`, `WriteoffResult`)
 structurally-identical `WriteoffResult`/`RepaymentResult` shapes, matching the
 established per-operation-type precedent (no cross-operation domain-model
 sharing across distinct Fineract transaction commands, even when their
-response envelopes coincide).
+response envelopes coincide). **Loan-apply's own domain concepts live in
+`LoanApply.kt`** (`GroupMember`, `LoanProduct`, `LoanApplyTemplate`,
+`ApplyLoanRequest`, `LoanApplicationResult`, `LoanPurpose`) — `GroupMember`
+was introduced rather than reusing the canonical `Member` (member-list):
+`Member` requires non-null `role`/`savingsBalance`/`loanStatus` (none of
+which `get_group_members` returns) and its `id` is a `String`, while this
+endpoint's `id` is a raw Fineract `Long`; forcing `Member` reuse would mean
+fabricating values with no wire source (Hard Rule 4), same test already
+applied to `MemberProfile`/`GroupDetail`. `LoanApplyTemplate` reuses the
+SHARED `MemberStatus` (`MemberProfile.kt`) for `interestType`/
+`amortizationType` rather than introducing a new `{id, value}` lookup-pair
+type. Before generating a future feature that also needs a group's
+loan-eligibility policy (`loanMultiplier`/`maxLoanAmount`), reuse
+`LoanApplyTemplate`'s eligibility fields / `LoanApplyMappers.kt` rather than
+re-deriving the `dt_group_config` read. `LoanPurpose.fineractPurposeId`'s
+sequential 1-5 assignment is a confirmed gap (`api.yaml` declares no
+explicit per-value wire id) — if a future `api.yaml` revision declares
+explicit ids, update the enum's constructor arguments in place (no shape
+change, no `SCHEMA_VERSION` bump needed on the domain side).
 <!-- kmp-dto-gen:END -->
