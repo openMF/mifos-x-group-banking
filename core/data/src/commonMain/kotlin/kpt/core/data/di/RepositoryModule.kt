@@ -44,6 +44,8 @@ import org.mifos.groupbanking.core.data.repository.InvitationRepository
 import org.mifos.groupbanking.core.data.repository.InvitationRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
+import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
 
@@ -109,6 +111,22 @@ val DataModule = module {
     single<MemberRepository> {
         MemberRepositoryImpl(
             membersPagingStore = get(AppStoreRegistry.MemberList),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // member-profile (get_client + get_client_accounts + get_member_role composite read;
+    // update_member_role write) — wraps the COMPOSITE dynamic-key NETWORK_WITH_CACHE
+    // MemberProfileStore (bound via AppStoreRegistry.MemberProfile in appStoreModule) and surfaces
+    // the offline-first .asScreenStream() read (per-client ScreenState<MemberProfileDetail>). The
+    // chairperson-gated updateMemberRole write also takes the MemberProfileApi directly (get()) to
+    // dispatch the PUT and invalidate the per-client cache via store.clear(clientId) on success
+    // (data-flow.yaml#cache.strategy: invalidate) — routed through the store, never a DAO bypass.
+    single<MemberProfileRepository> {
+        MemberProfileRepositoryImpl(
+            memberProfileStore = get(AppStoreRegistry.MemberProfile),
+            memberProfileApi = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

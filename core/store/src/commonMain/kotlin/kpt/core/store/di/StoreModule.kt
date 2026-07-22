@@ -18,6 +18,7 @@ import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboa
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
+import org.mifos.groupbanking.core.store.memberprofile.impl.provideMemberProfileStore
 import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
 
 /**
@@ -101,5 +102,19 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.MemberList))
+    }
+
+    // MODULE:MemberProfile — member-profile COMPOSITE store (dynamic-key NETWORK_WITH_CACHE,
+    // get_client + get_client_accounts + get_member_role). Internal to the store seam — exposed to
+    // UI only through MemberProfileRepository.asScreenStream(); the update_member_role write
+    // invalidates via store.clear(clientId) in MemberProfileRepositoryImpl.
+    single(AppStoreRegistry.MemberProfile) {
+        provideMemberProfileStore(api = get(), dao = get())
+    }
+
+    // MODULE:MemberProfile — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MemberProfile))
     }
 }

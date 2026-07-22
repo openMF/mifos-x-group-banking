@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_member_profile_screen_title">Member Profile</string>
+
+    <string name="screens_member_profile_avatar_cd">%1$s avatar</string>
+    <string name="screens_member_profile_member_since">Member since %1$s</string>
+    <string name="screens_member_profile_edit_role">Edit Role</string>
+    <string name="screens_member_profile_role_chairperson">Chairperson</string>
+    <string name="screens_member_profile_role_treasurer">Treasurer</string>
+    <string name="screens_member_profile_role_secretary">Secretary</string>
+    <string name="screens_member_profile_role_member">Member</string>
+
+    <string name="screens_member_profile_savings_label">Savings History</string>
+    <string name="screens_member_profile_savings_balance">KES %1$s</string>
+    <string name="screens_member_profile_sparkline_cd">Savings balance trend from KES %1$s to KES %2$s</string>
+    <string name="screens_member_profile_view_full_history">View Full History</string>
+
+    <string name="screens_member_profile_loan_label">Active Loan</string>
+    <string name="screens_member_profile_loan_outstanding">KES %1$s outstanding</string>
+    <string name="screens_member_profile_loan_arrears">This loan is in arrears. Due: %1$s</string>
+    <string name="screens_member_profile_loan_arrears_cd">Warning</string>
+
+    <string name="screens_member_profile_attendance_label">Meeting Attendance</string>
+    <string name="screens_member_profile_attendance_fraction">%1$d / %2$d</string>
+    <string name="screens_member_profile_attendance_rate">%1$d%% attendance rate</string>
+    <string name="screens_member_profile_attendance_progress_cd">%1$d percent attendance rate</string>
+
+    <string name="screens_member_profile_change_role_title">Change Member Role</string>
+    <string name="screens_member_profile_confirm">Confirm</string>
+
+    <string name="screens_member_profile_error_state_title">Could not load profile</string>
+    <string name="screens_member_profile_error_icon_cd">Error</string>
+    <string name="screens_member_profile_btn_retry">Retry</string>
+    <string name="screens_member_profile_role_updated">Role updated successfully.</string>
+    <string name="screens_member_profile_error_network">No internet. Showing cached profile.</string>
+    <string name="screens_member_profile_error_server">Server error. Please retry.</string>
+    <string name="screens_member_profile_error_not_found">Member not found.</string>
+    <string name="screens_member_profile_error_auth">Session expired.</string>
+    <string name="screens_member_profile_error_role_update">Could not update role. Please retry.</string>
+</resources>

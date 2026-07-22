@@ -66,6 +66,15 @@ logic, no domain field names.
 | `MemberPageDto` | `MemberDto.kt` | `@Serializable` offset-paginated envelope |
 | `MemberRoleDto` | `MemberDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `LoanStatusDto` | `MemberDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `MemberProfileDto` | `MemberProfileDto.kt` | `@Serializable` response row (`get_client`) — NOT the same shape as `MemberDto` |
+| `FineractStatusDto` | `MemberProfileDto.kt` | `@Serializable` shared nested `{id, value}` status pair |
+| `MemberAccountsDto` | `MemberProfileDto.kt` | `@Serializable` response (`get_client_accounts`) — literal raw arrays, NOT the aggregated domain shape |
+| `MemberSavingsAccountDto` | `MemberProfileDto.kt` | `@Serializable` nested response DTO |
+| `MemberLoanAccountDto` | `MemberProfileDto.kt` | `@Serializable` nested response DTO |
+| `MemberLoanAccountSummaryDto` | `MemberProfileDto.kt` | `@Serializable` nested response DTO |
+| `MemberRoleInfoDto` | `MemberProfileDto.kt` | `@Serializable` response row (`get_member_role`); reuses `MemberRoleDto` |
+| `UpdateMemberRoleRequestDto` | `MemberProfileDto.kt` | `@Serializable` request (`update_member_role` `PUT`); reuses `MemberRoleDto` |
+| `UpdateMemberRoleResponseDto` | `MemberProfileDto.kt` | `@Serializable` response (`update_member_role` `PUT`) |
 
 ## 3. Consumers
 
@@ -83,7 +92,9 @@ logic, no domain field names.
   `core/network/mapper/GroupDashboardMappers.kt` → `core/data`
   `GroupDashboardRepository` (COMP-GRP-001 4-way parallel fan-in);
   `core/network/mapper/MemberMappers.kt` → `core/data` `MemberRepository`
-  (`GET /groups/{groupId}/clients`)
+  (`GET /groups/{groupId}/clients`); `core/network/mapper/MemberProfileMappers.kt`
+  → `core/data` `MemberRepository` (`get_client` + `get_client_accounts` +
+  `get_member_role`, DTO -> domain; `update_member_role`, domain -> DTO)
 
 ## 4. Boundaries
 
@@ -133,6 +144,21 @@ logic, no domain field names.
   list endpoint and does not list `member-list` as a consumer. `MemberDto`
   here was generated from member-list's own approved `api.yaml#dtos.Member`
   instead — full note in `## dtos` (API.md).
+- **`MemberProfileDto` is NOT `MemberDto`** (flagged for the cross-feature
+  repair station): `get_client`'s response genuinely diverges from the
+  member-list `MemberDto` wire shape (no `role`/`savingsBalance`/`loanStatus`;
+  carries `firstname`/`lastname`/`mobileNo`/`imagePresent`/`status`/
+  `activationDate`/`officeId` instead) — see the full note in `## dtos`
+  (API.md). `firstname`/`lastname` (lowercase `n`) is genuine Fineract API
+  casing, matched verbatim per Hard Rule 5.
+- **`MemberAccountsDto` is the LITERAL raw response, not the aggregated
+  domain shape** (flagged for the cross-feature repair station): `api.yaml`
+  declares an aggregated `dtos.MemberAccounts` (`savingsBalance`/
+  `savingsHistory`/`activeLoan`), but `get_client_accounts` actually returns
+  raw `savingsAccounts[]`/`loanAccounts[]` arrays. `MemberAccountsDto` mirrors
+  the literal operation response; the aggregation happens in
+  `MemberProfileMappers.kt` on the way to the domain `MemberAccounts` — see
+  `## dtos` (API.md).
 
 ## 5. Data
 
@@ -316,6 +342,39 @@ logic, no domain field names.
 | `MemberDto` | `loanStatus` | `loanStatus` | `LoanStatusDto` | `LoanStatusDto.UNKNOWN` |
 | `MemberPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
 | `MemberPageDto` | `pageItems` | `pageItems` | `List<MemberDto>` | `emptyList()` |
+| `MemberProfileDto` | `id` | `id` | `Long` | — |
+| `MemberProfileDto` | `displayName` | `displayName` | `String` | — |
+| `MemberProfileDto` | `firstName` | `firstname` | `String` | — |
+| `MemberProfileDto` | `lastName` | `lastname` | `String` | — |
+| `MemberProfileDto` | `mobileNo` | `mobileNo` | `String` | — |
+| `MemberProfileDto` | `imagePresent` | `imagePresent` | `Boolean` | — |
+| `MemberProfileDto` | `status` | `status` | `FineractStatusDto` | — |
+| `MemberProfileDto` | `activationDate` | `activationDate` | `String` | — |
+| `MemberProfileDto` | `officeId` | `officeId` | `Long` | — |
+| `FineractStatusDto` | `id` | `id` | `Int` | — |
+| `FineractStatusDto` | `value` | `value` | `String` | — |
+| `MemberAccountsDto` | `savingsAccounts` | `savingsAccounts` | `List<MemberSavingsAccountDto>` | `emptyList()` |
+| `MemberAccountsDto` | `loanAccounts` | `loanAccounts` | `List<MemberLoanAccountDto>` | `emptyList()` |
+| `MemberSavingsAccountDto` | `id` | `id` | `Long` | — |
+| `MemberSavingsAccountDto` | `productName` | `productName` | `String` | — |
+| `MemberSavingsAccountDto` | `accountNo` | `accountNo` | `String` | — |
+| `MemberSavingsAccountDto` | `balance` | `balance` | `Double` | — |
+| `MemberSavingsAccountDto` | `status` | `status` | `FineractStatusDto` | — |
+| `MemberLoanAccountDto` | `id` | `id` | `Long` | — |
+| `MemberLoanAccountDto` | `productName` | `productName` | `String` | — |
+| `MemberLoanAccountDto` | `accountNo` | `accountNo` | `String` | — |
+| `MemberLoanAccountDto` | `status` | `status` | `FineractStatusDto` | — |
+| `MemberLoanAccountDto` | `summary` | `summary` | `MemberLoanAccountSummaryDto` | — |
+| `MemberLoanAccountSummaryDto` | `principalDisbursed` | `principalDisbursed` | `Double` | — |
+| `MemberLoanAccountSummaryDto` | `principalOutstanding` | `principalOutstanding` | `Double` | — |
+| `MemberLoanAccountSummaryDto` | `totalOverdue` | `totalOverdue` | `Double` | — |
+| `MemberRoleInfoDto` | `role` | `role` | `MemberRoleDto` | `MemberRoleDto.UNKNOWN` |
+| `MemberRoleInfoDto` | `groupId` | `groupId` | `Long` | — |
+| `MemberRoleInfoDto` | `assignedDate` | `assignedDate` | `String` | — |
+| `UpdateMemberRoleRequestDto` | `role` | `role` | `MemberRoleDto` | `MemberRoleDto.UNKNOWN` |
+| `UpdateMemberRoleRequestDto` | `groupId` | `groupId` | `Long` | — |
+| `UpdateMemberRoleRequestDto` | `assignedDate` | `assignedDate` | `String` | — |
+| `UpdateMemberRoleResponseDto` | `resourceId` | `resourceId` | `Long` | — |
 
 ## 6. Errors
 
@@ -353,6 +412,15 @@ tolerance (server-added top-level field, decoded without crashing).
 behavior, serialization round-trip, every `MemberRoleDto`/`LoanStatusDto`
 known value + `UNKNOWN` fallback, and the T7/EC30 cross-version fixture
 (server-added field + unknown role value, decoded without crashing).
+`core/network/src/commonTest/.../model/MemberProfileDtoTest.kt` covers
+`MemberProfileDto`'s literal Fineract `firstname`/`lastname` wire casing
+(distinct from the idiomatic `firstName`/`lastName` Kotlin property names),
+the nested `FineractStatusDto` shape, `MemberAccountsDto`'s raw
+`savingsAccounts[]`/`loanAccounts[]` default-empty behavior,
+`MemberRoleInfoDto`'s array-response decode + `UNKNOWN` role fallback, both
+`UpdateMemberRoleRequestDto`/`ResponseDto`, every DTO's `SCHEMA_VERSION`, and
+a T7/EC30 cross-version fixture (server-added field, decoded without
+crashing).
 
 ## 8. Observability
 
@@ -371,6 +439,13 @@ fields (balances + group config only; no PII). `MemberDto` carries
 `displayName` (display-name PII, same threat model as `ActivityItemDto.memberName`)
 and `photoUri` (a CDN URL, not raw image bytes) — avoid bulk-logging the full
 member-list page; `savingsBalance`/`role`/`loanStatus` are not sensitive.
+`MemberProfileDto` carries `displayName`/`firstName`/`lastName` (PII display
+names) and `mobileNo` (PII, a phone number) — avoid bulk-logging
+member-profile identity payloads. `MemberAccountsDto` / `FineractStatusDto` /
+`MemberSavingsAccountDto` / `MemberLoanAccountDto` /
+`MemberLoanAccountSummaryDto` / `MemberRoleInfoDto` /
+`UpdateMemberRoleRequestDto` / `UpdateMemberRoleResponseDto` carry no
+sensitive fields (balances + role only; no PII).
 
 ## 9. Evolution
 
@@ -391,8 +466,20 @@ feature that needs the fully-merged `GroupConfigDto` (catalogue defaults +
 per-group overrides), resolve the repository-layer merge documented on
 `GroupConfigDto`'s kdoc rather than duplicating the derivation logic in a new
 DTO. Member-list's DTOs live in `MemberDto.kt` (`MemberDto`, `MemberPageDto`,
-`MemberRoleDto`, `LoanStatusDto`); reuse `MemberDto` outright for
-member-profile / member-add / member-invite rather than duplicating it.
-Before extending `MemberDto`, resolve the `idea-layer/dtos/MemberDto.yaml`
-registry-divergence flagged in `## 4. Boundaries` and `## dtos` (API.md).
+`MemberRoleDto`, `LoanStatusDto`); reuse `MemberRoleDto` outright for
+role-badge concepts (member-profile's `MemberRoleInfoDto` /
+`UpdateMemberRoleRequestDto` do exactly this). Before extending `MemberDto`
+itself, resolve the `idea-layer/dtos/MemberDto.yaml` registry-divergence
+flagged in `## 4. Boundaries` and `## dtos` (API.md). **Member-profile's own
+DTOs live in `MemberProfileDto.kt`** (`MemberProfileDto`, `FineractStatusDto`,
+`MemberAccountsDto`, `MemberSavingsAccountDto`, `MemberLoanAccountDto`,
+`MemberLoanAccountSummaryDto`, `MemberRoleInfoDto`,
+`UpdateMemberRoleRequestDto`, `UpdateMemberRoleResponseDto`) —
+`MemberProfileDto` was introduced rather than reusing `MemberDto` (the
+generation brief's original instruction) because `get_client`'s response
+genuinely diverges from `MemberDto`'s wire shape; see the field-shape-
+divergence note in `## 4. Boundaries` and `## dtos` (API.md). Before
+generating member-add / member-invite, check whether their identity needs
+match `MemberProfileDto` (this feature) or `MemberDto` (member-list) rather
+than introducing a third identity DTO shape.
 <!-- kmp-dto-gen:END -->

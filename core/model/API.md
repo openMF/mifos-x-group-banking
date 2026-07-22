@@ -51,6 +51,14 @@
 | `MemberPage` | `totalFilteredRecords: Int`, `members: List<Member>` | offset-paginated envelope (`page_size=20`) |
 | `MemberRole` | enum: `CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN` | mirrors wire `MemberRoleDto` 1:1; NOT unified with `GroupRole` (missing `CHAIRPERSON`) or `ViewerRole` (extra `ORGANIZER` not in this feature's declared value-set) — see `Member.kt` kdoc |
 | `LoanStatus` | enum: `ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN` | mirrors wire `LoanStatusDto` 1:1; no pre-existing loan-status enum found to reuse |
+| `MemberProfile` | `id: Long`, `displayName: String`, `firstName: String`, `lastName: String`, `phone: String`, `hasPhoto: Boolean`, `status: MemberStatus`, `joinDate: String`, `officeId: Long` | `get_client` identity/join-date/phone header; deliberately NOT the canonical `Member` — see field-shape-divergence note below |
+| `MemberStatus` | `id: Int`, `value: String` | shared nested Fineract `{id, value}` status pair — reused by `MemberProfile.status` and `ActiveLoanSummary`-adjacent derivations |
+| `MemberAccounts` | `savingsBalance: Double`, `savingsHistory: List<SavingsDataPoint>`, `activeLoan: ActiveLoanSummary?` | member-profile accounts card (`get_client_accounts`); `savingsBalance` derived by summing raw `savingsAccounts[].balance`, `activeLoan` derived from the first raw `loanAccounts[]` row, `savingsHistory` has no wire source (confirmed gap) — see note below |
+| `SavingsDataPoint` | `date: String`, `balance: Double` | weekly sparkline point; NO wire source anywhere in `api.yaml` — mapper always produces an empty list |
+| `ActiveLoanSummary` | `id: Long`, `productName: String`, `outstandingBalance: Double`, `inArrears: Boolean`, `dueDate: String?` | derived from the first `get_client_accounts.loanAccounts[]` row; `dueDate` has no wire source (confirmed gap) |
+| `MemberRoleInfo` | `role: MemberRole`, `groupId: Long`, `assignedDate: String` | `get_member_role` datatable row (response is `type: array`); reuses `MemberRole` (no new enum) |
+| `UpdateMemberRoleRequest` | `role: MemberRole`, `groupId: Long`, `assignedDate: String` | `update_member_role` PUT body; reuses `MemberRole` |
+| `UpdateMemberRoleResult` | `resourceId: Long` | `update_member_role` result |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -68,7 +76,42 @@ exists for this feature — `api.yaml` is the sole SoT, per PP-1);
 `idea-layer/screens/member-list/api.yaml` (`GET /groups/{groupId}/clients`,
 offset-paginated, `dtos.Member` — a DIFFERENT, richer `idea-layer/dtos/MemberDto.yaml`
 registry entry (v2.0.0) also exists for the SAME list endpoint but was NOT used
-as the generation SoT; see the registry-divergence note below).
+as the generation SoT; see the registry-divergence note below);
+`idea-layer/screens/member-profile/api.yaml` (3 parallel reads — `get_client`,
+`get_client_accounts`, `get_member_role` — + 1 write `update_member_role`; no
+dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature
+— `api.yaml` is the sole SoT, per PP-1).
+
+**`MemberProfile` vs canonical `Member` field-shape divergence (flagged for
+the cross-feature repair station, same "forcing reuse would require
+fabricating values" precedent as `GroupDetail` vs `Group`):** the generation
+brief instructed reusing `Member`/`MemberRole` from member-list, but
+`get_client`'s actual response (`id`, `displayName`, `firstname`, `lastname`,
+`mobileNo`, `imagePresent`, `status`, `activationDate`, `officeId`) carries
+NONE of `Member`'s non-null-required `role`/`savingsBalance`/`loanStatus` and
+DOES carry 6 fields `Member` doesn't have. A THIRD shape also exists in the
+SAME `api.yaml` file — the abbreviated `dtos.Member` block (`id: String`,
+`firstName`/`lastName`/`phone`/`photoUri`/`joinDate`/`status: String`) —
+which matches neither `get_client`'s literal response nor member-list's
+`Member`. `MemberProfile` was introduced (named after this feature's own
+`MemberRepository.getMemberProfile(...)` method) rather than forcing any of
+the three mismatched shapes into one — resolve all three at Station 3.
+`MemberRole` (the enum, not `Member` the row) WAS reused outright for
+`MemberRoleInfo`/`UpdateMemberRoleRequest` — its value-set is an exact match.
+
+**`MemberAccounts` client-side aggregation (flagged for the cross-feature
+repair station, same "constructed in GroupRepository" precedent as
+`GroupConfig`):** `get_client_accounts`' literal response is
+`savingsAccounts: List<{id,productName,accountNo,balance,status}>` +
+`loanAccounts: List<{id,productName,accountNo,status,summary}>` — an array of
+raw accounts, not the aggregated `savingsBalance`/`savingsHistory`/
+`activeLoan` shape `api.yaml#dtos.MemberAccounts` declares. The domain
+`MemberAccounts` model matches the declared aggregated shape (the feature's
+own registry SoT); the mapper derives `savingsBalance` (sum of balances) and
+`activeLoan` (first loan account, `inArrears = totalOverdue > 0.0`) from the
+raw arrays. `savingsHistory` (weekly sparkline) has NO wire source anywhere
+in `api.yaml` — mapped to `emptyList()` until a real time-series endpoint
+exists (confirmed gap, same class as `GroupConfig.shareMin`).
 
 **`GroupDetail` vs `Group` field-shape divergence (flagged for the
 cross-feature repair station):** `idea-layer/screens/group-dashboard/ui.yaml#state_model`

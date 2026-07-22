@@ -53,6 +53,15 @@
 | `MemberPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope (`page_size=20`, stale-while-revalidate `ttl=120`) |
 | `MemberRoleDto` | enum `@SerialName`: `CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; 4 known values declared by member-list's own `api.yaml#dtos.MemberRole` — NOT identical to `GroupRoleDto` or `ViewerRoleDto`, see note below | field of `MemberDto.role` |
 | `LoanStatusDto` | enum `@SerialName`: `ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `MemberDto.loanStatus` |
+| `MemberProfileDto` | `id`, `displayName`, `firstName` (`@SerialName("firstname")`), `lastName` (`@SerialName("lastname")`), `mobileNo`, `imagePresent`, `status`, `activationDate`, `officeId` | all required, no defaults | `GET /clients/{clientId}` (`get_client`) — raw Fineract client resource; deliberately NOT `MemberDto`, see field-shape-divergence note below |
+| `FineractStatusDto` | `id`, `value` | both required | shared nested `{id, value}` status pair — reused by `MemberProfileDto.status`, `MemberSavingsAccountDto.status`, `MemberLoanAccountDto.status` |
+| `MemberAccountsDto` | `savingsAccounts` (default `[]`), `loanAccounts` (default `[]`) | both default empty | `GET /clients/{clientId}/accounts` (`get_client_accounts`) — literal raw response; deliberately NOT the aggregated `api.yaml#dtos.MemberAccounts` shape, see note below |
+| `MemberSavingsAccountDto` | `id`, `productName`, `accountNo`, `balance`, `status` | all required | field of `MemberAccountsDto.savingsAccounts` |
+| `MemberLoanAccountDto` | `id`, `productName`, `accountNo`, `status`, `summary` | all required | field of `MemberAccountsDto.loanAccounts` |
+| `MemberLoanAccountSummaryDto` | `principalDisbursed`, `principalOutstanding`, `totalOverdue` | all required | field of `MemberLoanAccountDto.summary` |
+| `MemberRoleInfoDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `GET /datatables/dt_member_role/{clientId}` (`get_member_role`, response `type: array`) |
+| `UpdateMemberRoleRequestDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `PUT /datatables/dt_member_role/{clientId}` (`update_member_role`) request body |
+| `UpdateMemberRoleResponseDto` | `resourceId` | required | response of `update_member_role` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -72,7 +81,45 @@ exists for this feature — `api.yaml` is the sole SoT);
 offset-paginated `limit`/`offset`, `page_size=20`, stale-while-revalidate
 `ttl=120` + offline show-cached; `api.yaml#dtos.Member` is the SoT used here
 — a DIFFERENT `idea-layer/dtos/MemberDto.yaml` registry entry also exists for
-the same list endpoint, see divergence note below).
+the same list endpoint, see divergence note below);
+`idea-layer/screens/member-profile/api.yaml` (`GET /clients/{clientId}` +
+`GET /clients/{clientId}/accounts` + `GET /datatables/dt_member_role/{clientId}`
++ `PUT /datatables/dt_member_role/{clientId}`; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1).
+
+**`MemberProfileDto` vs `MemberDto` field-shape divergence (flagged for the
+cross-feature repair station, same "forcing reuse would require fabricating
+values" precedent as `GroupDetailDto` vs `GroupDto`):** the generation brief
+instructed reusing `MemberDto`/`MemberRoleDto` from member-list, but
+`get_client`'s literal response (`id: Long`, `displayName`, `firstname`,
+`lastname`, `mobileNo`, `imagePresent`, `status: {id, value}`,
+`activationDate`, `officeId`) carries NONE of `MemberDto`'s non-null-required
+`role`/`savingsBalance`/`loanStatus` and DOES carry 6 fields `MemberDto`
+doesn't have. A THIRD shape exists in the SAME `api.yaml` file — the
+abbreviated `dtos.Member` registry block (`id: String`,
+`firstName`/`lastName`/`phone`/`photoUri`/`joinDate`/`status: String`) —
+which matches neither `get_client`'s literal response nor `MemberDto`.
+`MemberProfileDto`'s `@SerialName`s mirror the LITERAL `get_client` operation
+response per Hard Rule 5 (wire truth over the abbreviated registry summary);
+`firstname`/`lastname` (lowercase `n`) is genuine Fineract API casing, not a
+typo. `MemberRoleDto` (the enum) WAS reused outright for
+`MemberRoleInfoDto.role` / `UpdateMemberRoleRequestDto.role` — its value-set
+is an exact match; only the identity ROW (`MemberDto`) was not reusable.
+Resolve all three `get_client`-adjacent shapes at Station 3.
+
+**`MemberAccountsDto` vs `api.yaml#dtos.MemberAccounts` divergence (flagged
+for the cross-feature repair station, same "constructed in GroupRepository"
+precedent as `GroupConfigDto`):** `get_client_accounts`' literal response is
+an array of raw savings/loan accounts (`savingsAccounts[]` /
+`loanAccounts[]`), NOT the aggregated `savingsBalance`/`savingsHistory`/
+`activeLoan` shape `api.yaml#dtos.MemberAccounts` declares. `MemberAccountsDto`
+mirrors the LITERAL operation response (Hard Rule 5); the aggregated shape is
+emitted as the DOMAIN model `MemberAccounts` instead (see `core/model/API.md`),
+derived by `MemberProfileMappers.kt` from this DTO's two arrays.
+`SavingsDataPoint` (weekly sparkline) has NO wire source anywhere in
+`api.yaml` — the mapper always produces an empty list (confirmed gap, same
+class as `GroupConfigDto.shareMin`).
 
 **`GroupDetailDto` vs `GroupDto` field-shape divergence (flagged for the
 cross-feature repair station):** `get_group`'s response
@@ -256,7 +303,8 @@ Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
 mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
-`GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`.
+`GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
+`MemberProfileMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

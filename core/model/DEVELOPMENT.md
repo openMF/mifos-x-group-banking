@@ -58,10 +58,18 @@ mappers in `core/network/mapper`.
 | `ActivityType` | `GroupDashboard.kt` | enum (`MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN`) |
 | `GroupAccounts` | `GroupDashboard.kt` | data class — `get_group_accounts` result |
 | `GroupConfig` | `GroupDashboard.kt` | data class — client-side-constructed savings/loan rule set; repository-layer merge, out of DTO/mapper scope |
-| `Member` | `Member.kt` | data class — canonical member-list row (`GET /groups/{groupId}/clients`), also used by member-profile + member-add + member-invite; see `core/network/model/API.md` for the `idea-layer/dtos/MemberDto.yaml` registry-divergence note |
+| `Member` | `Member.kt` | data class — canonical member-list row (`GET /groups/{groupId}/clients`); `MemberRole` (not `Member` itself) reused by member-profile — see `core/network/model/API.md` for the `idea-layer/dtos/MemberDto.yaml` registry-divergence note AND the `MemberProfile` vs `Member` field-shape-divergence note |
 | `MemberPage` | `Member.kt` | data class — offset-paginated envelope |
 | `MemberRole` | `Member.kt` | enum (`CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN`) — deliberately NOT unified with `GroupRole` or `ViewerRole` (near-miss value-sets); see `MemberDto.kt` kdoc |
 | `LoanStatus` | `Member.kt` | enum (`ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN`) |
+| `MemberProfile` | `MemberProfile.kt` | data class — `get_client` identity/join-date/phone header; deliberately NOT `Member` (field-shape divergence, see `core/network/model/API.md`) |
+| `MemberStatus` | `MemberProfile.kt` | data class — shared nested `{id, value}` Fineract status pair |
+| `MemberAccounts` | `MemberProfile.kt` | data class — member-profile accounts card; client-side aggregation of `get_client_accounts`' raw arrays |
+| `SavingsDataPoint` | `MemberProfile.kt` | data class — weekly sparkline point; no wire source (confirmed gap) |
+| `ActiveLoanSummary` | `MemberProfile.kt` | data class — derived from the first `loanAccounts[]` row |
+| `MemberRoleInfo` | `MemberProfile.kt` | data class — `get_member_role` datatable row; reuses `MemberRole` |
+| `UpdateMemberRoleRequest` | `MemberProfile.kt` | data class — `update_member_role` PUT body; reuses `MemberRole` |
+| `UpdateMemberRoleResult` | `MemberProfile.kt` | data class — `update_member_role` result |
 
 ## 3. Consumers
 
@@ -76,7 +84,10 @@ mappers in `core/network/mapper`.
   `GroupCreateMappers.kt` output the same way, BOTH directions — DTO -> domain
   for the office list, domain -> DTO for the submitted `CreateGroupRequest`;
   the group-dashboard repository maps `GroupDashboardMappers.kt` output the
-  same way)
+  same way; the member-profile repository maps `MemberProfileMappers.kt`
+  output the same way, BOTH directions — DTO -> domain for `get_client` /
+  `get_client_accounts` / `get_member_role`, domain -> DTO for the submitted
+  `UpdateMemberRoleRequest`)
 
 ## 4. Boundaries
 
@@ -270,6 +281,34 @@ mappers in `core/network/mapper`.
 | `Member` | `loanStatus` | `LoanStatus` | non-null |
 | `MemberPage` | `totalFilteredRecords` | `Int` | non-null |
 | `MemberPage` | `members` | `List<Member>` | non-null (may be empty) |
+| `MemberProfile` | `id` | `Long` | non-null |
+| `MemberProfile` | `displayName` | `String` | non-null |
+| `MemberProfile` | `firstName` | `String` | non-null |
+| `MemberProfile` | `lastName` | `String` | non-null |
+| `MemberProfile` | `phone` | `String` | non-null |
+| `MemberProfile` | `hasPhoto` | `Boolean` | non-null |
+| `MemberProfile` | `status` | `MemberStatus` | non-null |
+| `MemberProfile` | `joinDate` | `String` | non-null |
+| `MemberProfile` | `officeId` | `Long` | non-null |
+| `MemberStatus` | `id` | `Int` | non-null |
+| `MemberStatus` | `value` | `String` | non-null |
+| `MemberAccounts` | `savingsBalance` | `Double` | non-null |
+| `MemberAccounts` | `savingsHistory` | `List<SavingsDataPoint>` | non-null (always empty — no wire source, confirmed gap) |
+| `MemberAccounts` | `activeLoan` | `ActiveLoanSummary?` | nullable (`null` when `loanAccounts[]` is empty) |
+| `SavingsDataPoint` | `date` | `String` | non-null |
+| `SavingsDataPoint` | `balance` | `Double` | non-null |
+| `ActiveLoanSummary` | `id` | `Long` | non-null |
+| `ActiveLoanSummary` | `productName` | `String` | non-null |
+| `ActiveLoanSummary` | `outstandingBalance` | `Double` | non-null |
+| `ActiveLoanSummary` | `inArrears` | `Boolean` | non-null |
+| `ActiveLoanSummary` | `dueDate` | `String?` | nullable (always `null` — no wire source, confirmed gap) |
+| `MemberRoleInfo` | `role` | `MemberRole` | non-null |
+| `MemberRoleInfo` | `groupId` | `Long` | non-null |
+| `MemberRoleInfo` | `assignedDate` | `String` | non-null |
+| `UpdateMemberRoleRequest` | `role` | `MemberRole` | non-null |
+| `UpdateMemberRoleRequest` | `groupId` | `Long` | non-null |
+| `UpdateMemberRoleRequest` | `assignedDate` | `String` | non-null |
+| `UpdateMemberRoleResult` | `resourceId` | `Long` | non-null |
 
 ## 6. Errors
 
@@ -285,15 +324,23 @@ suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
 `GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
 `JoinWithCodeMappersTest.kt`, `MemberDashboardMappersTest.kt`,
 `SavingsTransactionMappersTest.kt`, `GroupCreateMappersTest.kt`,
-`GroupDashboardMappersTest.kt`, `MemberMappersTest.kt`), which
+`GroupDashboardMappersTest.kt`, `MemberMappersTest.kt`,
+`MemberProfileMappersTest.kt`), which
 assert every field is mapped and equality holds end to end, in BOTH
 directions where a request is submitted (`GroupCreateMappersTest.kt` covers
 `CreateGroupRequestDto -> CreateGroupRequest` AND the reverse
-`CreateGroupRequest -> CreateGroupRequestDto`). `HealthIndicator.fromOverdueRate`
+`CreateGroupRequest -> CreateGroupRequestDto`; `MemberProfileMappersTest.kt`
+covers the same both-directions pattern for `UpdateMemberRoleResponseDto ->
+UpdateMemberRoleResult` AND the reverse `UpdateMemberRoleRequest ->
+UpdateMemberRoleRequestDto`). `HealthIndicator.fromOverdueRate`
 additionally has direct boundary-value tests in `GroupMappersTest.kt`;
 `Invitation.isExpired` / `isAlreadyUsed` have direct boundary-value tests in
 `JoinWithCodeMappersTest.kt` (before-expiry / at-exact-expiry / after-expiry,
-plus null-vs-non-null `acceptedAt`).
+plus null-vs-non-null `acceptedAt`). `MemberAccounts`' aggregation logic
+(`savingsBalance` = sum of balances, `activeLoan` = first loan account,
+`savingsHistory` = always empty) has direct boundary-value tests in
+`MemberProfileMappersTest.kt` (multi-account sum, zero-accounts, in-arrears
+vs not-in-arrears, empty-loan-list).
 
 ## 8. Observability
 
@@ -311,7 +358,11 @@ credential, but avoid bulk-logging the full activity feed. `Member` carries
 `displayName` (PII-adjacent display name, same threat model as
 `ActivityItem.memberName`) and `photoUri` (a CDN URL, not raw image bytes) —
 avoid bulk-logging the full member-list page; balances/role/loanStatus are
-not sensitive.
+not sensitive. `MemberProfile` carries `displayName`/`firstName`/`lastName`
+(PII display names) and `phone` (PII, a mobile number) — avoid bulk-logging
+member-profile identity data; `MemberAccounts` / `ActiveLoanSummary` /
+`MemberRoleInfo` / `UpdateMemberRoleRequest` / `UpdateMemberRoleResult` carry
+no sensitive fields (balances + role only; no PII).
 
 ## 9. Evolution
 
@@ -338,8 +389,18 @@ duplicating the derivation. Before generating `group-edit` or any feature
 that also embeds a per-group `group_type_config` datatable row, resolve the
 `GroupInstanceConfig`/`GroupTypeConfig` naming collision flagged in
 `core/network/model/API.md`. Member-list's domain concepts live in `Member.kt`
-(`Member`, `MemberPage`, `MemberRole`, `LoanStatus`) — reuse `Member` outright
-for member-profile / member-add / member-invite rather than duplicating it;
-before extending it, resolve the `idea-layer/dtos/MemberDto.yaml`
-registry-divergence flagged in `core/network/model/API.md`.
+(`Member`, `MemberPage`, `MemberRole`, `LoanStatus`) — reuse `MemberRole`
+outright for role-badge concepts (member-profile's `MemberRoleInfo` /
+`UpdateMemberRoleRequest` do exactly this); before extending `Member` itself,
+resolve the `idea-layer/dtos/MemberDto.yaml` registry-divergence flagged in
+`core/network/model/API.md`. **Member-profile's own domain concepts live in
+`MemberProfile.kt`** (`MemberProfile`, `MemberStatus`, `MemberAccounts`,
+`SavingsDataPoint`, `ActiveLoanSummary`, `MemberRoleInfo`,
+`UpdateMemberRoleRequest`, `UpdateMemberRoleResult`) — `MemberProfile` was
+introduced rather than reusing `Member` (the generation brief's original
+instruction) because `get_client`'s response genuinely diverges from
+`Member`'s wire shape; see the field-shape-divergence note in this file's
+`## models` section (API.md). Before generating member-add / member-invite,
+check whether their identity needs match `MemberProfile` (this feature) or
+`Member` (member-list) rather than introducing a third identity shape.
 <!-- kmp-dto-gen:END -->

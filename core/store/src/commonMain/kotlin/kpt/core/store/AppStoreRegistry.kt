@@ -58,6 +58,9 @@ object AppStoreRegistry : StoreRegistry() {
     // REGISTRY:MemberList — member-list paginated roster (PAGINATED NETWORK_WITH_CACHE, GET /groups/{groupId}/clients)
     val MemberList = store("memberList")
 
+    // REGISTRY:MemberProfile — member-profile composite home (composite dynamic-key NETWORK_WITH_CACHE, get_client + get_client_accounts + get_member_role)
+    val MemberProfile = store("memberProfile")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
@@ -80,6 +83,10 @@ object AppStoreRegistry : StoreRegistry() {
         // a group's roster + per-member balance/loan-status rotate frequently, so a short TTL
         // revalidates aggressively.
         val MEMBER_LIST: Duration = 2.minutes
+
+        // REGISTRY:MemberProfile — 5m matches data-flow.yaml ttl_seconds:300 (stale-while-revalidate);
+        // the composite (identity + savings/loan accounts + role datatable) revalidates aggressively.
+        val MEMBER_PROFILE: Duration = 5.minutes
     }
 
     /**
@@ -98,5 +105,7 @@ object AppStoreRegistry : StoreRegistry() {
         "groupDashboard" to Ttl.GROUP_DASHBOARD,
         // REGISTRY:MemberList
         "memberList" to Ttl.MEMBER_LIST,
+        // REGISTRY:MemberProfile
+        "memberProfile" to Ttl.MEMBER_PROFILE,
     )
 }

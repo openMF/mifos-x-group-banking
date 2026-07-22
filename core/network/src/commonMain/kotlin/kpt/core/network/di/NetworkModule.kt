@@ -25,6 +25,7 @@ import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
+import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
 import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
@@ -39,6 +40,8 @@ import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
 import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
 import org.mifos.groupbanking.core.network.service.memberlist.MemberApi
 import org.mifos.groupbanking.core.network.service.memberlist.MemberApiImpl
+import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApi
+import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
@@ -161,4 +164,15 @@ val NetworkModule = module {
     // step, not registered here.
     single<MemberApiConfig> { MemberApiConfig() }
     single<MemberApi> { MemberApiImpl(httpClient = get()) }
+
+    // Member profile (get_client / get_client_accounts / get_member_role / update_member_role)
+    // — member-profile feature client stack. Reuses the shared HttpClient singleton above (same
+    // companion server, no second engine), even though every path here is a raw Fineract
+    // passthrough rather than a `/companion/…` one — same convention as GroupCreateApi.getOffices.
+    // The config binding is registered for override-surface symmetry with CompanionAuthApiConfig
+    // even though the shared client is the one actually dispatching requests today. The composite
+    // Store5 read-store + write-invalidation repository consuming MemberProfileApi is emitted by
+    // a downstream kmp-store-gen/kmp-client-gen generation step, not registered here.
+    single<MemberProfileApiConfig> { MemberProfileApiConfig() }
+    single<MemberProfileApi> { MemberProfileApiImpl(httpClient = get()) }
 }
