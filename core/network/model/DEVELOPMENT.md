@@ -52,6 +52,16 @@ logic, no domain field names.
 | `ContributionModelDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — distinct from `ContributionModeDto` |
 | `ShareoutFormulaDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 | `PayoutOrderMethodDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `GroupDashboardResponseDto` | `GroupDashboardDto.kt` | `@Serializable` composite (COMP-GRP-001 4-way parallel fan-in), NOT returned by a single endpoint |
+| `GroupDetailDto` | `GroupDashboardDto.kt` | `@Serializable` response row (`get_group`) — NOT the same shape as `GroupDto` |
+| `GroupInstanceConfigDto` | `GroupDashboardDto.kt` | `@Serializable` nested response DTO, snake_case wire columns — naming-collision with `GroupTypeConfigDto` |
+| `GroupContributionModelDto` | `GroupDashboardDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `ViewerRoleInfoDto` | `GroupDashboardDto.kt` | `@Serializable` response (`get_viewer_role`); reuses `ViewerRoleDto` |
+| `GroupCorpusDto` | `GroupDashboardDto.kt` | `@Serializable` response (`get_group_corpus`) |
+| `ActivityItemDto` | `GroupDashboardDto.kt` | `@Serializable` nested response DTO |
+| `ActivityTypeDto` | `GroupDashboardDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `GroupAccountsDto` | `GroupDashboardDto.kt` | `@Serializable` response (`get_group_accounts`) |
+| `GroupConfigDto` | `GroupDashboardDto.kt` | `@Serializable` client-constructed shape, not returned by any endpoint |
 
 ## 3. Consumers
 
@@ -65,7 +75,9 @@ logic, no domain field names.
   → `core/data` invitation/join repository; `core/network/mapper/MemberDashboardMappers.kt`
   + `core/network/mapper/SavingsTransactionMappers.kt` → `core/data`
   `MemberDashboardRepository`; `core/network/mapper/GroupCreateMappers.kt` →
-  `core/data` group-create repository (offices list + submit)
+  `core/data` group-create repository (offices list + submit);
+  `core/network/mapper/GroupDashboardMappers.kt` → `core/data`
+  `GroupDashboardRepository` (COMP-GRP-001 4-way parallel fan-in)
 
 ## 4. Boundaries
 
@@ -100,6 +112,15 @@ logic, no domain field names.
   `externalId`, but the abbreviated `idea-layer/screens/group-create/api.yaml#dtos.Office`
   registry block omits it. Modeled here as nullable/optional rather than
   invented as non-null-required (Hard Rule 4).
+- **`GroupDetailDto` is NOT `GroupDto`** (flagged for the cross-feature repair
+  station): `get_group`'s response genuinely diverges from the group-list
+  `GroupDto` wire shape — see the full note in `## dtos` (API.md).
+- **`GroupInstanceConfigDto` is snake_case** (raw per-group `group_type_config`
+  datatable row, matching `InvitationRowDto`/`CreateGroupTypeConfigDto`'s
+  precedent) and shares its bare `GroupTypeConfig` source name with the
+  UNRELATED camelCase catalogue `GroupTypeConfigDto` — flagged for Station 3,
+  full note in `## dtos` (API.md). Every OTHER DTO in `GroupDashboardDto.kt`
+  is companion-bridge camelCase as usual.
 
 ## 5. Data
 
@@ -218,6 +239,62 @@ logic, no domain field names.
 | `OfficeDto` | `name` | `name` | `String` | — |
 | `OfficeDto` | `nameDecorated` | `nameDecorated` | `String` | — |
 | `OfficeDto` | `externalId` | `externalId` | `String?` | `null` |
+| `GroupDashboardResponseDto` | `group` | `group` | `GroupDetailDto` | — |
+| `GroupDashboardResponseDto` | `viewerRole` | `viewerRole` | `ViewerRoleInfoDto` | — |
+| `GroupDashboardResponseDto` | `corpus` | `corpus` | `GroupCorpusDto` | — |
+| `GroupDashboardResponseDto` | `accounts` | `accounts` | `GroupAccountsDto` | — |
+| `GroupDetailDto` | `id` | `id` | `String` | — |
+| `GroupDetailDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `GroupDetailDto` | `name` | `name` | `String` | — |
+| `GroupDetailDto` | `cycleNumber` | `cycleNumber` | `Int` | — |
+| `GroupDetailDto` | `cycleLengthMonths` | `cycleLengthMonths` | `Int` | — |
+| `GroupDetailDto` | `meetingFrequency` | `meetingFrequency` | `String` | — |
+| `GroupDetailDto` | `memberCount` | `memberCount` | `Int` | — |
+| `GroupDetailDto` | `overdueLoansCount` | `overdueLoansCount` | `Int` | — |
+| `GroupDetailDto` | `status` | `status` | `String` | — |
+| `GroupDetailDto` | `typeConfig` | `typeConfig` | `GroupInstanceConfigDto` | — |
+| `GroupInstanceConfigDto` | `groupType` | `group_type` | `GroupTypeSlugDto` | `GroupTypeSlugDto.UNKNOWN` |
+| `GroupInstanceConfigDto` | `poolModel` | `pool_model` | `SavingsMechanismDto` | `SavingsMechanismDto.UNKNOWN` |
+| `GroupInstanceConfigDto` | `contributionModel` | `contribution_model` | `GroupContributionModelDto` | `GroupContributionModelDto.UNKNOWN` |
+| `GroupInstanceConfigDto` | `shareoutFormula` | `shareout_formula` | `String` | — |
+| `GroupInstanceConfigDto` | `payoutOrderMethod` | `payout_order_method` | `String` | — |
+| `GroupInstanceConfigDto` | `shareValue` | `share_value` | `Double` | — |
+| `GroupInstanceConfigDto` | `contributionAmount` | `contribution_amount` | `Double` | — |
+| `GroupInstanceConfigDto` | `socialFundEnabled` | `social_fund_enabled` | `Boolean` | — |
+| `GroupInstanceConfigDto` | `cycleLengthMonths` | `cycle_length_months` | `Int` | — |
+| `GroupInstanceConfigDto` | `loanMultiplier` | `loan_multiplier` | `Double` | — |
+| `GroupInstanceConfigDto` | `interestRate` | `interest_rate` | `Double` | — |
+| `GroupInstanceConfigDto` | `fineAmount` | `fine_amount` | `Double` | — |
+| `ViewerRoleInfoDto` | `role` | `role` | `ViewerRoleDto` | `ViewerRoleDto.UNKNOWN` |
+| `ViewerRoleInfoDto` | `memberId` | `memberId` | `Long` | — |
+| `GroupCorpusDto` | `currentBalance` | `currentBalance` | `Double` | — |
+| `GroupCorpusDto` | `openingBalance` | `openingBalance` | `Double` | — |
+| `GroupCorpusDto` | `totalContributionsThisCycle` | `totalContributionsThisCycle` | `Double` | — |
+| `GroupCorpusDto` | `totalLoansOutstanding` | `totalLoansOutstanding` | `Double` | — |
+| `GroupCorpusDto` | `lastUpdated` | `lastUpdated` | `String` | — |
+| `GroupCorpusDto` | `rotationPosition` | `rotationPosition` | `Int?` | `null` |
+| `GroupCorpusDto` | `nextRecipientName` | `nextRecipientName` | `String?` | `null` |
+| `GroupCorpusDto` | `nextRecipientPosition` | `nextRecipientPosition` | `Int?` | `null` |
+| `ActivityItemDto` | `id` | `id` | `String` | — |
+| `ActivityItemDto` | `type` | `type` | `ActivityTypeDto` | `ActivityTypeDto.UNKNOWN` |
+| `ActivityItemDto` | `description` | `description` | `String` | — |
+| `ActivityItemDto` | `amount` | `amount` | `Double?` | `null` |
+| `ActivityItemDto` | `date` | `date` | `String` | — |
+| `ActivityItemDto` | `memberName` | `memberName` | `String?` | `null` |
+| `GroupAccountsDto` | `savingsBalance` | `savingsBalance` | `Double` | — |
+| `GroupAccountsDto` | `loansOutstanding` | `loansOutstanding` | `Double` | — |
+| `GroupAccountsDto` | `activeLoanCount` | `activeLoanCount` | `Int` | — |
+| `GroupAccountsDto` | `shareOutProjection` | `shareOutProjection` | `Double?` | `null` |
+| `GroupAccountsDto` | `recentActivity` | `recentActivity` | `List<ActivityItemDto>` | `emptyList()` |
+| `GroupConfigDto` | `shareValue` | `shareValue` | `Double?` | `null` |
+| `GroupConfigDto` | `shareMin` | `shareMin` | `Int?` | `null` |
+| `GroupConfigDto` | `shareMax` | `shareMax` | `Int?` | `null` |
+| `GroupConfigDto` | `contributionAmount` | `contributionAmount` | `Double?` | `null` |
+| `GroupConfigDto` | `loanMultiplier` | `loanMultiplier` | `Double?` | `null` |
+| `GroupConfigDto` | `interestRate` | `interestRate` | `Double?` | `null` |
+| `GroupConfigDto` | `cycleLengthMonths` | `cycleLengthMonths` | `Int` | — |
+| `GroupConfigDto` | `fineAmount` | `fineAmount` | `Double?` | `null` |
+| `GroupConfigDto` | `minimumDisbursementThreshold` | `minimumDisbursementThreshold` | `Double?` | `null` |
 
 ## 6. Errors
 
@@ -232,11 +309,11 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 
 `core/network/src/commonTest/.../model/LoginSignupDtoTest.kt`,
 `GroupTypeConfigDtoTest.kt`, `GroupDtoTest.kt`, `JoinWithCodeDtoTest.kt`,
-`MemberDashboardDtoTest.kt`, `SavingsTransactionDtoTest.kt`, and
-`GroupCreateDtoTest.kt` — construction, serialization round-trip,
-default-value, and equality tests per DTO, plus a T7/EC30 cross-version
-fixture proving an old client tolerates a server-added field + a server-added
-enum value without crashing.
+`MemberDashboardDtoTest.kt`, `SavingsTransactionDtoTest.kt`,
+`GroupCreateDtoTest.kt`, and `GroupDashboardDtoTest.kt` — construction,
+serialization round-trip, default-value, and equality tests per DTO, plus a
+T7/EC30 cross-version fixture proving an old client tolerates a server-added
+field + a server-added enum value without crashing.
 `JoinWithCodeDtoTest.kt` additionally covers `InvitationRowDto.acceptedAt`
 nullability (both the unused-code `null` case and the already-used
 non-null case). `MemberDashboardDtoTest.kt` additionally covers the
@@ -245,7 +322,11 @@ ROTATING_PAYOUT (`rotationPosition` + `nextRecipientEta`) field groups and
 their omitted-from-payload default-null behavior. `GroupCreateDtoTest.kt`
 additionally covers `OfficeDto.externalId`'s absent-from-payload default-null
 behavior and every `ContributionModelDto`/`ShareoutFormulaDto`/
-`PayoutOrderMethodDto` known value + `UNKNOWN` fallback.
+`PayoutOrderMethodDto` known value + `UNKNOWN` fallback. `GroupDashboardDtoTest.kt`
+additionally covers `GroupInstanceConfigDto`'s snake_case `@SerialName` wire
+casing, the mutually-exclusive nullable ACCUMULATING vs ROTATING_PAYOUT
+`GroupCorpusDto` field groups, and the full composite's cross-version
+tolerance (server-added top-level field, decoded without crashing).
 
 ## 8. Observability
 
@@ -257,7 +338,10 @@ it; other join-with-code DTOs carry no sensitive fields.
 `MemberDashboardResponseDto` / `GroupSummaryDto` / `SavingsTransactionDto`
 carry no sensitive fields (balances only; no PII). `CreateGroupRequestDto` /
 `CreateGroupTypeConfigDto` / `CreateGroupResponseDto` / `OfficeDto` carry no
-sensitive fields.
+sensitive fields. `GroupDashboardResponseDto` / `GroupDetailDto` /
+`GroupInstanceConfigDto` / `ViewerRoleInfoDto` / `GroupCorpusDto` /
+`ActivityItemDto` / `GroupAccountsDto` / `GroupConfigDto` carry no sensitive
+fields (balances + group config only; no PII).
 
 ## 9. Evolution
 
@@ -269,5 +353,13 @@ DTOs, resolve the `SavingsTransactionDto` naming collision flagged in
 per-account ledger row to `SavingsLedgerEntryDto` or migrate the consuming
 feature onto this companion shape. Before generating a group-EDIT feature that
 also submits `typeConfig`, reuse `CreateGroupTypeConfigDto` / its mappers
-rather than introducing a second edit-time payload shape.
+rather than introducing a second edit-time payload shape. Before generating
+`group-edit` or any feature that also embeds a per-group `group_type_config`
+datatable row, resolve the `GroupInstanceConfigDto`/`GroupTypeConfigDto`
+naming collision flagged in `## 4. Boundaries` and `## dtos` (API.md).
+Group-dashboard's DTOs live in `GroupDashboardDto.kt`; before generating a
+feature that needs the fully-merged `GroupConfigDto` (catalogue defaults +
+per-group overrides), resolve the repository-layer merge documented on
+`GroupConfigDto`'s kdoc rather than duplicating the derivation logic in a new
+DTO.
 <!-- kmp-dto-gen:END -->

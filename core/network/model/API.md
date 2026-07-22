@@ -39,6 +39,16 @@
 | `ContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; DISTINCT value-set from `ContributionModeDto` — see reuse note below | field of `CreateGroupTypeConfigDto.contributionModel` |
 | `ShareoutFormulaDto` | enum `@SerialName`: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `CreateGroupTypeConfigDto.shareoutFormula` |
 | `PayoutOrderMethodDto` | enum `@SerialName`: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; api.yaml declares 5 known values (task prose narrowed to 3 — api.yaml wins per PP-1) | field of `CreateGroupTypeConfigDto.payoutOrderMethod` |
+| `GroupDashboardResponseDto` | `group`, `viewerRole`, `corpus`, `accounts` | all required, camelCase | client-side composite (COMP-GRP-001 4-way parallel fan-in); NOT returned by a single endpoint, assembled by `GroupRepository` |
+| `GroupDetailDto` | `id`, `fineractCenterId`, `name`, `cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`, `overdueLoansCount`, `status`, `typeConfig` | all required, camelCase | `GET /companion/groups/{groupId}` (`get_group`, COMP-GRP-001 read path); NOT the same shape as `GroupDto` — see field-shape-divergence note below |
+| `GroupInstanceConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeSlugDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula`, `payout_order_method`, `share_value`, `contribution_amount`, `social_fund_enabled`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount` | 3 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable row for THIS group (Hard Rule 5) | field of `GroupDetailDto.typeConfig`; naming-collision with `GroupTypeConfigDto` — see note below |
+| `GroupContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; identical value-set to `ContributionModelDto` (group-create) but declared independently — see note below | field of `GroupInstanceConfigDto.contribution_model` |
+| `ViewerRoleInfoDto` | `role` (default `UNKNOWN`, reuses `ViewerRoleDto`), `memberId` | `role` defaults `UNKNOWN`; `memberId` required | `GET /companion/groups/{groupId}/my-role` (`get_viewer_role`) |
+| `GroupCorpusDto` | `currentBalance`, `openingBalance`, `totalContributionsThisCycle`, `totalLoansOutstanding`, `lastUpdated`, `rotationPosition` (nullable, default `null`), `nextRecipientName` (nullable, default `null`), `nextRecipientPosition` (nullable, default `null`) | 3 nullable ROTATING_PAYOUT-only fields default `null`; rest required | `GET /companion/groups/{groupId}/corpus` (`get_group_corpus`) |
+| `ActivityItemDto` | `id`, `type` (default `UNKNOWN`), `description`, `amount` (nullable, default `null`), `date`, `memberName` (nullable, default `null`) | `amount`/`memberName` nullable; `type` defaults `UNKNOWN`; rest required | field of `GroupAccountsDto.recentActivity` (last 10) |
+| `ActivityTypeDto` | enum `@SerialName`: `MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `ActivityItemDto.type` |
+| `GroupAccountsDto` | `savingsBalance`, `loansOutstanding`, `activeLoanCount`, `shareOutProjection` (nullable, default `null`), `recentActivity` (default `[]`) | `shareOutProjection` nullable (ACCUMULATING only); `recentActivity` defaults empty; rest required | `GET /companion/groups/{groupId}/accounts` (`get_group_accounts`) |
+| `GroupConfigDto` | `shareValue`/`shareMin`/`shareMax`/`contributionAmount`/`loanMultiplier`/`interestRate`/`fineAmount`/`minimumDisbursementThreshold` (all nullable, default `null`), `cycleLengthMonths` (required) | 8 nullable fields; only `cycleLengthMonths` required | NOT returned by any endpoint — "constructed in GroupRepository from the GroupTypeConfig embedded in get_group response" per `api.yaml#dtos.GroupConfig`; kept `@Serializable` for round-trip test coverage |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
@@ -49,7 +59,44 @@ Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}
 `idea-layer/screens/group-create/api.yaml` (COMP-GRP-001 `POST
 /companion/groups` + `GET /offices`; no dedicated `idea-layer/dtos/{Dto}.yaml`
 registry entry exists for this feature — `api.yaml` is the sole SoT, per PP-1
-"registry, or its equivalent, wins").
+"registry, or its equivalent, wins");
+`idea-layer/screens/group-dashboard/{api.yaml,ui.yaml,docs.yaml}` (COMP-GRP-001
+4-way parallel fan-in: `get_group` + `get_viewer_role` + `get_group_corpus` +
+`get_group_accounts`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature — `api.yaml` is the sole SoT).
+
+**`GroupDetailDto` vs `GroupDto` field-shape divergence (flagged for the
+cross-feature repair station):** `get_group`'s response
+(`id`/`fineractCenterId`/`name`/`cycleNumber`/`cycleLengthMonths`/
+`meetingFrequency`/`memberCount`/`overdueLoansCount`/`status`/`typeConfig`)
+genuinely diverges from the group-list `GroupDto` (COMP-GRP-001 `/mine`):
+missing `groupType`/`viewerRole`/`lastMeetingDate`/`healthIndicator`/
+`overdueRate` (all non-null required on `GroupDto`, no default), and carrying
+4 fields `GroupDto` doesn't have. The generation brief instructed reusing
+`GroupDto`/`Group` "do NOT duplicate", but doing so here would require
+fabricating values with no wire source (Hard Rule 4) — `GroupDetailDto` was
+introduced instead. Resolve at Station 3.
+
+**`GroupInstanceConfigDto` naming collision (flagged for the cross-feature
+repair station — same class of issue as the `SavingsTransactionDto` collision
+below):** `idea-layer/screens/group-dashboard/api.yaml#dtos.GroupTypeConfig`
+declares the snake_case per-group-instance shape embedded on
+`GroupDetailDto.typeConfig` under the bare name `GroupTypeConfig` — the SAME
+name already used by the camelCase COMP-DT-003 catalogue row
+(`GroupTypeConfigDto` in `GroupTypeConfigDto.kt`). The two are NOT the same
+wire shape (no field overlap beyond the group-type/pool-model axes) and use
+DIFFERENT casing conventions (this one is raw-datatable snake_case; the
+catalogue row is companion-bridge camelCase) — confirming they are genuinely
+different endpoints' payloads, not a copy-paste duplicate. Named
+`GroupInstanceConfigDto` here to avoid the Kotlin class-name clash while
+flagging the collision for Station 3.
+
+**`GroupContributionModelDto` — third contribution-mode-adjacent enum:**
+its value-set (`FIXED_AMOUNT`/`SHARE_BASED_VARIABLE`/`FIXED_NEGOTIATED`) is
+IDENTICAL to `ContributionModelDto`'s (group-create, see below), but the two
+were declared independently on unrelated features' `api.yaml`s with no shared
+source-of-truth cross-reference — NOT unified here; flagged for Station 3 to
+evaluate reusing `ContributionModelDto` instead of a 4th sibling enum.
 
 **Enum reuse (group-create, 2 of 5 typeConfig axes reuse existing wire
 enums, no duplicates):** `CreateGroupTypeConfigDto.groupType` reuses the
@@ -163,7 +210,7 @@ Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
 mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
 `MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
-`GroupCreateMappers.kt`.
+`GroupCreateMappers.kt`, `GroupDashboardMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

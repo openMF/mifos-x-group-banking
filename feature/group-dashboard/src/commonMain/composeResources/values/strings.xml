@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_group_dashboard_more_options_cd">More options</string>
+
+    <string name="screens_group_dashboard_cycle_info">Cycle %1$d of %2$d months • %3$s meetings</string>
+    <string name="screens_group_dashboard_member_count_chip">%1$d members</string>
+    <string name="screens_group_dashboard_overdue_loans_chip">%1$d overdue</string>
+
+    <string name="screens_group_dashboard_corpus_label">Corpus Fund</string>
+    <string name="screens_group_dashboard_amount_kes">KES %1$s</string>
+    <string name="screens_group_dashboard_shareout_projection">Projected share-out: KES %1$s</string>
+    <string name="screens_group_dashboard_corpus_blocked">Loan disbursement is blocked — corpus balance is below minimum threshold.</string>
+    <string name="screens_group_dashboard_opening_balance_label">Opening Balance</string>
+    <string name="screens_group_dashboard_contributions_label">Contributions</string>
+    <string name="screens_group_dashboard_loans_outstanding_label">Loans Out</string>
+
+    <string name="screens_group_dashboard_rotation_label">Rotation Status</string>
+    <string name="screens_group_dashboard_viewer_position">Your position: #%1$d</string>
+    <string name="screens_group_dashboard_next_payout_label">Next payout →</string>
+    <string name="screens_group_dashboard_next_recipient_chip">%1$s (#%2$d)</string>
+    <string name="screens_group_dashboard_pool_balance">Pool: KES %1$s</string>
+
+    <string name="screens_group_dashboard_quick_actions_label">Quick Actions</string>
+    <string name="screens_group_dashboard_action_start_meeting">Start Meeting</string>
+    <string name="screens_group_dashboard_action_members">Members</string>
+    <string name="screens_group_dashboard_action_loans">Loans</string>
+    <string name="screens_group_dashboard_action_share_out">Share-Out</string>
+    <string name="screens_group_dashboard_action_my_savings">My Savings</string>
+    <string name="screens_group_dashboard_action_my_loans">My Loans</string>
+    <string name="screens_group_dashboard_action_meetings">Meetings</string>
+    <string name="screens_group_dashboard_share_out_disabled_hint">Available at cycle end only</string>
+
+    <string name="screens_group_dashboard_savings_label">Savings Summary</string>
+    <string name="screens_group_dashboard_contribution_share_based">Share-based: KES %1$s / share</string>
+    <string name="screens_group_dashboard_contribution_fixed">Fixed: KES %1$s per meeting</string>
+    <string name="screens_group_dashboard_contribution_fixed_negotiated">Negotiated fixed: KES %1$s per meeting</string>
+    <string name="screens_group_dashboard_total_savings">KES %1$s total</string>
+
+    <string name="screens_group_dashboard_activity_label">Recent Activity</string>
+    <string name="screens_group_dashboard_activity_supporting">%1$s • %2$s</string>
+    <string name="screens_group_dashboard_activity_amount">KES %1$s</string>
+
+    <string name="screens_group_dashboard_error_state_title">Could not load group</string>
+    <string name="screens_group_dashboard_error_icon_cd">Error</string>
+    <string name="screens_group_dashboard_btn_retry">Retry</string>
+    <string name="screens_group_dashboard_error_network">No internet. Showing cached data.</string>
+    <string name="screens_group_dashboard_error_server">Server error. Please retry.</string>
+    <string name="screens_group_dashboard_error_not_found">Group not found.</string>
+    <string name="screens_group_dashboard_error_auth">Session expired.</string>
+    <string name="screens_group_dashboard_share_out_not_available">Share-Out is only available at the end of the cycle.</string>
+
+    <string name="screens_group_dashboard_corpus_dialog_title">Corpus balance low</string>
+    <string name="screens_group_dashboard_dialog_ok">OK</string>
+</resources>

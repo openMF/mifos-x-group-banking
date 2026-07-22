@@ -34,6 +34,8 @@ import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepository
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.GroupDashboardRepository
+import org.mifos.groupbanking.core.data.repository.GroupDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupRepository
 import org.mifos.groupbanking.core.data.repository.GroupRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
@@ -81,6 +83,18 @@ val DataModule = module {
     single<MemberDashboardRepository> {
         MemberDashboardRepositoryImpl(
             memberDashboardStore = get(AppStoreRegistry.MemberDashboard),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // group-dashboard (COMP-GRP-001) — wraps the COMPOSITE dynamic-key NETWORK_WITH_CACHE
+    // GroupDashboardStore (bound via AppStoreRegistry.GroupDashboard in appStoreModule) and
+    // surfaces the offline-first .asScreenStream() read (per-group ScreenState<GroupDashboard>,
+    // the 4-way parallel fan-in of get_group + get_viewer_role + get_group_corpus + get_group_accounts).
+    single<GroupDashboardRepository> {
+        GroupDashboardRepositoryImpl(
+            groupDashboardStore = get(AppStoreRegistry.GroupDashboard),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

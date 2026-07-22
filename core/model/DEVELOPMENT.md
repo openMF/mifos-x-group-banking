@@ -48,6 +48,16 @@ mappers in `core/network/mapper`.
 | `ContributionModel` | `GroupCreate.kt` | enum (`FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN`) — distinct from `ContributionMode` |
 | `ShareoutFormula` | `GroupCreate.kt` | enum (`NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN`) |
 | `PayoutOrderMethod` | `GroupCreate.kt` | enum (`FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN`) |
+| `GroupDashboard` | `GroupDashboard.kt` | data class — group-dashboard composite (COMP-GRP-001 4-way parallel fan-in) |
+| `GroupDetail` | `GroupDashboard.kt` | data class — `get_group` identity/header shape; deliberately NOT `Group` (field-shape divergence, see `core/network/model/API.md`) |
+| `GroupInstanceConfig` | `GroupDashboard.kt` | data class — per-group configured instance; reuses `GroupTypeSlug` + `SavingsMechanism`; naming-collision with catalogue `GroupTypeConfig` (see `core/network/model/API.md`) |
+| `GroupContributionModel` | `GroupDashboard.kt` | enum (`FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN`) — distinct declaration from `ContributionMode`/`ContributionModel` |
+| `ViewerRoleInfo` | `GroupDashboard.kt` | data class — `get_viewer_role` result; reuses `ViewerRole` |
+| `GroupCorpus` | `GroupDashboard.kt` | data class — `get_group_corpus` result |
+| `ActivityItem` | `GroupDashboard.kt` | data class — recent-activity row |
+| `ActivityType` | `GroupDashboard.kt` | enum (`MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN`) |
+| `GroupAccounts` | `GroupDashboard.kt` | data class — `get_group_accounts` result |
+| `GroupConfig` | `GroupDashboard.kt` | data class — client-side-constructed savings/loan rule set; repository-layer merge, out of DTO/mapper scope |
 
 ## 3. Consumers
 
@@ -60,7 +70,9 @@ mappers in `core/network/mapper`.
   repository maps `MemberDashboardMappers.kt` / `SavingsTransactionMappers.kt`
   output the same way; the group-create repository maps
   `GroupCreateMappers.kt` output the same way, BOTH directions — DTO -> domain
-  for the office list, domain -> DTO for the submitted `CreateGroupRequest`)
+  for the office list, domain -> DTO for the submitted `CreateGroupRequest`;
+  the group-dashboard repository maps `GroupDashboardMappers.kt` output the
+  same way)
 
 ## 4. Boundaries
 
@@ -189,6 +201,62 @@ mappers in `core/network/mapper`.
 | `Office` | `name` | `String` | non-null |
 | `Office` | `nameDecorated` | `String` | non-null |
 | `Office` | `externalId` | `String?` | nullable |
+| `GroupDashboard` | `group` | `GroupDetail` | non-null |
+| `GroupDashboard` | `viewerRole` | `ViewerRoleInfo` | non-null |
+| `GroupDashboard` | `corpus` | `GroupCorpus` | non-null |
+| `GroupDashboard` | `accounts` | `GroupAccounts` | non-null |
+| `GroupDetail` | `id` | `String` | non-null |
+| `GroupDetail` | `fineractCenterId` | `Long` | non-null |
+| `GroupDetail` | `name` | `String` | non-null |
+| `GroupDetail` | `cycleNumber` | `Int` | non-null |
+| `GroupDetail` | `cycleLengthMonths` | `Int` | non-null |
+| `GroupDetail` | `meetingFrequency` | `String` | non-null |
+| `GroupDetail` | `memberCount` | `Int` | non-null |
+| `GroupDetail` | `overdueLoansCount` | `Int` | non-null |
+| `GroupDetail` | `status` | `String` | non-null |
+| `GroupDetail` | `typeConfig` | `GroupInstanceConfig` | non-null |
+| `GroupInstanceConfig` | `groupType` | `GroupTypeSlug` | non-null |
+| `GroupInstanceConfig` | `poolModel` | `SavingsMechanism` | non-null |
+| `GroupInstanceConfig` | `contributionModel` | `GroupContributionModel` | non-null |
+| `GroupInstanceConfig` | `shareoutFormula` | `String` | non-null |
+| `GroupInstanceConfig` | `payoutOrderMethod` | `String` | non-null |
+| `GroupInstanceConfig` | `shareValue` | `Double` | non-null |
+| `GroupInstanceConfig` | `contributionAmount` | `Double` | non-null |
+| `GroupInstanceConfig` | `socialFundEnabled` | `Boolean` | non-null |
+| `GroupInstanceConfig` | `cycleLengthMonths` | `Int` | non-null |
+| `GroupInstanceConfig` | `loanMultiplier` | `Double` | non-null |
+| `GroupInstanceConfig` | `interestRate` | `Double` | non-null |
+| `GroupInstanceConfig` | `fineAmount` | `Double` | non-null |
+| `ViewerRoleInfo` | `role` | `ViewerRole` | non-null |
+| `ViewerRoleInfo` | `memberId` | `Long` | non-null |
+| `GroupCorpus` | `currentBalance` | `Double` | non-null |
+| `GroupCorpus` | `openingBalance` | `Double` | non-null |
+| `GroupCorpus` | `totalContributionsThisCycle` | `Double` | non-null |
+| `GroupCorpus` | `totalLoansOutstanding` | `Double` | non-null |
+| `GroupCorpus` | `lastUpdated` | `String` | non-null |
+| `GroupCorpus` | `rotationPosition` | `Int?` | nullable (ROTATING_PAYOUT only) |
+| `GroupCorpus` | `nextRecipientName` | `String?` | nullable (ROTATING_PAYOUT only) |
+| `GroupCorpus` | `nextRecipientPosition` | `Int?` | nullable (ROTATING_PAYOUT only) |
+| `ActivityItem` | `id` | `String` | non-null |
+| `ActivityItem` | `type` | `ActivityType` | non-null |
+| `ActivityItem` | `description` | `String` | non-null |
+| `ActivityItem` | `amount` | `Double?` | nullable |
+| `ActivityItem` | `date` | `String` | non-null |
+| `ActivityItem` | `memberName` | `String?` | nullable |
+| `GroupAccounts` | `savingsBalance` | `Double` | non-null |
+| `GroupAccounts` | `loansOutstanding` | `Double` | non-null |
+| `GroupAccounts` | `activeLoanCount` | `Int` | non-null |
+| `GroupAccounts` | `shareOutProjection` | `Double?` | nullable (ACCUMULATING only) |
+| `GroupAccounts` | `recentActivity` | `List<ActivityItem>` | non-null (may be empty) |
+| `GroupConfig` | `shareValue` | `Double?` | nullable |
+| `GroupConfig` | `shareMin` | `Int?` | nullable (no wire source — confirmed gap) |
+| `GroupConfig` | `shareMax` | `Int?` | nullable (no wire source — confirmed gap) |
+| `GroupConfig` | `contributionAmount` | `Double?` | nullable |
+| `GroupConfig` | `loanMultiplier` | `Double?` | nullable |
+| `GroupConfig` | `interestRate` | `Double?` | nullable |
+| `GroupConfig` | `cycleLengthMonths` | `Int` | non-null |
+| `GroupConfig` | `fineAmount` | `Double?` | nullable |
+| `GroupConfig` | `minimumDisbursementThreshold` | `Double?` | nullable (no wire source — confirmed gap) |
 
 ## 6. Errors
 
@@ -203,7 +271,8 @@ Domain models are pure data classes exercised indirectly via the mapper test
 suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
 `GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
 `JoinWithCodeMappersTest.kt`, `MemberDashboardMappersTest.kt`,
-`SavingsTransactionMappersTest.kt`, `GroupCreateMappersTest.kt`), which
+`SavingsTransactionMappersTest.kt`, `GroupCreateMappersTest.kt`,
+`GroupDashboardMappersTest.kt`), which
 assert every field is mapped and equality holds end to end, in BOTH
 directions where a request is submitted (`GroupCreateMappersTest.kt` covers
 `CreateGroupRequestDto -> CreateGroupRequest` AND the reverse
@@ -221,7 +290,11 @@ avoid logging it. `MemberDashboard` / `GroupSummary` / `SavingsTransaction`
 carry no sensitive fields (balances are not PII by this project's threat
 model, but avoid logging full transaction history in bulk).
 `CreateGroupRequest` / `CreateGroupTypeConfig` / `GroupCreationResult` /
-`Office` carry no sensitive fields.
+`Office` carry no sensitive fields. `GroupDashboard` / `GroupDetail` /
+`GroupInstanceConfig` / `ViewerRoleInfo` / `GroupCorpus` / `ActivityItem` /
+`GroupAccounts` / `GroupConfig` carry no sensitive fields (balances + group
+config only; no PII) — `ActivityItem.memberName` is a display name, not a
+credential, but avoid bulk-logging the full activity feed.
 
 ## 9. Evolution
 
@@ -237,5 +310,15 @@ naming-collision resolution flagged in `core/network/model/API.md`).
 Group-create's domain concepts live in `GroupCreate.kt`; if a future
 group-EDIT feature needs the same type-adaptive rule set, reuse
 `CreateGroupTypeConfig` (and `ContributionModel`/`ShareoutFormula`/
-`PayoutOrderMethod`) rather than introducing a second shape.
+`PayoutOrderMethod`) rather than introducing a second shape. Group-dashboard's
+domain concepts live in `GroupDashboard.kt` (`GroupDashboard`, `GroupDetail`,
+`GroupInstanceConfig`, `GroupContributionModel`, `ViewerRoleInfo`,
+`GroupCorpus`, `ActivityItem`, `ActivityType`, `GroupAccounts`,
+`GroupConfig`); before generating a feature that needs the full merged
+`GroupConfig` (catalogue defaults + per-group overrides), resolve the
+repository-layer merge documented on `GroupConfig`'s kdoc rather than
+duplicating the derivation. Before generating `group-edit` or any feature
+that also embeds a per-group `group_type_config` datatable row, resolve the
+`GroupInstanceConfig`/`GroupTypeConfig` naming collision flagged in
+`core/network/model/API.md`.
 <!-- kmp-dto-gen:END -->

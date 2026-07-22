@@ -124,6 +124,7 @@ include(":feature:group-list")
 include(":feature:join-with-code")
 include(":feature:personal-dashboard") // <- added by kmp-viewmodel-gen
 include(":feature:group-create") // <- added by kmp-viewmodel-gen
+include(":feature:group-dashboard") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")

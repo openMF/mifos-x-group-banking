@@ -37,6 +37,16 @@
 | `ShareoutFormula` | enum: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | mirrors wire `ShareoutFormulaDto` 1:1 |
 | `PayoutOrderMethod` | enum: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | mirrors wire `PayoutOrderMethodDto` 1:1 |
 | `Office` | `id: Long`, `name: String`, `nameDecorated: String`, `externalId: String?` | office dropdown row; `externalId` nullable (registry gap, see `core/network/model/API.md`) |
+| `GroupDashboard` | `group: GroupDetail`, `viewerRole: ViewerRoleInfo`, `corpus: GroupCorpus`, `accounts: GroupAccounts` | group-dashboard composite (COMP-GRP-001 4-way parallel fan-in); NOT returned by a single endpoint; `GroupConfig` deliberately excluded — see notes below |
+| `GroupDetail` | `id: String`, `fineractCenterId: Long`, `name: String`, `cycleNumber: Int`, `cycleLengthMonths: Int`, `meetingFrequency: String`, `memberCount: Int`, `overdueLoansCount: Int`, `status: String`, `typeConfig: GroupInstanceConfig` | `get_group` identity/header shape; deliberately NOT `Group` — see field-shape-divergence note below |
+| `GroupInstanceConfig` | `groupType: GroupTypeSlug`, `poolModel: SavingsMechanism`, `contributionModel: GroupContributionModel`, `shareoutFormula: String`, `payoutOrderMethod: String`, `shareValue: Double`, `contributionAmount: Double`, `socialFundEnabled: Boolean`, `cycleLengthMonths: Int`, `loanMultiplier: Double`, `interestRate: Double`, `fineAmount: Double` | THIS group's configured instance (embedded on `GroupDetail.typeConfig`); reuses `GroupTypeSlug` + `SavingsMechanism`; naming-collision with catalogue `GroupTypeConfig` — see note below |
+| `GroupContributionModel` | enum: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | mirrors wire `GroupContributionModelDto` 1:1; distinct from both `ContributionMode` and `ContributionModel` (see note below) |
+| `ViewerRoleInfo` | `role: ViewerRole`, `memberId: Long` | `get_viewer_role` result; reuses `ViewerRole` (no new enum) |
+| `GroupCorpus` | `currentBalance: Double`, `openingBalance: Double`, `totalContributionsThisCycle: Double`, `totalLoansOutstanding: Double`, `lastUpdated: String`, `rotationPosition: Int?`, `nextRecipientName: String?`, `nextRecipientPosition: Int?` | `get_group_corpus` result; ROTATING_PAYOUT fields nullable |
+| `ActivityItem` | `id: String`, `type: ActivityType`, `description: String`, `amount: Double?`, `date: String`, `memberName: String?` | row of `GroupAccounts.recentActivity` (last 10) |
+| `ActivityType` | enum: `MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN` | mirrors wire `ActivityTypeDto` 1:1 |
+| `GroupAccounts` | `savingsBalance: Double`, `loansOutstanding: Double`, `activeLoanCount: Int`, `shareOutProjection: Double?`, `recentActivity: List<ActivityItem>` | `get_group_accounts` result; `shareOutProjection` populated for ACCUMULATING pool models only |
+| `GroupConfig` | `shareValue: Double?`, `shareMin: Int?`, `shareMax: Int?`, `contributionAmount: Double?`, `loanMultiplier: Double?`, `interestRate: Double?`, `cycleLengthMonths: Int`, `fineAmount: Double?`, `minimumDisbursementThreshold: Double?` | client-side-constructed savings/loan rule set (`savings_summary_card`); repository-layer merge of `GroupInstanceConfig` + catalogue `GroupTypeConfig`, out of DTO/mapper scope; `shareMin`/`shareMax`/`minimumDisbursementThreshold` have NO wire source (confirmed gap) |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
@@ -46,13 +56,56 @@ Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}
 `idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET /companion/member/dashboard`);
 `idea-layer/screens/group-create/api.yaml` (COMP-GRP-001 `POST /companion/groups`
 + `GET /offices`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
-exists for this feature — `api.yaml` is the sole SoT).
+exists for this feature — `api.yaml` is the sole SoT);
+`idea-layer/screens/group-dashboard/{api.yaml,ui.yaml,docs.yaml}` (COMP-GRP-001
+4-way parallel fan-in: `get_group` + `get_viewer_role` + `get_group_corpus` +
+`get_group_accounts`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature — `api.yaml` is the sole SoT, per PP-1).
+
+**`GroupDetail` vs `Group` field-shape divergence (flagged for the
+cross-feature repair station):** `idea-layer/screens/group-dashboard/ui.yaml#state_model`
+pseudocodes its state field as `group: Group?`, and this feature's generation
+brief explicitly instructed reusing `Group` "do NOT duplicate" — but
+`get_group`'s actual `api.yaml` response (`id`, `fineractCenterId`, `name`,
+`cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`,
+`overdueLoansCount`, `status`, `typeConfig`) genuinely diverges from `Group`'s
+wire shape (`GroupDto`, from `group-list`'s COMP-GRP-001): it does NOT return
+`groupType`/`viewerRole`/`lastMeetingDate`/`healthIndicator`/`overdueRate`
+(all non-null required on `Group`, no default) and DOES return 4 fields
+`Group` doesn't carry. Forcing `Group` reuse would require fabricating values
+with no wire source, so `GroupDetail` was introduced instead — resolve at
+Station 3 (widen `Group` to a superset, or keep the two identity shapes
+formally distinct as they are today).
+
+**`GroupInstanceConfig` naming collision (flagged for the cross-feature
+repair station — same pattern as the already-documented `SavingsTransaction`
+collision):** `idea-layer/screens/group-dashboard/api.yaml#dtos.GroupTypeConfig`
+declares the per-group-instance shape embedded on `GroupDetail.typeConfig`
+under the bare name `GroupTypeConfig` — the SAME name already used by the
+COMP-DT-003 seed-catalogue row (`core.model.GroupTypeConfig`, reused
+elsewhere per this feature's own explicit "reuse GroupTypeConfig" instruction)
+— but the two shapes are NOT interchangeable (this one has `shareValue`/
+`contributionAmount`/`fineAmount`/`shareoutFormula`/`payoutOrderMethod`; the
+catalogue row has `displayName`/`tagline`/`defaultLoanMultiplier`/
+`maxMembers`/`minMembers` — no overlap beyond the group-type/pool-model
+axes). Named `GroupInstanceConfig` here to avoid the Kotlin class-name clash
+while flagging the source collision for Station 3.
+
+**`GroupContributionModel` is a THIRD contribution-mode-adjacent enum**
+(alongside `ContributionMode` — group-type-picker catalogue — and
+`ContributionModel` — group-create wizard): its 3-value set (`FIXED_AMOUNT`/
+`SHARE_BASED_VARIABLE`/`FIXED_NEGOTIATED`) happens to be IDENTICAL to
+`ContributionModel`'s (group-create), but was NOT unified with it because the
+two are declared independently on unrelated features' `api.yaml`s with no
+shared source-of-truth reference between them — flagged for Station 3 to
+evaluate whether `ContributionModel` should be reused here instead.
 
 Wire counterparts + `@SerialName` mapping: see `core/network/model/API.md`
 (includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`, a
 THREE-way naming-collision note re: `SavingsTransaction` /
 `idea-layer/dtos/SavingsTransactionDto.yaml` /
-`idea-layer/screens/personal-savings/api.yaml`, and the group-create enum
+`idea-layer/screens/personal-savings/api.yaml`, the group-create enum
 reuse-vs-new-enum rationale + `OfficeDto.externalId` / `PayoutOrderMethodDto`
-value-set notes).
+value-set notes, and the group-dashboard `GroupDetail`/`GroupInstanceConfig`
+divergence + collision notes above).
 <!-- kmp-dto-gen:END -->

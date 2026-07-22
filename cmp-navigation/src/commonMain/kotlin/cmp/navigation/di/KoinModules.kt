@@ -27,6 +27,7 @@ import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.mifos.groupbanking.feature.groupcreate.di.GroupCreateModule
+import org.mifos.groupbanking.feature.groupdashboard.di.GroupDashboardModule
 import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
 import org.mifos.groupbanking.feature.joinwithcode.di.JoinWithCodeModule
@@ -61,6 +62,7 @@ object KoinModules {
             JoinWithCodeModule, // <- added by kmp-viewmodel-gen
             PersonalDashboardModule, // <- added by kmp-viewmodel-gen
             GroupCreateModule, // <- added by kmp-viewmodel-gen
+            GroupDashboardModule, // <- added by kmp-viewmodel-gen
         )
     }
 

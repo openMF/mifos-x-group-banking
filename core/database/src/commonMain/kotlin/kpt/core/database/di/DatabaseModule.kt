@@ -46,6 +46,9 @@ val DatabaseModule = module {
 
     // group-banking domain — personal-dashboard per-group cache (SourceOfTruth DAO, COMP-DASH-001)
     single { get<AppDatabase>().memberDashboardDao }
+
+    // group-banking domain — group-dashboard composite per-group cache (SourceOfTruth DAO, COMP-GRP-001)
+    single { get<AppDatabase>().groupDashboardDao }
 }
 
 /**

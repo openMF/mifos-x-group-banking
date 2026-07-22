@@ -20,9 +20,12 @@ import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
 import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
+import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
+import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
+import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
 import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApi
@@ -136,4 +139,14 @@ val NetworkModule = module {
     // kmp-store-gen/kmp-client-gen generation step, not registered here.
     single<MemberDashboardApiConfig> { MemberDashboardApiConfig() }
     single<MemberDashboardApi> { MemberDashboardApiImpl(httpClient = get()) }
+
+    // Group dashboard (COMP-GRP-001 read path) — group-dashboard feature client stack. Reuses
+    // the shared HttpClient singleton above (same companion server, no second engine). The
+    // config binding is registered for override-surface symmetry with CompanionAuthApiConfig
+    // even though the shared client is the one actually dispatching requests today. The 4-way
+    // parallel-combine into the composite dashboard model + Store5 wrapper consuming
+    // GroupDashboardApi is emitted by a downstream kmp-store-gen/kmp-client-gen generation step,
+    // not registered here.
+    single<GroupDashboardApiConfig> { GroupDashboardApiConfig() }
+    single<GroupDashboardApi> { GroupDashboardApiImpl(httpClient = get()) }
 }

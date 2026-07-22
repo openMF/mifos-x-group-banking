@@ -20,6 +20,11 @@
 | `InvitationApi` | `/companion/datatables/invitations/{code}/{rowId}` | PUT | `MarkAcceptedRequestDto` | `MarkAcceptedResponseDto` | `NetworkResult<MarkAcceptedResponseDto, NetworkError>` |
 | `GroupCreateApi` (`org.mifos.groupbanking.core.network.service.groupcreate`) | `/offices` | GET (query `orderBy`, default `name`) | — | `List<OfficeDto>` | `NetworkResult<List<OfficeDto>, NetworkError>` |
 | `GroupCreateApi` | `/companion/groups` | POST | `CreateGroupRequestDto` | `CreateGroupResponseDto` | `NetworkResult<CreateGroupResponseDto, NetworkError>` |
+| `MemberDashboardApi` (`org.mifos.groupbanking.core.network.service.personaldashboard`) | `/companion/member/dashboard` | GET (query `selectedGroupId`, optional) | — | `MemberDashboardResponseDto` | `NetworkResult<MemberDashboardResponseDto, NetworkError>` |
+| `GroupDashboardApi` (`org.mifos.groupbanking.core.network.service.groupdashboard`) | `/companion/groups/{groupId}` | GET | — | `GroupDetailDto` | `NetworkResult<GroupDetailDto, NetworkError>` |
+| `GroupDashboardApi` | `/companion/groups/{groupId}/my-role` | GET | — | `ViewerRoleInfoDto` | `NetworkResult<ViewerRoleInfoDto, NetworkError>` |
+| `GroupDashboardApi` | `/companion/groups/{groupId}/corpus` | GET | — | `GroupCorpusDto` | `NetworkResult<GroupCorpusDto, NetworkError>` |
+| `GroupDashboardApi` | `/companion/groups/{groupId}/accounts` | GET | — | `GroupAccountsDto` | `NetworkResult<GroupAccountsDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -44,7 +49,18 @@ mutation orchestration flow** (`business_logic.kind: processor`, `cache_strategy
 `InvitationApi`. `GroupCreateApi.getOffices` has a DECLARED `stale_while_revalidate` cache
 strategy (`ttl_seconds=3600`) per `data-flow.yaml` that is NOT yet Store5-backed — no
 `OfficeStore` exists in `AppStoreRegistry` yet (pending a future `kmp-store-gen` step); see
-`core/data/API.md`'s `GroupCreateRepository` row for the SC2 gap note.
+`core/data/API.md`'s `GroupCreateRepository` row for the SC2 gap note. COMP-DASH-001 (unified
+member dashboard) — see `idea-layer/screens/personal-dashboard/api.yaml`. `MemberDashboardApi`
+is service-layer only; its Store5 store + Repository are owned by downstream generation steps.
+COMP-GRP-001 (group-dashboard read path — 4 independent companion reads: `get_group`,
+`get_viewer_role`, `get_group_corpus`, `get_group_accounts`) — see
+`idea-layer/screens/group-dashboard/api.yaml` + `data-flow.yaml#entries[0]` (all 4 fire as
+concurrent coroutines on mount/refresh/retry, each with its own `cache_strategy` —
+`stale-while-revalidate` for `get_group`/`get_viewer_role`/`get_group_accounts`,
+`network-first` for `get_group_corpus`). `GroupDashboardApi` is service-layer only; the 4-way
+parallel-combine into the composite `GroupDashboardResponseDto`/domain `GroupDashboard` model
+and the Store5 wrapper (`.asScreenStream()`) are owned by a downstream
+`kmp-store-gen`/`kmp-client-gen` generation step, not by `core/network`.
 
 ## dtos (core/network/model)
 
@@ -55,8 +71,11 @@ strategy (`ttl_seconds=3600`) per `data-flow.yaml` that is NOT yet Store5-backed
 `GroupPreviewDto`, `AssociateClientsRequestDto`/`ResponseDto`, `MarkAcceptedRequestDto`/
 `ResponseDto` (+ nested `MarkAcceptedChangesDto`), `CreateGroupRequestDto`/`ResponseDto`,
 `CreateGroupTypeConfigDto` (+ `ContributionModelDto`/`ShareoutFormulaDto`/`PayoutOrderMethodDto`
-wire enums), `OfficeDto` — see `core/network/model/API.md` for the DTO-owning generator's own
-doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
+wire enums), `OfficeDto`, `MemberDashboardResponseDto`, `GroupDashboardResponseDto`,
+`GroupDetailDto`, `GroupInstanceConfigDto` (+ `GroupContributionModelDto` wire enum),
+`ViewerRoleInfoDto`, `GroupCorpusDto`, `GroupAccountsDto`, `ActivityItemDto` (+
+`ActivityTypeDto` wire enum), `GroupConfigDto` — see `core/network/model/API.md` for the
+DTO-owning generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
 
 ## config
 
@@ -83,4 +102,14 @@ from this config's `baseUrl`.
 for override-surface symmetry; `GroupCreateApiImpl` currently reuses the shared `HttpClient`
 singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine
 from this config's `baseUrl`.
+
+`MemberDashboardApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `MemberDashboardApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
+
+`GroupDashboardApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable,
+registered for override-surface symmetry; `GroupDashboardApiImpl` currently reuses the shared
+`HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
+second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->
