@@ -18,6 +18,8 @@
 | `InvitationApi` | `/companion/groups/{groupId}` | GET | — | `GroupPreviewDto` | `NetworkResult<GroupPreviewDto, NetworkError>` |
 | `InvitationApi` | `/companion/groups/{groupId}/associate-clients` | POST | `AssociateClientsRequestDto` | `AssociateClientsResponseDto` | `NetworkResult<AssociateClientsResponseDto, NetworkError>` |
 | `InvitationApi` | `/companion/datatables/invitations/{code}/{rowId}` | PUT | `MarkAcceptedRequestDto` | `MarkAcceptedResponseDto` | `NetworkResult<MarkAcceptedResponseDto, NetworkError>` |
+| `GroupCreateApi` (`org.mifos.groupbanking.core.network.service.groupcreate`) | `/offices` | GET (query `orderBy`, default `name`) | — | `List<OfficeDto>` | `NetworkResult<List<OfficeDto>, NetworkError>` |
+| `GroupCreateApi` | `/companion/groups` | POST | `CreateGroupRequestDto` | `CreateGroupResponseDto` | `NetworkResult<CreateGroupResponseDto, NetworkError>` |
 | `SupabaseConfigClient` (`kpt.core.base.network`, wired via `kpt.core.network.di.NetworkModule`) | Supabase `app_config` table | RPC/read | — | dynamic server config | inert when `secrets/supabaseCredentialsFile.json` absent |
 
 Contract refs: COMP-AUTH-001 (self-register), COMP-AUTH-002 (login), COMP-AUTH-003 (me/biometric
@@ -34,7 +36,15 @@ COMP-GRP-003 (associate-client-to-group) — see
 `idea-layer/screens/join-with-code/api.yaml`. `InvitationApi` backs a **Store5-free mutation
 orchestration flow** (`business_logic.kind: processor`, `cache_strategy: no-cache` throughout) —
 its Repository (`InvitationRepositoryImpl`, `core/data`) surfaces `NetworkResult` directly, no
-`.asScreenStream()`/Store5 wrapping.
+`.asScreenStream()`/Store5 wrapping. COMP-GRP-001 (group-create orchestration, same COMP-GRP-001
+tool as group-list's `companion_create_group`) + raw Fineract `list_all_offices` passthrough —
+see `idea-layer/screens/group-create/api.yaml`. `GroupCreateApi.createGroup` backs a **Store5-free
+mutation orchestration flow** (`business_logic.kind: processor`, `cache_strategy: no_cache`) —
+`GroupCreateRepositoryImpl` (`core/data`) surfaces `NetworkResult` directly, same branch as
+`InvitationApi`. `GroupCreateApi.getOffices` has a DECLARED `stale_while_revalidate` cache
+strategy (`ttl_seconds=3600`) per `data-flow.yaml` that is NOT yet Store5-backed — no
+`OfficeStore` exists in `AppStoreRegistry` yet (pending a future `kmp-store-gen` step); see
+`core/data/API.md`'s `GroupCreateRepository` row for the SC2 gap note.
 
 ## dtos (core/network/model)
 
@@ -43,8 +53,10 @@ its Repository (`InvitationRepositoryImpl`, `core/data`) surfaces `NetworkResult
 `SavingsMechanismDto` / `ContributionModeDto` wire enums), `GroupDto`, `GroupPageDto` (+
 `GroupTypeDto` / `ViewerRoleDto` / `HealthIndicatorDto` wire enums), `InvitationRowDto`,
 `GroupPreviewDto`, `AssociateClientsRequestDto`/`ResponseDto`, `MarkAcceptedRequestDto`/
-`ResponseDto` (+ nested `MarkAcceptedChangesDto`) — see `core/network/model/API.md` for the
-DTO-owning generator's own doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
+`ResponseDto` (+ nested `MarkAcceptedChangesDto`), `CreateGroupRequestDto`/`ResponseDto`,
+`CreateGroupTypeConfigDto` (+ `ContributionModelDto`/`ShareoutFormulaDto`/`PayoutOrderMethodDto`
+wire enums), `OfficeDto` — see `core/network/model/API.md` for the DTO-owning generator's own
+doc surface (schema-versioned, EC30 `UNKNOWN` enum fallback).
 
 ## config
 
@@ -64,6 +76,11 @@ config's `baseUrl`.
 
 `InvitationApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable, registered
 for override-surface symmetry; `InvitationApiImpl` currently reuses the shared `HttpClient`
+singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine
+from this config's `baseUrl`.
+
+`GroupCreateApiConfig(baseUrl: String = "http://localhost:8080")` — Koin-injectable, registered
+for override-surface symmetry; `GroupCreateApiImpl` currently reuses the shared `HttpClient`
 singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a second engine
 from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->

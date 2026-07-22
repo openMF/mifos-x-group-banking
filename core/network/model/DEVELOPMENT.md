@@ -45,6 +45,13 @@ logic, no domain field names.
 | `GroupSummaryDto` | `MemberDashboardDto.kt` | `@Serializable` nested response DTO; reuses `SavingsMechanismDto` |
 | `SavingsTransactionDto` | `SavingsTransactionDto.kt` | `@Serializable` CANONICAL compact recent-activity row — see `## 4. Boundaries` naming-collision note |
 | `TransactionTypeDto` | `SavingsTransactionDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `CreateGroupRequestDto` | `GroupCreateDto.kt` | `@Serializable` request (COMP-GRP-001 `POST /companion/groups`) |
+| `CreateGroupTypeConfigDto` | `GroupCreateDto.kt` | `@Serializable` nested request DTO — raw `group_type_config` datatable payload, snake_case |
+| `CreateGroupResponseDto` | `GroupCreateDto.kt` | `@Serializable` response (COMP-GRP-001) |
+| `OfficeDto` | `GroupCreateDto.kt` | `@Serializable` response row (`GET /offices`), office dropdown |
+| `ContributionModelDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) — distinct from `ContributionModeDto` |
+| `ShareoutFormulaDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
+| `PayoutOrderMethodDto` | `GroupCreateDto.kt` | `@Serializable` enum, `UNKNOWN` fallback (T7/EC30) |
 
 ## 3. Consumers
 
@@ -57,7 +64,8 @@ logic, no domain field names.
   → `core/data` `GroupRepositoryImpl`; `core/network/mapper/JoinWithCodeMappers.kt`
   → `core/data` invitation/join repository; `core/network/mapper/MemberDashboardMappers.kt`
   + `core/network/mapper/SavingsTransactionMappers.kt` → `core/data`
-  `MemberDashboardRepository`)
+  `MemberDashboardRepository`; `core/network/mapper/GroupCreateMappers.kt` →
+  `core/data` group-create repository (offices list + submit)
 
 ## 4. Boundaries
 
@@ -80,6 +88,18 @@ logic, no domain field names.
   approved `api.yaml`. See the full note in `SavingsTransactionDto.kt` kdoc and
   `## dtos` below — this MUST be resolved before `personal-savings` DTOs are
   generated (class-name collision, not just a field mismatch).
+- **`CreateGroupTypeConfigDto` is snake_case** (raw `group_type_config`
+  datatable columns, matching `InvitationRowDto`'s precedent) — every OTHER
+  DTO in `GroupCreateDto.kt` (`CreateGroupRequestDto`'s top-level fields,
+  `CreateGroupResponseDto`, `OfficeDto`) is companion-bridge camelCase as
+  usual. See `## dtos` (API.md) for the enum reuse-vs-new-enum rationale
+  (`groupType`/`poolModel` reuse existing wire enums; `contributionModel`/
+  `shareoutFormula`/`payoutOrderMethod` are new, feature-local enums).
+- **`OfficeDto.externalId` nullability gap** (flagged for the cross-feature
+  repair station): `GET /offices`' operation response schema declares
+  `externalId`, but the abbreviated `idea-layer/screens/group-create/api.yaml#dtos.Office`
+  registry block omits it. Modeled here as nullable/optional rather than
+  invented as non-null-required (Hard Rule 4).
 
 ## 5. Data
 
@@ -170,6 +190,34 @@ logic, no domain field names.
 | `SavingsTransactionDto` | `date` | `date` | `String` (ISO date) | — |
 | `SavingsTransactionDto` | `type` | `type` | `TransactionTypeDto` | `TransactionTypeDto.UNKNOWN` |
 | `SavingsTransactionDto` | `amount` | `amount` | `Double` | — |
+| `CreateGroupRequestDto` | `name` | `name` | `String` | — |
+| `CreateGroupRequestDto` | `officeId` | `officeId` | `Long` | — |
+| `CreateGroupRequestDto` | `userId` | `userId` | `Long` | — |
+| `CreateGroupRequestDto` | `currency` | `currency` | `String` | — |
+| `CreateGroupRequestDto` | `meetingDay` | `meetingDay` | `String` | — |
+| `CreateGroupRequestDto` | `meetingTime` | `meetingTime` | `String` | — |
+| `CreateGroupRequestDto` | `typeConfig` | `typeConfig` | `CreateGroupTypeConfigDto` | — |
+| `CreateGroupTypeConfigDto` | `groupType` | `group_type` | `GroupTypeDto` | `GroupTypeDto.UNKNOWN` |
+| `CreateGroupTypeConfigDto` | `poolModel` | `pool_model` | `SavingsMechanismDto` | `SavingsMechanismDto.UNKNOWN` |
+| `CreateGroupTypeConfigDto` | `contributionModel` | `contribution_model` | `ContributionModelDto` | `ContributionModelDto.UNKNOWN` |
+| `CreateGroupTypeConfigDto` | `shareoutFormula` | `shareout_formula` | `ShareoutFormulaDto` | `ShareoutFormulaDto.UNKNOWN` |
+| `CreateGroupTypeConfigDto` | `payoutOrderMethod` | `payout_order_method` | `PayoutOrderMethodDto` | `PayoutOrderMethodDto.UNKNOWN` |
+| `CreateGroupTypeConfigDto` | `shareValue` | `share_value` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `contributionAmount` | `contribution_amount` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `socialFundEnabled` | `social_fund_enabled` | `Boolean` | — |
+| `CreateGroupTypeConfigDto` | `socialFundPercent` | `social_fund_percent` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `cycleLengthMonths` | `cycle_length_months` | `Int` | — |
+| `CreateGroupTypeConfigDto` | `loanMultiplier` | `loan_multiplier` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `interestRate` | `interest_rate` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `fineAmount` | `fine_amount` | `Double` | — |
+| `CreateGroupTypeConfigDto` | `maxMembers` | `max_members` | `Int` | — |
+| `CreateGroupResponseDto` | `groupId` | `groupId` | `String` | — |
+| `CreateGroupResponseDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `CreateGroupResponseDto` | `inviteCode` | `inviteCode` | `String` | — |
+| `OfficeDto` | `id` | `id` | `Long` | — |
+| `OfficeDto` | `name` | `name` | `String` | — |
+| `OfficeDto` | `nameDecorated` | `nameDecorated` | `String` | — |
+| `OfficeDto` | `externalId` | `externalId` | `String?` | `null` |
 
 ## 6. Errors
 
@@ -184,16 +232,20 @@ fields and unknown enum values are tolerated (never thrown) via the shared
 
 `core/network/src/commonTest/.../model/LoginSignupDtoTest.kt`,
 `GroupTypeConfigDtoTest.kt`, `GroupDtoTest.kt`, `JoinWithCodeDtoTest.kt`,
-`MemberDashboardDtoTest.kt`, and `SavingsTransactionDtoTest.kt` —
-construction, serialization round-trip, default-value, and equality tests per
-DTO, plus a T7/EC30 cross-version fixture proving an old client tolerates a
-server-added field + a server-added enum value without crashing.
+`MemberDashboardDtoTest.kt`, `SavingsTransactionDtoTest.kt`, and
+`GroupCreateDtoTest.kt` — construction, serialization round-trip,
+default-value, and equality tests per DTO, plus a T7/EC30 cross-version
+fixture proving an old client tolerates a server-added field + a server-added
+enum value without crashing.
 `JoinWithCodeDtoTest.kt` additionally covers `InvitationRowDto.acceptedAt`
 nullability (both the unused-code `null` case and the already-used
 non-null case). `MemberDashboardDtoTest.kt` additionally covers the
 mutually-exclusive nullable ACCUMULATING (`shareOutProjection`) vs
 ROTATING_PAYOUT (`rotationPosition` + `nextRecipientEta`) field groups and
-their omitted-from-payload default-null behavior.
+their omitted-from-payload default-null behavior. `GroupCreateDtoTest.kt`
+additionally covers `OfficeDto.externalId`'s absent-from-payload default-null
+behavior and every `ContributionModelDto`/`ShareoutFormulaDto`/
+`PayoutOrderMethodDto` known value + `UNKNOWN` fallback.
 
 ## 8. Observability
 
@@ -203,7 +255,9 @@ Never log `SelfRegisterRequestDto.password`, `LoginRequestDto.password`, or
 `InvitationRowDto.invitedEmailPhone` carries PII (email/phone) — avoid logging
 it; other join-with-code DTOs carry no sensitive fields.
 `MemberDashboardResponseDto` / `GroupSummaryDto` / `SavingsTransactionDto`
-carry no sensitive fields (balances only; no PII).
+carry no sensitive fields (balances only; no PII). `CreateGroupRequestDto` /
+`CreateGroupTypeConfigDto` / `CreateGroupResponseDto` / `OfficeDto` carry no
+sensitive fields.
 
 ## 9. Evolution
 
@@ -213,5 +267,7 @@ decoding safely. Before generating `personal-savings` or `savings-dashboard`
 DTOs, resolve the `SavingsTransactionDto` naming collision flagged in
 `## 4. Boundaries` and `## dtos` (API.md) — either rename the richer
 per-account ledger row to `SavingsLedgerEntryDto` or migrate the consuming
-feature onto this companion shape.
+feature onto this companion shape. Before generating a group-EDIT feature that
+also submits `typeConfig`, reuse `CreateGroupTypeConfigDto` / its mappers
+rather than introducing a second edit-time payload shape.
 <!-- kmp-dto-gen:END -->

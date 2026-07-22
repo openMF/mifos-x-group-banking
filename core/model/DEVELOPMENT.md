@@ -41,6 +41,13 @@ mappers in `core/network/mapper`.
 | `GroupSummary` | `MemberDashboard.kt` | data class — lightweight per-group summary row; reuses `SavingsMechanism` |
 | `SavingsTransaction` | `SavingsTransaction.kt` | data class — CANONICAL compact recent-activity row (personal-dashboard); see registry/naming-collision note in `core/network/model/API.md` |
 | `TransactionType` | `SavingsTransaction.kt` | enum (`DEPOSIT`, `WITHDRAWAL`, `UNKNOWN`) |
+| `CreateGroupRequest` | `GroupCreate.kt` | data class — group-create wizard submission payload (COMP-GRP-001) |
+| `CreateGroupTypeConfig` | `GroupCreate.kt` | data class — type-adaptive rule set; reuses `GroupTypeSlug` + `SavingsMechanism` |
+| `GroupCreationResult` | `GroupCreate.kt` | data class — group-create success result (groupId + inviteCode) |
+| `Office` | `GroupCreate.kt` | data class — office dropdown row; `externalId` nullable |
+| `ContributionModel` | `GroupCreate.kt` | enum (`FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN`) — distinct from `ContributionMode` |
+| `ShareoutFormula` | `GroupCreate.kt` | enum (`NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN`) |
+| `PayoutOrderMethod` | `GroupCreate.kt` | enum (`FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN`) |
 
 ## 3. Consumers
 
@@ -51,7 +58,9 @@ mappers in `core/network/mapper`.
   types before returning them; the join-with-code repository maps
   `JoinWithCodeMappers.kt` output the same way; the personal-dashboard
   repository maps `MemberDashboardMappers.kt` / `SavingsTransactionMappers.kt`
-  output the same way)
+  output the same way; the group-create repository maps
+  `GroupCreateMappers.kt` output the same way, BOTH directions — DTO -> domain
+  for the office list, domain -> DTO for the submitted `CreateGroupRequest`)
 
 ## 4. Boundaries
 
@@ -152,6 +161,34 @@ mappers in `core/network/mapper`.
 | `SavingsTransaction` | `date` | `LocalDate` | non-null |
 | `SavingsTransaction` | `type` | `TransactionType` | non-null |
 | `SavingsTransaction` | `amount` | `Double` | non-null |
+| `CreateGroupRequest` | `name` | `String` | non-null |
+| `CreateGroupRequest` | `officeId` | `Long` | non-null |
+| `CreateGroupRequest` | `userId` | `Long` | non-null |
+| `CreateGroupRequest` | `currency` | `String` | non-null |
+| `CreateGroupRequest` | `meetingDay` | `String` | non-null |
+| `CreateGroupRequest` | `meetingTime` | `String` | non-null |
+| `CreateGroupRequest` | `typeConfig` | `CreateGroupTypeConfig` | non-null |
+| `CreateGroupTypeConfig` | `groupType` | `GroupTypeSlug` | non-null |
+| `CreateGroupTypeConfig` | `poolModel` | `SavingsMechanism` | non-null |
+| `CreateGroupTypeConfig` | `contributionModel` | `ContributionModel` | non-null |
+| `CreateGroupTypeConfig` | `shareoutFormula` | `ShareoutFormula` | non-null |
+| `CreateGroupTypeConfig` | `payoutOrderMethod` | `PayoutOrderMethod` | non-null |
+| `CreateGroupTypeConfig` | `shareValue` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `contributionAmount` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `socialFundEnabled` | `Boolean` | non-null |
+| `CreateGroupTypeConfig` | `socialFundPercent` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `cycleLengthMonths` | `Int` | non-null |
+| `CreateGroupTypeConfig` | `loanMultiplier` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `interestRate` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `fineAmount` | `Double` | non-null |
+| `CreateGroupTypeConfig` | `maxMembers` | `Int` | non-null |
+| `GroupCreationResult` | `groupId` | `String` | non-null |
+| `GroupCreationResult` | `fineractCenterId` | `Long` | non-null |
+| `GroupCreationResult` | `inviteCode` | `String` | non-null |
+| `Office` | `id` | `Long` | non-null |
+| `Office` | `name` | `String` | non-null |
+| `Office` | `nameDecorated` | `String` | non-null |
+| `Office` | `externalId` | `String?` | nullable |
 
 ## 6. Errors
 
@@ -166,12 +203,15 @@ Domain models are pure data classes exercised indirectly via the mapper test
 suites (`core/network/src/commonTest/.../mapper/LoginSignupMappersTest.kt`,
 `GroupTypeConfigMappersTest.kt`, `GroupMappersTest.kt`,
 `JoinWithCodeMappersTest.kt`, `MemberDashboardMappersTest.kt`,
-`SavingsTransactionMappersTest.kt`), which assert every field is mapped and
-equality holds end to end. `HealthIndicator.fromOverdueRate` additionally has
-direct boundary-value tests in `GroupMappersTest.kt`; `Invitation.isExpired` /
-`isAlreadyUsed` have direct boundary-value tests in `JoinWithCodeMappersTest.kt`
-(before-expiry / at-exact-expiry / after-expiry, plus null-vs-non-null
-`acceptedAt`).
+`SavingsTransactionMappersTest.kt`, `GroupCreateMappersTest.kt`), which
+assert every field is mapped and equality holds end to end, in BOTH
+directions where a request is submitted (`GroupCreateMappersTest.kt` covers
+`CreateGroupRequestDto -> CreateGroupRequest` AND the reverse
+`CreateGroupRequest -> CreateGroupRequestDto`). `HealthIndicator.fromOverdueRate`
+additionally has direct boundary-value tests in `GroupMappersTest.kt`;
+`Invitation.isExpired` / `isAlreadyUsed` have direct boundary-value tests in
+`JoinWithCodeMappersTest.kt` (before-expiry / at-exact-expiry / after-expiry,
+plus null-vs-non-null `acceptedAt`).
 
 ## 8. Observability
 
@@ -180,6 +220,8 @@ carry sensitive auth material. `Invitation.invitedEmailPhone` carries PII —
 avoid logging it. `MemberDashboard` / `GroupSummary` / `SavingsTransaction`
 carry no sensitive fields (balances are not PII by this project's threat
 model, but avoid logging full transaction history in bulk).
+`CreateGroupRequest` / `CreateGroupTypeConfig` / `GroupCreationResult` /
+`Office` carry no sensitive fields.
 
 ## 9. Evolution
 
@@ -192,4 +234,8 @@ compact `SavingsTransaction` shape lives in its own `SavingsTransaction.kt`
 file since it is explicitly intended for reuse across multiple features
 (personal-dashboard today; personal-savings/savings-dashboard pending the
 naming-collision resolution flagged in `core/network/model/API.md`).
+Group-create's domain concepts live in `GroupCreate.kt`; if a future
+group-EDIT feature needs the same type-adaptive rule set, reuse
+`CreateGroupTypeConfig` (and `ContributionModel`/`ShareoutFormula`/
+`PayoutOrderMethod`) rather than introducing a second shape.
 <!-- kmp-dto-gen:END -->

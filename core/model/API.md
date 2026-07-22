@@ -30,17 +30,29 @@
 | `GroupSummary` | `groupId: String`, `name: String`, `poolModel: SavingsMechanism` | lightweight per-group summary row (group-selector chip); reuses `SavingsMechanism` |
 | `SavingsTransaction` | `id: String`, `date: LocalDate`, `type: TransactionType`, `amount: Double` | CANONICAL compact recent-activity row; see registry/naming-collision note below |
 | `TransactionType` | enum: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | mirrors wire `TransactionTypeDto` 1:1 |
+| `CreateGroupRequest` | `name: String`, `officeId: Long`, `userId: Long`, `currency: String`, `meetingDay: String`, `meetingTime: String`, `typeConfig: CreateGroupTypeConfig` | group-create wizard submission (COMP-GRP-001); assembled across the wizard's 4 steps |
+| `CreateGroupTypeConfig` | `groupType: GroupTypeSlug`, `poolModel: SavingsMechanism`, `contributionModel: ContributionModel`, `shareoutFormula: ShareoutFormula`, `payoutOrderMethod: PayoutOrderMethod`, `shareValue: Double`, `contributionAmount: Double`, `socialFundEnabled: Boolean`, `socialFundPercent: Double`, `cycleLengthMonths: Int`, `loanMultiplier: Double`, `interestRate: Double`, `fineAmount: Double`, `maxMembers: Int` | type-adaptive rule set forwarded to provision the `group_type_config` datatable row; reuses `GroupTypeSlug` + `SavingsMechanism` (no duplicate enums for those 2 axes) |
+| `GroupCreationResult` | `groupId: String`, `fineractCenterId: Long`, `inviteCode: String` | group-create success result |
+| `ContributionModel` | enum: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | mirrors wire `ContributionModelDto` 1:1; distinct from `ContributionMode` (different value-set) |
+| `ShareoutFormula` | enum: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | mirrors wire `ShareoutFormulaDto` 1:1 |
+| `PayoutOrderMethod` | enum: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | mirrors wire `PayoutOrderMethodDto` 1:1 |
+| `Office` | `id: Long`, `name: String`, `nameDecorated: String`, `externalId: String?` | office dropdown row; `externalId` nullable (registry gap, see `core/network/model/API.md`) |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`
 (contract refs COMP-AUTH-001, COMP-AUTH-002, COMP-AUTH-003);
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
 `idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
 `idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003);
-`idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET /companion/member/dashboard`).
+`idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET /companion/member/dashboard`);
+`idea-layer/screens/group-create/api.yaml` (COMP-GRP-001 `POST /companion/groups`
++ `GET /offices`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature — `api.yaml` is the sole SoT).
 
 Wire counterparts + `@SerialName` mapping: see `core/network/model/API.md`
-(includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`, and
-a THREE-way naming-collision note re: `SavingsTransaction` /
+(includes a registry-divergence note re: `idea-layer/dtos/GroupDto.yaml`, a
+THREE-way naming-collision note re: `SavingsTransaction` /
 `idea-layer/dtos/SavingsTransactionDto.yaml` /
-`idea-layer/screens/personal-savings/api.yaml`).
+`idea-layer/screens/personal-savings/api.yaml`, and the group-create enum
+reuse-vs-new-enum rationale + `OfficeDto.externalId` / `PayoutOrderMethodDto`
+value-set notes).
 <!-- kmp-dto-gen:END -->

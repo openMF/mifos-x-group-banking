@@ -12,6 +12,7 @@
 | `AuthRepository` / `AuthRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `currentSession: Flow<AuthSession?>` (session-token presence, `CompanionSessionStore`-backed) | `selfRegister(SelfRegistration): NetworkResult<AuthSession, NetworkError>`, `login(LoginCredentials): NetworkResult<AuthSession, NetworkError>`, `refreshSession(sessionToken): NetworkResult<UserProfile, NetworkError>`, `clearSession()` | Legacy/mutation path — `business_logic.kind: processor` (NOT Store5; see RULE-IMPLEMENT-STORE5-001 scope) |
 | `InvitationRepository` / `InvitationRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | — (no read-stream; `validateCode`/`fetchGroupPreview` are one-shot no-cache reads) | `validateCode(code): NetworkResult<Invitation, NetworkError>`, `fetchGroupPreview(groupId): NetworkResult<GroupPreview, NetworkError>`, `joinGroup(groupId, clientId, role, code, rowId): NetworkResult<JoinGroupResult, NetworkError>` (associates then best-effort marks the invite accepted — non-fatal on mark-accepted failure) | Store5-free mutation orchestration — `business_logic.kind: processor`, `cache_strategy: no-cache` throughout (see RULE-IMPLEMENT-STORE5-001 scope) |
 | `UserDataRepository` / `UserDataRepositoryImpl` (`kpt.core.data.user`) | `userData: StateFlow<UserData>`, theme/language/preference flows | `setLanguage`/`setThemeBrand`/`setIsAuthenticated`/etc. | Template-provided user-preferences repository (unrelated to auth session) |
+| `GroupCreateRepository` / `GroupCreateRepositoryImpl` (`org.mifos.groupbanking.core.data.repository`) | `getOffices(orderBy = "name"): NetworkResult<List<Office>, NetworkError>` (plain pass-through today — SC2 gap, see notes) | `createGroup(CreateGroupRequest): NetworkResult<GroupCreationResult, NetworkError>` | Store5-free mutation orchestration for `createGroup` — `business_logic.kind: processor` (see RULE-IMPLEMENT-STORE5-001 scope); `getOffices` is Store5-free TODAY pending a future `kmp-store-gen` `OfficeStore` |
 
 Contract refs (AuthRepository): COMP-AUTH-001/002/003 — see
 `idea-layer/screens/login-signup/api.yaml` + `idea-layer/exports/login-signup/API.md`.
@@ -22,10 +23,25 @@ declares a `validate_invite_token_response.id` source that the response contract
 actually define. Exposed as an explicit caller-supplied param; see
 `InvitationRepository.joinGroup` KDoc.
 
+Contract refs (GroupCreateRepository): COMP-GRP-001 (`createGroup`, group-create orchestration:
+createCenter + activate + associateClients + assignRole + provision `group_type_config`) + raw
+Fineract `list_all_offices` (`getOffices`) — see `idea-layer/screens/group-create/api.yaml`.
+**KNOWN SC2 GAP**: `data-flow.yaml`'s `on_mount` entry declares a genuine
+`stale_while_revalidate` (`ttl_seconds=3600`) cache strategy for `getOffices` with an
+`offices_cache` table — no `OfficeStore` exists yet in `AppStoreRegistry` (owned by a future
+`kmp-store-gen` step), so `getOffices` is, for now, a plain `NetworkResult` pass-through
+(same shape as `InvitationRepository`) rather than `.asScreenStream()`. Upgrade path documented
+in `GroupCreateRepository` KDoc. **Offline-queue note**: `createGroup`'s
+`data-flow.yaml#offline_queue` (table `sync_queue`, operation `CREATE_GROUP_ORCHESTRATE`) is
+wired at the ViewModel layer via `DraftSubmitHandler` wrapping this repository's `createGroup`
+call (this project's `core-base/store` convention — see `GroupCreateRepository` KDoc), NOT
+inside the repository itself.
+
 ## Store5 note
 
 `core/data` also hosts Store5-wrapping Repositories for read-stream features (per SP-04 —
 `.asScreenStream()` / `.asPagingScreenStream()` over a `core/store` `Store`/`MutableStore`).
-None exist yet for `login-signup` or `join-with-code` (both out of Store5 scope — see
-DEVELOPMENT.md#4).
+None exist yet for `login-signup`, `join-with-code`, or `group-create` (all out of Store5 scope
+today — see DEVELOPMENT.md#4). `group-create`'s `getOffices` is the one candidate pending a
+future `kmp-store-gen` `OfficeStore`.
 <!-- kmp-client-gen:END -->

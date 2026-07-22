@@ -19,11 +19,14 @@ import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
 import org.mifos.groupbanking.core.network.config.GroupApiConfig
+import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
 import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
 import org.mifos.groupbanking.core.network.config.InvitationApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
 import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
+import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApi
+import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApiImpl
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
@@ -114,6 +117,16 @@ val NetworkModule = module {
     // to cache) is registered in RepositoryModule.kt.
     single<InvitationApiConfig> { InvitationApiConfig() }
     single<InvitationApi> { InvitationApiImpl(httpClient = get()) }
+
+    // Group-create wizard (COMP-GRP-001 + raw Fineract `/offices` passthrough) — group-create
+    // feature client stack. Reuses the shared HttpClient singleton above (same companion host,
+    // no second engine). The config binding is registered for override-surface symmetry with
+    // CompanionAuthApiConfig even though the shared client is the one actually dispatching
+    // requests today. The Repository consuming GroupCreateApi (Store5-free mutation
+    // orchestration for createGroup; getOffices pending a future kmp-store-gen OfficeStore — see
+    // GroupCreateRepository KDoc) is registered in RepositoryModule.kt.
+    single<GroupCreateApiConfig> { GroupCreateApiConfig() }
+    single<GroupCreateApi> { GroupCreateApiImpl(httpClient = get()) }
 
     // Personal dashboard (COMP-DASH-001) — personal-dashboard feature client stack. Reuses the
     // shared HttpClient singleton above (same companion server, no second engine). The config

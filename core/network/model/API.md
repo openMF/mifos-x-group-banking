@@ -32,13 +32,41 @@
 | `GroupSummaryDto` | `groupId`, `name`, `poolModel` (default `UNKNOWN`, reuses `SavingsMechanismDto`) | `poolModel` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.myGroups` / `.selectedGroup` |
 | `SavingsTransactionDto` | `id`, `date`, `type` (default `UNKNOWN`), `amount` | `type` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.recentTransactions` — CANONICAL compact shape, see naming-collision note below |
 | `TransactionTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback (also absorbs richer wire values like `INTEREST_POSTING`/`FEE_DEDUCTION` that this compact contract does not model) | field of `SavingsTransactionDto.type` |
+| `CreateGroupRequestDto` | `name`, `officeId`, `userId`, `currency`, `meetingDay`, `meetingTime`, `typeConfig` | all required, camelCase | `POST /companion/groups` (COMP-GRP-001) request |
+| `CreateGroupTypeConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula` (default `UNKNOWN`), `payout_order_method` (default `UNKNOWN`), `share_value`, `contribution_amount`, `social_fund_enabled`, `social_fund_percent`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount`, `max_members` | 5 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable columns (Hard Rule 5), NOT the companion camelCase convention | field of `CreateGroupRequestDto.typeConfig`; provisioned as a `group_type_config` datatable row (COMP-GRP-001 step 5) |
+| `CreateGroupResponseDto` | `groupId`, `fineractCenterId`, `inviteCode` | all required, camelCase | response of COMP-GRP-001 |
+| `OfficeDto` | `id`, `name`, `nameDecorated`, `externalId` (nullable, default `null`) | `externalId` nullable/optional (registry-vs-operation-schema gap, see note below); rest required | `GET /offices` (`orderBy=name` default), cached SWR (`ttl=3600`) |
+| `ContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; DISTINCT value-set from `ContributionModeDto` — see reuse note below | field of `CreateGroupTypeConfigDto.contributionModel` |
+| `ShareoutFormulaDto` | enum `@SerialName`: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `CreateGroupTypeConfigDto.shareoutFormula` |
+| `PayoutOrderMethodDto` | enum `@SerialName`: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; api.yaml declares 5 known values (task prose narrowed to 3 — api.yaml wins per PP-1) | field of `CreateGroupTypeConfigDto.payoutOrderMethod` |
 
 Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
 `idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
 `idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
 `idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003);
 `idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET
-/companion/member/dashboard`, status: approved, approved 2026-07-17).
+/companion/member/dashboard`, status: approved, approved 2026-07-17);
+`idea-layer/screens/group-create/api.yaml` (COMP-GRP-001 `POST
+/companion/groups` + `GET /offices`; no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature — `api.yaml` is the sole SoT, per PP-1
+"registry, or its equivalent, wins").
+
+**Enum reuse (group-create, 2 of 5 typeConfig axes reuse existing wire
+enums, no duplicates):** `CreateGroupTypeConfigDto.groupType` reuses the
+EXISTING short-form `GroupTypeDto` (declared in `GroupDto.kt`, group-list
+feature) — `api.yaml#dtos.GroupTypeConfig.group_type`'s declared value-set
+(`VSLA`/`ROSCA`/.../`CBO`/`BURIAL`/`JLG`) is the SHORT form, matching
+`GroupTypeDto` exactly, NOT the long-form `GroupTypeSlugDto` used by the
+group-type-picker catalogue. `CreateGroupTypeConfigDto.poolModel` reuses the
+EXISTING `SavingsMechanismDto` (declared in `GroupTypeConfigDto.kt`) — its
+value-set (`ACCUMULATING`/`ROTATING_PAYOUT`/`NONE`) is identical to
+`typeConfig.pool_model`'s declared values. `contributionModel` (NEW
+`ContributionModelDto`), `shareoutFormula` (NEW `ShareoutFormulaDto`), and
+`payoutOrderMethod` (NEW `PayoutOrderMethodDto`) were NOT reuse candidates:
+`contribution_model`'s declared value-set (`FIXED_AMOUNT`/
+`SHARE_BASED_VARIABLE`/`FIXED_NEGOTIATED`) differs from the existing
+`ContributionModeDto` (`SHARE_BASED_VARIABLE`/`FIXED`/`MINIMAL`), and no
+existing enum covers `shareout_formula` or `payout_order_method` at all.
 
 **Enum reuse (join-with-code, no new enums introduced):** `InvitationRowDto.roleToAssign`,
 `GroupPreviewDto.roleToAssign`, and `AssociateClientsRequestDto.roleToAssign` all reuse the
@@ -99,6 +127,10 @@ use snake_case `@SerialName`s (raw Fineract datatable columns, matching `idea-la
 `#dtos.MarkAcceptedRequest` verbatim) — distinct from every other DTO in this file, which uses the
 companion bridge's normalized camelCase. `GroupPreviewDto` / `AssociateClientsRequestDto` /
 `AssociateClientsResponseDto` (companion-bridge, non-datatable endpoints) use camelCase as usual.
+`CreateGroupTypeConfigDto` (group-create) is the newest snake_case member of this family — it is
+the raw `group_type_config` datatable payload nested inside `CreateGroupRequestDto`, whose OWN
+top-level fields (`name`/`officeId`/.../`typeConfig`) stay camelCase like every other companion
+request DTO.
 
 **Registry gap (flagged for the cross-feature repair station):** `mark_invitation_accepted`'s
 `rowId` path param is declared sourced from `validate_invite_token_response.id`, but neither
@@ -106,6 +138,21 @@ companion bridge's normalized camelCase. `GroupPreviewDto` / `AssociateClientsRe
 `InvitationRowDto` therefore does not carry one either (Hard Rule 4 forbids inventing an
 undeclared field). The repository/use-case layer that wires `mark_invitation_accepted`'s `rowId`
 will need this contract gap resolved upstream in the idea-layer `api.yaml`.
+
+**Registry gap (`OfficeDto.externalId`, flagged for the cross-feature repair station):**
+`idea-layer/screens/group-create/api.yaml#api[0] (get_offices)`'s response `items` schema
+declares 4 fields (`id`, `name`, `nameDecorated`, `externalId`), but the abbreviated
+`#dtos.Office` registry block only declares 3 (omits `externalId`). Modeled here as
+`externalId: String? = null` (nullable/optional) rather than invented as non-null-required — the
+two declarations should be reconciled upstream in `api.yaml`.
+
+**`PayoutOrderMethodDto` value-set widened from task prose (flagged, resolved per PP-1):** the
+generation brief's prose narrowed this enum to `FIXED_ORDER`/`LOTTERY`/`AUCTION`/`UNKNOWN` (4
+entries), but `idea-layer/screens/group-create/api.yaml#dtos.GroupTypeConfig.payout_order_method`
+(the actual SoT — no dedicated `idea-layer/dtos/{Dto}.yaml` registry exists for this feature)
+declares 5 known values: `FIXED_ORDER | LOTTERY | AUCTION | NEED_BASED | NA`. Per PP-1 ("when the
+registry [or its SoT-equivalent] and prose disagree, the registry wins"), all 5 were implemented
+(6 total with `UNKNOWN`), not the narrower 3+1 from the prose summary.
 
 Field-name casing precedent: `idea-layer/dtos/LoanDto.yaml` (camelCase wire
 fields, e.g. `memberId`, `disbursedOn`) — the companion bridge returns
@@ -115,7 +162,8 @@ matches `api.yaml#dtos` field names verbatim (no case translation).
 Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
 mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
 `GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
-`MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`.
+`MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
+`GroupCreateMappers.kt`.
 
 **Registry divergence note (PP-1, flagged for the cross-feature repair
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a

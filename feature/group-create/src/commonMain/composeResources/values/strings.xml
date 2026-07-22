@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_group_create_topbar_title">New %1$s Group</string>
+    <string name="screens_group_create_close_cd">Close wizard, discards any entered data</string>
+    <string name="screens_group_create_type_banner_cd">Group type: %1$s</string>
+    <string name="screens_group_create_step_indicator_cd">Wizard progress indicator, shows the current step out of four</string>
+    <string name="screens_group_create_step_identity">Identity</string>
+    <string name="screens_group_create_step_rules">Rules</string>
+    <string name="screens_group_create_step_members">Members</string>
+    <string name="screens_group_create_step_review">Review</string>
+
+    <string name="screens_group_create_field_name_label">Group Name</string>
+    <string name="screens_group_create_field_name_placeholder">e.g. Mwangaza Women\'s Group</string>
+    <string name="screens_group_create_field_name_cd">Group name input, enter a name for your new group</string>
+
+    <string name="screens_group_create_field_office_label">Office</string>
+    <string name="screens_group_create_field_office_placeholder">Select office</string>
+    <string name="screens_group_create_field_office_cd">Office selector, choose the office this group belongs to</string>
+
+    <string name="screens_group_create_field_currency_label">Currency</string>
+    <string name="screens_group_create_field_currency_cd">Currency selector, choose the group\'s transaction currency</string>
+
+    <string name="screens_group_create_field_meeting_day_label">Meeting Day</string>
+    <string name="screens_group_create_field_meeting_day_cd">Meeting day selector, choose the weekly meeting day</string>
+
+    <string name="screens_group_create_field_meeting_time_label">Meeting Time</string>
+    <string name="screens_group_create_field_meeting_time_placeholder">09:00</string>
+    <string name="screens_group_create_field_meeting_time_cd">Meeting time picker, choose the meeting start time</string>
+
+    <string name="screens_group_create_section_share_contributions">Share Contributions</string>
+    <string name="screens_group_create_section_loan_cycle_rules">Loan &amp; Cycle Rules</string>
+
+    <string name="screens_group_create_field_share_value_label">Share Value (KES per share)</string>
+    <string name="screens_group_create_field_share_value_cd">Share value input, enter the price per share unit in Kenyan shillings</string>
+
+    <string name="screens_group_create_field_share_min_label">Min Shares per Meeting</string>
+    <string name="screens_group_create_field_share_min_cd">Minimum shares per meeting input, enter the minimum share count a member must buy</string>
+
+    <string name="screens_group_create_field_share_max_label">Max Shares per Meeting</string>
+    <string name="screens_group_create_field_share_max_cd">Maximum shares per meeting input, enter the maximum share count a member may buy</string>
+
+    <string name="screens_group_create_field_contribution_amount_label">Fixed Contribution per Meeting (KES)</string>
+    <string name="screens_group_create_field_contribution_amount_cd">Fixed contribution input, enter the amount each member contributes per meeting in Kenyan shillings</string>
+
+    <string name="screens_group_create_field_payout_order_label">Payout Order Method</string>
+    <string name="screens_group_create_field_payout_order_cd">Payout order method selector, choose how the rotating payout order is decided</string>
+
+    <string name="screens_group_create_field_loan_multiplier_label">Loan Multiplier (×savings)</string>
+    <string name="screens_group_create_field_loan_multiplier_cd">Loan multiplier input, enter how many times savings a member may borrow</string>
+
+    <string name="screens_group_create_field_interest_rate_label">Interest Rate (%)</string>
+    <string name="screens_group_create_field_interest_rate_cd">Interest rate input, enter the flat interest rate percentage charged on loans</string>
+
+    <string name="screens_group_create_field_cycle_length_label">Cycle Length (months)</string>
+    <string name="screens_group_create_field_cycle_length_cd">Cycle length input, enter the group cycle length in months</string>
+
+    <string name="screens_group_create_field_fine_amount_label">Late Penalty / Fine (KES)</string>
+    <string name="screens_group_create_field_fine_amount_cd">Late penalty input, enter the fine amount charged for late attendance in Kenyan shillings</string>
+
+    <string name="screens_group_create_field_social_fund_toggle_label">Enable Social / Welfare Fund</string>
+    <string name="screens_group_create_field_social_fund_toggle_cd">Social welfare fund toggle, turn on to enable a welfare and emergency pool</string>
+
+    <string name="screens_group_create_field_social_fund_percent_label">Social Fund % of Corpus</string>
+    <string name="screens_group_create_field_social_fund_percent_cd">Social fund percentage input, enter the share of corpus routed to the social fund</string>
+    <string name="screens_group_create_field_social_fund_percent_help">A slice of every share-out held back for member emergencies.</string>
+
+    <string name="screens_group_create_field_max_members_label">Max Members</string>
+    <string name="screens_group_create_field_max_members_cd">Maximum members input, enter the upper limit on group membership</string>
+    <string name="screens_group_create_field_max_members_help">Cap on how many members can join this group. Members are added after the group is created.</string>
+
+    <string name="screens_group_create_review_title">Review Group Details</string>
+    <string name="screens_group_create_section_identity">Identity</string>
+    <string name="screens_group_create_section_identity_cd">Identity review section, showing the group name, office, currency and meeting time</string>
+    <string name="screens_group_create_section_rules">Rules</string>
+    <string name="screens_group_create_section_rules_cd">Rules review section, showing the group\'s financial rules</string>
+    <string name="screens_group_create_section_members">Members</string>
+    <string name="screens_group_create_section_members_cd">Members review section, showing the maximum group size</string>
+
+    <string name="screens_group_create_row_group_type">Group Type</string>
+    <string name="screens_group_create_row_name">Name</string>
+    <string name="screens_group_create_row_office">Office</string>
+    <string name="screens_group_create_row_currency">Currency</string>
+    <string name="screens_group_create_row_meeting">Meeting</string>
+    <string name="screens_group_create_row_meeting_value">%1$s at %2$s</string>
+    <string name="screens_group_create_row_share_value">Share Value</string>
+    <string name="screens_group_create_row_share_value_value">%1$s %2$s / share</string>
+    <string name="screens_group_create_row_shares_per_meeting">Shares per Meeting</string>
+    <string name="screens_group_create_row_shares_per_meeting_value">%1$s–%2$s shares</string>
+    <string name="screens_group_create_row_contribution">Contribution</string>
+    <string name="screens_group_create_row_contribution_value">%1$s %2$s / meeting</string>
+    <string name="screens_group_create_row_payout_order">Payout Order</string>
+    <string name="screens_group_create_row_loan_multiplier">Loan Multiplier</string>
+    <string name="screens_group_create_row_loan_multiplier_value">%1$s× savings</string>
+    <string name="screens_group_create_row_interest_rate">Interest Rate</string>
+    <string name="screens_group_create_row_interest_rate_value">%1$s%% flat</string>
+    <string name="screens_group_create_row_cycle_length">Cycle Length</string>
+    <string name="screens_group_create_row_cycle_length_value">%1$s months</string>
+    <string name="screens_group_create_row_late_fine">Late Fine</string>
+    <string name="screens_group_create_row_late_fine_value">%1$s %2$s</string>
+    <string name="screens_group_create_row_social_fund">Social Fund</string>
+    <string name="screens_group_create_row_social_fund_value">%1$s%% of corpus</string>
+    <string name="screens_group_create_row_max_members">Max Members</string>
+
+    <string name="screens_group_create_action_next">Next</string>
+    <string name="screens_group_create_action_next_cd">Next step button, validates the current step and advances to the next wizard step</string>
+    <string name="screens_group_create_action_back">Back</string>
+    <string name="screens_group_create_action_back_cd">Previous step button, returns to the prior wizard step without validating</string>
+    <string name="screens_group_create_action_submit">Create Group</string>
+    <string name="screens_group_create_action_submit_cd">Create group button, submits the wizard and creates the new group</string>
+    <string name="screens_group_create_action_submitting">Creating Group…</string>
+    <string name="screens_group_create_action_submitting_cd">Creating group, please wait</string>
+    <string name="screens_group_create_action_retry">Retry</string>
+    <string name="screens_group_create_action_retry_cd">Retry creating the group</string>
+
+    <string name="screens_group_create_offline_notice">You are offline. This group will be created when you reconnect.</string>
+    <string name="screens_group_create_offline_notice_cd">Offline indicator icon</string>
+    <string name="screens_group_create_offline_dialog_title">You\'re offline</string>
+    <string name="screens_group_create_offline_dialog_message">Your group has been queued for sync and will be created automatically once you reconnect.</string>
+    <string name="screens_group_create_offline_dialog_confirm">Got it</string>
+
+    <string name="screens_group_create_error_title">Couldn\'t create group</string>
+    <string name="screens_group_create_error_icon_cd">Error</string>
+    <string name="screens_group_create_error_validation">Please fix the highlighted fields.</string>
+    <string name="screens_group_create_error_network">No internet. Your group has been queued for sync.</string>
+    <string name="screens_group_create_error_server">Server error. Please retry.</string>
+    <string name="screens_group_create_error_auth">Session expired.</string>
+
+    <string name="screens_group_create_success_topbar_title">Group Created</string>
+    <string name="screens_group_create_success_icon_cd">Success</string>
+    <string name="screens_group_create_success_title">%1$s created</string>
+    <string name="screens_group_create_success_message">Your group is set up. Share the invite code with members, or open the dashboard.</string>
+    <string name="screens_group_create_success_invite_label">Invite code</string>
+    <string name="screens_group_create_success_redirecting">Opening group dashboard…</string>
+
+    <string name="screens_group_create_validation_group_name_invalid">Enter a group name (up to 60 characters).</string>
+    <string name="screens_group_create_validation_office_required">Select an office.</string>
+    <string name="screens_group_create_validation_meeting_day_required">Select a meeting day.</string>
+    <string name="screens_group_create_validation_meeting_time_required">Select a meeting time.</string>
+    <string name="screens_group_create_validation_share_value_invalid">Enter a share value greater than 0.</string>
+    <string name="screens_group_create_validation_share_min_invalid">Enter a minimum share count of at least 1.</string>
+    <string name="screens_group_create_validation_share_max_invalid">Enter a maximum share count that is at least the minimum.</string>
+    <string name="screens_group_create_validation_contribution_amount_invalid">Enter a contribution amount greater than 0.</string>
+    <string name="screens_group_create_validation_payout_order_required">Select a payout order method.</string>
+    <string name="screens_group_create_validation_loan_multiplier_invalid">Enter a valid loan multiplier.</string>
+    <string name="screens_group_create_validation_interest_rate_invalid">Enter a valid interest rate.</string>
+    <string name="screens_group_create_validation_cycle_length_invalid">Enter a valid cycle length in months.</string>
+    <string name="screens_group_create_validation_fine_amount_invalid">Enter a valid fine amount.</string>
+    <string name="screens_group_create_validation_social_fund_percent_invalid">Enter a valid social fund percentage.</string>
+    <string name="screens_group_create_validation_max_members_invalid">Enter a member cap of at least 2.</string>
+</resources>

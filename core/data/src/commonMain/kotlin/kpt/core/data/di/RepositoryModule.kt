@@ -32,6 +32,8 @@ import org.koin.dsl.module
 import kpt.core.store.AppStoreRegistry
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.GroupCreateRepository
+import org.mifos.groupbanking.core.data.repository.GroupCreateRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupRepository
 import org.mifos.groupbanking.core.data.repository.GroupRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupTypeConfigRepository
@@ -89,6 +91,15 @@ val DataModule = module {
     // (NetworkModule) directly. Surfaces NetworkResult, never .asScreenStream()/.write() — same
     // branch as AuthRepository above.
     single<InvitationRepository> { InvitationRepositoryImpl(api = get()) }
+
+    // group-create wizard (COMP-GRP-001 + raw Fineract /offices) — Store5-free mutation
+    // orchestration for createGroup (business_logic.kind: processor, no read-stream to cache),
+    // wraps GroupCreateApi (NetworkModule) directly. Surfaces NetworkResult, never
+    // .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository above.
+    // getOffices is pending a future kmp-store-gen OfficeStore for its declared
+    // stale-while-revalidate cache_strategy (SC2) — see GroupCreateRepository KDoc; not
+    // half-built here, this repo's getOffices is a plain pass-through today.
+    single<GroupCreateRepository> { GroupCreateRepositoryImpl(api = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
