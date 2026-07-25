@@ -150,6 +150,18 @@ val MemberListState.screenState: MemberListScreenState
 sealed interface MemberListEvent {
     data class NavigateToMemberProfile(val memberId: String, val groupId: String) : MemberListEvent
     data class NavigateToAddMember(val groupId: String) : MemberListEvent
+
+    /**
+     * Navigate to `member-invite` (the organizer generates a single-use invite link/code). Declared
+     * edge: `member-onboarding-flow.yaml#steps[1]` ("taps Add Member (direct) or **Invite Member**
+     * (invite path)") + `member-invite/ui.yaml#entry_points[0]` (`source: member-list`,
+     * `trigger: invite_fab_tap`, forwarding `groupId`). member-list's own `ui.yaml` had no invite
+     * component/action yet — this event + [MemberListAction.OnInviteMember] are the one sanctioned
+     * addition-from-declared-flow (mirrors the [NavigateBack] flagged-addition convention above).
+     * Reported to the caller for a `member-list/ui.yaml#components`+`state_model` update (an invite
+     * top-bar action + `OnInviteMember` action + `NavigateToMemberInvite` event).
+     */
+    data class NavigateToMemberInvite(val groupId: String) : MemberListEvent
     data class ShowSnackbar(val message: String) : MemberListEvent
     data object NavigateBack : MemberListEvent
 }
@@ -169,6 +181,9 @@ sealed interface MemberListEvent {
 sealed interface MemberListAction {
     data class OnMemberClick(val memberId: String) : MemberListAction
     data object OnAddMember : MemberListAction
+
+    /** Tap the invite top-bar action — see [MemberListEvent.NavigateToMemberInvite] KDoc. */
+    data object OnInviteMember : MemberListAction
     data object OnLoadMore : MemberListAction
     data object OnRefresh : MemberListAction
     data object Retry : MemberListAction
@@ -269,6 +284,7 @@ internal class MemberListViewModel(
         when (action) {
             is MemberListAction.OnMemberClick -> handleMemberClick(action.memberId)
             MemberListAction.OnAddMember -> handleAddMember()
+            MemberListAction.OnInviteMember -> handleInviteMember()
             MemberListAction.OnLoadMore -> handleLoadMore()
             MemberListAction.OnRefresh -> handleRefresh()
             MemberListAction.Retry -> handleRetry()
@@ -297,6 +313,14 @@ internal class MemberListViewModel(
         analytics.trackClientOperation(operation = "create")
         Logger.i(TAG) { "add-member tapped groupId=$groupId" }
         sendEvent(MemberListEvent.NavigateToAddMember(groupId))
+    }
+
+    // -- Invite-member top-bar action (member-onboarding-flow invite path -> member-invite) ----------
+
+    private fun handleInviteMember() {
+        analytics.trackClientOperation(operation = "invite")
+        Logger.i(TAG) { "invite-member tapped groupId=$groupId" }
+        sendEvent(MemberListEvent.NavigateToMemberInvite(groupId))
     }
 
     // -- Scroll-to-end load-more (data-flow.yaml on_interact/OnLoadMore via MemberRepository) --------

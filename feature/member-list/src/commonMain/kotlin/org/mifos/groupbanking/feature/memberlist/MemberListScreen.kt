@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -46,6 +47,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.paging.rememberLoadMoreTrigger
 import kpt.core.designsystem.theme.spacing
@@ -69,6 +71,7 @@ import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_mem
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_error_server_message
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_error_title
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_fab_cd
+import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_invite_cd
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_load_more_message
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_loading_message
 import org.mifos.groupbanking.feature.memberlist.generated.resources.screens_member_list_title
@@ -94,6 +97,7 @@ internal fun MemberListScreen(
     groupId: String,
     onNavigateToMemberProfile: (memberId: String, groupId: String) -> Unit,
     onNavigateToAddMember: (groupId: String) -> Unit,
+    onNavigateToMemberInvite: (groupId: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MemberListViewModel = koinViewModel(parameters = { parametersOf(groupId) }),
@@ -110,6 +114,7 @@ internal fun MemberListScreen(
             is MemberListEvent.NavigateToMemberProfile ->
                 onNavigateToMemberProfile(event.memberId, event.groupId)
             is MemberListEvent.NavigateToAddMember -> onNavigateToAddMember(event.groupId)
+            is MemberListEvent.NavigateToMemberInvite -> onNavigateToMemberInvite(event.groupId)
             MemberListEvent.NavigateBack -> onNavigateBack()
             is MemberListEvent.ShowSnackbar -> {
                 val resolved = messageKeyToText(event.message, networkMessage, serverMessage, authMessage)
@@ -154,11 +159,20 @@ internal fun MemberListContent(
         stringResource(Res.string.screens_member_list_title)
     }
     val fabCd = stringResource(Res.string.screens_member_list_fab_cd)
+    val inviteCd = stringResource(Res.string.screens_member_list_invite_cd)
 
     KptScaffold(
         showNavigationIcon = true,
         onNavigationIconClick = { onAction(MemberListAction.OnBack) },
         title = title,
+        actions = listOf(
+            // Invite-member top-bar action — member-onboarding-flow invite path (-> member-invite).
+            TopAppBarAction(
+                icon = Icons.Filled.GroupAdd,
+                contentDescription = inviteCd,
+                onClick = { onAction(MemberListAction.OnInviteMember) },
+            ),
+        ),
         floatingActionButtonContent = FloatingActionButtonContent(
             onClick = { onAction(MemberListAction.OnAddMember) },
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,

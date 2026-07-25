@@ -37,6 +37,9 @@ object MemberListTestTags {
     /** `+ Add Member` FAB — [MemberListAction.OnAddMember]. */
     const val FAB_ADD_MEMBER: String = "member_list_fab_add_member"
 
+    /** Invite-member top-bar action — [MemberListAction.OnInviteMember] (invite-path -> member-invite). */
+    const val INVITE_ACTION: String = "member_list_invite_action"
+
     /** Full-illustration empty surface — `MemberListScreenState.Empty` (zero members). */
     const val EMPTY_SECTION: String = "member_list_empty_section"
 

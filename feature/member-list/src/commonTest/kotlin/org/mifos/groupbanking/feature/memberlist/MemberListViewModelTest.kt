@@ -230,6 +230,18 @@ class MemberListViewModelTest {
         }
     }
 
+    // ─── OnInviteMember ────────────────────────────────────────────────────────
+
+    @Test
+    fun `OnInviteMember emits NavigateToMemberInvite with groupId`() = runTest(testDispatcher) {
+        val (_, _, viewModel) = buildViewModel()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(MemberListAction.OnInviteMember)
+            assertEquals(MemberListEvent.NavigateToMemberInvite(GROUP_ID), awaitItem())
+        }
+    }
+
     // ─── OnBack ───────────────────────────────────────────────────────────────
 
     @Test

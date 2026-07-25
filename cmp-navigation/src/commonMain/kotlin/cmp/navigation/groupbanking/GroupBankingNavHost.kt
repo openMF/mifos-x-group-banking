@@ -59,6 +59,8 @@ import org.mifos.groupbanking.feature.meetingconduct.meetingConductScreen
 import org.mifos.groupbanking.feature.meetingconduct.navigateToMeetingConduct
 import org.mifos.groupbanking.feature.memberadd.memberAddScreen
 import org.mifos.groupbanking.feature.memberadd.navigateToMemberAdd
+import org.mifos.groupbanking.feature.memberinvite.memberInviteScreen
+import org.mifos.groupbanking.feature.memberinvite.navigateToMemberInvite
 import org.mifos.groupbanking.feature.memberlist.memberListScreen
 import org.mifos.groupbanking.feature.memberlist.navigateToMemberList
 import org.mifos.groupbanking.feature.memberprofile.memberProfileScreen
@@ -461,7 +463,18 @@ fun GroupBankingNavHost(
                         navController.navigateToMemberProfile(memberId = memberId, groupId = groupId)
                     },
                     onAddMember = { groupId -> navController.navigateToMemberAdd(groupId = groupId) },
+                    // member-onboarding-flow invite path — member-list "Invite Member" top-bar action
+                    // → member-invite (member-invite/ui.yaml#entry_points[0]: source=member-list,
+                    // trigger=invite_fab_tap, forwarding groupId). Makes member-invite reachable.
+                    onInviteMember = { groupId -> navController.navigateToMemberInvite(groupId = groupId) },
                     onBack = { navController.popBackStack() },
+                )
+
+                // 11c. member-invite → back to member-list / group-dashboard (invite-path leaf,
+                //      flow.yaml#navigates_to: [member-list, group-dashboard]). Reached from
+                //      member-list's "Invite Member" top-bar action.
+                memberInviteScreen(
+                    onNavigateBack = { navController.popBackStack() },
                 )
 
                 // 11a. member-profile → member-list (role change / removal returns) /

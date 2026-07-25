@@ -20,6 +20,8 @@
     <string name="screens_member_list_fab_cd">Add member to group</string>
     <string name="screens_member_list_action_add_member">Add Member</string>
 
+    <string name="screens_member_list_invite_cd">Invite a member with a shareable code or link</string>
+
     <string name="screens_member_list_empty_icon_cd">No members</string>
     <string name="screens_member_list_empty_title">No members yet</string>
     <string name="screens_member_list_empty_body">Add the first member to this group.</string>

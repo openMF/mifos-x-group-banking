@@ -41,6 +41,7 @@ fun NavController.navigateToMemberList(groupId: String, navOptions: NavOptions? 
 fun NavGraphBuilder.memberListScreen(
     onMemberClick: (memberId: String, groupId: String) -> Unit,
     onAddMember: (groupId: String) -> Unit,
+    onInviteMember: (groupId: String) -> Unit,
     onBack: () -> Unit,
 ) {
     composableWithRootPushTransitions<MemberListRoute> { backStackEntry ->
@@ -49,6 +50,7 @@ fun NavGraphBuilder.memberListScreen(
             groupId = route.groupId,
             onNavigateToMemberProfile = onMemberClick,
             onNavigateToAddMember = onAddMember,
+            onNavigateToMemberInvite = onInviteMember,
             onNavigateBack = onBack,
         )
     }
