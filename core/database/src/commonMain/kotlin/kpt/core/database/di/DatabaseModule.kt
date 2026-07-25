@@ -53,6 +53,9 @@ val DatabaseModule = module {
     // group-banking domain — field-officer-dashboard aggregate per-staff cache (SourceOfTruth DAO, FR-009)
     single { get<AppDatabase>().fieldOfficerDashboardDao }
 
+    // group-banking domain — organizer-dashboard single-key hub cache (SourceOfTruth DAO, GET /companion/organizer/dashboard)
+    single { get<AppDatabase>().organizerDashboardDao }
+
     // group-banking domain — member-list paginated per-group cache (SourceOfTruth DAO, GET /groups/{groupId}/clients)
     single { get<AppDatabase>().memberListDao }
 
@@ -74,6 +77,9 @@ val DatabaseModule = module {
 
     // group-banking domain — meeting-calendar single-key cache (SourceOfTruth DAO, GET /centers/{centerId}/meetings + dt_meeting_record)
     single { get<AppDatabase>().meetingCalendarDao }
+
+    // group-banking domain — previous-meeting-review per-member attendance cache (SourceOfTruth DAO, GET /datatables/dt_meeting_attendance/{meetingId})
+    single { get<AppDatabase>().meetingAttendanceDao }
 }
 
 /**

@@ -87,6 +87,14 @@ object AppStoreRegistry : StoreRegistry() {
     // NETWORK_WITH_CACHE, FR-009 — parallel GET /centers + GET /groups fanned into KPIs + health list)
     val FieldOfficerDashboard = store("fieldOfficerDashboard")
 
+    // REGISTRY:OrganizerDashboard — organizer-dashboard hub store (single-key NETWORK_WITH_CACHE,
+    // GET /companion/organizer/dashboard — KPIs scoped to "my groups" + today's schedule + activity)
+    val OrganizerDashboard = store("organizerDashboard")
+
+    // REGISTRY:MeetingAttendance — previous-meeting-review per-member attendance roster (single-key
+    // NETWORK_WITH_CACHE, GET /datatables/dt_meeting_attendance/{meetingId}, keyed by meetingId)
+    val MeetingAttendance = store("meetingAttendance")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
@@ -147,6 +155,16 @@ object AppStoreRegistry : StoreRegistry() {
         // ttl_seconds:300 (stale-while-revalidate); cross-group KPIs + per-group health rotate as
         // members contribute / loans post, so a short TTL revalidates aggressively.
         val FIELD_OFFICER_DASHBOARD: Duration = 5.minutes
+
+        // REGISTRY:OrganizerDashboard — 5m matches organizer-dashboard/data-flow.yaml
+        // ttl_seconds:300 (stale-while-revalidate); "my groups" KPIs + today's schedule + activity
+        // feed rotate as members contribute / meetings run, so a short TTL revalidates aggressively.
+        val ORGANIZER_DASHBOARD: Duration = 5.minutes
+
+        // REGISTRY:MeetingAttendance — 5m matches previous-meeting-review/data-flow.yaml
+        // ttl_seconds:300 (stale-while-revalidate); a closed meeting's attendance is effectively
+        // immutable, but the short TTL still revalidates on entry (mirrors the record cache policy).
+        val MEETING_ATTENDANCE: Duration = 5.minutes
     }
 
     /**
@@ -181,5 +199,9 @@ object AppStoreRegistry : StoreRegistry() {
         "meetingCalendar" to Ttl.MEETING_CALENDAR,
         // REGISTRY:FieldOfficerDashboard
         "fieldOfficerDashboard" to Ttl.FIELD_OFFICER_DASHBOARD,
+        // REGISTRY:OrganizerDashboard
+        "organizerDashboard" to Ttl.ORGANIZER_DASHBOARD,
+        // REGISTRY:MeetingAttendance
+        "meetingAttendance" to Ttl.MEETING_ATTENDANCE,
     )
 }

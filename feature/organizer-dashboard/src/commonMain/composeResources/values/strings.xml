@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_organizer_dashboard_top_bar_title">Dashboard</string>
+    <string name="screens_organizer_dashboard_notifications_cd">Notifications</string>
+    <string name="screens_organizer_dashboard_notifications_deferred">Notifications centre is coming in a later release.</string>
+    <string name="screens_organizer_dashboard_loading_message">Loading dashboard…</string>
+
+    <string name="screens_organizer_dashboard_welcome_greeting">Welcome back, %1$s</string>
+    <string name="screens_organizer_dashboard_welcome_subtitle">Here\'s your overview for today</string>
+
+    <string name="screens_organizer_dashboard_kpi_my_groups">My Groups</string>
+    <string name="screens_organizer_dashboard_kpi_members">Members</string>
+    <string name="screens_organizer_dashboard_kpi_pending_shareout">Share-Outs Due</string>
+    <string name="screens_organizer_dashboard_kpi_meetings_today">Meetings Today</string>
+
+    <string name="screens_organizer_dashboard_quick_nav_label">Quick Navigation</string>
+    <string name="screens_organizer_dashboard_nav_all_groups">All Groups</string>
+    <string name="screens_organizer_dashboard_nav_all_groups_sub">%1$d groups</string>
+    <string name="screens_organizer_dashboard_nav_field_officers">Field Officers</string>
+    <string name="screens_organizer_dashboard_nav_field_officers_sub">Officer overview</string>
+    <string name="screens_organizer_dashboard_badge_optional">Optional</string>
+
+    <string name="screens_organizer_dashboard_todays_schedule_label">Today\'s Schedule</string>
+    <string name="screens_organizer_dashboard_schedule_count_chip">%1$d meetings</string>
+    <string name="screens_organizer_dashboard_schedule_supporting">%1$s · %2$d members</string>
+    <string name="screens_organizer_dashboard_no_meetings_today">No meetings scheduled for today</string>
+    <string name="screens_organizer_dashboard_schedule_row_cd">Meeting for %1$s at %2$s</string>
+
+    <string name="screens_organizer_dashboard_activity_label">Recent Activity</string>
+    <string name="screens_organizer_dashboard_activity_supporting">%1$s · %2$s</string>
+
+    <string name="screens_organizer_dashboard_empty_title">No data yet</string>
+    <string name="screens_organizer_dashboard_empty_body">Your groups and activity will appear here once set up.</string>
+    <string name="screens_organizer_dashboard_empty_cta">View Groups</string>
+
+    <string name="screens_organizer_dashboard_error_load_title">Could not load dashboard</string>
+    <string name="screens_organizer_dashboard_error_cta_retry">Retry</string>
+    <string name="screens_organizer_dashboard_error_network">No internet connection. Showing cached data.</string>
+    <string name="screens_organizer_dashboard_error_server">Server error. Please try again.</string>
+    <string name="screens_organizer_dashboard_error_auth">Session expired. Please log in again.</string>
+</resources>

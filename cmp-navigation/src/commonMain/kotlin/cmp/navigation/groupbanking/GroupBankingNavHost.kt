@@ -58,15 +58,19 @@ import org.mifos.groupbanking.feature.meetingsummary.meetingSummaryScreen
 import org.mifos.groupbanking.feature.meetingsummary.navigateToMeetingSummary
 import org.mifos.groupbanking.feature.meetingcalendar.meetingCalendarScreen
 import org.mifos.groupbanking.feature.meetingcalendar.navigateToMeetingCalendar
+import org.mifos.groupbanking.feature.previousmeetingreview.navigateToPreviousMeetingReview
+import org.mifos.groupbanking.feature.previousmeetingreview.previousMeetingReviewScreen
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
 import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialog
 import org.mifos.groupbanking.feature.loanrepaymentdialog.LoanRepaymentDialog
+import org.mifos.groupbanking.feature.fieldofficerdashboard.navigateToFieldOfficerDashboard
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
 import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
 import org.mifos.groupbanking.feature.membersavingsdetail.memberSavingsDetailScreen
 import org.mifos.groupbanking.feature.membersavingsdetail.navigateToMemberSavingsDetail
+import org.mifos.groupbanking.feature.organizerdashboard.organizerDashboardScreen
 import org.mifos.groupbanking.feature.personaldashboard.navigateToPersonalDashboard
 import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
 import org.mifos.groupbanking.feature.savingsdashboard.navigateToSavingsDashboard
@@ -214,6 +218,19 @@ fun GroupBankingNavHost(
                     onExportReport = { navController.navigateToPlaceholder("Export Report") },
                 )
 
+                // 6b. organizer-dashboard (organizer-per-group hub) → group-list (KPI cards / All-Groups
+                // quick-nav / meeting rows / empty CTA) + field-officer-dashboard (optional-tier tile).
+                // Registered + fully reachable via `navController.navigateToOrganizerDashboard()`; its
+                // `ui.yaml#entry_points` declare an `app_launch` trigger gated on
+                // `isOrganizerInAnyGroup`, but this app's current login shell has no organizer-role
+                // landing branch, so no in-app affordance calls it yet — the SAME residual-follow-up
+                // convention as `field-officer-dashboard` / `settings` above (flagged for an idea-layer
+                // / login-shell update, never an invented entry point).
+                organizerDashboardScreen(
+                    onNavigateToGroupList = { navController.navigateToGroupList() },
+                    onNavigateToFieldOfficerDashboard = { navController.navigateToFieldOfficerDashboard() },
+                )
+
                 // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list
                 groupDashboardScreen(
                     // group-dashboard `Start/View Meetings` → meeting-calendar. group-dashboard
@@ -337,8 +354,17 @@ fun GroupBankingNavHost(
                 meetingCalendarScreen(
                     // TODO(nav): replace when meeting-conduct navigation is wired here
                     onNavigateToConduct = { _, _ -> navController.navigateToPlaceholder("Conduct Meeting") },
-                    // TODO(nav): replace when previous-meeting-review feature is implemented
-                    onNavigateToReview = { _, _ -> navController.navigateToPlaceholder("Meeting Review") },
+                    // → previous-meeting-review (past-meeting drill-down, calendar-launched).
+                    // TODO(nav): meeting-calendar's NavigateToReview event does not forward center_id
+                    // yet — passing 0 until that sibling callback carries it (see drain-request).
+                    onNavigateToReview = { meetingId, meetingNumber ->
+                        navController.navigateToPreviousMeetingReview(
+                            meetingId = meetingId,
+                            meetingNumber = meetingNumber,
+                            centerId = 0,
+                            launchedFrom = "calendar",
+                        )
+                    },
                     onNavigateBack = { navController.popBackStack() },
                 )
 
@@ -356,9 +382,29 @@ fun GroupBankingNavHost(
                             centerId = centerId,
                         )
                     },
-                    // TODO(nav): replace when previous-meeting-review feature is implemented
-                    onNavigateToPreviousMeetingReview = { _, _ -> navController.navigateToPlaceholder("Meeting Review") },
+                    // → previous-meeting-review (step-0 drill-down, conduct-launched).
+                    // TODO(nav): meeting-conduct's callback forwards (meetingId, centerId) but not
+                    // meeting_number — passing 0 until that sibling callback carries it (see drain-request).
+                    onNavigateToPreviousMeetingReview = { meetingId, centerId ->
+                        navController.navigateToPreviousMeetingReview(
+                            meetingId = meetingId,
+                            meetingNumber = 0,
+                            centerId = centerId,
+                            launchedFrom = "conduct",
+                        )
+                    },
                     onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 9e. previous-meeting-review (read-only FR-019 recap) → meeting-conduct (Start Meeting,
+                //     conduct-launched only) / back. Reached from meeting-calendar (completed-meeting card)
+                //     + meeting-conduct (step-0 drill-down), and via deep-link
+                //     navigateToPreviousMeetingReview(...). The Start-Meeting onward target routes to the
+                //     PlaceholderRoute until meeting-conduct navigation is wired (never a dead click).
+                previousMeetingReviewScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    // TODO(nav): replace when meeting-conduct navigation is wired here
+                    onNavigateToConduct = { _, _, _ -> navController.navigateToPlaceholder("Conduct Meeting") },
                 )
 
                 // 10. settings -- migrated off the legacy `kpt.feature.settings` template shell

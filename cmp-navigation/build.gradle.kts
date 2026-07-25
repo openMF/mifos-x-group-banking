@@ -60,6 +60,11 @@ kotlin {
             implementation(projects.feature.shareOutExecute) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.meetingSummary) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.meetingConduct) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.previousMeetingReview) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.organizerDashboard) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.fieldOfficerDashboard) // <- added by idea-agent wave-merge (parallel-batch dep reconcile)
+            implementation(projects.feature.meetingCalendar) // <- added by idea-agent wave-merge (parallel-batch dep reconcile)
+            implementation(projects.feature.memberInvite) // <- added by idea-agent wave-merge (parallel-batch dep reconcile)
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

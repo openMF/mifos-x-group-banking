@@ -21,9 +21,11 @@ import org.mifos.groupbanking.core.store.loandetail.impl.provideLoanDetailStore
 import org.mifos.groupbanking.core.store.loanlist.impl.provideLoansPagingStore
 import org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore
 import org.mifos.groupbanking.core.store.meetingcalendar.impl.provideMeetingCalendarStore
+import org.mifos.groupbanking.core.store.previousmeetingreview.impl.provideMeetingAttendanceStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
 import org.mifos.groupbanking.core.store.memberprofile.impl.provideMemberProfileStore
+import org.mifos.groupbanking.core.store.organizerdashboard.impl.provideOrganizerDashboardStore
 import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
 
 /**
@@ -184,5 +186,32 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.FieldOfficerDashboard))
+    }
+
+    // MODULE:OrganizerDashboard — organizer-dashboard SINGLE-KEY store (NETWORK_WITH_CACHE,
+    // GET /companion/organizer/dashboard). Internal to the store seam — exposed to UI only through
+    // OrganizerDashboardRepository.asScreenStream().
+    single(AppStoreRegistry.OrganizerDashboard) {
+        provideOrganizerDashboardStore(api = get(), dao = get())
+    }
+
+    // MODULE:OrganizerDashboard — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.OrganizerDashboard))
+    }
+
+    // MODULE:MeetingAttendance — previous-meeting-review per-member attendance SINGLE-KEY store
+    // (NETWORK_WITH_CACHE, GET /datatables/dt_meeting_attendance/{meetingId}). Internal to the store
+    // seam — exposed to UI only through PreviousMeetingReviewRepository (merged with the reused
+    // MeetingSummaryStore record read).
+    single(AppStoreRegistry.MeetingAttendance) {
+        provideMeetingAttendanceStore(api = get(), dao = get())
+    }
+
+    // MODULE:MeetingAttendance — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MeetingAttendance))
     }
 }

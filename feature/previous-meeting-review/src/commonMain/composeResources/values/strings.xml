@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_previous_meeting_review_title">Previous Meeting Review</string>
+    <string name="screens_previous_meeting_review_title_format">Meeting #%1$d</string>
+    <string name="screens_previous_meeting_review_top_app_bar_a11y">Previous meeting review header, meeting number %1$d</string>
+    <string name="screens_previous_meeting_review_back_a11y">Navigate back to previous screen</string>
+
+    <string name="screens_previous_meeting_review_context_conduct_format">Reviewing before Meeting #%1$d · %2$s</string>
+    <string name="screens_previous_meeting_review_context_calendar_format">Completed Meeting · %1$s</string>
+
+    <string name="screens_previous_meeting_review_unresolved_header">Unresolved Items</string>
+    <string name="screens_previous_meeting_review_warning_icon_a11y">Warning</string>
+
+    <string name="screens_previous_meeting_review_total_collected_label">Total Collected</string>
+    <string name="screens_previous_meeting_review_kes_amount_format">KES %1$s</string>
+    <string name="screens_previous_meeting_review_closing_corpus_label">Closing Corpus</string>
+    <string name="screens_previous_meeting_review_fines_label">Fines Collected</string>
+    <string name="screens_previous_meeting_review_loans_disbursed_label">Loans Disbursed</string>
+
+    <string name="screens_previous_meeting_review_attendance_section_header">Attendance</string>
+    <string name="screens_previous_meeting_review_attendance_chip_format">%1$d/%2$d Present</string>
+    <string name="screens_previous_meeting_review_attendance_chip_a11y">Attendance: %1$d of %2$d members present</string>
+    <string name="screens_previous_meeting_review_attendance_fine_format">Fine: KES %1$s</string>
+    <string name="screens_previous_meeting_review_status_present">Present</string>
+    <string name="screens_previous_meeting_review_status_late">Late</string>
+    <string name="screens_previous_meeting_review_status_absent">Absent</string>
+
+    <string name="screens_previous_meeting_review_savings_section_header">Savings Per Member</string>
+    <string name="screens_previous_meeting_review_savings_supporting_format">Group: KES %1$s · Individual: KES %2$s</string>
+
+    <string name="screens_previous_meeting_review_loan_section_header">Loan Activity</string>
+    <string name="screens_previous_meeting_review_loan_supporting_format">Repaid: KES %1$s · Outstanding: KES %2$s</string>
+    <string name="screens_previous_meeting_review_loan_disbursed_chip_format">Disbursed KES %1$s</string>
+
+    <string name="screens_previous_meeting_review_start_meeting_btn_format">Start Meeting #%1$d</string>
+    <string name="screens_previous_meeting_review_start_meeting_cta_a11y">Start next meeting number %1$d</string>
+
+    <string name="screens_previous_meeting_review_error_state_title">Could not load previous meeting</string>
+    <string name="screens_previous_meeting_review_error_icon_cd">Error</string>
+    <string name="screens_previous_meeting_review_error_network">No internet. Showing cached data.</string>
+    <string name="screens_previous_meeting_review_error_server">Server error. Please try again.</string>
+    <string name="screens_previous_meeting_review_error_not_found">Meeting record not found.</string>
+    <string name="screens_previous_meeting_review_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_previous_meeting_review_action_retry">Retry</string>
+</resources>

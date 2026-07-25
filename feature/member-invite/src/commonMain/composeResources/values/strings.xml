@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_member_invite_topbar_title">Invite Member</string>
+    <string name="screens_member_invite_back_cd">Navigate back</string>
+
+    <string name="screens_member_invite_section_create">Send Invite</string>
+    <string name="screens_member_invite_section_pending">Pending Invites</string>
+
+    <string name="screens_member_invite_field_email_phone_label">Phone or Email</string>
+    <string name="screens_member_invite_field_email_phone_placeholder">e.g. +254712345678 or name@email.com</string>
+    <string name="screens_member_invite_field_email_phone_cd">Phone number or email address input</string>
+
+    <string name="screens_member_invite_field_role_label">Role</string>
+    <string name="screens_member_invite_field_role_cd">Select member role</string>
+    <string name="screens_member_invite_role_member">Member</string>
+    <string name="screens_member_invite_role_treasurer">Treasurer</string>
+    <string name="screens_member_invite_role_secretary">Secretary</string>
+    <string name="screens_member_invite_role_chairperson">Chairperson</string>
+
+    <string name="screens_member_invite_action_generate">Generate Code</string>
+    <string name="screens_member_invite_action_generate_cd">Generate invite code</string>
+    <string name="screens_member_invite_action_generating">Generating…</string>
+    <string name="screens_member_invite_generating_cd">Generating invite code, please wait</string>
+
+    <string name="screens_member_invite_label_invite_code">Invite Code</string>
+    <string name="screens_member_invite_label_invite_link">Join Link</string>
+    <string name="screens_member_invite_label_expires">Expires</string>
+
+    <string name="screens_member_invite_action_copy_code">Copy Code</string>
+    <string name="screens_member_invite_action_copy_code_cd">Copy invite code to clipboard</string>
+    <string name="screens_member_invite_action_copy_link">Copy Link</string>
+    <string name="screens_member_invite_action_copy_link_cd">Copy invite link to clipboard</string>
+    <string name="screens_member_invite_action_share">Share</string>
+    <string name="screens_member_invite_action_share_cd">Share invite via other apps</string>
+
+    <string name="screens_member_invite_action_revoke">Revoke</string>
+    <string name="screens_member_invite_action_revoke_cd">Revoke pending invite</string>
+
+    <string name="screens_member_invite_empty_pending">No pending invites. Generate a code above to invite members.</string>
+
+    <string name="screens_member_invite_share_subject">Join our savings group</string>
+    <string name="screens_member_invite_share_body">Use this invite code to join our group:</string>
+
+    <string name="screens_member_invite_snack_code_copied">Invite code copied</string>
+    <string name="screens_member_invite_snack_link_copied">Invite link copied</string>
+    <string name="screens_member_invite_snack_revoked">Invite revoked</string>
+
+    <string name="screens_member_invite_error_validation">Please enter a valid phone number or email address.</string>
+    <string name="screens_member_invite_error_network">No internet connection. Please check your network and try again.</string>
+    <string name="screens_member_invite_error_server">Server error. Please try again.</string>
+    <string name="screens_member_invite_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_member_invite_error_revoke">Failed to revoke invite. Please try again.</string>
+    <string name="screens_member_invite_error_banner_title">Something went wrong</string>
+    <string name="screens_member_invite_error_banner_icon_cd">Error</string>
+
+    <string name="screens_member_invite_action_retry">Retry</string>
+    <string name="screens_member_invite_action_retry_cd">Retry failed request</string>
+</resources>

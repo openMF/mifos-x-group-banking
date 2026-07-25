@@ -128,6 +128,7 @@ include(":feature:group-dashboard") // <- added by kmp-viewmodel-gen
 include(":feature:member-list") // <- added by kmp-viewmodel-gen
 include(":feature:member-profile") // <- added by kmp-viewmodel-gen
 include(":feature:member-add") // <- added by kmp-viewmodel-gen
+include(":feature:member-invite") // <- added by kmp-viewmodel-gen
 include(":feature:loan-list") // <- added by kmp-viewmodel-gen
 include(":feature:loan-detail") // <- added by kmp-viewmodel-gen
 include(":feature:loan-apply") // <- added by kmp-viewmodel-gen
@@ -145,7 +146,9 @@ include(":feature:share-out-execute") // <- added by kmp-viewmodel-gen
 include(":feature:meeting-conduct") // <- added by kmp-viewmodel-gen
 include(":feature:meeting-summary") // <- added by kmp-viewmodel-gen
 include(":feature:meeting-calendar") // <- added by kmp-viewmodel-gen
+include(":feature:previous-meeting-review") // <- added by kmp-viewmodel-gen
 include(":feature:field-officer-dashboard") // <- added by kmp-viewmodel-gen
+include(":feature:organizer-dashboard") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")

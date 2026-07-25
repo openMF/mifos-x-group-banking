@@ -60,14 +60,20 @@ import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepository
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MeetingSummaryRepository
 import org.mifos.groupbanking.core.data.repository.MeetingSummaryRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.PreviousMeetingReviewRepository
+import org.mifos.groupbanking.core.data.repository.PreviousMeetingReviewRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MeetingConductRepository
 import org.mifos.groupbanking.core.data.repository.MeetingConductRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
 import org.mifos.groupbanking.core.data.repository.MemberAddRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MemberInviteRepository
+import org.mifos.groupbanking.core.data.repository.MemberInviteRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.OrganizerDashboardRepository
+import org.mifos.groupbanking.core.data.repository.OrganizerDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MeetingRepository
 import org.mifos.groupbanking.core.data.repository.MeetingRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
@@ -150,6 +156,19 @@ val DataModule = module {
         )
     }
 
+    // organizer-dashboard hub (GET /companion/organizer/dashboard) — wraps the single-key
+    // NETWORK_WITH_CACHE OrganizerDashboardStore (bound via AppStoreRegistry.OrganizerDashboard in
+    // appStoreModule) and surfaces the offline-first .asScreenStream() read
+    // (ScreenState<OrganizerDashboardSummary>, KPIs scoped to "my groups" + today's schedule +
+    // recent activity). Read-only — no write path (data-flow.yaml#sync_queue: []).
+    single<OrganizerDashboardRepository> {
+        OrganizerDashboardRepositoryImpl(
+            organizerDashboardStore = get(AppStoreRegistry.OrganizerDashboard),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
     // member-list (GET /groups/{groupId}/clients) — wraps the PAGINATED NETWORK_WITH_CACHE
     // MembersPagingStore (bound via AppStoreRegistry.MemberList in appStoreModule) and surfaces the
     // offline-first .asPagingScreenStream() read (paged ScreenState<List<Member>> + load-more +
@@ -223,6 +242,20 @@ val DataModule = module {
         )
     }
 
+    // previous-meeting-review (FR-019) — COMPOSITE read that REUSES the meeting-summary record read
+    // (MeetingSummaryRepository above → MeetingSummaryStore) and merges it with the NEW single-key
+    // NETWORK_WITH_CACHE MeetingAttendanceStore (bound via AppStoreRegistry.MeetingAttendance in
+    // appStoreModule). Surfaces one offline-first ScreenState<PreviousMeetingDetail> = record totals +
+    // savings + loans + per-member attendance + derived unresolved items. Read-only — no write path.
+    single<PreviousMeetingReviewRepository> {
+        PreviousMeetingReviewRepositoryImpl(
+            meetingSummaryRepository = get(),
+            meetingAttendanceStore = get(AppStoreRegistry.MeetingAttendance),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
     // loan-repayment-dialog (POST /loans/{loanId}/transactions?command=repayment) — Store5-free
     // mutation orchestration for recordRepayment (business_logic.kind: processor, no read-stream
     // of its own), wraps LoanRepaymentApi (NetworkModule) directly. Surfaces NetworkResult, never
@@ -258,6 +291,14 @@ val DataModule = module {
     // (NetworkModule) directly. Surfaces NetworkResult, never .asScreenStream()/.write() — same
     // branch as AuthRepository above.
     single<InvitationRepository> { InvitationRepositoryImpl(api = get()) }
+
+    // member-invite organizer-side (COMP-DT-002 generate + COMP-DT-003 list + COMP-DT-005 revoke)
+    // — Store5-free submit-mutation (business_logic.kind: crud, no read-stream to cache, no
+    // offline queue per data-flow.yaml#sync_queue.entries: []), wraps MemberInviteApi
+    // (NetworkModule) directly. Surfaces NetworkResult, never .asScreenStream()/.write() — same
+    // branch as InvitationRepository/MeetingConductRepository/LoanApplyRepository above. DISTINCT
+    // from InvitationRepository (recipient-side join flow) — organizer-vs-recipient bounded context.
+    single<MemberInviteRepository> { MemberInviteRepositoryImpl(api = get()) }
 
     // group-create wizard (COMP-GRP-001 + raw Fineract /offices) — Store5-free mutation
     // orchestration for createGroup (business_logic.kind: processor, no read-stream to cache),

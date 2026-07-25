@@ -34,6 +34,7 @@ import org.mifos.groupbanking.core.network.config.LoanRepaymentApiConfig
 import org.mifos.groupbanking.core.network.config.LoanRequestApiConfig
 import org.mifos.groupbanking.core.network.config.LoanWriteoffApiConfig
 import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
+import org.mifos.groupbanking.core.network.config.MemberInviteApiConfig
 import org.mifos.groupbanking.core.network.config.MemberApiConfig
 import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
 import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
@@ -53,11 +54,16 @@ import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConf
 import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
 import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
+import org.mifos.groupbanking.core.network.service.memberinvite.MemberInviteApi
+import org.mifos.groupbanking.core.network.service.memberinvite.MemberInviteApiImpl
 import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApi
 import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApiImpl
 import org.mifos.groupbanking.core.network.service.meetingsummary.MeetingRecordApi
 import org.mifos.groupbanking.core.network.service.meetingsummary.MeetingRecordApiImpl
 import org.mifos.groupbanking.core.network.config.MeetingApiConfig
+import org.mifos.groupbanking.core.network.config.MeetingAttendanceApiConfig
+import org.mifos.groupbanking.core.network.service.previousmeetingreview.MeetingAttendanceApi
+import org.mifos.groupbanking.core.network.service.previousmeetingreview.MeetingAttendanceApiImpl
 import org.mifos.groupbanking.core.network.service.meetingcalendar.MeetingApi
 import org.mifos.groupbanking.core.network.service.meetingcalendar.MeetingApiImpl
 import org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApi
@@ -78,6 +84,9 @@ import org.mifos.groupbanking.core.network.service.memberlist.MemberApi
 import org.mifos.groupbanking.core.network.service.memberlist.MemberApiImpl
 import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApi
 import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl
+import org.mifos.groupbanking.core.network.config.OrganizerDashboardApiConfig
+import org.mifos.groupbanking.core.network.service.organizerdashboard.OrganizerDashboardApi
+import org.mifos.groupbanking.core.network.service.organizerdashboard.OrganizerDashboardApiImpl
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
 import org.mifos.groupbanking.core.network.config.MeetingConductApiConfig
@@ -181,6 +190,16 @@ val NetworkModule = module {
     single<InvitationApiConfig> { InvitationApiConfig() }
     single<InvitationApi> { InvitationApiImpl(httpClient = get()) }
 
+    // member-invite organizer-side stack (COMP-DT-002 generate / COMP-DT-003 list / COMP-DT-005
+    // revoke) — DISTINCT from the join-with-code recipient-side InvitationApi above (disjoint HTTP
+    // verbs on the same invitations datatable). Reuses the shared HttpClient singleton (same
+    // companion server, no second engine). The config binding is registered for override-surface
+    // symmetry with CompanionAuthApiConfig even though the shared client dispatches the requests.
+    // The Repository consuming MemberInviteApi (Store5-free submit-mutation — no read-stream to
+    // cache) is registered in RepositoryModule.kt.
+    single<MemberInviteApiConfig> { MemberInviteApiConfig() }
+    single<MemberInviteApi> { MemberInviteApiImpl(httpClient = get()) }
+
     // Group-create wizard (COMP-GRP-001 + raw Fineract `/offices` passthrough) — group-create
     // feature client stack. Reuses the shared HttpClient singleton above (same companion host,
     // no second engine). The config binding is registered for override-surface symmetry with
@@ -199,6 +218,15 @@ val NetworkModule = module {
     // kmp-store-gen/kmp-client-gen generation step, not registered here.
     single<MemberDashboardApiConfig> { MemberDashboardApiConfig() }
     single<MemberDashboardApi> { MemberDashboardApiImpl(httpClient = get()) }
+
+    // Organizer dashboard (GET /companion/organizer/dashboard) — organizer-dashboard feature client
+    // stack. Reuses the shared HttpClient singleton above (same companion server, no second engine).
+    // The config binding is registered for override-surface symmetry with CompanionAuthApiConfig
+    // even though the shared client is the one actually dispatching requests today. The
+    // Repository/Store5 wrapper consuming OrganizerDashboardApi is wired downstream in
+    // appStoreModule / RepositoryModule, not registered here.
+    single<OrganizerDashboardApiConfig> { OrganizerDashboardApiConfig() }
+    single<OrganizerDashboardApi> { OrganizerDashboardApiImpl(httpClient = get()) }
 
     // Group dashboard (COMP-GRP-001 read path) — group-dashboard feature client stack. Reuses
     // the shared HttpClient singleton above (same companion server, no second engine). The
@@ -252,6 +280,13 @@ val NetworkModule = module {
     // MeetingRepositoryImpl. Config binding registered for override-surface symmetry.
     single<MeetingApiConfig> { MeetingApiConfig() }
     single<MeetingApi> { MeetingApiImpl(httpClient = get()) }
+
+    // Meeting attendance (get_meeting_attendance) — previous-meeting-review feature client stack.
+    // Reuses the shared HttpClient singleton above (same server, no second engine).
+    // MeetingAttendanceApi is wrapped by provideMeetingAttendanceStore (appStoreModule) +
+    // PreviousMeetingReviewRepositoryImpl (merged with the reused MeetingSummaryStore record read).
+    single<MeetingAttendanceApiConfig> { MeetingAttendanceApiConfig() }
+    single<MeetingAttendanceApi> { MeetingAttendanceApiImpl(httpClient = get()) }
 
     // Loan repayment (make_repayment) — loan-repayment-dialog feature client stack. Reuses the
     // shared HttpClient singleton above (same companion server, no second engine). The config
