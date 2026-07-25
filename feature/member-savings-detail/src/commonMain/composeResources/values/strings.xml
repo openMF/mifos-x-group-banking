@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_member_savings_detail_screen_title">Member Savings</string>
+
+    <string name="screens_member_savings_detail_avatar_cd_format">%1$s\'s avatar</string>
+
+    <string name="screens_member_savings_detail_balance_label_shares">Shares Held</string>
+    <string name="screens_member_savings_detail_balance_label_savings">Savings Balance</string>
+    <string name="screens_member_savings_detail_shares_at_format">%1$d shares @ KES %2$s/share</string>
+    <string name="screens_member_savings_detail_balance_amount_format">KES %1$s</string>
+    <string name="screens_member_savings_detail_shares_total_format">= KES %1$s total</string>
+    <string name="screens_member_savings_detail_account_no_format">Account: %1$s</string>
+
+    <string name="screens_member_savings_detail_trend_label">6-Month Trend</string>
+    <string name="screens_member_savings_detail_sparkline_cd_format">Savings trend from KES %1$s to KES %2$s</string>
+
+    <string name="screens_member_savings_detail_filter_all">All</string>
+    <string name="screens_member_savings_detail_filter_deposits">Deposits</string>
+    <string name="screens_member_savings_detail_filter_withdrawals">Withdrawals</string>
+
+    <string name="screens_member_savings_detail_txn_type_deposit">Deposit</string>
+    <string name="screens_member_savings_detail_txn_type_withdrawal">Withdrawal</string>
+    <string name="screens_member_savings_detail_txn_type_interest">Interest Posting</string>
+    <string name="screens_member_savings_detail_txn_type_fee">Fee Deduction</string>
+    <string name="screens_member_savings_detail_txn_type_transfer">Transfer</string>
+    <string name="screens_member_savings_detail_txn_type_unknown">Transaction</string>
+
+    <string name="screens_member_savings_detail_amount_deposit_format">+ KES %1$s</string>
+    <string name="screens_member_savings_detail_amount_withdrawal_format">- KES %1$s</string>
+    <string name="screens_member_savings_detail_amount_default_format">KES %1$s</string>
+    <string name="screens_member_savings_detail_running_balance_format">Balance: KES %1$s</string>
+    <string name="screens_member_savings_detail_reversed_label">REVERSED</string>
+    <string name="screens_member_savings_detail_txn_row_cd_format">%1$s, KES %2$s, %3$s</string>
+    <string name="screens_member_savings_detail_txn_expanded_id_format">Transaction ID: %1$s</string>
+    <string name="screens_member_savings_detail_txn_expanded_date_format">Posted: %1$s</string>
+    <string name="screens_member_savings_detail_txn_expanded_balance_format">Running balance: KES %1$s</string>
+
+    <string name="screens_member_savings_detail_load_more_cd">Loading more transactions</string>
+    <string name="screens_member_savings_detail_shimmer_cd">Loading savings</string>
+
+    <string name="screens_member_savings_detail_empty_icon_cd">No transactions</string>
+    <string name="screens_member_savings_detail_empty_title">No transactions</string>
+    <string name="screens_member_savings_detail_empty_body">No transactions match the selected filter.</string>
+
+    <string name="screens_member_savings_detail_error_icon_cd">Could not load savings, tap Try Again to retry</string>
+    <string name="screens_member_savings_detail_error_title">Could not load savings</string>
+    <string name="screens_member_savings_detail_action_retry">Try Again</string>
+    <string name="screens_member_savings_detail_error_network">No internet. Showing cached savings data.</string>
+    <string name="screens_member_savings_detail_error_server">Server error. Please retry.</string>
+    <string name="screens_member_savings_detail_error_not_found">Savings account not found.</string>
+    <string name="screens_member_savings_detail_error_auth">Session expired. Please log in again.</string>
+</resources>

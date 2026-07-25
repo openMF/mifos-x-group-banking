@@ -138,6 +138,8 @@ include(":feature:loan-mark-defaulted-dialog") // <- added by kmp-viewmodel-gen
 include(":feature:sync-status") // <- added by kmp-viewmodel-gen
 include(":feature:settings-logout-dialog") // <- added by kmp-viewmodel-gen
 include(":feature:personal-savings") // <- added by kmp-viewmodel-gen
+include(":feature:member-savings-detail") // <- added by kmp-viewmodel-gen
+include(":feature:savings-dashboard") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")
