@@ -14,10 +14,13 @@ import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.store.fieldofficerdashboard.impl.provideFieldOfficerDashboardStore
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
 import org.mifos.groupbanking.core.store.loandetail.impl.provideLoanDetailStore
 import org.mifos.groupbanking.core.store.loanlist.impl.provideLoansPagingStore
+import org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore
+import org.mifos.groupbanking.core.store.meetingcalendar.impl.provideMeetingCalendarStore
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
 import org.mifos.groupbanking.core.store.memberprofile.impl.provideMemberProfileStore
@@ -142,5 +145,44 @@ val appStoreModule: Module = module {
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
         mgr.register(get(AppStoreRegistry.LoanDetail))
+    }
+
+    // MODULE:MeetingSummary — meeting-summary single-key COMPOSITE store (NETWORK_WITH_CACHE,
+    // GET /datatables/dt_meeting_record/{centerId}). Internal to the store seam — exposed to UI
+    // only through MeetingSummaryRepository.asScreenStream().
+    single(AppStoreRegistry.MeetingSummary) {
+        provideMeetingSummaryStore(api = get(), dao = get())
+    }
+
+    // MODULE:MeetingSummary — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MeetingSummary))
+    }
+
+    // MODULE:MeetingCalendar — meeting-calendar single-key store (NETWORK_WITH_CACHE,
+    // GET /centers/{centerId}/meetings merged with dt_meeting_record). Internal to the store seam —
+    // exposed to UI only through MeetingRepository.asScreenStream().
+    single(AppStoreRegistry.MeetingCalendar) {
+        provideMeetingCalendarStore(api = get(), dao = get())
+    }
+
+    // MODULE:MeetingCalendar — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.MeetingCalendar))
+    }
+
+    // MODULE:FieldOfficerDashboard — field-officer-dashboard AGGREGATE store (composite dynamic-key
+    // NETWORK_WITH_CACHE, FR-009 — parallel GET /centers + GET /groups). Internal to the store seam
+    // — exposed to UI only through FieldOfficerDashboardRepository.asScreenStream().
+    single(AppStoreRegistry.FieldOfficerDashboard) {
+        provideFieldOfficerDashboardStore(api = get(), dao = get())
+    }
+
+    // MODULE:FieldOfficerDashboard — register for logout cache clearing (clears in-memory + Room SoT rows).
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(AppStoreRegistry.FieldOfficerDashboard))
     }
 }

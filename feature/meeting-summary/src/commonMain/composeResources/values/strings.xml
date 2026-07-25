@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_meeting_summary_title">Meeting Summary</string>
+    <string name="screens_meeting_summary_title_format">Meeting #%1$d Summary</string>
+    <string name="screens_meeting_summary_top_app_bar_a11y">Meeting summary top app bar</string>
+    <string name="screens_meeting_summary_back_a11y">Back to meeting calendar</string>
+
+    <string name="screens_meeting_summary_total_collected_label">Total Collected</string>
+    <string name="screens_meeting_summary_kes_amount_format">KES %1$s</string>
+    <string name="screens_meeting_summary_meeting_date_format">Meeting #%1$d · %2$s</string>
+    <string name="screens_meeting_summary_corpus_chip_format">Corpus: KES %1$s</string>
+
+    <string name="screens_meeting_summary_attendance_label">Attendance</string>
+    <string name="screens_meeting_summary_attendance_value_format">%1$d/%2$d</string>
+    <string name="screens_meeting_summary_group_savings_label">Group Savings</string>
+    <string name="screens_meeting_summary_individual_savings_label">Individual Savings</string>
+    <string name="screens_meeting_summary_repayments_label">Loan Repayments</string>
+    <string name="screens_meeting_summary_fines_label">Fines Collected</string>
+    <string name="screens_meeting_summary_loans_disbursed_label">Loans Disbursed</string>
+
+    <string name="screens_meeting_summary_savings_breakdown_header">Savings Breakdown</string>
+    <string name="screens_meeting_summary_member_savings_row_format">Group: KES %1$s · Individual: KES %2$s</string>
+
+    <string name="screens_meeting_summary_corpus_reconciliation_header">Corpus Reconciliation</string>
+    <string name="screens_meeting_summary_opening_corpus_label">Opening</string>
+    <string name="screens_meeting_summary_closing_corpus_label">Closing</string>
+    <string name="screens_meeting_summary_net_change_label">Net Change</string>
+
+    <string name="screens_meeting_summary_done_btn">Done</string>
+    <string name="screens_meeting_summary_done_btn_a11y">Done, return to meeting calendar</string>
+    <string name="screens_meeting_summary_share_btn_description">Share meeting report</string>
+    <string name="screens_meeting_summary_share_copied">Meeting report copied to clipboard</string>
+
+    <string name="screens_meeting_summary_report_title_format">Meeting #%1$d Summary — %2$s</string>
+
+    <string name="screens_meeting_summary_error_state_title">Could not load meeting summary</string>
+    <string name="screens_meeting_summary_error_icon_cd">Error</string>
+    <string name="screens_meeting_summary_error_network">No internet. Showing cached data.</string>
+    <string name="screens_meeting_summary_error_server">Server error. Please try again.</string>
+    <string name="screens_meeting_summary_error_not_found">Meeting record not found.</string>
+    <string name="screens_meeting_summary_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_meeting_summary_action_retry">Retry</string>
+</resources>

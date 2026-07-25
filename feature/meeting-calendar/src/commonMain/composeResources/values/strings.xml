@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_meeting_calendar_title">Meetings</string>
+    <string name="screens_meeting_calendar_loading_message">Loading meetings…</string>
+    <string name="screens_meeting_calendar_toggle_view_cd">Toggle calendar/list view</string>
+
+    <string name="screens_meeting_calendar_past_header">Past Meetings</string>
+    <string name="screens_meeting_calendar_start_meeting">Start Meeting</string>
+    <string name="screens_meeting_calendar_meeting_number">Meeting #%1$d</string>
+    <string name="screens_meeting_calendar_row_subtitle_attended">%1$s · %2$d/5 present</string>
+    <string name="screens_meeting_calendar_collected_amount">KES %1$s</string>
+
+    <string name="screens_meeting_calendar_status_upcoming">Upcoming</string>
+    <string name="screens_meeting_calendar_status_completed">Completed</string>
+    <string name="screens_meeting_calendar_status_missed">Missed</string>
+
+    <string name="screens_meeting_calendar_empty_icon_cd">No meetings scheduled</string>
+    <string name="screens_meeting_calendar_empty_title">No Meetings Yet</string>
+    <string name="screens_meeting_calendar_empty_body">Meetings will appear here once scheduled.</string>
+
+    <string name="screens_meeting_calendar_error_icon_cd">Meeting list failed to load</string>
+    <string name="screens_meeting_calendar_error_title">Could not load meetings</string>
+    <string name="screens_meeting_calendar_error_network_message">No internet connection. Showing cached meetings.</string>
+    <string name="screens_meeting_calendar_error_server_message">Server error. Please try again.</string>
+    <string name="screens_meeting_calendar_error_auth_message">Session expired. Please log in again.</string>
+    <string name="screens_meeting_calendar_action_retry">Retry</string>
+</resources>

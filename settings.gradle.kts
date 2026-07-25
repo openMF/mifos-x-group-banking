@@ -142,6 +142,10 @@ include(":feature:member-savings-detail") // <- added by kmp-viewmodel-gen
 include(":feature:savings-dashboard") // <- added by kmp-viewmodel-gen
 include(":feature:share-out-preview") // <- added by kmp-viewmodel-gen
 include(":feature:share-out-execute") // <- added by kmp-viewmodel-gen
+include(":feature:meeting-conduct") // <- added by kmp-viewmodel-gen
+include(":feature:meeting-summary") // <- added by kmp-viewmodel-gen
+include(":feature:meeting-calendar") // <- added by kmp-viewmodel-gen
+include(":feature:field-officer-dashboard") // <- added by kmp-viewmodel-gen
 
 include(":core-base:analytics")
 include(":core-base:common")

@@ -67,6 +67,26 @@ object AppStoreRegistry : StoreRegistry() {
     // REGISTRY:LoanDetail — loan-detail single-key composite store (NETWORK_WITH_CACHE, GET /loans/{loanId})
     val LoanDetail = store("loanDetail")
 
+    // REGISTRY:SavingsDashboard — savings-dashboard single-key composite store (NETWORK_WITH_CACHE,
+    // parallel GET /companion/groups/{groupId}/savings + .../savings/individual)
+    val SavingsDashboard = store("savingsDashboard")
+
+    // REGISTRY:ShareOutPreview — share-out-preview single-key store (NETWORK_WITH_CACHE,
+    // GET /companion/groups/{groupId}/shareout/preview, COMP-DIST-001)
+    val ShareOutPreview = store("shareOutPreview")
+
+    // REGISTRY:MeetingSummary — meeting-summary single-key composite store (NETWORK_WITH_CACHE,
+    // GET /datatables/dt_meeting_record/{centerId}, keyed by "$centerId:$meetingNumber")
+    val MeetingSummary = store("meetingSummary")
+
+    // REGISTRY:MeetingCalendar — meeting-calendar single-key store (NETWORK_WITH_CACHE,
+    // GET /centers/{centerId}/meetings merged with dt_meeting_record)
+    val MeetingCalendar = store("meetingCalendar")
+
+    // REGISTRY:FieldOfficerDashboard — field-officer-dashboard aggregate store (composite dynamic-key
+    // NETWORK_WITH_CACHE, FR-009 — parallel GET /centers + GET /groups fanned into KPIs + health list)
+    val FieldOfficerDashboard = store("fieldOfficerDashboard")
+
     /** Per-store TTL durations. */
     object Ttl {
         // REGISTRY:GroupTypeConfig — 24h matches data-flow.yaml ttl_seconds:86400; the seed
@@ -103,6 +123,30 @@ object AppStoreRegistry : StoreRegistry() {
         // a loan's outstanding/overdue balances + repayment schedule/history rotate as repayments post,
         // so a short TTL revalidates aggressively.
         val LOAN_DETAIL: Duration = 2.minutes
+
+        // REGISTRY:SavingsDashboard — 5m matches savings-dashboard/data-flow.yaml
+        // cache_strategy:stale_while_revalidate ttl_seconds:300; per-group contribution summaries
+        // rotate as members contribute, so a short TTL revalidates aggressively.
+        val SAVINGS_DASHBOARD: Duration = 5.minutes
+
+        // REGISTRY:ShareOutPreview — 2m matches share-out-preview/data-flow.yaml
+        // cache_strategy:stale_while_revalidate ttl:120; the server-computed distribution preview
+        // shifts as savings post pre-share-out, so a short TTL revalidates aggressively.
+        val SHARE_OUT_PREVIEW: Duration = 2.minutes
+
+        // REGISTRY:MeetingSummary — 10m matches meeting-summary/data-flow.yaml
+        // cache.strategy:stale_while_revalidate ttl_seconds:600; a completed meeting record is
+        // effectively immutable once closed, so a longer TTL is correct (still revalidates on entry).
+        val MEETING_SUMMARY: Duration = 10.minutes
+
+        // REGISTRY:MeetingCalendar — 5m matches data-flow.yaml ttl_seconds:300 (stale-while-revalidate);
+        // a center's scheduled/past meetings + attendance/collected figures rotate as meetings run.
+        val MEETING_CALENDAR: Duration = 5.minutes
+
+        // REGISTRY:FieldOfficerDashboard — 5m matches field-officer-dashboard/data-flow.yaml
+        // ttl_seconds:300 (stale-while-revalidate); cross-group KPIs + per-group health rotate as
+        // members contribute / loans post, so a short TTL revalidates aggressively.
+        val FIELD_OFFICER_DASHBOARD: Duration = 5.minutes
     }
 
     /**
@@ -127,5 +171,15 @@ object AppStoreRegistry : StoreRegistry() {
         "loanList" to Ttl.LOAN_LIST,
         // REGISTRY:LoanDetail
         "loanDetail" to Ttl.LOAN_DETAIL,
+        // REGISTRY:SavingsDashboard
+        "savingsDashboard" to Ttl.SAVINGS_DASHBOARD,
+        // REGISTRY:ShareOutPreview
+        "shareOutPreview" to Ttl.SHARE_OUT_PREVIEW,
+        // REGISTRY:MeetingSummary
+        "meetingSummary" to Ttl.MEETING_SUMMARY,
+        // REGISTRY:MeetingCalendar
+        "meetingCalendar" to Ttl.MEETING_CALENDAR,
+        // REGISTRY:FieldOfficerDashboard
+        "fieldOfficerDashboard" to Ttl.FIELD_OFFICER_DASHBOARD,
     )
 }

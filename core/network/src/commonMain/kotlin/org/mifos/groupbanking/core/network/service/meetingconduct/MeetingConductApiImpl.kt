@@ -1,0 +1,235 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package org.mifos.groupbanking.core.network.service.meetingconduct
+
+import co.touchlab.kermit.Logger
+import io.ktor.client.HttpClient
+import io.ktor.client.call.NoTransformationFoundException
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.ContentConvertException
+import kotlinx.serialization.SerializationException
+import kpt.core.base.network.NetworkError
+import kpt.core.base.network.NetworkResult
+import org.mifos.groupbanking.core.network.model.CenterDetailDto
+import org.mifos.groupbanking.core.network.model.CorpusRecordDto
+import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
+import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
+import org.mifos.groupbanking.core.network.model.DataTableEntryResponseDto
+import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
+import org.mifos.groupbanking.core.network.model.LoanListResponseDto
+import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
+import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
+import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
+import org.mifos.groupbanking.core.network.model.SavingsTransactionRequestDto
+import org.mifos.groupbanking.core.network.model.UpdateCorpusRequestDto
+
+private const val TAG = "MeetingConductApi"
+private const val MEETING_RECORD_DATATABLE = "/datatables/dt_meeting_record"
+private const val ATTENDANCE_DATATABLE = "/datatables/dt_meeting_attendance"
+private const val GROUP_CORPUS_DATATABLE = "/datatables/dt_group_corpus"
+private const val LOAN_VOTE_DATATABLE = "/datatables/dt_loan_vote"
+private const val CENTERS_PATH = "/centers"
+private const val LOANS_PATH = "/loans"
+private const val SAVINGS_ACCOUNTS_PATH = "/savingsaccounts"
+
+/**
+ * Plain-Ktor implementation of [MeetingConductApi]. This class is the ONLY layer in the
+ * meeting-conduct client stack allowed a try-catch — every exception is caught HERE and converted
+ * into [NetworkResult.Error]; nothing throws past this boundary (Mandatory Rule 4 forbids try-catch
+ * one layer up, in `MeetingConductRepositoryImpl`). The HTTP-status → [NetworkError] mapping mirrors
+ * `core-base/network`'s `ResultSuspendConverterFactory` table exactly, same as
+ * [org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApiImpl]. Reuses the shared
+ * `HttpClient` singleton registered in `kpt.core.network.di.NetworkModule` — no second engine.
+ *
+ * See API.md#services — MeetingConductApi.
+ */
+class MeetingConductApiImpl(
+    private val httpClient: HttpClient,
+) : MeetingConductApi {
+
+    override suspend fun getPreviousMeetingRecord(centerId: Int): NetworkResult<MeetingRecordDetailDto, NetworkError> {
+        val path = "$MEETING_RECORD_DATATABLE/$centerId"
+        Logger.d(TAG) { "getPreviousMeetingRecord: GET $path" }
+        return requestAsNetworkResult(op = "getPreviousMeetingRecord") { httpClient.get(path) }
+    }
+
+    override suspend fun getGroupMembers(centerId: Int): NetworkResult<CenterDetailDto, NetworkError> {
+        val path = "$CENTERS_PATH/$centerId"
+        Logger.d(TAG) { "getGroupMembers: GET $path (associations=clientMembers)" }
+        return requestAsNetworkResult(op = "getGroupMembers") {
+            httpClient.get(path) { parameter("associations", "clientMembers") }
+        }
+    }
+
+    override suspend fun getGroupCorpus(centerId: Int): NetworkResult<CorpusRecordDto, NetworkError> {
+        val path = "$GROUP_CORPUS_DATATABLE/$centerId"
+        Logger.d(TAG) { "getGroupCorpus: GET $path" }
+        return requestAsNetworkResult(op = "getGroupCorpus") { httpClient.get(path) }
+    }
+
+    override suspend fun getActiveLoans(groupId: Int): NetworkResult<LoanListResponseDto, NetworkError> {
+        Logger.d(TAG) { "getActiveLoans: GET $LOANS_PATH (groupId=$groupId, loanStatus=active)" }
+        return requestAsNetworkResult(op = "getActiveLoans") {
+            httpClient.get(LOANS_PATH) {
+                parameter("groupId", groupId)
+                parameter("loanStatus", "active")
+            }
+        }
+    }
+
+    override suspend fun getLoanVotes(loanId: String): NetworkResult<LoanVoteRecordDto, NetworkError> {
+        val path = "$LOAN_VOTE_DATATABLE/$loanId"
+        Logger.d(TAG) { "getLoanVotes: GET $path" }
+        return requestAsNetworkResult(op = "getLoanVotes") { httpClient.get(path) }
+    }
+
+    override suspend fun postMeetingRecord(
+        request: CreateMeetingRecordRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        Logger.d(TAG) { "postMeetingRecord: POST $MEETING_RECORD_DATATABLE (centerId=${request.centerId})" }
+        return requestAsNetworkResult(op = "postMeetingRecord") {
+            httpClient.post(MEETING_RECORD_DATATABLE) {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+
+    override suspend fun postMeetingAttendance(
+        request: CreateAttendanceRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        Logger.d(TAG) { "postMeetingAttendance: POST $ATTENDANCE_DATATABLE (memberId=${request.memberId})" }
+        return requestAsNetworkResult(op = "postMeetingAttendance") {
+            httpClient.post(ATTENDANCE_DATATABLE) {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+
+    override suspend fun postSavingsTransaction(
+        savingsId: String,
+        request: SavingsTransactionRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        val path = "$SAVINGS_ACCOUNTS_PATH/$savingsId/transactions"
+        Logger.d(TAG) { "postSavingsTransaction: POST $path (amount=${request.transactionAmount})" }
+        return requestAsNetworkResult(op = "postSavingsTransaction") {
+            httpClient.post(path) {
+                parameter("command", "deposit")
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+
+    override suspend fun postLoanRepayment(
+        loanId: String,
+        request: LoanRepaymentRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        val path = "$LOANS_PATH/$loanId/transactions"
+        Logger.d(TAG) { "postLoanRepayment: POST $path?command=repayment (amount=${request.transactionAmount})" }
+        return requestAsNetworkResult(op = "postLoanRepayment") {
+            httpClient.post(path) {
+                parameter("command", "repayment")
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+
+    override suspend fun postLoanDisbursal(
+        loanId: String,
+        request: LoanDisbursalRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        val path = "$LOANS_PATH/$loanId/transactions"
+        Logger.d(TAG) { "postLoanDisbursal: POST $path?command=disburse loanId=$loanId" }
+        return requestAsNetworkResult(op = "postLoanDisbursal") {
+            httpClient.post(path) {
+                parameter("command", "disburse")
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+
+    override suspend fun updateCorpus(
+        centerId: Int,
+        request: UpdateCorpusRequestDto,
+    ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
+        val path = "$GROUP_CORPUS_DATATABLE/$centerId"
+        Logger.d(TAG) { "updateCorpus: PUT $path (closingCorpus=${request.corpusBalance})" }
+        return requestAsNetworkResult(op = "updateCorpus") {
+            httpClient.put(path) {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
+    }
+}
+
+/**
+ * Executes [block], catches transport/serialization exceptions, and maps the resulting
+ * [HttpResponse] status code into a [NetworkResult]. Mirrors the shared loanapply/memberadd
+ * requestAsNetworkResult helper.
+ */
+private suspend inline fun <reified T> requestAsNetworkResult(
+    op: String,
+    block: suspend () -> HttpResponse,
+): NetworkResult<T, NetworkError> {
+    val response = try {
+        block()
+    } catch (e: SerializationException) {
+        Logger.e(TAG) { "$op request failure: ${e.message}" }
+        return NetworkResult.Error(NetworkError.SERIALIZATION)
+    } catch (e: Exception) {
+        Logger.e(TAG) { "$op transport failure: ${e.message}" }
+        return NetworkResult.Error(NetworkError.UNKNOWN)
+    }
+
+    return if (response.status.value in 200..299) {
+        try {
+            val data = response.body<T>()
+            Logger.i(TAG) { "$op succeeded (${response.status.value})" }
+            NetworkResult.Success(data)
+        } catch (e: NoTransformationFoundException) {
+            Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
+            NetworkResult.Error(NetworkError.SERIALIZATION)
+        } catch (e: SerializationException) {
+            Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
+            NetworkResult.Error(NetworkError.SERIALIZATION)
+        } catch (e: ContentConvertException) {
+            Logger.e(TAG) { "$op response deserialization failure: ${e.message}" }
+            NetworkResult.Error(NetworkError.SERIALIZATION)
+        }
+    } else {
+        val error = response.status.toNetworkError()
+        Logger.e(TAG) { "$op failed with HTTP ${response.status.value} -> $error" }
+        NetworkResult.Error(error)
+    }
+}
+
+private fun HttpStatusCode.toNetworkError(): NetworkError = when (value) {
+    HttpStatusCode.BadRequest.value -> NetworkError.BAD_REQUEST
+    HttpStatusCode.Unauthorized.value -> NetworkError.UNAUTHORIZED
+    HttpStatusCode.NotFound.value -> NetworkError.NOT_FOUND
+    HttpStatusCode.RequestTimeout.value -> NetworkError.REQUEST_TIMEOUT
+    HttpStatusCode.TooManyRequests.value -> NetworkError.TOO_MANY_REQUESTS
+    in 500..599 -> NetworkError.SERVER
+    else -> NetworkError.UNKNOWN
+}

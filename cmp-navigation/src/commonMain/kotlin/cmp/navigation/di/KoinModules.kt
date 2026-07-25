@@ -26,6 +26,7 @@ import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.mifos.groupbanking.feature.groupcreate.di.GroupCreateModule
+import org.mifos.groupbanking.feature.fieldofficerdashboard.di.FieldOfficerDashboardModule
 import org.mifos.groupbanking.feature.groupdashboard.di.GroupDashboardModule
 import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
@@ -37,6 +38,9 @@ import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.di.LoanMarkDefault
 import org.mifos.groupbanking.feature.loanrepaymentdialog.di.LoanRepaymentDialogModule
 import org.mifos.groupbanking.feature.loanrequest.di.LoanRequestModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
+import org.mifos.groupbanking.feature.meetingconduct.di.MeetingConductModule
+import org.mifos.groupbanking.feature.meetingsummary.di.MeetingSummaryModule
+import org.mifos.groupbanking.feature.meetingcalendar.di.MeetingCalendarModule
 import org.mifos.groupbanking.feature.memberadd.di.MemberAddModule
 import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule
@@ -103,6 +107,10 @@ object KoinModules {
             SavingsDashboardModule, // <- added by kmp-viewmodel-gen
             ShareOutPreviewModule, // <- added by kmp-viewmodel-gen
             ShareOutExecuteModule, // <- added by kmp-viewmodel-gen
+            MeetingSummaryModule, // <- added by kmp-viewmodel-gen
+            MeetingCalendarModule, // <- added by kmp-viewmodel-gen
+            FieldOfficerDashboardModule, // <- added by kmp-viewmodel-gen
+            MeetingConductModule, // <- added by kmp-viewmodel-gen
         )
     }
 

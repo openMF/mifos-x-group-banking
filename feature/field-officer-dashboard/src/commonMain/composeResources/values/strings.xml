@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_field_officer_dashboard_title">Field Officer Dashboard</string>
+    <string name="screens_field_officer_dashboard_loading_message">Loading dashboard…</string>
+
+    <string name="screens_field_officer_dashboard_kpi_groups">Groups Managed</string>
+    <string name="screens_field_officer_dashboard_kpi_members">Active Members</string>
+    <string name="screens_field_officer_dashboard_kpi_savings">Savings This Month</string>
+    <string name="screens_field_officer_dashboard_kpi_loans">Loans Outstanding</string>
+
+    <string name="screens_field_officer_dashboard_filter_all_regions">All Regions</string>
+    <string name="screens_field_officer_dashboard_filter_all_statuses">All Statuses</string>
+    <string name="screens_field_officer_dashboard_filter_overdue_any">Any Overdue Rate</string>
+    <string name="screens_field_officer_dashboard_filter_overdue_none">No Overdue</string>
+    <string name="screens_field_officer_dashboard_filter_overdue_lt10">Overdue &lt; 10%</string>
+    <string name="screens_field_officer_dashboard_filter_overdue_gt10">Overdue &gt; 10%</string>
+    <string name="screens_field_officer_dashboard_filter_status_active">Active</string>
+    <string name="screens_field_officer_dashboard_filter_status_pending">Pending</string>
+    <string name="screens_field_officer_dashboard_filter_status_closed">Closed</string>
+    <string name="screens_field_officer_dashboard_filter_clear">Clear Filters</string>
+
+    <string name="screens_field_officer_dashboard_groups_count_label">%1$d of %2$d groups</string>
+
+    <string name="screens_field_officer_dashboard_health_green">Healthy</string>
+    <string name="screens_field_officer_dashboard_health_amber">At Risk</string>
+    <string name="screens_field_officer_dashboard_health_red">Critical</string>
+    <string name="screens_field_officer_dashboard_health_unknown">Unknown</string>
+
+    <string name="screens_field_officer_dashboard_subtitle">%1$s · Cycle %2$d</string>
+    <string name="screens_field_officer_dashboard_card_cd">%1$s, office %2$s, health %3$s</string>
+
+    <string name="screens_field_officer_dashboard_content_desc_export">Export Field Officer Group Report as CSV</string>
+    <string name="screens_field_officer_dashboard_export_error">Failed to generate report. Please try again.</string>
+
+    <string name="screens_field_officer_dashboard_empty_title">No Groups Assigned</string>
+    <string name="screens_field_officer_dashboard_empty_body">You don\'t have any groups assigned yet. Contact your office administrator.</string>
+    <string name="screens_field_officer_dashboard_empty_filter_title">No Groups Match Filters</string>
+    <string name="screens_field_officer_dashboard_empty_filter_body">Try adjusting or clearing your filters.</string>
+
+    <string name="screens_field_officer_dashboard_error_load_title">Could not load dashboard</string>
+    <string name="screens_field_officer_dashboard_cta_retry">Retry</string>
+    <string name="screens_field_officer_dashboard_error_network">No internet connection. Showing cached data.</string>
+    <string name="screens_field_officer_dashboard_error_server">Server error. Please try again.</string>
+    <string name="screens_field_officer_dashboard_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_field_officer_dashboard_error_no_groups">No groups assigned to your account.</string>
+
+    <string name="screens_field_officer_dashboard_picker_region_title">Filter by Region</string>
+    <string name="screens_field_officer_dashboard_picker_status_title">Filter by Status</string>
+    <string name="screens_field_officer_dashboard_picker_overdue_title">Filter by Overdue Rate</string>
+    <string name="screens_field_officer_dashboard_picker_all">All</string>
+    <string name="screens_field_officer_dashboard_dialog_cancel">Cancel</string>
+</resources>

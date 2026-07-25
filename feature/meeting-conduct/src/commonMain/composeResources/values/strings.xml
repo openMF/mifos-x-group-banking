@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_meeting_conduct_topbar_title">Meeting #%1$d</string>
+    <string name="screens_meeting_conduct_topbar_subtitle">%1$s — Step %2$d of %3$d</string>
+    <string name="screens_meeting_conduct_close_cd">Close meeting wizard and return to calendar</string>
+    <string name="screens_meeting_conduct_offline_badge">Offline</string>
+    <string name="screens_meeting_conduct_offline_badge_cd">Offline mode active</string>
+
+    <string name="screens_meeting_conduct_loading_cd">Loading meeting data</string>
+
+    <string name="screens_meeting_conduct_step0_title">Previous Meeting Review</string>
+    <string name="screens_meeting_conduct_step1_title">Attendance</string>
+    <string name="screens_meeting_conduct_step2_title">Opening Balance</string>
+    <string name="screens_meeting_conduct_step3_title">Savings Collection</string>
+    <string name="screens_meeting_conduct_step4_title">Loan Review</string>
+    <string name="screens_meeting_conduct_step5_title">Loan Applications</string>
+    <string name="screens_meeting_conduct_step6_title">Closing Balance</string>
+
+    <string name="screens_meeting_conduct_stepper_review">Review</string>
+    <string name="screens_meeting_conduct_stepper_attendance">Attendance</string>
+    <string name="screens_meeting_conduct_stepper_balance">Balance</string>
+    <string name="screens_meeting_conduct_stepper_savings">Savings</string>
+    <string name="screens_meeting_conduct_stepper_loans">Loans</string>
+    <string name="screens_meeting_conduct_stepper_apply">Apply</string>
+    <string name="screens_meeting_conduct_stepper_close">Close</string>
+    <string name="screens_meeting_conduct_stepper_cd">Meeting wizard step progress</string>
+
+    <string name="screens_meeting_conduct_currency_kes">KES %1$s</string>
+    <string name="screens_meeting_conduct_corpus_band_corpus">Corpus: KES %1$s</string>
+    <string name="screens_meeting_conduct_corpus_band_cash">Cash on Hand: KES %1$s</string>
+    <string name="screens_meeting_conduct_corpus_band_cd">Persistent corpus and cash on hand summary</string>
+
+    <string name="screens_meeting_conduct_info_meeting">Meeting</string>
+    <string name="screens_meeting_conduct_info_date">Date</string>
+    <string name="screens_meeting_conduct_info_total_collected">Total Collected</string>
+    <string name="screens_meeting_conduct_info_closing_corpus">Closing Corpus</string>
+    <string name="screens_meeting_conduct_info_attendance">Attendance</string>
+    <string name="screens_meeting_conduct_prev_summary_cd">Previous meeting summary details</string>
+    <string name="screens_meeting_conduct_first_meeting_title">First Meeting</string>
+    <string name="screens_meeting_conduct_first_meeting_body">No previous meeting data — this is the group\'s first meeting.</string>
+    <string name="screens_meeting_conduct_view_full_report">View Full Report</string>
+
+    <string name="screens_meeting_conduct_attendance_fine_info">Late: KES 50 fine · Absent: KES 100 fine (FR-012)</string>
+    <string name="screens_meeting_conduct_attendance_present">Present</string>
+    <string name="screens_meeting_conduct_attendance_late">Late</string>
+    <string name="screens_meeting_conduct_attendance_absent">Absent</string>
+    <string name="screens_meeting_conduct_attendance_fine_chip">Fine: KES %1$s</string>
+    <string name="screens_meeting_conduct_attendance_progress">%1$d/%2$d recorded</string>
+    <string name="screens_meeting_conduct_attendance_row_cd">Set attendance for %1$s</string>
+
+    <string name="screens_meeting_conduct_corpus_group_fund">Group Corpus Fund</string>
+    <string name="screens_meeting_conduct_corpus_at_start">At start of Meeting #%1$d</string>
+    <string name="screens_meeting_conduct_cash_on_hand_label">Cash on Hand</string>
+
+    <string name="screens_meeting_conduct_savings_min_chip">Min. group savings: KES 200/member (FR-020)</string>
+    <string name="screens_meeting_conduct_savings_group_label">Group Savings (KES)</string>
+    <string name="screens_meeting_conduct_savings_individual_label">Individual Savings (KES)</string>
+    <string name="screens_meeting_conduct_savings_running_total_label">Total Savings This Step</string>
+    <string name="screens_meeting_conduct_savings_group_cd">Group savings amount for %1$s</string>
+    <string name="screens_meeting_conduct_savings_individual_cd">Individual savings amount for %1$s</string>
+
+    <string name="screens_meeting_conduct_loan_summary">KES %1$s loan · KES %2$s outstanding · Week %3$d/%4$d</string>
+    <string name="screens_meeting_conduct_loan_overdue">OVERDUE</string>
+    <string name="screens_meeting_conduct_loan_repayment_label">Repayment (KES)</string>
+    <string name="screens_meeting_conduct_loan_fine_label">Penalty Fine (KES)</string>
+    <string name="screens_meeting_conduct_loan_repayment_cd">Loan repayment amount for %1$s</string>
+    <string name="screens_meeting_conduct_no_active_loans_title">No Active Loans</string>
+    <string name="screens_meeting_conduct_no_active_loans_body">No members currently have active loans. Tap Next to proceed.</string>
+
+    <string name="screens_meeting_conduct_corpus_gate_chip">Available to disburse: KES %1$s</string>
+    <string name="screens_meeting_conduct_loan_app_requests">Requests KES %1$s</string>
+    <string name="screens_meeting_conduct_loan_app_purpose">Purpose: %1$s</string>
+    <string name="screens_meeting_conduct_loan_vote_tally">%1$d For · %2$d Against</string>
+    <string name="screens_meeting_conduct_loan_vote_for">For</string>
+    <string name="screens_meeting_conduct_loan_vote_against">Against</string>
+    <string name="screens_meeting_conduct_loan_approve">Chairperson Approve</string>
+    <string name="screens_meeting_conduct_loan_approved">Approved</string>
+    <string name="screens_meeting_conduct_no_pending_loans_title">No Pending Applications</string>
+    <string name="screens_meeting_conduct_no_pending_loans_body">No loan applications to review this meeting. Tap Next to proceed.</string>
+
+    <string name="screens_meeting_conduct_recon_opening">Opening Corpus</string>
+    <string name="screens_meeting_conduct_recon_group_savings">+ Group Savings</string>
+    <string name="screens_meeting_conduct_recon_repayments">+ Loan Repayments</string>
+    <string name="screens_meeting_conduct_recon_fines">+ Fines Collected</string>
+    <string name="screens_meeting_conduct_recon_disbursed">— Loans Disbursed</string>
+    <string name="screens_meeting_conduct_recon_closing">Closing Corpus</string>
+    <string name="screens_meeting_conduct_reconciliation_cd">Meeting closing balance reconciliation summary</string>
+    <string name="screens_meeting_conduct_submit_meeting">Submit Meeting</string>
+    <string name="screens_meeting_conduct_submitting">Submitting…</string>
+    <string name="screens_meeting_conduct_submit_cd">Submit meeting and post collection sheet</string>
+    <string name="screens_meeting_conduct_offline_submit_note">You\'re offline. Meeting data will be saved locally and synced when connected.</string>
+
+    <string name="screens_meeting_conduct_back">Back</string>
+    <string name="screens_meeting_conduct_next">Next</string>
+    <string name="screens_meeting_conduct_back_cd">Return to previous wizard step</string>
+    <string name="screens_meeting_conduct_next_cd">Advance to next wizard step or submit meeting</string>
+
+    <string name="screens_meeting_conduct_success_message">Meeting #%1$d submitted successfully!</string>
+    <string name="screens_meeting_conduct_success_offline_message">Meeting saved offline — will sync when connected.</string>
+
+    <string name="screens_meeting_conduct_error_attendance_incomplete">Please record attendance for all members before proceeding.</string>
+    <string name="screens_meeting_conduct_error_min_contribution">Every member must contribute the minimum group savings of KES 200.</string>
+    <string name="screens_meeting_conduct_error_repayment_exceeds">A repayment amount exceeds the loan\'s outstanding balance.</string>
+    <string name="screens_meeting_conduct_error_corpus_insufficient">Corpus balance insufficient to disburse the approved loans.</string>
+    <string name="screens_meeting_conduct_error_server">Server error. Please try again.</string>
+    <string name="screens_meeting_conduct_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_meeting_conduct_error_offline">You are offline. Data will be saved and synced when connected.</string>
+    <string name="screens_meeting_conduct_error_retry">Retry</string>
+    <string name="screens_meeting_conduct_load_error_title">Could not load meeting</string>
+</resources>

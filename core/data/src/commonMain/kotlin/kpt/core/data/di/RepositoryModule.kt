@@ -36,6 +36,8 @@ import org.mifos.groupbanking.core.data.repository.ChangePinRepository
 import org.mifos.groupbanking.core.data.repository.ChangePinRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepository
 import org.mifos.groupbanking.core.data.repository.GroupCreateRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.FieldOfficerDashboardRepository
+import org.mifos.groupbanking.core.data.repository.FieldOfficerDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupDashboardRepository
 import org.mifos.groupbanking.core.data.repository.GroupDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.GroupRepository
@@ -56,12 +58,18 @@ import org.mifos.groupbanking.core.data.repository.LoanRequestRepository
 import org.mifos.groupbanking.core.data.repository.LoanRequestRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepository
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MeetingSummaryRepository
+import org.mifos.groupbanking.core.data.repository.MeetingSummaryRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MeetingConductRepository
+import org.mifos.groupbanking.core.data.repository.MeetingConductRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberAddRepository
 import org.mifos.groupbanking.core.data.repository.MemberAddRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepository
 import org.mifos.groupbanking.core.data.repository.MemberDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepository
 import org.mifos.groupbanking.core.data.repository.MemberProfileRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.MeetingRepository
+import org.mifos.groupbanking.core.data.repository.MeetingRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.SavingsRepository
@@ -128,6 +136,20 @@ val DataModule = module {
         )
     }
 
+    // field-officer-dashboard (FR-009) — wraps the composite dynamic-key NETWORK_WITH_CACHE
+    // FieldOfficerDashboardStore (bound via AppStoreRegistry.FieldOfficerDashboard in appStoreModule)
+    // and surfaces the offline-first .asScreenStream() read (per-staff ScreenState<FieldOfficerDashboard>,
+    // the parallel fan-in of get_centers_for_staff + get_groups_for_staff). The Store5-free CSV export
+    // (runReport) takes FieldOfficerApi directly (get()) — no read-stream to cache.
+    single<FieldOfficerDashboardRepository> {
+        FieldOfficerDashboardRepositoryImpl(
+            fieldOfficerDashboardStore = get(AppStoreRegistry.FieldOfficerDashboard),
+            fieldOfficerApi = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
     // member-list (GET /groups/{groupId}/clients) — wraps the PAGINATED NETWORK_WITH_CACHE
     // MembersPagingStore (bound via AppStoreRegistry.MemberList in appStoreModule) and surfaces the
     // offline-first .asPagingScreenStream() read (paged ScreenState<List<Member>> + load-more +
@@ -183,6 +205,19 @@ val DataModule = module {
     single<LoanDetailRepository> {
         LoanDetailRepositoryImpl(
             loanDetailStore = get(AppStoreRegistry.LoanDetail),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // meeting-summary (GET /datatables/dt_meeting_record/{centerId}?meetingNumber=N) — wraps the
+    // single-key composite NETWORK_WITH_CACHE MeetingSummaryStore (bound via
+    // AppStoreRegistry.MeetingSummary in appStoreModule) and surfaces the offline-first
+    // .asScreenStream() read (per-meeting ScreenState<MeetingSummaryData> = totals + savings
+    // breakdown + loan activity). Read-only screen — no write path.
+    single<MeetingSummaryRepository> {
+        MeetingSummaryRepositoryImpl(
+            meetingSummaryStore = get(AppStoreRegistry.MeetingSummary),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -307,6 +342,28 @@ val DataModule = module {
     // NetworkResult, never .asScreenStream(); the execute writes reuse the shared SyncQueueRepository
     // for the offline enqueue seam — same branch as LoanRequestRepository above.
     single<ShareOutRepository> { ShareOutRepositoryImpl(api = get(), syncQueueRepository = get()) }
+
+    // meeting-conduct 7-step wizard (5-way on-mount parallel combine + ordered submit sequence) —
+    // Store5-free composite (business_logic.kind: composite, no AppStoreRegistry entry), wraps
+    // MeetingConductApi (NetworkModule) directly plus the shared SyncQueueRepository for the offline
+    // enqueue seam (flow.yaml#submit_meeting.offline, SUBMIT_MEETING). Surfaces NetworkResult, never
+    // .asScreenStream()/.write() — same branch as ShareOutRepository/LoanRequestRepository above.
+    single<MeetingConductRepository> {
+        MeetingConductRepositoryImpl(api = get(), syncQueueRepository = get())
+    }
+
+    // meeting-calendar (GET /centers/{centerId}/meetings + get_meeting_records_datatable) — wraps
+    // the single-key NETWORK_WITH_CACHE MeetingCalendarStore (bound via AppStoreRegistry.MeetingCalendar
+    // in appStoreModule) and surfaces the offline-first .asScreenStream() read (per-center
+    // ScreenState<List<MeetingListItem>>, the 2-way parallel merge of get_center_meetings +
+    // get_meeting_records_datatable). Read-only — no write path (data-flow.yaml#sync_queue: []).
+    single<MeetingRepository> {
+        MeetingRepositoryImpl(
+            meetingCalendarStore = get(AppStoreRegistry.MeetingCalendar),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

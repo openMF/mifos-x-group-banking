@@ -50,6 +50,9 @@ val DatabaseModule = module {
     // group-banking domain — group-dashboard composite per-group cache (SourceOfTruth DAO, COMP-GRP-001)
     single { get<AppDatabase>().groupDashboardDao }
 
+    // group-banking domain — field-officer-dashboard aggregate per-staff cache (SourceOfTruth DAO, FR-009)
+    single { get<AppDatabase>().fieldOfficerDashboardDao }
+
     // group-banking domain — member-list paginated per-group cache (SourceOfTruth DAO, GET /groups/{groupId}/clients)
     single { get<AppDatabase>().memberListDao }
 
@@ -65,6 +68,12 @@ val DatabaseModule = module {
     // group-banking domain — offline write-queue shared infra DAO (member-add/loan-request enqueue,
     // sync-status read; NOT a Store5 SourceOfTruth)
     single { get<AppDatabase>().syncQueueDao }
+
+    // group-banking domain — meeting-summary single-key composite cache (SourceOfTruth DAO, GET /datatables/dt_meeting_record/{centerId})
+    single { get<AppDatabase>().meetingRecordDao }
+
+    // group-banking domain — meeting-calendar single-key cache (SourceOfTruth DAO, GET /centers/{centerId}/meetings + dt_meeting_record)
+    single { get<AppDatabase>().meetingCalendarDao }
 }
 
 /**

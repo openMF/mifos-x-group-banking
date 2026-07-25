@@ -39,6 +39,7 @@ import androidx.navigation.toRoute
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.KptConnectivityBanner
+import org.mifos.groupbanking.feature.fieldofficerdashboard.fieldOfficerDashboardScreen
 import org.mifos.groupbanking.feature.groupcreate.groupCreateScreen
 import org.mifos.groupbanking.feature.groupcreate.navigateToGroupCreate
 import org.mifos.groupbanking.feature.groupdashboard.groupDashboardScreen
@@ -52,6 +53,11 @@ import org.mifos.groupbanking.feature.joinwithcode.joinWithCodeScreen
 import org.mifos.groupbanking.feature.joinwithcode.navigateToJoinWithCode
 import org.mifos.groupbanking.feature.loandetail.loanDetailScreen
 import org.mifos.groupbanking.feature.loandetail.navigateToLoanDetail
+import org.mifos.groupbanking.feature.meetingconduct.meetingConductScreen
+import org.mifos.groupbanking.feature.meetingsummary.meetingSummaryScreen
+import org.mifos.groupbanking.feature.meetingsummary.navigateToMeetingSummary
+import org.mifos.groupbanking.feature.meetingcalendar.meetingCalendarScreen
+import org.mifos.groupbanking.feature.meetingcalendar.navigateToMeetingCalendar
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
 import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialog
@@ -193,10 +199,32 @@ fun GroupBankingNavHost(
                     onNavigateToGroupList = { navController.navigateToGroupList() },
                 )
 
+                // 6a. field-officer-dashboard (FR-009) → group-dashboard (supervisory read-only view) /
+                // export share-sheet. Registered + fully reachable via
+                // `navController.navigateToFieldOfficerDashboard()`; its `ui.yaml#entry_points` declare
+                // an `app_launch` trigger gated on `userRole == FIELD_OFFICER || PROGRAM_MANAGER`, but
+                // this app's current login shell has no staff-role landing branch, so no in-app
+                // affordance calls it yet — the SAME residual-follow-up convention as `settings` above
+                // (flagged for an idea-layer / login-shell update, never an invented entry point).
+                fieldOfficerDashboardScreen(
+                    onNavigateToGroupDashboard = { groupId ->
+                        navController.navigateToGroupDashboard(groupId = groupId.toString(), viewerRole = "FIELD_OFFICER")
+                    },
+                    // TODO(nav): replace with the OS share-sheet handoff once the CSV export surface exists
+                    onExportReport = { navController.navigateToPlaceholder("Export Report") },
+                )
+
                 // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list
                 groupDashboardScreen(
-                    // TODO(nav): replace when meeting-calendar feature is implemented
-                    onNavigateToMeetingCalendar = { navController.navigateToPlaceholder("Meetings") },
+                    // group-dashboard `Start/View Meetings` → meeting-calendar. group-dashboard
+                    // forwards a `groupId: String` but meeting-calendar's nav_param is `center_id: Int`
+                    // (a flagged idea-layer nav-param drift — group-dashboard has no centerId at this
+                    // seam); bridge by parsing groupId, mirroring the loan-list `toLongOrNull` drift
+                    // precedent above. Reported to the caller for an idea-layer follow-up (forward
+                    // fineractCenterId from group-dashboard, or key meeting-calendar by groupId).
+                    onNavigateToMeetingCalendar = { groupId ->
+                        navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
+                    },
                     // TODO(nav): replace when member-list feature is implemented
                     onNavigateToMemberList = { navController.navigateToPlaceholder("Members") },
                     onNavigateToLoanList = { groupId ->
@@ -292,6 +320,45 @@ fun GroupBankingNavHost(
                             loanAmountKes = loanAmountKes,
                         )
                     },
+                )
+
+                // 9b. meeting-summary → back to meeting-calendar (flow.yaml#navigates_to:
+                //     [meeting-calendar]). Read-only screen; Done/back both pop to the prior
+                //     back-stack entry (the calendar / conduct wizard the summary was opened from).
+                //     Reachable via `navController.navigateToMeetingSummary(...)` (deep-link entry).
+                meetingSummaryScreen(
+                    onNavigateDone = { navController.popBackStack() },
+                )
+
+                // 9c. meeting-calendar → meeting-conduct (Start Meeting) / previous-meeting-review
+                //     (past-meeting drill-down) / back. Reached from group-dashboard's Meetings action.
+                //     Both onward targets route to PlaceholderRoute until their feature modules land
+                //     (mirrors loan-apply's not-yet-generated-target convention) — never a dead click.
+                meetingCalendarScreen(
+                    // TODO(nav): replace when meeting-conduct navigation is wired here
+                    onNavigateToConduct = { _, _ -> navController.navigateToPlaceholder("Conduct Meeting") },
+                    // TODO(nav): replace when previous-meeting-review feature is implemented
+                    onNavigateToReview = { _, _ -> navController.navigateToPlaceholder("Meeting Review") },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 9d. meeting-conduct (7-step wizard) → meeting-summary (submit success) /
+                //     previous-meeting-review (step-0 drill-down) / back. Reached via
+                //     `navController.navigateToMeetingConduct(meetingId, meetingNumber, centerId)`
+                //     (from meeting-calendar's Start-Meeting card once that callback forwards centerId).
+                //     Submit success routes to the REAL meeting-summary screen; the not-yet-built
+                //     previous-meeting-review target falls back to PlaceholderRoute (never a dead click).
+                meetingConductScreen(
+                    onNavigateToMeetingSummary = { meetingId, meetingNumber, centerId ->
+                        navController.navigateToMeetingSummary(
+                            meetingId = meetingId,
+                            meetingNumber = meetingNumber,
+                            centerId = centerId,
+                        )
+                    },
+                    // TODO(nav): replace when previous-meeting-review feature is implemented
+                    onNavigateToPreviousMeetingReview = { _, _ -> navController.navigateToPlaceholder("Meeting Review") },
+                    onNavigateBack = { navController.popBackStack() },
                 )
 
                 // 10. settings -- migrated off the legacy `kpt.feature.settings` template shell
