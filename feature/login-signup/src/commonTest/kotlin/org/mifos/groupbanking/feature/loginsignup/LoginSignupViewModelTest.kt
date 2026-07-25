@@ -137,7 +137,7 @@ class LoginSignupViewModelTest {
     }
 
     @Test
-    fun `OnLoginTap success with organizer role emits NavigateToGroupList`() = runTest(testDispatcher) {
+    fun `OnLoginTap success with organizer role emits NavigateToOrganizerDashboard`() = runTest(testDispatcher) {
         repository.loginResult = NetworkResult.Success(
             sampleSession(groups = listOf(sampleMembership(role = GroupRole.ORGANIZER))),
         )
@@ -147,7 +147,10 @@ class LoginSignupViewModelTest {
 
         viewModel.eventFlow.test {
             viewModel.trySendAction(LoginSignupAction.OnLoginTap)
-            assertEquals(LoginSignupEvent.NavigateToGroupList, awaitItem())
+            // An organizer-in-any-group lands on the organizer hub (SPEC.md#login-routing +
+            // organizer-dashboard `app_launch` gated on `isOrganizerInAnyGroup`); group-list stays
+            // reachable from that hub's All-Groups quick-nav.
+            assertEquals(LoginSignupEvent.NavigateToOrganizerDashboard, awaitItem())
         }
     }
 

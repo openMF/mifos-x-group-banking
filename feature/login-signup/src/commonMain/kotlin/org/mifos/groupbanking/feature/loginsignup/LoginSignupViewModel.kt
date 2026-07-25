@@ -145,6 +145,7 @@ data class LoginSignupState(
  */
 sealed interface LoginSignupEvent {
     data object NavigateToPersonalDashboard : LoginSignupEvent
+    data object NavigateToOrganizerDashboard : LoginSignupEvent
     data object NavigateToGroupList : LoginSignupEvent
     data object NavigateToGroupTypePicker : LoginSignupEvent
     data object NavigateToJoinWithCode : LoginSignupEvent
@@ -519,10 +520,16 @@ internal class LoginSignupViewModel(
     private fun screenStateFor(memberships: List<GroupMembership>): LoginSignupScreenState =
         if (memberships.isEmpty()) LoginSignupScreenState.ZeroGroups else LoginSignupScreenState.Content
 
-    /** Routes on `groupMemberships` per SPEC.md — organizer role → group-list, else personal-dashboard. */
+    /**
+     * Routes on `groupMemberships` per SPEC.md — an organizer in ANY group lands on the
+     * organizer-per-group hub (`organizer-dashboard`, whose `ui.yaml#entry_points` declare exactly
+     * this `app_launch` trigger gated on `isOrganizerInAnyGroup`); every other member lands on
+     * `personal-dashboard`. `group-list` stays reachable from the organizer hub's All-Groups
+     * quick-nav (`organizer-dashboard#onNavigateToGroupList`) and from `personal-dashboard`.
+     */
     private fun routeEvent(memberships: List<GroupMembership>): LoginSignupEvent? = when {
         memberships.isEmpty() -> null
-        memberships.any { it.role == GroupRole.ORGANIZER } -> LoginSignupEvent.NavigateToGroupList
+        memberships.any { it.role == GroupRole.ORGANIZER } -> LoginSignupEvent.NavigateToOrganizerDashboard
         else -> LoginSignupEvent.NavigateToPersonalDashboard
     }
 

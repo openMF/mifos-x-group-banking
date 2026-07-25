@@ -30,6 +30,7 @@ fun NavController.navigateToLoginSignup(navOptions: NavOptions? = null) = naviga
  */
 fun NavGraphBuilder.loginSignupScreen(
     onNavigateToPersonalDashboard: () -> Unit,
+    onNavigateToOrganizerDashboard: () -> Unit,
     onNavigateToGroupList: () -> Unit,
     onNavigateToGroupTypePicker: () -> Unit,
     onNavigateToJoinWithCode: () -> Unit,
@@ -37,6 +38,7 @@ fun NavGraphBuilder.loginSignupScreen(
     composableWithRootPushTransitions<LoginSignupRoute> {
         LoginSignupScreen(
             onNavigateToPersonalDashboard = onNavigateToPersonalDashboard,
+            onNavigateToOrganizerDashboard = onNavigateToOrganizerDashboard,
             onNavigateToGroupList = onNavigateToGroupList,
             onNavigateToGroupTypePicker = onNavigateToGroupTypePicker,
             onNavigateToJoinWithCode = onNavigateToJoinWithCode,

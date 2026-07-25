@@ -94,6 +94,7 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 @Composable
 internal fun LoginSignupScreen(
     onNavigateToPersonalDashboard: () -> Unit,
+    onNavigateToOrganizerDashboard: () -> Unit,
     onNavigateToGroupList: () -> Unit,
     onNavigateToGroupTypePicker: () -> Unit,
     onNavigateToJoinWithCode: () -> Unit,
@@ -107,6 +108,7 @@ internal fun LoginSignupScreen(
     EventsEffect(viewModel) { event ->
         when (event) {
             LoginSignupEvent.NavigateToPersonalDashboard -> onNavigateToPersonalDashboard()
+            LoginSignupEvent.NavigateToOrganizerDashboard -> onNavigateToOrganizerDashboard()
             LoginSignupEvent.NavigateToGroupList -> onNavigateToGroupList()
             LoginSignupEvent.NavigateToGroupTypePicker -> onNavigateToGroupTypePicker()
             LoginSignupEvent.NavigateToJoinWithCode -> onNavigateToJoinWithCode()

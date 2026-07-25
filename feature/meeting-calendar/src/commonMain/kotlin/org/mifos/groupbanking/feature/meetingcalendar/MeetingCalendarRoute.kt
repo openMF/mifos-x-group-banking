@@ -37,16 +37,25 @@ fun NavController.navigateToMeetingCalendar(centerId: Int, navOptions: NavOption
  * not-yet-generated-target convention. See API.md#route.
  */
 fun NavGraphBuilder.meetingCalendarScreen(
-    onNavigateToConduct: (meetingId: String, meetingNumber: Int) -> Unit,
-    onNavigateToReview: (meetingId: String, meetingNumber: Int) -> Unit,
+    onNavigateToConduct: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
+    onNavigateToReview: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composableWithPushTransitions<MeetingCalendarRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<MeetingCalendarRoute>()
         MeetingCalendarScreen(
             centerId = route.centerId,
-            onNavigateToConduct = onNavigateToConduct,
-            onNavigateToReview = onNavigateToReview,
+            // The screen's `MeetingCalendarEvent` carries only (meetingId, meetingNumber); the
+            // host targets (`meeting-conduct` / `previous-meeting-review`) are additionally keyed
+            // by `centerId`, which this destination already holds as `route.centerId`. Forward it
+            // here so the caller (the NavHost) gets the full nav-arg set without the screen having
+            // to re-thread a param it never had — resolves the prior `centerId = 0` drift bridge.
+            onNavigateToConduct = { meetingId, meetingNumber ->
+                onNavigateToConduct(meetingId, meetingNumber, route.centerId)
+            },
+            onNavigateToReview = { meetingId, meetingNumber ->
+                onNavigateToReview(meetingId, meetingNumber, route.centerId)
+            },
             onNavigateBack = onNavigateBack,
         )
     }
