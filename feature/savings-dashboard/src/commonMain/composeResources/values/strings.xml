@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_savings_dashboard_screen_title">Savings</string>
+
+    <string name="screens_savings_dashboard_tab_group">Group Savings</string>
+    <string name="screens_savings_dashboard_tab_individual">Individual</string>
+
+    <string name="screens_savings_dashboard_last_synced_format">Last synced: %1$s</string>
+
+    <string name="screens_savings_dashboard_group_trend_title">Weekly Group Contributions</string>
+    <string name="screens_savings_dashboard_individual_trend_title">Weekly Individual Contributions</string>
+    <string name="screens_savings_dashboard_trend_empty">No contribution trend yet</string>
+    <string name="screens_savings_dashboard_group_trend_cd">Weekly group contributions bar chart</string>
+    <string name="screens_savings_dashboard_individual_trend_cd">Weekly individual contributions line chart</string>
+
+    <string name="screens_savings_dashboard_cycle_progress_label">Cycle Progress</string>
+    <string name="screens_savings_dashboard_cycle_progress_shares_format">%1$s shares of %2$s target</string>
+    <string name="screens_savings_dashboard_cycle_progress_amount_format">KES %1$s of KES %2$s</string>
+    <string name="screens_savings_dashboard_cycle_progress_percent_format">%1$s%% of cycle target</string>
+    <string name="screens_savings_dashboard_cycle_progress_cd">Cycle progress %1$s percent</string>
+
+    <string name="screens_savings_dashboard_group_total_chip_format">Group total: KES %1$s</string>
+
+    <string name="screens_savings_dashboard_total_individual_label">Total Individual Balances</string>
+    <string name="screens_savings_dashboard_individual_total_amount_format">KES %1$s</string>
+
+    <string name="screens_savings_dashboard_avatar_cd_format">%1$s\'s avatar</string>
+
+    <string name="screens_savings_dashboard_member_shares_format">%1$d shares @ KES %2$s/share</string>
+    <string name="screens_savings_dashboard_member_meetings_format">%1$d meetings · Last: KES %2$s</string>
+    <string name="screens_savings_dashboard_member_amount_format">KES %1$s</string>
+    <string name="screens_savings_dashboard_member_label_share_value">share value</string>
+    <string name="screens_savings_dashboard_member_label_total">total</string>
+
+    <string name="screens_savings_dashboard_individual_last_txn_format">KES %1$s on %2$s</string>
+    <string name="screens_savings_dashboard_individual_balance_format">KES %1$s</string>
+    <string name="screens_savings_dashboard_individual_balance_label">balance</string>
+
+    <string name="screens_savings_dashboard_error_banner">Showing cached savings — pull down to retry</string>
+    <string name="screens_savings_dashboard_action_retry">Retry</string>
+
+    <string name="screens_savings_dashboard_empty_icon_cd">No savings data</string>
+    <string name="screens_savings_dashboard_empty_title">No Savings Data</string>
+    <string name="screens_savings_dashboard_empty_subtitle">Savings will appear after the first meeting is conducted</string>
+
+    <string name="screens_savings_dashboard_error_icon_cd">Could not load savings, tap Retry to try again</string>
+    <string name="screens_savings_dashboard_error_title">Could not load savings</string>
+    <string name="screens_savings_dashboard_error_group_not_found">Group not found.</string>
+    <string name="screens_savings_dashboard_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_savings_dashboard_error_offline">No internet. Showing cached savings data.</string>
+    <string name="screens_savings_dashboard_error_server">Server error. Please retry.</string>
+</resources>

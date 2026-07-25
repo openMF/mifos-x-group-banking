@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_share_out_preview_screen_title">Share-Out Preview</string>
+
+    <string name="screens_share_out_preview_cycle_label_format">Cycle %1$d — Distribution Preview</string>
+    <string name="screens_share_out_preview_preview_disclaimer">All calculations are preliminary. Confirm to proceed.</string>
+
+    <string name="screens_share_out_preview_total_corpus">Total Corpus (Fund)</string>
+    <string name="screens_share_out_preview_total_profit">Total Profit (Interest Earned)</string>
+    <string name="screens_share_out_preview_total_pool">Total Distribution Pool</string>
+    <string name="screens_share_out_preview_amount_kes_format">KES %1$s</string>
+
+    <string name="screens_share_out_preview_formula_prorata_shares">Formula: Pro-rata by shares held</string>
+    <string name="screens_share_out_preview_formula_prorata_savings">Formula: Pro-rata by savings</string>
+    <string name="screens_share_out_preview_formula_equal">Formula: Equal split</string>
+    <string name="screens_share_out_preview_formula_fixed_order">Formula: Fixed rotation order</string>
+    <string name="screens_share_out_preview_formula_lottery">Formula: Rotation by lottery</string>
+    <string name="screens_share_out_preview_formula_auction">Formula: Chit auction</string>
+    <string name="screens_share_out_preview_formula_unknown">Distribution formula</string>
+
+    <string name="screens_share_out_preview_col_member">Member</string>
+    <string name="screens_share_out_preview_col_shares">Shares</string>
+    <string name="screens_share_out_preview_col_savings">Savings</string>
+    <string name="screens_share_out_preview_col_share">Share %</string>
+    <string name="screens_share_out_preview_col_payout">Payout (KES)</string>
+    <string name="screens_share_out_preview_share_percent_format">%1$s%%</string>
+
+    <string name="screens_share_out_preview_next_recipient_label">Next Recipient</string>
+    <string name="screens_share_out_preview_your_position_label_format">Your position: %1$d</string>
+    <string name="screens_share_out_preview_payout_amount_label">Payout Amount</string>
+
+    <string name="screens_share_out_preview_confirm_button">Confirm &amp; Proceed to Execute</string>
+    <string name="screens_share_out_preview_retry_button">Retry</string>
+
+    <string name="screens_share_out_preview_error_title">Could not compute distribution</string>
+    <string name="screens_share_out_preview_error_network">No internet. Showing cached data.</string>
+    <string name="screens_share_out_preview_error_server">Server error. Please try again.</string>
+    <string name="screens_share_out_preview_error_insufficient_data">Insufficient data to compute distribution.</string>
+    <string name="screens_share_out_preview_error_auth">Session expired. Please log in again.</string>
+
+    <string name="screens_share_out_preview_a11y_top_bar">Share-Out Preview top bar</string>
+    <string name="screens_share_out_preview_a11y_back_button">Navigate back to group dashboard</string>
+    <string name="screens_share_out_preview_a11y_refresh_action">Refresh distribution calculation</string>
+    <string name="screens_share_out_preview_a11y_formula_chip">Distribution formula in use</string>
+    <string name="screens_share_out_preview_a11y_payout_table">Per-member payout breakdown table</string>
+    <string name="screens_share_out_preview_a11y_rotation_card">Rotation payout preview card</string>
+    <string name="screens_share_out_preview_a11y_confirm_button">Confirm distribution and proceed to execute</string>
+    <string name="screens_share_out_preview_a11y_shimmer_loading">Loading distribution preview</string>
+    <string name="screens_share_out_preview_a11y_error_state">Distribution preview error</string>
+    <string name="screens_share_out_preview_a11y_retry_button">Retry distribution preview calculation</string>
+</resources>

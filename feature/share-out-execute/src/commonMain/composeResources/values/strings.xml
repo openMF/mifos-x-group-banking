@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_share_out_execute_screen_title_shareout">Execute Share-Out</string>
+    <string name="screens_share_out_execute_screen_title_rotation">Execute Rotation Payout</string>
+
+    <string name="screens_share_out_execute_total_pool_label">Total Distribution Pool</string>
+    <string name="screens_share_out_execute_amount_kes_format">KES %1$s</string>
+    <string name="screens_share_out_execute_summary_one_recipient">1 recipient (rotation)</string>
+    <string name="screens_share_out_execute_summary_members_to_receive">members to receive payouts</string>
+
+    <string name="screens_share_out_execute_header_member_payouts">Member Payouts</string>
+    <string name="screens_share_out_execute_header_rotation_payout">Rotation Payout</string>
+    <string name="screens_share_out_execute_member_share_format">KES %1$s (%2$s%%)</string>
+
+    <string name="screens_share_out_execute_offline_info_banner">You are offline. Share-out will be queued and executed automatically when you reconnect.</string>
+
+    <string name="screens_share_out_execute_confirm_shareout_title">Confirm Share-Out</string>
+    <string name="screens_share_out_execute_confirm_shareout_body">This action is irreversible. Type "SHARE OUT" below or use biometric authentication to confirm.</string>
+    <string name="screens_share_out_execute_confirmation_field_label">Confirmation</string>
+    <string name="screens_share_out_execute_confirmation_field_placeholder">Type "SHARE OUT"</string>
+    <string name="screens_share_out_execute_confirmation_field_error">Must type exactly "SHARE OUT"</string>
+    <string name="screens_share_out_execute_biometric_button">Use Biometric Instead</string>
+
+    <string name="screens_share_out_execute_rotation_paying_out_to">Paying out to</string>
+    <string name="screens_share_out_execute_rotation_amount_label">Amount</string>
+
+    <string name="screens_share_out_execute_execute_button_shareout">Execute Share-Out</string>
+    <string name="screens_share_out_execute_execute_button_rotation">Execute Rotation Payout</string>
+
+    <string name="screens_share_out_execute_progress_format">%1$d of %2$d payouts completed</string>
+
+    <string name="screens_share_out_execute_success_title_shareout">Share-Out Complete!</string>
+    <string name="screens_share_out_execute_success_title_rotation">Rotation Payout Complete!</string>
+    <string name="screens_share_out_execute_success_body_format">KES %1$s distributed to %2$d members successfully.</string>
+
+    <string name="screens_share_out_execute_partial_title">Partial Completion</string>
+    <string name="screens_share_out_execute_partial_body_format">%1$d of %2$d payouts succeeded. %3$d failed. Tap Retry to re-attempt.</string>
+
+    <string name="screens_share_out_execute_queued_title">Queued for Sync</string>
+    <string name="screens_share_out_execute_queued_body_format">%1$d payouts queued. They will be processed automatically when you reconnect.</string>
+
+    <string name="screens_share_out_execute_done_button">Done</string>
+    <string name="screens_share_out_execute_retry_button">Retry Failed Payouts</string>
+
+    <string name="screens_share_out_execute_error_confirmation_required">Please type "SHARE OUT" or use biometric to confirm.</string>
+    <string name="screens_share_out_execute_error_server">Server error. Please try again.</string>
+    <string name="screens_share_out_execute_error_auth">Session expired. Please log in again.</string>
+    <string name="screens_share_out_execute_error_forbidden">You do not have permission to execute this share-out.</string>
+    <string name="screens_share_out_execute_error_shareout_already_done">This share-out has already been executed for this cycle.</string>
+    <string name="screens_share_out_execute_error_validation">Some payout details are invalid. Please review and try again.</string>
+    <string name="screens_share_out_execute_error_partial">Some payouts failed. Tap Retry to re-attempt the failed members.</string>
+    <string name="screens_share_out_execute_error_queued_offline">You are offline. Payout will execute automatically when you reconnect.</string>
+    <string name="screens_share_out_execute_error_biometric_unavailable">Biometric unavailable. Type "SHARE OUT" to confirm instead.</string>
+    <string name="screens_share_out_execute_error_biometric_failed">Biometric authentication failed. Type "SHARE OUT" to confirm instead.</string>
+
+    <string name="screens_share_out_execute_biometric_reason">Confirm the irreversible share-out distribution</string>
+
+    <string name="screens_share_out_execute_a11y_back">Navigate back to share-out preview</string>
+    <string name="screens_share_out_execute_a11y_confirmation_field">Confirmation phrase input field</string>
+    <string name="screens_share_out_execute_a11y_biometric_button">Confirm using biometric authentication</string>
+    <string name="screens_share_out_execute_a11y_execute_button">Execute the share-out distribution</string>
+    <string name="screens_share_out_execute_a11y_retry_button">Retry failed payouts</string>
+    <string name="screens_share_out_execute_a11y_done_button">Done, return to group dashboard</string>
+</resources>

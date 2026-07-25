@@ -66,6 +66,8 @@ import org.mifos.groupbanking.core.data.repository.MemberRepository
 import org.mifos.groupbanking.core.data.repository.MemberRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.SavingsRepository
 import org.mifos.groupbanking.core.data.repository.SavingsRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.ShareOutRepository
+import org.mifos.groupbanking.core.data.repository.ShareOutRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.SyncManager
 import org.mifos.groupbanking.core.data.repository.SyncManagerImpl
 import org.mifos.groupbanking.core.data.repository.SyncQueueRepository
@@ -297,6 +299,14 @@ val DataModule = module {
     // never .asScreenStream()/.write() — same branch as AuthRepository/InvitationRepository/
     // GroupCreateRepository/MemberAddRepository/LoanApplyRepository above.
     single<SavingsRepository> { SavingsRepositoryImpl(api = get()) }
+
+    // share-out-preview + share-out-execute — wraps ShareOutApi (NetworkModule) for the companion
+    // read GET /companion/groups/{groupId}/shareout/preview (COMP-DIST-001) AND the two execute
+    // writes POST .../shareout/execute (COMP-DIST-001) + .../rotation/execute (COMP-DIST-002).
+    // Store5-free today (no AppStoreRegistry entry yet — SP-03 kmp-store-gen has not run). Surfaces
+    // NetworkResult, never .asScreenStream(); the execute writes reuse the shared SyncQueueRepository
+    // for the offline enqueue seam — same branch as LoanRequestRepository above.
+    single<ShareOutRepository> { ShareOutRepositoryImpl(api = get(), syncQueueRepository = get()) }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

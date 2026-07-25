@@ -59,10 +59,18 @@ import org.mifos.groupbanking.feature.loanrepaymentdialog.LoanRepaymentDialog
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupRoute
 import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
+import org.mifos.groupbanking.feature.membersavingsdetail.memberSavingsDetailScreen
+import org.mifos.groupbanking.feature.membersavingsdetail.navigateToMemberSavingsDetail
 import org.mifos.groupbanking.feature.personaldashboard.navigateToPersonalDashboard
 import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
+import org.mifos.groupbanking.feature.savingsdashboard.navigateToSavingsDashboard
+import org.mifos.groupbanking.feature.savingsdashboard.savingsDashboardScreen
 import org.mifos.groupbanking.feature.settings.settingsScreen
 import org.mifos.groupbanking.feature.settingslogoutdialog.SettingsLogoutDialog
+import org.mifos.groupbanking.feature.shareoutexecute.navigateToShareOutExecute
+import org.mifos.groupbanking.feature.shareoutexecute.shareOutExecuteScreen
+import org.mifos.groupbanking.feature.shareoutpreview.navigateToShareOutPreview
+import org.mifos.groupbanking.feature.shareoutpreview.shareOutPreviewScreen
 
 /**
  * App-level NavHost for the mifos-x group-banking journey.
@@ -194,10 +202,67 @@ fun GroupBankingNavHost(
                     onNavigateToLoanList = { groupId ->
                         navController.navigateToLoanList(groupId = groupId.toLongOrNull() ?: 0L)
                     },
-                    // TODO(nav): replace when share-out feature is implemented
-                    onNavigateToShareOut = { _, _ -> navController.navigateToPlaceholder("Share-out") },
-                    // TODO(nav): replace when member-savings-detail feature is implemented
-                    onNavigateToMemberSavingsDetail = { navController.navigateToPlaceholder("Member savings") },
+                    // group-dashboard `Share Out (cycle-end action)` → share-out-preview
+                    // (`idea-layer/screens/share-out-preview/ui.yaml#entry_points[0]`). This seam
+                    // supplies only groupId (the catalogue GroupTypeConfig is not held here — same
+                    // drift ShareOutPreviewRoute's "drift bridge" KDoc documents); navigate by
+                    // groupId alone, the companion preview response drives poolModel/shareoutFormula.
+                    onNavigateToShareOut = { groupId, _ -> navController.navigateToShareOutPreview(groupId = groupId) },
+                    // group-dashboard `OnViewSavings` → the group-level savings-dashboard
+                    // (`idea-layer/screens/savings-dashboard/ui.yaml#entry_points[0]`: "OnViewSavings
+                    // (all roles)"), NOT member-savings-detail. GroupDashboardViewModel emits this as
+                    // `NavigateToMemberSavingsDetail(groupId)` carrying only groupId (a flagged
+                    // idea-layer drift, see that VM's KDoc + SavingsDashboardRoute KDoc "drift
+                    // bridge"): the catalogue GroupTypeConfig this screen's nav_params want is not
+                    // available at this seam, so we navigate by groupId alone.
+                    onNavigateToMemberSavingsDetail = { groupId ->
+                        navController.navigateToSavingsDashboard(groupId = groupId)
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 7a. savings-dashboard → member-savings-detail (member-row tap) / back.
+                savingsDashboardScreen(
+                    onNavigateToMemberDetail = { memberId, groupId, typeConfig ->
+                        navController.navigateToMemberSavingsDetail(
+                            memberId = memberId,
+                            groupId = groupId,
+                            typeConfig = typeConfig,
+                        )
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 7b. member-savings-detail → back (terminal read-only leaf, reached from
+                // savings-dashboard's per-member rows; its feature module already exists).
+                memberSavingsDetailScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 7c. share-out-preview → share-out-execute (confirm) / back. Reached from
+                // group-dashboard's `Share Out (cycle-end action)`. The confirm handoff now wires to
+                // the REAL share-out-execute feature module (COMP-DIST-001/002 irreversible execute).
+                shareOutPreviewScreen(
+                    onNavigateToShareOutExecute = { groupId, typeConfig, totalPool, memberPayouts ->
+                        navController.navigateToShareOutExecute(
+                            groupId = groupId,
+                            typeConfig = typeConfig,
+                            totalPool = totalPool,
+                            memberPayouts = memberPayouts,
+                        )
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 7d. share-out-execute → group-dashboard (done) / back to share-out-preview.
+                shareOutExecuteScreen(
+                    // Only organizer/treasurer/chairperson roles can reach execute (entry gate on
+                    // share-out-preview), so returning to the dashboard as ORGANIZER matches the
+                    // existing group-create/join return convention above; the dashboard re-resolves
+                    // the authoritative viewerRole server-side on load.
+                    onNavigateToGroupDashboard = { groupId ->
+                        navController.navigateToGroupDashboard(groupId = groupId, viewerRole = "ORGANIZER")
+                    },
                     onNavigateBack = { navController.popBackStack() },
                 )
 

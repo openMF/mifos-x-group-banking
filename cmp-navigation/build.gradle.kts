@@ -56,6 +56,8 @@ kotlin {
             implementation(projects.feature.personalSavings) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.memberSavingsDetail) // <- added by kmp-viewmodel-gen
             implementation(projects.feature.savingsDashboard) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.shareOutPreview) // <- added by kmp-viewmodel-gen
+            implementation(projects.feature.shareOutExecute) // <- added by kmp-viewmodel-gen
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

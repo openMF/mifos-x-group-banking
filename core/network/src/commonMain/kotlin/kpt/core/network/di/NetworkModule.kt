@@ -72,8 +72,11 @@ import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileAp
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
 import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
 import org.mifos.groupbanking.core.network.config.SavingsApiConfig
+import org.mifos.groupbanking.core.network.config.ShareOutApiConfig
 import org.mifos.groupbanking.core.network.service.savings.SavingsApi
 import org.mifos.groupbanking.core.network.service.savings.SavingsApiImpl
+import org.mifos.groupbanking.core.network.service.shareout.ShareOutApi
+import org.mifos.groupbanking.core.network.service.shareout.ShareOutApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
@@ -318,4 +321,13 @@ val NetworkModule = module {
     // is registered in RepositoryModule.kt.
     single<SavingsApiConfig> { SavingsApiConfig() }
     single<SavingsApi> { SavingsApiImpl(httpClient = get()) }
+
+    // share-out-preview companion read (get_shareout_preview — COMP-DIST-001 preview,
+    // GET /companion/groups/{groupId}/shareout/preview). Reuses the shared HttpClient singleton
+    // above (same companion host, no second engine). The config binding is registered for
+    // override-surface symmetry with SavingsApiConfig even though the shared client dispatches the
+    // request. The Repository consuming ShareOutApi (Store5-free today — no AppStoreRegistry entry
+    // yet, pending a future kmp-store-gen ShareOutStore) is registered in RepositoryModule.kt.
+    single<ShareOutApiConfig> { ShareOutApiConfig() }
+    single<ShareOutApi> { ShareOutApiImpl(httpClient = get()) }
 }
