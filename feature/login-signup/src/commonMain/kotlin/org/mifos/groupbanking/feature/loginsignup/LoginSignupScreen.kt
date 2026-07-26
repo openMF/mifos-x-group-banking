@@ -70,6 +70,9 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_email_phone_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_email_phone_label
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_email_phone_placeholder
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_identifier_cd
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_identifier_label
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_identifier_placeholder
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_name_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_name_label
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_name_placeholder
@@ -82,6 +85,7 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_sign_in_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_title
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_email_phone_invalid
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_identifier_invalid
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_name_required
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_password_weak
 
@@ -217,15 +221,34 @@ internal fun AuthFormSection(
                     Spacer(Modifier.height(sp.sm))
                 }
 
+                val isLoginMode = state.mode == AuthMode.Login
                 AuthTextField(
                     value = state.emailPhone,
-                    label = stringResource(Res.string.screens_login_signup_field_email_phone_label),
-                    placeholder = stringResource(Res.string.screens_login_signup_field_email_phone_placeholder),
+                    label = stringResource(
+                        if (isLoginMode) {
+                            Res.string.screens_login_signup_field_identifier_label
+                        } else {
+                            Res.string.screens_login_signup_field_email_phone_label
+                        },
+                    ),
+                    placeholder = stringResource(
+                        if (isLoginMode) {
+                            Res.string.screens_login_signup_field_identifier_placeholder
+                        } else {
+                            Res.string.screens_login_signup_field_email_phone_placeholder
+                        },
+                    ),
                     onValueChange = { onAction(LoginSignupAction.OnEmailPhoneChange(it)) },
                     enabled = !isLoading,
-                    keyboardType = KeyboardType.Email,
+                    keyboardType = if (isLoginMode) KeyboardType.Text else KeyboardType.Email,
                     errorMessage = state.validationErrors["emailPhone"]?.let { validationMessage(it) },
-                    contentDescription = stringResource(Res.string.screens_login_signup_field_email_phone_cd),
+                    contentDescription = stringResource(
+                        if (isLoginMode) {
+                            Res.string.screens_login_signup_field_identifier_cd
+                        } else {
+                            Res.string.screens_login_signup_field_email_phone_cd
+                        },
+                    ),
                     modifier = Modifier.testTag(LoginSignupTestTags.FIELD_EMAIL_PHONE),
                 )
                 Spacer(Modifier.height(sp.sm))
@@ -380,6 +403,7 @@ private fun LoginSignupError.resolvedMessage(): String = when (this) {
 private fun validationMessage(errorKey: String): String = when (errorKey) {
     "error_name_required" -> stringResource(Res.string.screens_login_signup_validation_name_required)
     "error_email_phone_invalid" -> stringResource(Res.string.screens_login_signup_validation_email_phone_invalid)
+    "error_identifier_invalid" -> stringResource(Res.string.screens_login_signup_validation_identifier_invalid)
     "error_password_weak" -> stringResource(Res.string.screens_login_signup_validation_password_weak)
     else -> stringResource(Res.string.screens_login_signup_validation_email_phone_invalid)
 }

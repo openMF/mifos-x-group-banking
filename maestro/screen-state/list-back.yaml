@@ -23,7 +23,7 @@
 #
 # Executed on device by /device-test or manually via:
 #   maestro test maestro/screen-state/list-back.yaml
-appId: org.mifos.kmp.template
+appId: org.mifos.groupbanking
 name: screen-state — list ↔ detail ↔ back retention
 tags:
   - screen-state

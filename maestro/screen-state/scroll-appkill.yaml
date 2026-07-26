@@ -24,7 +24,7 @@
 # read completed AFTER the initial LazyListState was already handed to the
 # LazyColumn (restore-ordering bug — the read-before-collect serial ordering
 # in `RetainedScreenState.kt` LaunchedEffect must hold).
-appId: org.mifos.kmp.template
+appId: org.mifos.groupbanking
 name: screen-state — scroll survives killApp + relaunch
 tags:
   - screen-state

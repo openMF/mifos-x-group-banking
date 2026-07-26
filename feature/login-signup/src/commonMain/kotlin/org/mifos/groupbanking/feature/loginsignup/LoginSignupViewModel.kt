@@ -36,6 +36,8 @@ private const val MIN_NAME_LENGTH = 2
 private const val MIN_PASSWORD_LENGTH_SIGNUP = 8
 private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 private val E164_PHONE_REGEX = Regex("^\\+[1-9]\\d{6,14}$")
+// Sign-in also accepts a username: 3-30 chars, starts alphanumeric, then letters/digits/._-
+private val USERNAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{2,29}$")
 
 /**
  * LOGIN or SIGNUP mode toggle — drives which of [LoginSignupState]'s field set is visible.
@@ -295,7 +297,8 @@ internal class LoginSignupViewModel(
 
     private fun handleLoginTap() {
         val errors = buildMap {
-            validateEmailPhone(state.emailPhone)?.let { put("emailPhone", it) }
+            // Sign-in accepts email, phone OR username (RULE-GAP-IDEA-FIRST: login-signup ui.yaml#login_identifier_field)
+            validateSignInIdentifier(state.emailPhone)?.let { put("emailPhone", it) }
             validatePassword(state.password, requireStrong = false)?.let { put("password", it) }
         }
         if (errors.isNotEmpty()) {
@@ -571,6 +574,13 @@ private fun NetworkError.toLoginSignupError(context: AuthErrorContext): LoginSig
 
 private fun isValidEmailOrPhone(value: String): Boolean =
     EMAIL_REGEX.matches(value) || E164_PHONE_REGEX.matches(value)
+
+// Sign-in identifier accepts email OR E.164 phone OR username (see USERNAME_REGEX).
+private fun isValidSignInIdentifier(value: String): Boolean =
+    isValidEmailOrPhone(value) || USERNAME_REGEX.matches(value)
+
+private fun validateSignInIdentifier(value: String): String? =
+    if (value.isBlank() || !isValidSignInIdentifier(value)) "error_identifier_invalid" else null
 
 private fun validateName(name: String): String? =
     if (name.trim().length < MIN_NAME_LENGTH) "error_name_required" else null

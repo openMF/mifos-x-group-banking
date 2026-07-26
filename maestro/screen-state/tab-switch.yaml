@@ -17,7 +17,7 @@
 # in-memory state-holder mechanism; feature modules carry zero retention code.
 #
 # Verified on physical device (OPPO CPH2423, Android 15) 2026-07-06.
-appId: org.mifos.kmp.template.demo.debug
+appId: org.mifos.groupbanking.demo.debug
 name: screen-state — bottom-nav tab switch retains Home scroll position
 tags:
   - screen-state

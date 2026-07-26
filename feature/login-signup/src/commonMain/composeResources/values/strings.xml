@@ -13,6 +13,9 @@
     <string name="screens_login_signup_field_email_phone_label">Email or Phone</string>
     <string name="screens_login_signup_field_email_phone_placeholder">email@example.com or +254700000000</string>
     <string name="screens_login_signup_field_email_phone_cd">Email or phone number input</string>
+    <string name="screens_login_signup_field_identifier_label">Email, Phone or Username</string>
+    <string name="screens_login_signup_field_identifier_placeholder">username, email or +254700000000</string>
+    <string name="screens_login_signup_field_identifier_cd">Email, phone or username input</string>
 
     <string name="screens_login_signup_field_password_label">Password</string>
     <string name="screens_login_signup_field_password_placeholder_login">Your password</string>
@@ -54,6 +57,7 @@
 
     <string name="screens_login_signup_validation_name_required">Full name is required.</string>
     <string name="screens_login_signup_validation_email_phone_invalid">Enter a valid email address or phone number.</string>
+    <string name="screens_login_signup_validation_identifier_invalid">Enter a valid email, phone number, or username.</string>
     <string name="screens_login_signup_validation_password_weak">Password must be at least 8 characters.</string>
 
     <string name="screens_login_signup_forgot_password_snackbar">To reset your password, use the web portal or contact your group organizer.</string>

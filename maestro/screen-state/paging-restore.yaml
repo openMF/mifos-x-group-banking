@@ -27,7 +27,7 @@
 #
 # testTags sourced from `feature/crypto/.../ui/TestTags.kt` (flat `LIST` /
 # `ROW` for Phase-04 back-compat).
-appId: org.mifos.kmp.template
+appId: org.mifos.groupbanking
 name: screen-state — CoinMarkets deep-scroll + cursor survives killApp
 tags:
   - screen-state
