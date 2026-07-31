@@ -34,6 +34,18 @@ object PersonalDashboardTestTags {
     /** Savings summary card — [PersonalDashboardAction.OnSavingsCardClick]. */
     const val SAVINGS_CARD: String = "personal_dashboard_savings_card"
 
+    /** Loan entry card — [PersonalDashboardAction.OnLoansCardClick] (navigates to personal-loans). */
+    const val LOAN_CARD: String = "personal_dashboard_loan_card"
+
+    /** Profile / overflow menu icon-button — opens the Settings / Sync Status dropdown. */
+    const val OVERFLOW_MENU: String = "personal_dashboard_overflow_menu"
+
+    /** "Settings" item in the profile overflow menu — [PersonalDashboardAction.OnSettingsClick]. */
+    const val MENU_SETTINGS_ITEM: String = "personal_dashboard_menu_settings"
+
+    /** "Sync Status" item in the profile overflow menu — [PersonalDashboardAction.OnSyncStatusClick]. */
+    const val MENU_SYNC_STATUS_ITEM: String = "personal_dashboard_menu_sync_status"
+
     /** Pool-model-adaptive share-out / rotation-position projection card. */
     const val SHAREOUT_CARD: String = "personal_dashboard_shareout_card"
 

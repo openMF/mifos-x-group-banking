@@ -27,16 +27,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.GroupOff
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +63,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.groupbanking.core.model.GroupSummary
 import org.mifos.groupbanking.feature.personaldashboard.components.GroupSelectorChipRow
+import org.mifos.groupbanking.feature.personaldashboard.components.LoanSummaryCard
 import org.mifos.groupbanking.feature.personaldashboard.components.RecentActivityRow
 import org.mifos.groupbanking.feature.personaldashboard.components.SavingsSummaryCard
 import org.mifos.groupbanking.feature.personaldashboard.components.ShareoutProjectionCard
@@ -69,8 +78,11 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_greeting_afternoon
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_greeting_evening
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_greeting_morning
+import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_menu_settings
+import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_menu_sync_status
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_no_group_label
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_notification_icon_cd
+import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_overflow_menu_cd
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_recent_activity_title
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_retry_action
 
@@ -91,6 +103,9 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
 internal fun PersonalDashboardScreen(
     onNavigateToSavings: (clientId: Long, groupLinkedSavingsId: Long, individualSavingsId: Long?, poolModel: String) -> Unit,
     onNavigateToGroupList: () -> Unit,
+    onNavigateToLoans: (clientId: Long) -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToSyncStatus: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PersonalDashboardViewModel = koinViewModel(),
 ) {
@@ -105,6 +120,9 @@ internal fun PersonalDashboardScreen(
                 event.poolModel,
             )
             PersonalDashboardEvent.NavigateToGroupList -> onNavigateToGroupList()
+            is PersonalDashboardEvent.NavigateToLoans -> onNavigateToLoans(event.clientId)
+            PersonalDashboardEvent.NavigateToSettings -> onNavigateToSettings()
+            PersonalDashboardEvent.NavigateToSyncStatus -> onNavigateToSyncStatus()
         }
     }
 
@@ -139,6 +157,11 @@ internal fun PersonalDashboardContent(
     }
     val greeting = stringResource(greetingKey, state.memberName)
 
+    // Profile / overflow menu callbacks (`ui.yaml#components.top_bar.overflow_menu`) — reachable
+    // from every screenState's top section so Settings / Sync Status are always one tap away.
+    val onOpenSettings = { onAction(PersonalDashboardAction.OnSettingsClick) }
+    val onOpenSyncStatus = { onAction(PersonalDashboardAction.OnSyncStatusClick) }
+
     KptScaffold(
         showNavigationIcon = false,
         pullToRefreshState = rememberKptPullToRefreshState(
@@ -149,20 +172,32 @@ internal fun PersonalDashboardContent(
         modifier = modifier.testTag(PersonalDashboardTestTags.SCREEN),
     ) {
         when (state.screenState) {
-            PersonalDashboardScreenState.Loading -> PersonalDashboardLoadingSection(greeting = greeting)
+            PersonalDashboardScreenState.Loading -> PersonalDashboardLoadingSection(
+                greeting = greeting,
+                onOpenSettings = onOpenSettings,
+                onOpenSyncStatus = onOpenSyncStatus,
+            )
 
             PersonalDashboardScreenState.Content -> PersonalDashboardContentSection(
                 state = state,
                 greeting = greeting,
                 onAction = onAction,
+                onOpenSettings = onOpenSettings,
+                onOpenSyncStatus = onOpenSyncStatus,
             )
 
-            PersonalDashboardScreenState.Empty -> PersonalDashboardEmptySection(greeting = greeting)
+            PersonalDashboardScreenState.Empty -> PersonalDashboardEmptySection(
+                greeting = greeting,
+                onOpenSettings = onOpenSettings,
+                onOpenSyncStatus = onOpenSyncStatus,
+            )
 
             PersonalDashboardScreenState.Error -> PersonalDashboardErrorSection(
                 greeting = greeting,
                 groupName = state.selectedGroup?.name.orEmpty(),
                 onRetry = { onAction(PersonalDashboardAction.OnRetry) },
+                onOpenSettings = onOpenSettings,
+                onOpenSyncStatus = onOpenSyncStatus,
             )
         }
     }
@@ -182,6 +217,8 @@ internal fun PersonalDashboardTopSection(
     groups: List<GroupSummary>,
     selectedGroupId: String?,
     onGroupSelected: (String) -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -206,6 +243,10 @@ internal fun PersonalDashboardTopSection(
                     contentDescription = notificationCd,
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.testTag(PersonalDashboardTestTags.NOTIFICATION_ICON),
+                )
+                PersonalDashboardOverflowMenu(
+                    onOpenSettings = onOpenSettings,
+                    onOpenSyncStatus = onOpenSyncStatus,
                 )
             }
             Column(
@@ -251,12 +292,69 @@ internal fun PersonalDashboardTopSection(
 }
 
 /**
+ * Profile / overflow menu — `ui.yaml#components.top_bar.overflow_menu`. A [MoreVert] [IconButton]
+ * that opens a [DropdownMenu] with `Settings` ([onOpenSettings] →
+ * [PersonalDashboardAction.OnSettingsClick]) and `Sync Status` ([onOpenSyncStatus] →
+ * [PersonalDashboardAction.OnSyncStatusClick]) items — the in-app affordance that makes the shared
+ * `settings` + `sync-status` screens reachable from the authenticated member home. See API.md#screen.
+ */
+@Composable
+internal fun PersonalDashboardOverflowMenu(
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val menuCd = stringResource(Res.string.screens_personal_dashboard_overflow_menu_cd)
+    val settingsLabel = stringResource(Res.string.screens_personal_dashboard_menu_settings)
+    val syncStatusLabel = stringResource(Res.string.screens_personal_dashboard_menu_sync_status)
+
+    Box(modifier = modifier) {
+        IconButton(
+            onClick = { expanded = true },
+            modifier = Modifier.testTag(PersonalDashboardTestTags.OVERFLOW_MENU),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = menuCd,
+                tint = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(settingsLabel) },
+                leadingIcon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onOpenSettings()
+                },
+                modifier = Modifier.testTag(PersonalDashboardTestTags.MENU_SETTINGS_ITEM),
+            )
+            DropdownMenuItem(
+                text = { Text(syncStatusLabel) },
+                leadingIcon = { Icon(imageVector = Icons.Filled.Sync, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onOpenSyncStatus()
+                },
+                modifier = Modifier.testTag(PersonalDashboardTestTags.MENU_SYNC_STATUS_ITEM),
+            )
+        }
+    }
+}
+
+/**
  * `PersonalDashboardScreenState.Loading` — top section (group name blank on cold start, per
  * [PersonalDashboardState]'s declared `""`/`null` defaults) + 4 shimmering skeleton blocks,
  * mirroring `preview/loading.html`'s `shimmer_loading` (count: 4). See API.md#screen.
  */
 @Composable
-internal fun PersonalDashboardLoadingSection(greeting: String, modifier: Modifier = Modifier) {
+internal fun PersonalDashboardLoadingSection(
+    greeting: String,
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val sp = MaterialTheme.spacing
     Column(modifier = modifier.fillMaxSize().testTag(PersonalDashboardTestTags.LOADING_SECTION)) {
         PersonalDashboardTopSection(
@@ -266,6 +364,8 @@ internal fun PersonalDashboardLoadingSection(greeting: String, modifier: Modifie
             groups = emptyList(),
             selectedGroupId = null,
             onGroupSelected = {},
+            onOpenSettings = onOpenSettings,
+            onOpenSyncStatus = onOpenSyncStatus,
         )
         Column(
             modifier = Modifier.fillMaxWidth().padding(sp.lg),
@@ -299,6 +399,8 @@ internal fun PersonalDashboardContentSection(
     state: PersonalDashboardState,
     greeting: String,
     onAction: (PersonalDashboardAction) -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -313,6 +415,8 @@ internal fun PersonalDashboardContentSection(
                 groups = state.myGroups,
                 selectedGroupId = state.selectedGroup?.groupId,
                 onGroupSelected = { onAction(PersonalDashboardAction.OnSelectGroup(it)) },
+                onOpenSettings = onOpenSettings,
+                onOpenSyncStatus = onOpenSyncStatus,
             )
         }
         item {
@@ -321,6 +425,13 @@ internal fun PersonalDashboardContentSection(
                     groupLinkedBalance = state.groupLinkedSavingsBalance,
                     individualBalance = state.individualSavingsBalance,
                     onClick = { onAction(PersonalDashboardAction.OnSavingsCardClick) },
+                )
+            }
+        }
+        item {
+            Box(modifier = Modifier.fillMaxWidth().offset(y = -sp.md).padding(horizontal = sp.lg)) {
+                LoanSummaryCard(
+                    onClick = { onAction(PersonalDashboardAction.OnLoansCardClick) },
                 )
             }
         }
@@ -367,7 +478,12 @@ internal fun PersonalDashboardContentSection(
  * [PersonalDashboardViewModel]'s own documented `NavigateToGroupList` gap. See API.md#screen.
  */
 @Composable
-internal fun PersonalDashboardEmptySection(greeting: String, modifier: Modifier = Modifier) {
+internal fun PersonalDashboardEmptySection(
+    greeting: String,
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val sp = MaterialTheme.spacing
     val noGroupLabel = stringResource(Res.string.screens_personal_dashboard_no_group_label)
     val iconCd = stringResource(Res.string.screens_personal_dashboard_empty_icon_cd)
@@ -382,6 +498,8 @@ internal fun PersonalDashboardEmptySection(greeting: String, modifier: Modifier 
             groups = emptyList(),
             selectedGroupId = null,
             onGroupSelected = {},
+            onOpenSettings = onOpenSettings,
+            onOpenSyncStatus = onOpenSyncStatus,
         )
         Column(
             modifier = Modifier
@@ -422,6 +540,8 @@ internal fun PersonalDashboardErrorSection(
     greeting: String,
     groupName: String,
     onRetry: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSyncStatus: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -438,6 +558,8 @@ internal fun PersonalDashboardErrorSection(
             groups = emptyList(),
             selectedGroupId = null,
             onGroupSelected = {},
+            onOpenSettings = onOpenSettings,
+            onOpenSyncStatus = onOpenSyncStatus,
         )
         Column(
             modifier = Modifier

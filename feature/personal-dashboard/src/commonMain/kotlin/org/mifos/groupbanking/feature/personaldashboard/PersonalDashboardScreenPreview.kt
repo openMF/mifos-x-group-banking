@@ -126,6 +126,8 @@ private fun PersonalDashboardTopSectionPreview() {
             groups = previewGroups,
             selectedGroupId = previewGroups[0].groupId,
             onGroupSelected = {},
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
         )
     }
 }
@@ -134,7 +136,11 @@ private fun PersonalDashboardTopSectionPreview() {
 @Composable
 private fun PersonalDashboardLoadingSectionPreview() {
     KptTheme {
-        PersonalDashboardLoadingSection(greeting = "Good morning, Amina Wanjiru")
+        PersonalDashboardLoadingSection(
+            greeting = "Good morning, Amina Wanjiru",
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
+        )
     }
 }
 
@@ -154,6 +160,8 @@ private fun PersonalDashboardContentSectionAccumulatingPreview() {
             state = accumulatingState,
             greeting = "Good morning, Amina Wanjiru",
             onAction = {},
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
         )
     }
 }
@@ -166,6 +174,8 @@ private fun PersonalDashboardContentSectionRotatingPreview() {
             state = rotatingState,
             greeting = "Good afternoon, Joseph Kamau",
             onAction = {},
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
         )
     }
 }
@@ -174,7 +184,11 @@ private fun PersonalDashboardContentSectionRotatingPreview() {
 @Composable
 private fun PersonalDashboardEmptySectionPreview() {
     KptTheme {
-        PersonalDashboardEmptySection(greeting = "Good morning, Amina Wanjiru")
+        PersonalDashboardEmptySection(
+            greeting = "Good morning, Amina Wanjiru",
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
+        )
     }
 }
 
@@ -186,6 +200,8 @@ private fun PersonalDashboardErrorSectionPreview() {
             greeting = "Good morning, Amina Wanjiru",
             groupName = "Mwangaza Women's Group",
             onRetry = {},
+            onOpenSettings = {},
+            onOpenSyncStatus = {},
         )
     }
 }

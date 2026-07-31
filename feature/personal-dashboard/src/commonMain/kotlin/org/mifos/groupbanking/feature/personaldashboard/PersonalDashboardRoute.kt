@@ -41,17 +41,30 @@ fun NavController.navigateToPersonalDashboard(navOptions: NavOptions? = null) =
  *   this screen's canvas (see [PersonalDashboardViewModel] class KDoc "Idea-layer gap" note); the
  *   callback is still exposed here so the host wiring compiles and is ready the moment an
  *   idea-layer update adds the missing affordance.
+ * - [onNavigateToLoans] closes [PersonalDashboardEvent.NavigateToLoans]
+ *   (`ui.yaml#components.loan_card.on_click.target: personal-loans`) — carries the member's
+ *   `clientId` (the `personal-loans` nav_param) to the loans list. The un-deferred loan entry card.
+ * - [onNavigateToSettings] / [onNavigateToSyncStatus] close
+ *   [PersonalDashboardEvent.NavigateToSettings] / [PersonalDashboardEvent.NavigateToSyncStatus]
+ *   (`ui.yaml#components.top_bar.overflow_menu`) — the profile/overflow-menu entry points to the
+ *   shared `settings` + `sync-status` screens.
  *
  * See API.md#route.
  */
 fun NavGraphBuilder.personalDashboardScreen(
     onNavigateToSavings: (clientId: Long, groupLinkedSavingsId: Long, individualSavingsId: Long?, poolModel: String) -> Unit,
     onNavigateToGroupList: () -> Unit,
+    onNavigateToLoans: (clientId: Long) -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToSyncStatus: () -> Unit,
 ) {
     composableWithRootPushTransitions<PersonalDashboardRoute> {
         PersonalDashboardScreen(
             onNavigateToSavings = onNavigateToSavings,
             onNavigateToGroupList = onNavigateToGroupList,
+            onNavigateToLoans = onNavigateToLoans,
+            onNavigateToSettings = onNavigateToSettings,
+            onNavigateToSyncStatus = onNavigateToSyncStatus,
         )
     }
 }

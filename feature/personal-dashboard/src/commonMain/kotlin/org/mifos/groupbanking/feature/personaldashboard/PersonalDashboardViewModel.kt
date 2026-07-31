@@ -182,6 +182,19 @@ sealed interface PersonalDashboardEvent {
         val poolModel: String,
     ) : PersonalDashboardEvent
     data object NavigateToGroupList : PersonalDashboardEvent
+
+    /**
+     * loan_card tap → `personal-loans` (`ui.yaml#components.loan_card.on_click`, un-deferred loan
+     * entry). Carries the member's [clientId] — the `personal-loans` nav_param
+     * (`ui.yaml#components.loan_card.on_click.params: { clientId }`).
+     */
+    data class NavigateToLoans(val clientId: Long) : PersonalDashboardEvent
+
+    /** Profile overflow menu → `settings` (`ui.yaml#components.top_bar.overflow_menu.menu_settings`). */
+    data object NavigateToSettings : PersonalDashboardEvent
+
+    /** Profile overflow menu → `sync-status` (`ui.yaml#components.top_bar.overflow_menu.menu_sync_status`). */
+    data object NavigateToSyncStatus : PersonalDashboardEvent
 }
 
 /**
@@ -197,6 +210,9 @@ sealed interface PersonalDashboardAction {
     data object OnRetry : PersonalDashboardAction
     data object OnSavingsCardClick : PersonalDashboardAction
     data class OnSelectGroup(val groupId: String) : PersonalDashboardAction
+    data object OnLoansCardClick : PersonalDashboardAction
+    data object OnSettingsClick : PersonalDashboardAction
+    data object OnSyncStatusClick : PersonalDashboardAction
 
     /** Async stream emissions — routed via `trySendAction`, never dispatched by the UI. */
     sealed interface Internal : PersonalDashboardAction {
@@ -268,8 +284,19 @@ internal class PersonalDashboardViewModel(
             PersonalDashboardAction.OnRetry -> handleRetry()
             PersonalDashboardAction.OnSavingsCardClick -> handleSavingsCardClick()
             is PersonalDashboardAction.OnSelectGroup -> handleSelectGroup(action.groupId)
+            PersonalDashboardAction.OnLoansCardClick -> handleLoansCardClick()
+            PersonalDashboardAction.OnSettingsClick -> sendEvent(PersonalDashboardEvent.NavigateToSettings)
+            PersonalDashboardAction.OnSyncStatusClick -> sendEvent(PersonalDashboardEvent.NavigateToSyncStatus)
             is PersonalDashboardAction.Internal.StreamUpdated -> handleStreamUpdated(action.screenState)
         }
+    }
+
+    // -- Loan entry card tap (ui.yaml effect: navigate, target: personal-loans) ---------------------
+
+    private fun handleLoansCardClick() {
+        Logger.i(TAG) { "loan card tapped clientId=${state.clientId} — navigating to personal-loans" }
+        analytics.trackLoanOperation(operation = "view")
+        sendEvent(PersonalDashboardEvent.NavigateToLoans(clientId = state.clientId))
     }
 
     // -- Group selector chip tap (ui.yaml effect: call_api, re-fetch for tapped groupId) ----------

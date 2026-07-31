@@ -73,6 +73,8 @@ import org.mifos.groupbanking.feature.previousmeetingreview.navigateToPreviousMe
 import org.mifos.groupbanking.feature.previousmeetingreview.previousMeetingReviewScreen
 import org.mifos.groupbanking.feature.loanlist.loanListScreen
 import org.mifos.groupbanking.feature.loanlist.navigateToLoanList
+import org.mifos.groupbanking.feature.loanrequest.loanRequestScreen
+import org.mifos.groupbanking.feature.loanrequest.navigateToLoanRequest
 import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialog
 import org.mifos.groupbanking.feature.loanrepaymentdialog.LoanRepaymentDialog
 import org.mifos.groupbanking.feature.fieldofficerdashboard.navigateToFieldOfficerDashboard
@@ -83,14 +85,20 @@ import org.mifos.groupbanking.feature.membersavingsdetail.memberSavingsDetailScr
 import org.mifos.groupbanking.feature.membersavingsdetail.navigateToMemberSavingsDetail
 import org.mifos.groupbanking.feature.organizerdashboard.navigateToOrganizerDashboard
 import org.mifos.groupbanking.feature.organizerdashboard.organizerDashboardScreen
+import org.mifos.groupbanking.feature.personaldashboard.PersonalDashboardRoute
 import org.mifos.groupbanking.feature.personaldashboard.navigateToPersonalDashboard
 import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
+import org.mifos.groupbanking.feature.personalloans.navigateToPersonalLoans
+import org.mifos.groupbanking.feature.personalloans.personalLoansScreen
 import org.mifos.groupbanking.feature.personalsavings.navigateToPersonalSavings
 import org.mifos.groupbanking.feature.personalsavings.personalSavingsScreen
 import org.mifos.groupbanking.feature.savingsdashboard.navigateToSavingsDashboard
 import org.mifos.groupbanking.feature.savingsdashboard.savingsDashboardScreen
+import org.mifos.groupbanking.feature.settings.navigateToSettings
 import org.mifos.groupbanking.feature.settings.settingsScreen
 import org.mifos.groupbanking.feature.settingslogoutdialog.SettingsLogoutDialog
+import org.mifos.groupbanking.feature.syncstatus.navigateToSyncStatus
+import org.mifos.groupbanking.feature.syncstatus.syncStatusScreen
 import org.mifos.groupbanking.feature.shareoutexecute.navigateToShareOutExecute
 import org.mifos.groupbanking.feature.shareoutexecute.shareOutExecuteScreen
 import org.mifos.groupbanking.feature.shareoutpreview.navigateToShareOutPreview
@@ -127,13 +135,18 @@ import org.mifos.groupbanking.feature.shareoutpreview.shareOutPreviewScreen
  * `remember { mutableStateOf(false) }` state, same convention as `repaymentDialogTarget` above)
  * which renders [SettingsLogoutDialog] as an overlay; `onNavigateToLogin` routes straight to
  * [navigateToLoginSignup] (the session-expired-mid-PIN-change path, `data-flow.yaml`'s `401 ->
- * navigate: login`). **Known gap:** no screen in this NavHost currently calls
- * `navController.navigateToSettings()` — `ui.yaml#entry_points[0]` declares a `bottom_nav` trigger
- * that does not exist in this app's current live navigation shell (no bottom nav / tab bar is
- * wired here yet). The destination is registered and fully reachable via
- * `navController.navigateToSettings()`, but no in-app affordance calls it yet; flagged as a
- * residual follow-up rather than inventing an unrequested settings entry point on an unrelated
- * screen.
+ * navigate: login`). **Resolved (was a known gap):** `settings` and `sync-status` are now reached
+ * from `personal-dashboard`'s profile/overflow menu — the idea-layer declares that affordance on
+ * the authenticated member home (`personal-dashboard/ui.yaml#components.top_bar.overflow_menu`),
+ * replacing the never-wired `bottom_nav` trigger the settings/sync-status ui.yaml previously
+ * declared. `personalDashboardScreen`'s `onNavigateToSettings`/`onNavigateToSyncStatus` callbacks
+ * call `navController.navigateToSettings()` / `navController.navigateToSyncStatus()`; both
+ * destinations are registered below (`settingsScreen(...)` + `syncStatusScreen()`).
+ *
+ * The un-deferred `personal-dashboard` loan entry card
+ * (`personal-dashboard/ui.yaml#components.loan_card`) is likewise wired: `onNavigateToLoans` →
+ * `navigateToPersonalLoans(clientId)`, with `personalLoansScreen(...)` + `loanRequestScreen(...)`
+ * registered below (personal-dashboard → personal-loans → loan-request).
  */
 @Composable
 fun GroupBankingNavHost(
@@ -233,6 +246,43 @@ fun GroupBankingNavHost(
                         )
                     },
                     onNavigateToGroupList = { navController.navigateToGroupList() },
+                    // personal-dashboard `loan_card.on_click` → the member's own loan list. The
+                    // event carries the member's clientId (personal-loans' nav_param). Un-deferred
+                    // loan entry (idea-layer/screens/personal-dashboard/ui.yaml#components.loan_card).
+                    onNavigateToLoans = { clientId -> navController.navigateToPersonalLoans(clientId = clientId) },
+                    // personal-dashboard profile/overflow menu → shared settings + sync-status
+                    // (idea-layer/screens/personal-dashboard/ui.yaml#components.top_bar.overflow_menu).
+                    // This is the in-app affordance that resolves the previously-flagged "no screen
+                    // calls navigateToSettings()/navigateToSyncStatus()" gap (see class KDoc).
+                    onNavigateToSettings = { navController.navigateToSettings() },
+                    onNavigateToSyncStatus = { navController.navigateToSyncStatus() },
+                )
+
+                // 6y. personal-loans → loan-request (FAB / empty CTA) / back. Reached from
+                //     personal-dashboard's loan_card tap. `personal-loans` forwards only its own
+                //     `clientId` nav-arg to loan-request; `savingsBalance` is not held at this seam
+                //     (MemberDashboard/personal-loans carry no savings-balance for the member), so it
+                //     is bridged as 0.0 and `loanMultiplier` defaults to 3.0 — the same documented
+                //     drift-bridge convention this NavHost uses elsewhere (see PersonalLoansRoute
+                //     KDoc "caller's responsibility at the nav-graph wiring site"). loan-request then
+                //     re-resolves the member's real eligibility server-side on load.
+                personalLoansScreen(
+                    onNavigateToLoanRequest = { clientId ->
+                        navController.navigateToLoanRequest(clientId = clientId, savingsBalance = 0.0)
+                    },
+                    onNavigateBack = { navController.popBackStack() },
+                )
+
+                // 6x. loan-request → personal-dashboard (submit success) / back to personal-loans.
+                //     Reached from personal-loans' Request-Loan FAB / empty-state CTA. On success the
+                //     member returns to their dashboard: pop back past personal-loans to the existing
+                //     personal-dashboard entry (inclusive=false keeps the dashboard on the stack)
+                //     rather than pushing a duplicate dashboard.
+                loanRequestScreen(
+                    onNavigateToDashboard = {
+                        navController.popBackStack(PersonalDashboardRoute, inclusive = false)
+                    },
+                    onNavigateBack = { navController.popBackStack() },
                 )
 
                 // 6z. personal-savings → back to personal-dashboard (terminal read-only leaf,
@@ -466,12 +516,18 @@ fun GroupBankingNavHost(
                 )
 
                 // 10. settings -- migrated off the legacy `kpt.feature.settings` template shell
-                // (see class KDoc "settings" note). Reachable via `navController.navigateToSettings()`.
+                // (see class KDoc "settings" note). Reached via `navController.navigateToSettings()`
+                // from personal-dashboard's profile/overflow menu.
                 settingsScreen(
                     onNavigateToLogin = { navController.navigateToLoginSignup() },
                     onShowLogoutDialog = { showSettingsLogoutDialog = true },
                     onNavigateBack = { navController.popBackStack() },
                 )
+
+                // 10a. sync-status -- read-only offline-sync dashboard (terminal, no outbound nav).
+                // Reached via `navController.navigateToSyncStatus()` from personal-dashboard's
+                // profile/overflow menu (idea-layer/screens/sync-status/ui.yaml#entry_points).
+                syncStatusScreen()
 
                 // 11. member-list → member-profile (row tap) / member-add (Add-Member FAB) / back.
                 //     Reached from group-dashboard's "View Members" action.
