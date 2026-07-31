@@ -47,6 +47,12 @@ data class MemberDashboardCacheEntity(
     @PrimaryKey
     val cacheKey: String,
     val memberName: String,
+    // Member-identity + savings-account ids forwarded to personal-savings (nullable individual
+    // account). New columns as of AppDatabase v16 — fresh installs pick this up via
+    // fallbackToDestructiveMigration.
+    val clientId: Long,
+    val groupLinkedSavingsId: Long,
+    val individualSavingsId: Long?,
     val selectedGroupId: String,
     val selectedGroupName: String,
     val selectedGroupPoolModel: String,

@@ -29,6 +29,15 @@ import org.mifos.groupbanking.core.model.LoanSummary
 private const val TAG = "LoanListViewModel"
 
 /**
+ * Roles that may apply for a loan on behalf of the group — `data-flow.yaml#on_apply_loan`:
+ * "canApplyLoan is derived from the current role (chairperson / treasurer = true, member = false)".
+ * The `viewerRole` nav-param (forwarded from `group-dashboard`, originating `dt_member_role`) is
+ * matched against this set to seed [LoanListState.canApplyLoan]. ORGANIZER is included because the
+ * organizer is the group's top management role (superset of chairperson/treasurer authority).
+ */
+private val LOAN_APPLY_ROLES = setOf("ORGANIZER", "CHAIRPERSON", "TREASURER")
+
+/**
  * Screen-level render state for `loan-list-screen` — verbatim mirror of
  * ui.yaml#state_model.LoanListViewModel.screen_state. Derived (not stored) from
  * [LoanListState.isLoading] / [LoanListState.error] / [LoanListState.loans] via the
@@ -106,21 +115,15 @@ sealed interface LoanListError {
  * Mirrors `GroupListState`'s identical `@Transient` convention for non-serializable domain
  * payloads (see `training-layer/TRAINING_MASTER.yaml#patterns.state_models`).
  *
- * **[canApplyLoan] — confirmed idea-layer gap, flagged not invented:** `data-flow.yaml` states
- * "canApplyLoan is derived from the current SessionManager role (chairperson / treasurer = true,
- * member = false)", but the actual injectable `kpt.core.base.security.SessionManager`
- * (`core-base/security`) carries ONLY session-lifecycle state (`isSessionActive` / timeout) — no
- * role field. Unlike `group-dashboard` (which receives a `viewerRole` nav-param forwarded from
- * `group-list`/`group-create` via Koin `parametersOf`), `ui.yaml#nav_params` for `loan-list`
- * declares only `groupId: Long` — no `viewerRole` is forwarded from `group-dashboard`'s "Loans"
- * entry point or `bottom_nav`. With no role source reachable from this ViewModel's declared DI
- * graph (`LoanRepository`, `NetworkMonitor`, `SessionManager`), [canApplyLoan] stays at its
- * conservative ui.yaml default (`false`) end-to-end — the Apply-Loan FAB never renders until this
- * gap is closed, rather than defaulting it `true` and risking an unauthorized member seeing the
- * FAB. Mirrors `GroupDashboardState.isCorpusInsufficient`'s / `isCycleEnd`'s identical
- * no-wire-source-defaults-false precedent. Reported to the caller for an idea-layer follow-up
- * (either add `viewerRole` to `loan-list`'s `nav_params`, mirroring `group-dashboard`'s
- * precedent, or expose a role query on `LoanRepository`/`GroupRepository`). See API.md#state.
+ * **[canApplyLoan] — now wired from the `viewerRole` nav-param (gap closed):** `data-flow.yaml`
+ * states "canApplyLoan is derived from the current role (chairperson / treasurer = true, member =
+ * false)". The `viewerRole` nav-param is now forwarded from `group-dashboard`'s "Loans" entry point
+ * (`ui.yaml#nav_params.viewerRole`, mirroring `group-dashboard`'s own `groupId`/`viewerRole` pair)
+ * and matched against [LOAN_APPLY_ROLES] in the constructor to seed this field — the Apply-Loan FAB
+ * renders for management roles (ORGANIZER/CHAIRPERSON/TREASURER) and stays hidden for MEMBER. The
+ * injectable `kpt.core.base.security.SessionManager` (`core-base/security`) still carries only
+ * session-lifecycle state (no role field) — the role travels by nav-param, not by session, exactly
+ * as `group-dashboard` already does. See API.md#state.
  */
 @Serializable
 @Immutable
@@ -210,9 +213,15 @@ sealed interface LoanListAction {
  * matching `GroupListViewModel`'s identical precedent of not re-injecting it at the ViewModel
  * layer.
  *
- * [groupId] is the `ui.yaml#nav_params` value forwarded from `group-dashboard`'s "Loans" entry
- * point (or `bottom_nav`) via Koin `parametersOf(groupId)` (see `di.LoanListModule`) — it seeds
- * [LoanListState.groupId] and scopes the paged [LoanRepository.loansPagingStream] read.
+ * [groupId] and [viewerRole] are the `ui.yaml#nav_params` values forwarded from `group-dashboard`'s
+ * "Loans" entry point via Koin `parametersOf(groupId, viewerRole)` (see `di.LoanListModule`) —
+ * [groupId] seeds [LoanListState.groupId] and scopes the paged [LoanRepository.loansPagingStream]
+ * read; [viewerRole] (the `dt_member_role` role string ORGANIZER/CHAIRPERSON/TREASURER/MEMBER,
+ * originating on `group-list` and threaded through `group-dashboard`) seeds
+ * [LoanListState.canApplyLoan] via the [LOAN_APPLY_ROLES] gate — this closes the previously-flagged
+ * `canApplyLoan` no-role-source gap (`data-flow.yaml#on_apply_loan`: chairperson/treasurer = true,
+ * member = false), so the Apply-Loan FAB now renders for management roles rather than staying
+ * conservatively hidden for everyone.
  *
  * See API.md#viewmodel.
  */
@@ -222,8 +231,12 @@ internal class LoanListViewModel(
     private val crashReporter: CrashReporter,
     private val analytics: KptAnalyticsTracker,
     private val groupId: Long,
+    viewerRole: String,
 ) : BaseViewModel<LoanListState, LoanListEvent, LoanListAction>(
-    initialState = LoanListState(groupId = groupId),
+    initialState = LoanListState(
+        groupId = groupId,
+        canApplyLoan = viewerRole in LOAN_APPLY_ROLES,
+    ),
 ) {
 
     /** Offline-first PAGED stream, scoped to [groupId] — see `LoanRepository.loansPagingStream` KDoc. */

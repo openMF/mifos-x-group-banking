@@ -120,6 +120,10 @@ sealed interface DashboardError {
 @Immutable
 data class PersonalDashboardState(
     val memberName: String = "",
+    // Member-identity + savings-account ids forwarded to personal-savings on savings-card tap.
+    val clientId: Long = 0L,
+    val groupLinkedSavingsId: Long = 0L,
+    val individualSavingsId: Long? = null,
     @Transient
     val myGroups: List<GroupSummary> = emptyList(),
     @Transient
@@ -151,12 +155,13 @@ val PersonalDashboardState.screenState: PersonalDashboardScreenState
  * One-shot side effects emitted by `PersonalDashboardViewModel` — verbatim mirror of
  * ui.yaml#state_model.PersonalDashboardViewModel.events.
  *
- * [NavigateToSavings] carries `groupId` + `poolModel` (the `SavingsMechanism.name` string) —
- * `flow.yaml#on_savings_card_click` describes passing `selectedGroup.groupId` and `typeConfig`
- * to the personal-savings screen so it can render the correct pool-model view, but
- * `MemberDashboard`/`GroupSummary` carry no full `typeConfig` object (only the `poolModel`
- * discriminator) — `poolModel` is the closest available substitute and is sufficient for the
- * described purpose (choosing the ACCUMULATING vs ROTATING_PAYOUT layout on the target screen).
+ * [NavigateToSavings] carries the three `personal-savings` nav_params — [clientId],
+ * [groupLinkedSavingsId], and (optional) [individualSavingsId] — resolved from the member-dashboard
+ * response (`get_member_dashboard`, `ui.yaml#components.savings_summary_card.on_click.params`). It
+ * also carries `poolModel` (the `SavingsMechanism.name` string) so the target screen can choose the
+ * ACCUMULATING vs ROTATING_PAYOUT layout. This closes the previously-flagged gap where
+ * `MemberDashboard` carried none of the personal-savings ids and the card was drift-bridged to the
+ * group-level `savings-dashboard`.
  *
  * **Idea-layer gap (flagged, not invented here):** [NavigateToGroupList] is declared in
  * ui.yaml#state_model.events.members and `flow.yaml#navigates_to: [group-list]`, but NO
@@ -170,7 +175,12 @@ val PersonalDashboardState.screenState: PersonalDashboardScreenState
  * navigation from this screen is actually wanted. See API.md#events.
  */
 sealed interface PersonalDashboardEvent {
-    data class NavigateToSavings(val groupId: String, val poolModel: String) : PersonalDashboardEvent
+    data class NavigateToSavings(
+        val clientId: Long,
+        val groupLinkedSavingsId: Long,
+        val individualSavingsId: Long?,
+        val poolModel: String,
+    ) : PersonalDashboardEvent
     data object NavigateToGroupList : PersonalDashboardEvent
 }
 
@@ -293,10 +303,15 @@ internal class PersonalDashboardViewModel(
             return
         }
         analytics.trackSavingsOperation(operation = "view", accountId = group.groupId)
-        Logger.i(TAG) { "savings card tapped groupId=${group.groupId} poolModel=${group.poolModel}" }
+        Logger.i(TAG) {
+            "savings card tapped groupId=${group.groupId} clientId=${state.clientId} " +
+                "groupLinkedSavingsId=${state.groupLinkedSavingsId} poolModel=${group.poolModel}"
+        }
         sendEvent(
             PersonalDashboardEvent.NavigateToSavings(
-                groupId = group.groupId,
+                clientId = state.clientId,
+                groupLinkedSavingsId = state.groupLinkedSavingsId,
+                individualSavingsId = state.individualSavingsId,
                 poolModel = group.poolModel.name,
             ),
         )
@@ -349,6 +364,9 @@ internal class PersonalDashboardViewModel(
                 val dashboard = screenState.data
                 copy(
                     memberName = dashboard.memberName,
+                    clientId = dashboard.clientId,
+                    groupLinkedSavingsId = dashboard.groupLinkedSavingsId,
+                    individualSavingsId = dashboard.individualSavingsId,
                     myGroups = dashboard.myGroups,
                     selectedGroup = dashboard.selectedGroup,
                     poolModel = dashboard.poolModel.name,

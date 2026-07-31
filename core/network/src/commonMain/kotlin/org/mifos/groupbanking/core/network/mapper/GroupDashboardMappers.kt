@@ -100,6 +100,7 @@ fun GroupCorpusDto.toDomainModel(): GroupCorpus = GroupCorpus(
     totalContributionsThisCycle = totalContributionsThisCycle,
     totalLoansOutstanding = totalLoansOutstanding,
     lastUpdated = lastUpdated,
+    isCycleEnd = isCycleEnd,
     rotationPosition = rotationPosition,
     nextRecipientName = nextRecipientName,
     nextRecipientPosition = nextRecipientPosition,

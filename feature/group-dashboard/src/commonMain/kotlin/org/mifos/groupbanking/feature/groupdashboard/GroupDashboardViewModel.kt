@@ -141,13 +141,12 @@ sealed interface GroupDashboardError {
  * KDoc) and are always `null` — [isCorpusInsufficient] is therefore defensively `false` until the
  * backend adds `minimumDisbursementThreshold`.
  *
- * [isCycleEnd] similarly has **no backing wire field** — neither [GroupDetail] nor [GroupCorpus]
- * carries a cycle-end date/countdown, and the legacy `flow.yaml#compute_derived_state` formula
- * (`group.cycleWeek == group.cycleLengthWeeks`) references fields (`cycleWeek`/`cycleLengthWeeks`)
- * that do not exist on the current domain model (only `cycleNumber`/`cycleLengthMonths` — months,
- * not weeks). Defaults `false` (the conservative choice — never falsely unblocks Share-Out).
- * Reported to the caller for an idea-layer follow-up (a real `cycleEndDate`/`daysRemaining` wire
- * field is needed on `get_group` or `get_group_corpus`).
+ * [isCycleEnd] is now backed by the server-computed [GroupCorpus.isCycleEnd] wire field
+ * (`get_group_corpus.isCycleEnd`, `api.yaml`) — [handleStreamUpdated] reads it directly from the
+ * corpus section rather than the legacy `flow.yaml#compute_derived_state` formula
+ * (`group.cycleWeek == group.cycleLengthWeeks`, whose fields never existed on the domain model).
+ * The Share-Out action gate ([handleShareOut]) is unblocked exactly when the server reports the
+ * cycle has ended; `false` remains the conservative default (never falsely unblocks Share-Out).
  *
  * See API.md#state.
  */
@@ -499,8 +498,9 @@ internal class GroupDashboardViewModel(
                     accounts = dashboard.accounts,
                     recentActivity = dashboard.accounts.recentActivity,
                     isCorpusInsufficient = isCorpusInsufficient(dashboard.corpus, derivedConfig),
-                    // isCycleEnd: no wire field backs this today — see class KDoc.
-                    isCycleEnd = false,
+                    // isCycleEnd now backed by the server-computed get_group_corpus.isCycleEnd wire
+                    // field (see GroupCorpus.isCycleEnd) — gates the Share-Out action.
+                    isCycleEnd = dashboard.corpus.isCycleEnd,
                     rotationPosition = if (poolModel == SavingsMechanism.ROTATING_PAYOUT) {
                         dashboard.corpus.rotationPosition
                     } else {

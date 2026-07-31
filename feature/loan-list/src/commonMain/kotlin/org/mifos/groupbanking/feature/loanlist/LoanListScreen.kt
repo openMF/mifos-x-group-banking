@@ -89,11 +89,12 @@ import org.mifos.groupbanking.feature.loanlist.generated.resources.screens_loan_
 @Composable
 internal fun LoanListScreen(
     groupId: Long,
-    onNavigateToLoanDetail: (loanId: Long) -> Unit,
+    viewerRole: String,
+    onNavigateToLoanDetail: (loanId: Long, viewerRole: String) -> Unit,
     onNavigateToLoanApply: (groupId: Long) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LoanListViewModel = koinViewModel(parameters = { parametersOf(groupId) }),
+    viewModel: LoanListViewModel = koinViewModel(parameters = { parametersOf(groupId, viewerRole) }),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -104,7 +105,7 @@ internal fun LoanListScreen(
 
     EventsEffect(viewModel) { event ->
         when (event) {
-            is LoanListEvent.NavigateToLoanDetail -> onNavigateToLoanDetail(event.loanId)
+            is LoanListEvent.NavigateToLoanDetail -> onNavigateToLoanDetail(event.loanId, viewerRole)
             is LoanListEvent.NavigateToLoanApply -> onNavigateToLoanApply(event.groupId)
             is LoanListEvent.ShowSnackbar -> {
                 val resolved = messageKeyToText(event.message, networkMessage, serverMessage, authMessage)

@@ -78,8 +78,10 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
  * Container for `personal-dashboard-screen`. Collects [PersonalDashboardViewModel] state via
  * [collectAsStateWithLifecycle], consumes one-shot [PersonalDashboardEvent]s (navigate to
  * personal-savings / group-list) through [EventsEffect], and delegates all rendering to the
- * stateless [PersonalDashboardContent]. [onNavigateToSavings] carries `groupId` + `poolModel` so
- * the target screen can render the correct pool-model view; [onNavigateToGroupList] closes
+ * stateless [PersonalDashboardContent]. [onNavigateToSavings] carries the personal-savings
+ * nav_params (`clientId`, `groupLinkedSavingsId`, optional `individualSavingsId`) + `poolModel` so
+ * the target screen can load the member's savings ledgers and render the correct pool-model view;
+ * [onNavigateToGroupList] closes
  * [PersonalDashboardEvent.NavigateToGroupList] — currently unreachable from any wired `on_click`
  * on this screen's canvas (see [PersonalDashboardViewModel] class KDoc "Idea-layer gap" note) but
  * still exposed here so the host wiring compiles and the sealed-interface `when` in [EventsEffect]
@@ -87,7 +89,7 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
  */
 @Composable
 internal fun PersonalDashboardScreen(
-    onNavigateToSavings: (groupId: String, poolModel: String) -> Unit,
+    onNavigateToSavings: (clientId: Long, groupLinkedSavingsId: Long, individualSavingsId: Long?, poolModel: String) -> Unit,
     onNavigateToGroupList: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PersonalDashboardViewModel = koinViewModel(),
@@ -96,7 +98,12 @@ internal fun PersonalDashboardScreen(
 
     EventsEffect(viewModel) { event ->
         when (event) {
-            is PersonalDashboardEvent.NavigateToSavings -> onNavigateToSavings(event.groupId, event.poolModel)
+            is PersonalDashboardEvent.NavigateToSavings -> onNavigateToSavings(
+                event.clientId,
+                event.groupLinkedSavingsId,
+                event.individualSavingsId,
+                event.poolModel,
+            )
             PersonalDashboardEvent.NavigateToGroupList -> onNavigateToGroupList()
         }
     }

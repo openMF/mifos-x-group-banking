@@ -92,6 +92,7 @@ import org.mifos.groupbanking.feature.loandetail.generated.resources.screens_loa
 @Composable
 internal fun LoanDetailScreen(
     loanId: Long,
+    viewerRole: String,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     // `feature/loan-detail` has no dependency on `feature/loan-repayment-dialog` (no feature<->
@@ -108,7 +109,7 @@ internal fun LoanDetailScreen(
     // `loanDetailScreen()` (`LoanDetailRoute.kt`) and `GroupBankingNavHost.kt` — never left dead
     // (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3 count-assertion).
     onShowDefaultDialog: (loanId: Long, memberName: String, loanAmountKes: Double) -> Unit = { _, _, _ -> },
-    viewModel: LoanDetailViewModel = koinViewModel(parameters = { parametersOf(loanId) }),
+    viewModel: LoanDetailViewModel = koinViewModel(parameters = { parametersOf(loanId, viewerRole) }),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

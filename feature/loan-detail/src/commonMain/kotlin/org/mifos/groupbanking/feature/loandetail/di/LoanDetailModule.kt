@@ -21,11 +21,13 @@ import org.mifos.groupbanking.feature.loandetail.LoanDetailViewModel
  * `KoinModules.allModules`. See API.md#di.
  *
  * `LoanDetailViewModel` is registered with the `viewModel { parameters -> ... }` builder (rather
- * than `viewModelOf(::LoanDetailViewModel)`) because its `loanId` constructor parameter is the
- * `ui.yaml#nav_params` value forwarded from `loan-list`'s "Loan card tap" entry point, not a
- * DI-graph type — same convention as `LoanListModule`'s `groupId` / `GroupDashboardModule`'s
- * `groupId`/`viewerRole` pair. The (not-yet-generated) `LoanDetailRoute.kt` composable MUST supply
- * it via `koinViewModel<LoanDetailViewModel> { parametersOf(loanId) }`.
+ * than `viewModelOf(::LoanDetailViewModel)`) because its `loanId` + `viewerRole` constructor
+ * parameters are the `ui.yaml#nav_params` values forwarded from `loan-list`'s "Loan card tap" entry
+ * point, not DI-graph types — same convention as `LoanListModule`'s `groupId`/`viewerRole` /
+ * `GroupDashboardModule`'s `groupId`/`viewerRole` pair. Koin resolves params by declaration ORDER,
+ * so `LoanDetailRoute.kt`'s composable MUST supply them via
+ * `koinViewModel<LoanDetailViewModel> { parametersOf(loanId, viewerRole) }` — loanId (Long) FIRST,
+ * viewerRole (String) SECOND, matching the `parameters.get<...>()` order below.
  */
 val LoanDetailModule = module {
     viewModel { parameters ->
@@ -35,6 +37,7 @@ val LoanDetailModule = module {
             crashReporter = get(),
             analytics = get(),
             loanId = parameters.get<Long>(),
+            viewerRole = parameters.get<String>(),
         )
     }
 }

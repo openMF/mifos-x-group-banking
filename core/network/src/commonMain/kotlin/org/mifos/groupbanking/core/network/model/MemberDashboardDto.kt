@@ -30,6 +30,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MemberDashboardResponseDto(
     @SerialName("memberName") val memberName: String,
+    // Member-identity + account ids forwarded to the personal-savings nav_params
+    // (`api.yaml#get_member_dashboard.response`). [individualSavingsId] is nullable — the member
+    // may have no voluntary individual account. Defaulted so an older server response without the
+    // fields still decodes to a conservative (0L / null) value rather than failing to parse.
+    @SerialName("clientId") val clientId: Long = 0L,
+    @SerialName("groupLinkedSavingsId") val groupLinkedSavingsId: Long = 0L,
+    @SerialName("individualSavingsId") val individualSavingsId: Long? = null,
     @SerialName("myGroups") val myGroups: List<GroupSummaryDto> = emptyList(),
     @SerialName("selectedGroup") val selectedGroup: GroupSummaryDto,
     @SerialName("poolModel") val poolModel: SavingsMechanismDto = SavingsMechanismDto.UNKNOWN,

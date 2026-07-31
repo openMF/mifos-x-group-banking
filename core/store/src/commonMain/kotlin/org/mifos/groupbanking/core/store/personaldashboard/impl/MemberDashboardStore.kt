@@ -126,6 +126,9 @@ private fun MemberDashboard.toEntity(cacheKey: String): MemberDashboardCacheEnti
     return MemberDashboardCacheEntity(
         cacheKey = cacheKey,
         memberName = memberName,
+        clientId = clientId,
+        groupLinkedSavingsId = groupLinkedSavingsId,
+        individualSavingsId = individualSavingsId,
         selectedGroupId = selectedGroup.groupId,
         selectedGroupName = selectedGroup.name,
         selectedGroupPoolModel = selectedGroup.poolModel.name,
@@ -147,6 +150,9 @@ private fun MemberDashboard.toEntity(cacheKey: String): MemberDashboardCacheEnti
 
 private fun MemberDashboardCacheEntity.toDomain(): MemberDashboard = MemberDashboard(
     memberName = memberName,
+    clientId = clientId,
+    groupLinkedSavingsId = groupLinkedSavingsId,
+    individualSavingsId = individualSavingsId,
     myGroups = MemberDashboardCacheCodec.decodeGroups(myGroupsJson).map { it.toDomain() },
     selectedGroup = GroupSummary(
         groupId = selectedGroupId,

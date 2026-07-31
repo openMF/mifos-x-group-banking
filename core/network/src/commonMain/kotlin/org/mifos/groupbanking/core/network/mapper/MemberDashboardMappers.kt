@@ -25,6 +25,9 @@ import org.mifos.groupbanking.core.network.model.MemberDashboardResponseDto
 
 fun MemberDashboardResponseDto.toDomainModel(): MemberDashboard = MemberDashboard(
     memberName = memberName,
+    clientId = clientId,
+    groupLinkedSavingsId = groupLinkedSavingsId,
+    individualSavingsId = individualSavingsId,
     myGroups = myGroups.map { it.toDomainModel() },
     selectedGroup = selectedGroup.toDomainModel(),
     poolModel = poolModel.toDomainModel(),

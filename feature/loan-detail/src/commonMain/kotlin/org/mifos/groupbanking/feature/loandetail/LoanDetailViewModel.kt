@@ -34,6 +34,20 @@ import org.mifos.groupbanking.core.model.RepaymentTransaction
 private const val TAG = "LoanDetailViewModel"
 
 /**
+ * Roles that may record a repayment — `flow.yaml#guard: "canRecordRepayment (treasurer role)"`.
+ * ORGANIZER is included as the superset top-management role (mirrors `group-dashboard`'s
+ * `MANAGEMENT_ROLES` treatment of ORGANIZER as chair-equivalent authority). Matched against the
+ * `viewerRole` nav-param (forwarded from `loan-list`, originating `dt_member_role`).
+ */
+private val RECORD_REPAYMENT_ROLES = setOf("TREASURER", "ORGANIZER")
+
+/**
+ * Roles that may mark a loan defaulted — `flow.yaml#guard: "canMarkDefaulted (chairperson role)"`.
+ * ORGANIZER included per the same superset-management rationale as [RECORD_REPAYMENT_ROLES].
+ */
+private val MARK_DEFAULTED_ROLES = setOf("CHAIRPERSON", "ORGANIZER")
+
+/**
  * Screen-level render state for `loan-detail-screen` — verbatim mirror of
  * `ui.yaml#state_model.LoanDetailViewModel.screen_state` (only 3 members declared — a single loan
  * composite is never "empty" once present, same class of read as `group-dashboard`). Derived (not
@@ -111,22 +125,18 @@ sealed interface LoanDetailError {
  * this transient render state, is the durable source). Mirrors `GroupDashboardState`'s /
  * `LoanListState`'s identical `@Transient` convention for non-serializable domain payloads.
  *
- * **[canRecordRepayment] / [canMarkDefaulted] — confirmed idea-layer gap, flagged not invented:**
- * `ui.yaml` gates the two action buttons on `canRecordRepayment`/`canMarkDefaulted` (a
- * role/permission concept) ANDed with a loan-status predicate evaluated separately in the Screen
- * layer (`visible_when: "canRecordRepayment && loan.status == ACTIVE"`). There is no reachable
- * role/permission source anywhere in this ViewModel's declared DI graph (`LoanDetailRepository`,
- * `SessionManager`, `CrashReporter`, `KptAnalyticsTracker`) — the injectable `SessionManager`
- * carries only session-lifecycle state (no role field, same gap already documented on
- * `LoanListState.canApplyLoan`), and `ui.yaml#nav_params` for `loan-detail` declares only `loanId`
- * (no `viewerRole` forwarded, unlike `group-dashboard`'s `groupId`/`viewerRole` pair). Both fields
- * stay at their conservative ui.yaml default (`false`) end-to-end — the Record-Repayment /
- * Mark-Defaulted buttons never render until this gap is closed, rather than defaulting `true` and
- * risking an unauthorized member seeing them. [handleRecordRepayment] / [handleMarkDefaulted] are
- * still fully wired for real (dialog-opening events dispatch correctly) so nothing is a dead
- * clickable once the gap closes. Reported to the caller for an idea-layer follow-up (add
- * `viewerRole` to `loan-detail`'s `nav_params`, mirroring `group-dashboard`'s precedent). See
- * API.md#state.
+ * **[canRecordRepayment] / [canMarkDefaulted] — now wired from the `viewerRole` nav-param (gap
+ * closed):** `ui.yaml` gates the two action buttons on `canRecordRepayment`/`canMarkDefaulted` (a
+ * role concept) ANDed with a loan-status predicate evaluated separately in the Screen layer
+ * (`visible_when: "canRecordRepayment && loan.status == ACTIVE"`). `ui.yaml#nav_params` for
+ * `loan-detail` now declares `viewerRole` (forwarded from `loan-list`, which forwards it from
+ * `group-dashboard`, originating `dt_member_role`) — matched against [RECORD_REPAYMENT_ROLES]
+ * (`flow.yaml#guard: canRecordRepayment (treasurer role)`) and [MARK_DEFAULTED_ROLES]
+ * (`flow.yaml#guard: canMarkDefaulted (chairperson role)`) in the constructor to seed both fields.
+ * The injectable `SessionManager` still carries only session-lifecycle state — the role travels by
+ * nav-param, not by session, exactly as `group-dashboard`/`loan-list` already do.
+ * [handleRecordRepayment] / [handleMarkDefaulted] remain fully wired (dialog-opening events
+ * dispatch correctly) so nothing is a dead clickable. See API.md#state.
  *
  * [isRecordingRepayment] is reserved for the not-yet-generated repayment-dialog submission flow
  * (`dialog: loan-repayment-dialog` in `ui.yaml`; the actual `LoanRepository.recordRepayment`
@@ -214,10 +224,11 @@ sealed interface LoanDetailAction {
  * `LoanRepository` (loan-list) — flagged as a documentation-vs-implementation drift for the caller,
  * not re-created here.
  *
- * [loanId] is the `ui.yaml#nav_params` value forwarded from `loan-list`'s "Loan card tap" entry
- * point via Koin `parametersOf(loanId)` (see `di.LoanDetailModule`) — it scopes the single-key
- * [LoanDetailRepository.loanDetailStream] read; there is no `viewerRole` nav-param (see
- * [LoanDetailState]'s KDoc "canRecordRepayment / canMarkDefaulted" gap note).
+ * [loanId] and [viewerRole] are the `ui.yaml#nav_params` values forwarded from `loan-list`'s "Loan
+ * card tap" entry point via Koin `parametersOf(loanId, viewerRole)` (see `di.LoanDetailModule`) —
+ * [loanId] scopes the single-key [LoanDetailRepository.loanDetailStream] read; [viewerRole] seeds
+ * [LoanDetailState.canRecordRepayment] / [LoanDetailState.canMarkDefaulted] via the
+ * [RECORD_REPAYMENT_ROLES] / [MARK_DEFAULTED_ROLES] gates (see [LoanDetailState]'s KDoc).
  *
  * See API.md#viewmodel.
  */
@@ -227,8 +238,12 @@ internal class LoanDetailViewModel(
     private val crashReporter: CrashReporter,
     private val analytics: KptAnalyticsTracker,
     private val loanId: Long,
+    viewerRole: String,
 ) : BaseViewModel<LoanDetailState, LoanDetailEvent, LoanDetailAction>(
-    initialState = LoanDetailState(),
+    initialState = LoanDetailState(
+        canRecordRepayment = viewerRole in RECORD_REPAYMENT_ROLES,
+        canMarkDefaulted = viewerRole in MARK_DEFAULTED_ROLES,
+    ),
 ) {
 
     /** Fixed-key offline-first stream for [loanId] — see class KDoc. */

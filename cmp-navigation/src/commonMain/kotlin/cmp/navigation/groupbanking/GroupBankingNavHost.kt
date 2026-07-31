@@ -85,6 +85,8 @@ import org.mifos.groupbanking.feature.organizerdashboard.navigateToOrganizerDash
 import org.mifos.groupbanking.feature.organizerdashboard.organizerDashboardScreen
 import org.mifos.groupbanking.feature.personaldashboard.navigateToPersonalDashboard
 import org.mifos.groupbanking.feature.personaldashboard.personalDashboardScreen
+import org.mifos.groupbanking.feature.personalsavings.navigateToPersonalSavings
+import org.mifos.groupbanking.feature.personalsavings.personalSavingsScreen
 import org.mifos.groupbanking.feature.savingsdashboard.navigateToSavingsDashboard
 import org.mifos.groupbanking.feature.savingsdashboard.savingsDashboardScreen
 import org.mifos.groupbanking.feature.settings.settingsScreen
@@ -217,16 +219,26 @@ fun GroupBankingNavHost(
 
                 // 6. personal-dashboard → group-list (+ savings placeholder)
                 personalDashboardScreen(
-                    // personal-dashboard `savings_summary_card.on_click` → the group's savings
-                    // surface. The event carries only (groupId, poolModel); `personal-savings`'s
-                    // route is keyed by (clientId, groupLinkedSavingsId, individualSavingsId) — none
-                    // available at this seam — so we navigate to the param-compatible group
-                    // `savings-dashboard` (keyed by groupId), the SAME drift-bridge convention
-                    // group-dashboard's `onNavigateToMemberSavingsDetail` uses below.
-                    // TODO(nav): route to `personal-savings` once the idea-layer forwards the
-                    // member's clientId/savingsId through PersonalDashboardEvent.NavigateToSavings.
-                    onNavigateToSavings = { groupId, _ -> navController.navigateToSavingsDashboard(groupId = groupId) },
+                    // personal-dashboard `savings_summary_card.on_click` → the member's own
+                    // personal-savings ledger. The event now carries the three personal-savings
+                    // nav_params (clientId, groupLinkedSavingsId, optional individualSavingsId),
+                    // forwarded from the get_member_dashboard response — wired straight to the real
+                    // `personal-savings` feature module (the earlier savings-dashboard drift bridge
+                    // is retired now that MemberDashboard carries these ids).
+                    onNavigateToSavings = { clientId, groupLinkedSavingsId, individualSavingsId, _ ->
+                        navController.navigateToPersonalSavings(
+                            clientId = clientId,
+                            groupLinkedSavingsId = groupLinkedSavingsId,
+                            individualSavingsId = individualSavingsId,
+                        )
+                    },
                     onNavigateToGroupList = { navController.navigateToGroupList() },
+                )
+
+                // 6z. personal-savings → back to personal-dashboard (terminal read-only leaf,
+                //     reached from personal-dashboard's savings_summary_card tap).
+                personalSavingsScreen(
+                    onNavigateBack = { navController.popBackStack() },
                 )
 
                 // 6a. field-officer-dashboard (FR-009) → group-dashboard (supervisory read-only view) /
@@ -269,8 +281,11 @@ fun GroupBankingNavHost(
                         navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
                     },
                     onNavigateToMemberList = { groupId -> navController.navigateToMemberList(groupId = groupId) },
-                    onNavigateToLoanList = { groupId ->
-                        navController.navigateToLoanList(groupId = groupId.toLongOrNull() ?: 0L)
+                    // viewerRole is forwarded from group-dashboard (server-reconciled role) so
+                    // loan-list can gate the Apply-Loan FAB (canApplyLoan); loan-list threads it
+                    // onward to loan-detail for the record-repayment / mark-defaulted gates.
+                    onNavigateToLoanList = { groupId, viewerRole ->
+                        navController.navigateToLoanList(groupId = groupId.toLongOrNull() ?: 0L, viewerRole = viewerRole)
                     },
                     // group-dashboard `Share Out (cycle-end action)` → share-out-preview
                     // (`idea-layer/screens/share-out-preview/ui.yaml#entry_points[0]`). This seam
@@ -338,7 +353,9 @@ fun GroupBankingNavHost(
 
                 // 8. loan-list → loan-detail (wired for real, its feature module now exists) / loan-apply
                 loanListScreen(
-                    onNavigateToLoanDetail = { loanId -> navController.navigateToLoanDetail(loanId = loanId) },
+                    onNavigateToLoanDetail = { loanId, viewerRole ->
+                        navController.navigateToLoanDetail(loanId = loanId, viewerRole = viewerRole)
+                    },
                     onNavigateToLoanApply = { groupId -> navController.navigateToLoanApply(groupId = groupId) },
                     onNavigateBack = { navController.popBackStack() },
                 )

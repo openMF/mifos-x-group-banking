@@ -88,7 +88,7 @@ internal fun GroupDashboardScreen(
     viewerRole: String,
     onNavigateToMeetingCalendar: (groupId: String) -> Unit,
     onNavigateToMemberList: (groupId: String) -> Unit,
-    onNavigateToLoanList: (groupId: String) -> Unit,
+    onNavigateToLoanList: (groupId: String, viewerRole: String) -> Unit,
     onNavigateToShareOut: (groupId: String, distributionStrategy: String) -> Unit,
     onNavigateToMemberSavingsDetail: (groupId: String) -> Unit,
     onNavigateBack: () -> Unit,
@@ -111,7 +111,9 @@ internal fun GroupDashboardScreen(
         when (event) {
             is GroupDashboardEvent.NavigateToMeetingCalendar -> onNavigateToMeetingCalendar(event.groupId)
             is GroupDashboardEvent.NavigateToMemberList -> onNavigateToMemberList(event.groupId)
-            is GroupDashboardEvent.NavigateToLoanList -> onNavigateToLoanList(event.groupId)
+            // Forward the server-reconciled viewerRole (state.viewerRole) so loan-list can gate the
+            // Apply-Loan FAB; state.viewerRole wins over the seed nav-param once Content resolves.
+            is GroupDashboardEvent.NavigateToLoanList -> onNavigateToLoanList(event.groupId, state.viewerRole)
             is GroupDashboardEvent.NavigateToShareOut -> onNavigateToShareOut(event.groupId, event.distributionStrategy)
             is GroupDashboardEvent.NavigateToMemberSavingsDetail -> onNavigateToMemberSavingsDetail(event.groupId)
             GroupDashboardEvent.NavigateBack -> onNavigateBack()

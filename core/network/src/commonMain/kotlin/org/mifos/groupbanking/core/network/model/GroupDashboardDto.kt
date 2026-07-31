@@ -155,6 +155,11 @@ data class GroupCorpusDto(
     @SerialName("totalContributionsThisCycle") val totalContributionsThisCycle: Double,
     @SerialName("totalLoansOutstanding") val totalLoansOutstanding: Double,
     @SerialName("lastUpdated") val lastUpdated: String,
+    // Server-computed cycle-end flag (`api.yaml#get_group_corpus.response.isCycleEnd`) — true when
+    // the group's savings cycle has reached its end and Share-Out is available. Defaults `false` so
+    // an older server response without the field decodes to the conservative (Share-Out-blocked)
+    // value rather than failing to parse.
+    @SerialName("isCycleEnd") val isCycleEnd: Boolean = false,
     @SerialName("rotationPosition") val rotationPosition: Int? = null,
     @SerialName("nextRecipientName") val nextRecipientName: String? = null,
     @SerialName("nextRecipientPosition") val nextRecipientPosition: Int? = null,

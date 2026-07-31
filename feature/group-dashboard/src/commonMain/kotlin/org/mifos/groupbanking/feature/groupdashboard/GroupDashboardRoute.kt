@@ -44,7 +44,7 @@ fun NavController.navigateToGroupDashboard(groupId: String, viewerRole: String, 
 fun NavGraphBuilder.groupDashboardScreen(
     onNavigateToMeetingCalendar: (groupId: String) -> Unit,
     onNavigateToMemberList: (groupId: String) -> Unit,
-    onNavigateToLoanList: (groupId: String) -> Unit,
+    onNavigateToLoanList: (groupId: String, viewerRole: String) -> Unit,
     onNavigateToShareOut: (groupId: String, distributionStrategy: String) -> Unit,
     onNavigateToMemberSavingsDetail: (groupId: String) -> Unit,
     onNavigateBack: () -> Unit,

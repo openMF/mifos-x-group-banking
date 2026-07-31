@@ -22,10 +22,10 @@ import kpt.core.base.ui.nav.composableWithPushTransitions
  * quick action or `bottom_nav`. See API.md#route.
  */
 @Serializable
-data class LoanListRoute(val groupId: Long)
+data class LoanListRoute(val groupId: Long, val viewerRole: String)
 
-fun NavController.navigateToLoanList(groupId: Long, navOptions: NavOptions? = null) =
-    navigate(LoanListRoute(groupId = groupId), navOptions)
+fun NavController.navigateToLoanList(groupId: Long, viewerRole: String, navOptions: NavOptions? = null) =
+    navigate(LoanListRoute(groupId = groupId, viewerRole = viewerRole), navOptions)
 
 /**
  * Registers [LoanListScreen] on the host [NavGraphBuilder]. Every callback here closes a
@@ -41,7 +41,7 @@ fun NavController.navigateToLoanList(groupId: Long, navOptions: NavOptions? = nu
  * count-assertion: 3 defaults / 3 overrides / 0 suppressed. See API.md#route.
  */
 fun NavGraphBuilder.loanListScreen(
-    onNavigateToLoanDetail: (loanId: Long) -> Unit,
+    onNavigateToLoanDetail: (loanId: Long, viewerRole: String) -> Unit,
     onNavigateToLoanApply: (groupId: Long) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
@@ -49,6 +49,7 @@ fun NavGraphBuilder.loanListScreen(
         val route = backStackEntry.toRoute<LoanListRoute>()
         LoanListScreen(
             groupId = route.groupId,
+            viewerRole = route.viewerRole,
             onNavigateToLoanDetail = onNavigateToLoanDetail,
             onNavigateToLoanApply = onNavigateToLoanApply,
             onNavigateBack = onNavigateBack,

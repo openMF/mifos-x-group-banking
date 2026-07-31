@@ -32,10 +32,10 @@ fun NavController.navigateToPersonalDashboard(navOptions: NavOptions? = null) =
  * (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3):
  *
  * - [onNavigateToSavings] closes [PersonalDashboardEvent.NavigateToSavings]
- *   (`flow.yaml#navigates_to: savings-dashboard`, `ui.yaml#components.savings_summary_card
- *   .on_click.target: personal-savings`) — a typed nav-arg contract (`groupId` + `poolModel`) for
- *   the caller to wire once that feature module is generated, mirroring `GroupListRoute`'s
- *   not-yet-generated-target convention.
+ *   (`ui.yaml#components.savings_summary_card.on_click.target: personal-savings`) — a typed nav-arg
+ *   contract carrying the three `personal-savings` nav_params (`clientId`, `groupLinkedSavingsId`,
+ *   optional `individualSavingsId`) + `poolModel`, wired to the real `personal-savings` feature
+ *   module in `GroupBankingNavHost`.
  * - [onNavigateToGroupList] closes [PersonalDashboardEvent.NavigateToGroupList]
  *   (`flow.yaml#navigates_to: group-list`) — currently unreachable from any wired `on_click` on
  *   this screen's canvas (see [PersonalDashboardViewModel] class KDoc "Idea-layer gap" note); the
@@ -45,7 +45,7 @@ fun NavController.navigateToPersonalDashboard(navOptions: NavOptions? = null) =
  * See API.md#route.
  */
 fun NavGraphBuilder.personalDashboardScreen(
-    onNavigateToSavings: (groupId: String, poolModel: String) -> Unit,
+    onNavigateToSavings: (clientId: Long, groupLinkedSavingsId: Long, individualSavingsId: Long?, poolModel: String) -> Unit,
     onNavigateToGroupList: () -> Unit,
 ) {
     composableWithRootPushTransitions<PersonalDashboardRoute> {

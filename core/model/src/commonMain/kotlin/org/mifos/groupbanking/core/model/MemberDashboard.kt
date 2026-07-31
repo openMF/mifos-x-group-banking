@@ -19,6 +19,15 @@ package org.mifos.groupbanking.core.model
  */
 data class MemberDashboard(
     val memberName: String,
+    /**
+     * Member-identity + savings-account ids forwarded to the `personal-savings` nav_params
+     * (`clientId`, `groupLinkedSavingsId`, `individualSavingsId`) when the member taps the savings
+     * summary card. [individualSavingsId] is nullable — the member may have no voluntary individual
+     * account (`personal-savings` route's `individualSavingsId: Long? = null`).
+     */
+    val clientId: Long,
+    val groupLinkedSavingsId: Long,
+    val individualSavingsId: Long?,
     val myGroups: List<GroupSummary>,
     val selectedGroup: GroupSummary,
     val poolModel: SavingsMechanism,
