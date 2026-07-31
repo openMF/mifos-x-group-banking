@@ -107,7 +107,10 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
 
     return when (response) {
         is StoreReadResponse.Data -> {
-            val items = response.value
+            // Guard an empty/absent page: a store whose mapper yields a null list for an empty
+            // response (platform type) crashed here with a FATAL NPE on `items.size` (device-truth
+            // 2026-07-31: loan-list empty page). Treat null as an empty page — render, don't crash.
+            val items = response.value ?: emptyList()
             StorePageResult.Success(
                 items = items,
                 prevKey = if (key.page > 0) key.page - 1 else null,

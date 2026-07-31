@@ -195,7 +195,11 @@ internal class GroupTypePickerViewModel(
 
     private fun handleTypeCardTap(typeSlug: String) {
         val slug = runCatching { GroupTypeSlug.valueOf(typeSlug) }.getOrDefault(GroupTypeSlug.UNKNOWN)
-        val config = state.typeConfigs.firstOrNull { it.typeSlug == slug }
+        // Screen dispatches OnTypeCardTap(config.typeSlug.name) — a String. Resolve by the enum's
+        // `.name`, NOT the enum itself: `it.typeSlug == slug` compared GroupTypeSlug (enum) to String
+        // → ALWAYS false → every tap fell to the unresolved path → dead nav to group-create
+        // (device-truth 2026-07-31, RULE-IMPL-DEAD-CLICKABLE-001).
+        val config = state.typeConfigs.firstOrNull { it.typeSlug.name == slug }
         if (config == null) {
             // Defensive: a card can only be visible (per ui.yaml `visible:
             // typeConfigs.isNotEmpty()`) once typeConfigs is populated, so this path is a
