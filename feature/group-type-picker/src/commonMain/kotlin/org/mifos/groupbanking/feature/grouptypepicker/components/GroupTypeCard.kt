@@ -27,8 +27,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -112,17 +110,25 @@ fun GroupTypeCard(
                 verticalArrangement = Arrangement.spacedBy(sp.xs),
             ) {
                 features.forEach { feature ->
-                    AssistChip(
-                        onClick = {},
-                        enabled = false,
-                        label = { Text(text = feature, style = MaterialTheme.typography.labelSmall) },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = AssistChipDefaults.assistChipColors(
-                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            disabledLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
-                        border = null,
-                    )
+                    // Decorative pill — deliberately NOT clickable. A disabled AssistChip still
+                    // registers a pointer/clickable node that SWALLOWED taps landing on the card's
+                    // centre, so the card's own .clickable (onClick, above) never fired → dead card
+                    // nav to group-create (device-truth A/B capture 2026-07-31, RULE-IMPL-DEAD-CLICKABLE-001).
+                    // A plain Box has no pointer node, so taps fall through to the card.
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(8.dp),
+                            )
+                            .padding(horizontal = sp.sm, vertical = sp.xs),
+                    ) {
+                        Text(
+                            text = feature,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    }
                 }
             }
         }
