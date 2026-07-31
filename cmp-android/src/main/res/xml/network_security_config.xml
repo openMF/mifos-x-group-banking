@@ -15,6 +15,14 @@
         </trust-anchors>
     </base-config>
 
+    <!-- Local development: allow cleartext HTTP to the companion backend on
+         loopback (localhost via `adb reverse`, and 10.0.2.2 = host from emulator). -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+
     <!-- Allow cleartext for local development only in debug builds -->
     <debug-overrides>
         <trust-anchors>
