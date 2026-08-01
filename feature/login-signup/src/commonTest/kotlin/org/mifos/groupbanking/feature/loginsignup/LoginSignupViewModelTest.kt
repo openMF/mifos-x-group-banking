@@ -23,6 +23,8 @@ import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.observability.ConsoleCrashReporter
+import org.mifos.groupbanking.core.data.demo.DemoSession
+import org.mifos.groupbanking.core.data.demo.DemoSessionManager
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.model.AuthSession
 import org.mifos.groupbanking.core.model.GroupMembership
@@ -46,14 +48,17 @@ class LoginSignupViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var repository: FakeAuthRepository
+    private lateinit var demoSessionManager: FakeDemoSessionManager
     private lateinit var viewModel: LoginSignupViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = FakeAuthRepository()
+        demoSessionManager = FakeDemoSessionManager()
         viewModel = LoginSignupViewModel(
             authRepository = repository,
+            demoSessionManager = demoSessionManager,
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
             crashReporter = ConsoleCrashReporter(),
         )
@@ -288,10 +293,99 @@ class LoginSignupViewModelTest {
     }
 
     @Test
-    fun `OnJoinWithCodeTap emits NavigateToJoinWithCode`() = runTest(testDispatcher) {
+    fun `OnJoinWithCodeTap emits NavigateToJoinWithCode with no code`() = runTest(testDispatcher) {
         viewModel.eventFlow.test {
             viewModel.trySendAction(LoginSignupAction.OnJoinWithCodeTap)
-            assertEquals(LoginSignupEvent.NavigateToJoinWithCode, awaitItem())
+            assertEquals(LoginSignupEvent.NavigateToJoinWithCode(inviteCode = null), awaitItem())
+        }
+    }
+
+    @Test
+    fun `OnAcceptInvitationTap emits NavigateToJoinWithCode with no code`() = runTest(testDispatcher) {
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(LoginSignupAction.OnAcceptInvitationTap)
+            assertEquals(LoginSignupEvent.NavigateToJoinWithCode(inviteCode = null), awaitItem())
+        }
+    }
+
+    @Test
+    fun `OnDemoExplore opens the demo confirm dialog`() = runTest(testDispatcher) {
+        viewModel.trySendAction(LoginSignupAction.OnDemoExplore)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(viewModel.stateFlow.value.showDemoDialog)
+    }
+
+    @Test
+    fun `OnDemoCancel dismisses the demo confirm dialog`() = runTest(testDispatcher) {
+        viewModel.trySendAction(LoginSignupAction.OnDemoExplore)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.trySendAction(LoginSignupAction.OnDemoCancel)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(false, viewModel.stateFlow.value.showDemoDialog)
+    }
+
+    @Test
+    fun `OnDemoConfirm seeds the offline demo session and emits NavigateToOrganizerDashboard`() = runTest(testDispatcher) {
+        viewModel.trySendAction(LoginSignupAction.OnDemoExplore)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(LoginSignupAction.OnDemoConfirm)
+            assertEquals(LoginSignupEvent.NavigateToOrganizerDashboard, awaitItem())
+        }
+
+        val state = viewModel.stateFlow.value
+        assertEquals(1, demoSessionManager.startCallCount)
+        assertEquals(false, state.showDemoDialog)
+        assertEquals(false, state.isSeedingDemo)
+    }
+
+    @Test
+    fun `OnDemoConfirm seed failure surfaces Error screen state without navigation`() = runTest(testDispatcher) {
+        demoSessionManager.startResult = Result.failure(IllegalStateException("disk full"))
+
+        viewModel.trySendAction(LoginSignupAction.OnDemoConfirm)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.stateFlow.value
+        assertEquals(false, state.isSeedingDemo)
+        assertEquals(LoginSignupScreenState.Error, state.screenState)
+        assertEquals(LoginSignupError.Server, state.error)
+    }
+
+    @Test
+    fun `login success with pendingInviteCode resumes join instead of default landing (TC-LS-010)`() = runTest(testDispatcher) {
+        repository.loginResult = NetworkResult.Success(
+            sampleSession(groups = listOf(sampleMembership(role = GroupRole.MEMBER))),
+        )
+        // pendingInviteCode carried pre-auth from join-with-code (6-char).
+        viewModel.trySendAction(LoginSignupAction.Internal.SetPendingInviteCode("DEMO24"))
+        viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("grace.wanjiku@example.com"))
+        viewModel.trySendAction(LoginSignupAction.OnPasswordChange("Passw0rd!"))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(LoginSignupAction.OnLoginTap)
+            assertEquals(LoginSignupEvent.NavigateToJoinWithCode(inviteCode = "DEMO24"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `signup success with pendingInviteCode resumes join instead of ZeroGroups (TC-LS-010)`() = runTest(testDispatcher) {
+        repository.selfRegisterResult = NetworkResult.Success(sampleSession(groups = emptyList()))
+        viewModel.trySendAction(LoginSignupAction.Internal.SetPendingInviteCode("DEMO24"))
+        viewModel.trySendAction(LoginSignupAction.OnModeToggle(AuthMode.Signup))
+        viewModel.trySendAction(LoginSignupAction.OnNameChange("Grace Wanjiku"))
+        viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("grace.wanjiku@example.com"))
+        viewModel.trySendAction(LoginSignupAction.OnPasswordChange("Passw0rd!"))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(LoginSignupAction.OnSignupTap)
+            assertEquals(LoginSignupEvent.NavigateToJoinWithCode(inviteCode = "DEMO24"), awaitItem())
         }
     }
 
@@ -379,5 +473,32 @@ private class FakeAuthRepository : AuthRepository {
     override suspend fun clearSession() {
         clearSessionCalled = true
         sessionFlow.value = null
+    }
+}
+
+/** In-memory [DemoSessionManager] fake — no persistence, no cache seed, no network. */
+private class FakeDemoSessionManager : DemoSessionManager {
+
+    var startResult: Result<DemoSession> = Result.success(
+        DemoSession(userId = "demo-user-amina", groupId = "demo-group-001", organizerName = "Amina Otieno"),
+    )
+
+    var startCallCount: Int = 0
+        private set
+    var clearCallCount: Int = 0
+        private set
+
+    private var active: Boolean = false
+
+    override suspend fun startDemoSession(): Result<DemoSession> {
+        startCallCount++
+        return startResult.also { active = it.isSuccess }
+    }
+
+    override fun isDemoSession(): Boolean = active
+
+    override suspend fun clearDemoSession() {
+        clearCallCount++
+        active = false
     }
 }

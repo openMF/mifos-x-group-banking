@@ -25,6 +25,8 @@ import kpt.core.database.AppDatabase
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.network.di.NetworkModule
+import org.mifos.groupbanking.core.data.demo.DemoSessionManager
+import org.mifos.groupbanking.core.data.demo.DemoSessionManagerImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -96,6 +98,21 @@ val DataModule = module {
     // login-signup client stack (COMP-AUTH-001/002/003) — Store5-free (business_logic.kind:
     // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
     single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get()) }
+
+    // login-signup Demo Explore offline guest session (ui.yaml#demo_confirm_dialog,
+    // flow.yaml#on_demo_confirm). Seeds the organizer-dashboard read cache from the bundled
+    // PROJECT_DEMO_DATA fixture + persists a synthetic demo session — 100% offline, no companion
+    // API / Fineract. Not a Store5 read-store (business_logic.kind: processor) — a session-scoped
+    // seed manager, same branch as SyncManager / UserLogoutManager below. Depends on
+    // CompanionSessionStore (DatastoreModule) + OrganizerDashboardDao (DatabaseModule) +
+    // FetchedAtRepository (below).
+    single<DemoSessionManager> {
+        DemoSessionManagerImpl(
+            sessionStore = get(),
+            organizerDashboardDao = get<AppDatabase>().organizerDashboardDao,
+            fetchedAtRepository = get(),
+        )
+    }
 
     // group-type-picker seeded catalogue (COMP-DT-003) — wraps the NETWORK_WITH_CACHE
     // GroupTypeConfigStore (bound via AppStoreRegistry.GroupTypeConfig in appStoreModule) and

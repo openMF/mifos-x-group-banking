@@ -14,6 +14,7 @@ import kpt.core.designsystem.theme.KptTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
+import org.mifos.groupbanking.feature.loginsignup.components.DemoExploreConfirmDialog
 
 /**
  * `@Preview` gallery for `LoginSignupScreen.kt`. See API.md#preview. Data source: `demo-data.yaml`
@@ -115,5 +116,21 @@ private fun AuthFormSectionSignupErrorPreview() {
 private fun ZeroGroupsSectionPreview() {
     KptTheme {
         ZeroGroupsSection(onAction = {})
+    }
+}
+
+@Preview
+@Composable
+private fun DemoExploreConfirmDialogPreview() {
+    KptTheme {
+        DemoExploreConfirmDialog(isSeeding = false, onConfirm = {}, onCancel = {})
+    }
+}
+
+@Preview
+@Composable
+private fun DemoExploreConfirmDialogSeedingPreview() {
+    KptTheme {
+        DemoExploreConfirmDialog(isSeeding = true, onConfirm = {}, onCancel = {})
     }
 }

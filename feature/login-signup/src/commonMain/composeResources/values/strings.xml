@@ -61,4 +61,21 @@
     <string name="screens_login_signup_validation_password_weak">Password must be at least 8 characters.</string>
 
     <string name="screens_login_signup_forgot_password_snackbar">To reset your password, use the web portal or contact your group organizer.</string>
+
+    <string name="screens_login_signup_divider_alt_actions">New here?</string>
+
+    <string name="screens_login_signup_action_accept_invitation">Accept an Invitation</string>
+    <string name="screens_login_signup_accept_invitation_cd">Accept a group invitation using an invite code</string>
+
+    <string name="screens_login_signup_action_demo_explore">Demo Explore</string>
+    <string name="screens_login_signup_demo_explore_cd">Explore the app as a demo user without an account</string>
+
+    <string name="screens_login_signup_demo_dialog_title">Explore as a demo user</string>
+    <string name="screens_login_signup_demo_dialog_body">This is a demo user logging in to explore the application.</string>
+    <string name="screens_login_signup_demo_dialog_note">No real account is created and nothing is saved to a server. You can sign up or accept an invitation any time.</string>
+    <string name="screens_login_signup_demo_dialog_cancel">Cancel</string>
+    <string name="screens_login_signup_demo_dialog_confirm">Continue</string>
+    <string name="screens_login_signup_demo_dialog_cd">Demo Explore confirmation dialog</string>
+    <string name="screens_login_signup_demo_dialog_cancel_cd">Cancel and return to the sign in form</string>
+    <string name="screens_login_signup_demo_dialog_confirm_cd">Continue into the demo session</string>
 </resources>

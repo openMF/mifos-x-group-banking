@@ -178,7 +178,7 @@ fun GroupBankingNavHost(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = LoginSignupRoute,
+                startDestination = LoginSignupRoute(),
                 modifier = Modifier.fillMaxSize(),
             ) {
                 // 1. login-signup (start / pre-auth)
@@ -193,7 +193,11 @@ fun GroupBankingNavHost(
                     onNavigateToOrganizerDashboard = { navController.navigateToOrganizerDashboard() },
                     onNavigateToGroupList = { navController.navigateToGroupList() },
                     onNavigateToGroupTypePicker = { navController.navigateToGroupTypePicker() },
-                    onNavigateToJoinWithCode = { navController.navigateToJoinWithCode() },
+                    // Thread the optional pre-auth resume invite code onward so join-with-code
+                    // can pre-fill it (null for a plain Accept-Invitation / zero-groups Join tap).
+                    onNavigateToJoinWithCode = { inviteCode ->
+                        navController.navigateToJoinWithCode(inviteCode = inviteCode)
+                    },
                 )
 
                 // 2. group-type-picker → group-create (carries the resolved GroupTypeConfig)
@@ -226,7 +230,11 @@ fun GroupBankingNavHost(
                     onNavigateToGroupDashboard = { groupId ->
                         navController.navigateToGroupDashboard(groupId = groupId, viewerRole = "MEMBER")
                     },
-                    onNavigateToLoginSignup = { _ -> navController.navigateToLoginSignup() },
+                    // Pre-auth invite resume (TC-LS-010): carry the entered code back to
+                    // login-signup so a subsequent login/signup success resumes the join.
+                    onNavigateToLoginSignup = { pendingInviteCode ->
+                        navController.navigateToLoginSignup(pendingInviteCode = pendingInviteCode)
+                    },
                     onNavigateBack = { navController.popBackStack() },
                 )
 

@@ -62,4 +62,22 @@ object LoginSignupTestTags {
 
     /** "Join with Invite Code" button — ZeroGroups screenState. */
     const val JOIN_WITH_CODE_BUTTON: String = "login_signup_join_with_code_button"
+
+    /** Labeled divider separating the primary CTA from the first-class alt-auth entries (both modes). */
+    const val ALT_ACTIONS_DIVIDER: String = "login_signup_alt_actions_divider"
+
+    /** First-class PRE-AUTH "Accept an Invitation" outlined button — Content state, both modes. */
+    const val ACCEPT_INVITATION_BUTTON: String = "login_signup_accept_invitation_button"
+
+    /** "Demo Explore" text button — Content state, both modes. */
+    const val DEMO_EXPLORE_BUTTON: String = "login_signup_demo_explore_button"
+
+    /** Demo Explore confirm [androidx.compose.material3.AlertDialog] (shown while showDemoDialog || isSeedingDemo). */
+    const val DEMO_CONFIRM_DIALOG: String = "login_signup_demo_confirm_dialog"
+
+    /** "Continue" confirm button inside the Demo Explore dialog (shows a spinner while isSeedingDemo). */
+    const val DEMO_CONFIRM_BUTTON: String = "login_signup_demo_confirm_button"
+
+    /** "Cancel" dismiss button inside the Demo Explore dialog. */
+    const val DEMO_CANCEL_BUTTON: String = "login_signup_demo_cancel_button"
 }
