@@ -15,7 +15,7 @@
     <string name="screens_join_with_code_validating_message">Checking code…</string>
     <string name="screens_join_with_code_validating_cd">Validating invite code, please wait</string>
 
-    <string name="screens_join_with_code_preview_title">You\'re invited to join</string>
+    <string name="screens_join_with_code_preview_title">You're invited to join</string>
     <string name="screens_join_with_code_preview_card_cd">Group preview details</string>
     <string name="screens_join_with_code_label_group_type">Type</string>
     <string name="screens_join_with_code_label_organizer">Organiser</string>

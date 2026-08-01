@@ -6,7 +6,7 @@
     <string name="screens_group_list_search_hint">Search groups…</string>
     <string name="screens_group_list_search_icon_cd">Search</string>
     <string name="screens_group_list_search_clear_cd">Clear search</string>
-    <string name="screens_group_list_search_empty_message">No results for \'%1$s\'</string>
+    <string name="screens_group_list_search_empty_message">No results for '%1$s'</string>
 
     <string name="screens_group_list_cycle_label">Cycle %1$d</string>
     <string name="screens_group_list_member_count">%1$d members</string>

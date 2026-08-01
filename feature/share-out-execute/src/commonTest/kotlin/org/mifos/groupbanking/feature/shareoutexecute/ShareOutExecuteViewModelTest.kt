@@ -82,6 +82,7 @@ class ShareOutExecuteViewModelTest {
         typeConfig: GroupTypeConfig = accumulatingTypeConfig(),
         totalPool: Double = TOTAL_POOL,
         memberPayouts: List<MemberPayout> = defaultPayouts(),
+        cycleNumber: Int = 3,
     ): ShareOutExecuteViewModel = ShareOutExecuteViewModel(
         repository = repository,
         networkMonitor = networkMonitor,
@@ -92,6 +93,7 @@ class ShareOutExecuteViewModelTest {
         typeConfig = typeConfig,
         totalPool = totalPool,
         memberPayouts = memberPayouts,
+        cycleNumber = cycleNumber,
     )
 
     // -- initial state -------------------------------------------------------------------------

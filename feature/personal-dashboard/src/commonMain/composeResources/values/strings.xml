@@ -32,7 +32,7 @@
     <string name="screens_personal_dashboard_transaction_withdrawal_amount">- KES %1$s</string>
 
     <string name="screens_personal_dashboard_empty_icon_cd">No groups</string>
-    <string name="screens_personal_dashboard_empty_title">Welcome! You haven\'t joined a group yet</string>
+    <string name="screens_personal_dashboard_empty_title">Welcome! You haven't joined a group yet</string>
     <string name="screens_personal_dashboard_empty_body">Join an existing savings group or create your own to start saving together.</string>
 
     <string name="screens_personal_dashboard_error_icon_cd">Error</string>

@@ -267,6 +267,7 @@ internal class ShareOutExecuteViewModel(
     private val typeConfig: GroupTypeConfig,
     private val totalPool: Double,
     private val memberPayouts: List<MemberPayout>,
+    private val cycleNumber: Int,
 ) : BaseViewModel<ShareOutExecuteState, ShareOutExecuteEvent, ShareOutExecuteAction>(
     initialState = run {
         val poolModel = typeConfig.toPoolModel()
@@ -275,6 +276,7 @@ internal class ShareOutExecuteViewModel(
             typeConfig = typeConfig,
             poolModel = poolModel,
             shareoutFormula = typeConfig.toDefaultShareoutFormula(poolModel),
+            cycleNumber = cycleNumber,
             totalPool = totalPool,
             memberPayouts = memberPayouts,
             totalCount = memberPayouts.size,

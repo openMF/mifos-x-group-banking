@@ -151,6 +151,7 @@ sealed interface ShareOutPreviewEvent {
         val typeConfig: GroupTypeConfig,
         val totalPool: Double,
         val memberPayouts: List<MemberPayout>,
+        val cycleNumber: Int,
     ) : ShareOutPreviewEvent
 
     data object NavigateBack : ShareOutPreviewEvent
@@ -333,6 +334,7 @@ internal class ShareOutPreviewViewModel(
                 typeConfig = typeConfig,
                 totalPool = current.totalPool,
                 memberPayouts = current.memberPayouts,
+                cycleNumber = current.cycleNumber,
             ),
         )
     }

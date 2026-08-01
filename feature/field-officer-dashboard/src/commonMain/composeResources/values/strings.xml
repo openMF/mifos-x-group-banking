@@ -33,7 +33,7 @@
     <string name="screens_field_officer_dashboard_export_error">Failed to generate report. Please try again.</string>
 
     <string name="screens_field_officer_dashboard_empty_title">No Groups Assigned</string>
-    <string name="screens_field_officer_dashboard_empty_body">You don\'t have any groups assigned yet. Contact your office administrator.</string>
+    <string name="screens_field_officer_dashboard_empty_body">You don't have any groups assigned yet. Contact your office administrator.</string>
     <string name="screens_field_officer_dashboard_empty_filter_title">No Groups Match Filters</string>
     <string name="screens_field_officer_dashboard_empty_filter_body">Try adjusting or clearing your filters.</string>
 

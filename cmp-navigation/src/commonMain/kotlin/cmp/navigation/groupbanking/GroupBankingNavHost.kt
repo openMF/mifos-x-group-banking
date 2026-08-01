@@ -378,12 +378,13 @@ fun GroupBankingNavHost(
                 // group-dashboard's `Share Out (cycle-end action)`. The confirm handoff now wires to
                 // the REAL share-out-execute feature module (COMP-DIST-001/002 irreversible execute).
                 shareOutPreviewScreen(
-                    onNavigateToShareOutExecute = { groupId, typeConfig, totalPool, memberPayouts ->
+                    onNavigateToShareOutExecute = { groupId, typeConfig, totalPool, memberPayouts, cycleNumber ->
                         navController.navigateToShareOutExecute(
                             groupId = groupId,
                             typeConfig = typeConfig,
                             totalPool = totalPool,
                             memberPayouts = memberPayouts,
+                            cycleNumber = cycleNumber,
                         )
                     },
                     onNavigateBack = { navController.popBackStack() },

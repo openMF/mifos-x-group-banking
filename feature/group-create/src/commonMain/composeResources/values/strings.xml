@@ -10,7 +10,7 @@
     <string name="screens_group_create_step_review">Review</string>
 
     <string name="screens_group_create_field_name_label">Group Name</string>
-    <string name="screens_group_create_field_name_placeholder">e.g. Mwangaza Women\'s Group</string>
+    <string name="screens_group_create_field_name_placeholder">e.g. Mwangaza Women's Group</string>
     <string name="screens_group_create_field_name_cd">Group name input, enter a name for your new group</string>
 
     <string name="screens_group_create_field_office_label">Office</string>
@@ -18,7 +18,7 @@
     <string name="screens_group_create_field_office_cd">Office selector, choose the office this group belongs to</string>
 
     <string name="screens_group_create_field_currency_label">Currency</string>
-    <string name="screens_group_create_field_currency_cd">Currency selector, choose the group\'s transaction currency</string>
+    <string name="screens_group_create_field_currency_cd">Currency selector, choose the group's transaction currency</string>
 
     <string name="screens_group_create_field_meeting_day_label">Meeting Day</string>
     <string name="screens_group_create_field_meeting_day_cd">Meeting day selector, choose the weekly meeting day</string>
@@ -72,7 +72,7 @@
     <string name="screens_group_create_section_identity">Identity</string>
     <string name="screens_group_create_section_identity_cd">Identity review section, showing the group name, office, currency and meeting time</string>
     <string name="screens_group_create_section_rules">Rules</string>
-    <string name="screens_group_create_section_rules_cd">Rules review section, showing the group\'s financial rules</string>
+    <string name="screens_group_create_section_rules_cd">Rules review section, showing the group's financial rules</string>
     <string name="screens_group_create_section_members">Members</string>
     <string name="screens_group_create_section_members_cd">Members review section, showing the maximum group size</string>
 
@@ -114,11 +114,11 @@
 
     <string name="screens_group_create_offline_notice">You are offline. This group will be created when you reconnect.</string>
     <string name="screens_group_create_offline_notice_cd">Offline indicator icon</string>
-    <string name="screens_group_create_offline_dialog_title">You\'re offline</string>
+    <string name="screens_group_create_offline_dialog_title">You're offline</string>
     <string name="screens_group_create_offline_dialog_message">Your group has been queued for sync and will be created automatically once you reconnect.</string>
     <string name="screens_group_create_offline_dialog_confirm">Got it</string>
 
-    <string name="screens_group_create_error_title">Couldn\'t create group</string>
+    <string name="screens_group_create_error_title">Couldn't create group</string>
     <string name="screens_group_create_error_icon_cd">Error</string>
     <string name="screens_group_create_error_validation">Please fix the highlighted fields.</string>
     <string name="screens_group_create_error_network">No internet. Your group has been queued for sync.</string>

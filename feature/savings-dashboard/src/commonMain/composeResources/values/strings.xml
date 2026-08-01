@@ -24,7 +24,7 @@
     <string name="screens_savings_dashboard_total_individual_label">Total Individual Balances</string>
     <string name="screens_savings_dashboard_individual_total_amount_format">KES %1$s</string>
 
-    <string name="screens_savings_dashboard_avatar_cd_format">%1$s\'s avatar</string>
+    <string name="screens_savings_dashboard_avatar_cd_format">%1$s's avatar</string>
 
     <string name="screens_savings_dashboard_member_shares_format">%1$d shares @ KES %2$s/share</string>
     <string name="screens_savings_dashboard_member_meetings_format">%1$d meetings · Last: KES %2$s</string>

@@ -2,7 +2,7 @@
 <resources>
     <string name="screens_loan_mark_defaulted_dialog_title">Mark Loan as Defaulted</string>
     <string name="screens_loan_mark_defaulted_dialog_warning_icon_cd">Warning</string>
-    <string name="screens_loan_mark_defaulted_dialog_warning_body">This action cannot be undone. Member %1$s\'s loan of KES %2$s will be marked as defaulted.</string>
+    <string name="screens_loan_mark_defaulted_dialog_warning_body">This action cannot be undone. Member %1$s's loan of KES %2$s will be marked as defaulted.</string>
     <string name="screens_loan_mark_defaulted_dialog_cancel">Cancel</string>
     <string name="screens_loan_mark_defaulted_dialog_confirm">Mark Defaulted</string>
     <string name="screens_loan_mark_defaulted_dialog_confirm_cd">Marking loan as defaulted</string>

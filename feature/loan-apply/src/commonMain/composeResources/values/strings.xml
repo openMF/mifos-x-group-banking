@@ -45,7 +45,7 @@
     <string name="screens_loan_apply_action_submitting">Submitting…</string>
     <string name="screens_loan_apply_action_submitting_cd">Submitting application, please wait</string>
 
-    <string name="screens_loan_apply_error_title">Couldn\'t submit application</string>
+    <string name="screens_loan_apply_error_title">Couldn't submit application</string>
     <string name="screens_loan_apply_error_icon_cd">Error</string>
     <string name="screens_loan_apply_action_retry">Retry</string>
     <string name="screens_loan_apply_action_retry_cd">Retry submitting the application</string>

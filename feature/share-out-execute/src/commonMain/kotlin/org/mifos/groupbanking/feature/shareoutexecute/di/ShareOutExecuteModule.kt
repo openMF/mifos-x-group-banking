@@ -42,6 +42,7 @@ val ShareOutExecuteModule = module {
             typeConfig = parameters.get<GroupTypeConfig>(),
             totalPool = parameters.get<Double>(),
             memberPayouts = parameters.get<List<MemberPayout>>(),
+            cycleNumber = parameters.get<Int>(),
         )
     }
 }

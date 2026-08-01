@@ -128,6 +128,7 @@ fun NavGraphBuilder.shareOutPreviewScreen(
         typeConfig: GroupTypeConfig,
         totalPool: Double,
         memberPayouts: List<MemberPayout>,
+        cycleNumber: Int,
     ) -> Unit,
     onNavigateBack: () -> Unit,
 ) {

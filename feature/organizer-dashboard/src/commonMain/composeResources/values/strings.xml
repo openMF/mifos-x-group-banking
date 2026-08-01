@@ -6,7 +6,7 @@
     <string name="screens_organizer_dashboard_loading_message">Loading dashboard…</string>
 
     <string name="screens_organizer_dashboard_welcome_greeting">Welcome back, %1$s</string>
-    <string name="screens_organizer_dashboard_welcome_subtitle">Here\'s your overview for today</string>
+    <string name="screens_organizer_dashboard_welcome_subtitle">Here's your overview for today</string>
 
     <string name="screens_organizer_dashboard_kpi_my_groups">My Groups</string>
     <string name="screens_organizer_dashboard_kpi_members">Members</string>
@@ -20,7 +20,7 @@
     <string name="screens_organizer_dashboard_nav_field_officers_sub">Officer overview</string>
     <string name="screens_organizer_dashboard_badge_optional">Optional</string>
 
-    <string name="screens_organizer_dashboard_todays_schedule_label">Today\'s Schedule</string>
+    <string name="screens_organizer_dashboard_todays_schedule_label">Today's Schedule</string>
     <string name="screens_organizer_dashboard_schedule_count_chip">%1$d meetings</string>
     <string name="screens_organizer_dashboard_schedule_supporting">%1$s · %2$d members</string>
     <string name="screens_organizer_dashboard_no_meetings_today">No meetings scheduled for today</string>

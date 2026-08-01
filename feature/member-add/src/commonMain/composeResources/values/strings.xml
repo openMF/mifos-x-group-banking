@@ -46,7 +46,7 @@
     <string name="screens_member_add_error_network">No internet. Member queued for sync.</string>
     <string name="screens_member_add_error_server">Server error. Please retry.</string>
     <string name="screens_member_add_error_auth">Session expired.</string>
-    <string name="screens_member_add_error_banner_title">Couldn\'t add member</string>
+    <string name="screens_member_add_error_banner_title">Couldn't add member</string>
     <string name="screens_member_add_error_banner_icon_cd">Error</string>
 
     <string name="screens_member_add_action_retry">Retry</string>
@@ -56,6 +56,6 @@
     <string name="screens_member_add_success_icon_cd">Success</string>
 
     <string name="screens_member_add_offline_dialog_title">Saved offline</string>
-    <string name="screens_member_add_offline_dialog_message">You\'re offline right now. This member will be created automatically once your connection is back.</string>
+    <string name="screens_member_add_offline_dialog_message">You're offline right now. This member will be created automatically once your connection is back.</string>
     <string name="screens_member_add_offline_dialog_confirm">Got it</string>
 </resources>

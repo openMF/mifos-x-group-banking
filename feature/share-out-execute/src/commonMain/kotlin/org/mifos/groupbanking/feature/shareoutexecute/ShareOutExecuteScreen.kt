@@ -138,12 +138,13 @@ internal fun ShareOutExecuteScreen(
     typeConfig: GroupTypeConfig,
     totalPool: Double,
     memberPayouts: List<MemberPayout>,
+    cycleNumber: Int,
     onNavigateToGroupDashboard: (groupId: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     biometricAuthenticator: BiometricAuthenticator = koinInject(),
     viewModel: ShareOutExecuteViewModel = koinViewModel(
-        parameters = { parametersOf(groupId, typeConfig, totalPool, memberPayouts) },
+        parameters = { parametersOf(groupId, typeConfig, totalPool, memberPayouts, cycleNumber) },
     ),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()

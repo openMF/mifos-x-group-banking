@@ -2,7 +2,7 @@
 <resources>
     <string name="screens_member_savings_detail_screen_title">Member Savings</string>
 
-    <string name="screens_member_savings_detail_avatar_cd_format">%1$s\'s avatar</string>
+    <string name="screens_member_savings_detail_avatar_cd_format">%1$s's avatar</string>
 
     <string name="screens_member_savings_detail_balance_label_shares">Shares Held</string>
     <string name="screens_member_savings_detail_balance_label_savings">Savings Balance</string>

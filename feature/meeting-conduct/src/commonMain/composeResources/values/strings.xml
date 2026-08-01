@@ -37,7 +37,7 @@
     <string name="screens_meeting_conduct_info_attendance">Attendance</string>
     <string name="screens_meeting_conduct_prev_summary_cd">Previous meeting summary details</string>
     <string name="screens_meeting_conduct_first_meeting_title">First Meeting</string>
-    <string name="screens_meeting_conduct_first_meeting_body">No previous meeting data — this is the group\'s first meeting.</string>
+    <string name="screens_meeting_conduct_first_meeting_body">No previous meeting data — this is the group's first meeting.</string>
     <string name="screens_meeting_conduct_view_full_report">View Full Report</string>
 
     <string name="screens_meeting_conduct_attendance_fine_info">Late: KES 50 fine · Absent: KES 100 fine (FR-012)</string>
@@ -88,7 +88,7 @@
     <string name="screens_meeting_conduct_submit_meeting">Submit Meeting</string>
     <string name="screens_meeting_conduct_submitting">Submitting…</string>
     <string name="screens_meeting_conduct_submit_cd">Submit meeting and post collection sheet</string>
-    <string name="screens_meeting_conduct_offline_submit_note">You\'re offline. Meeting data will be saved locally and synced when connected.</string>
+    <string name="screens_meeting_conduct_offline_submit_note">You're offline. Meeting data will be saved locally and synced when connected.</string>
 
     <string name="screens_meeting_conduct_back">Back</string>
     <string name="screens_meeting_conduct_next">Next</string>
@@ -100,7 +100,7 @@
 
     <string name="screens_meeting_conduct_error_attendance_incomplete">Please record attendance for all members before proceeding.</string>
     <string name="screens_meeting_conduct_error_min_contribution">Every member must contribute the minimum group savings of KES 200.</string>
-    <string name="screens_meeting_conduct_error_repayment_exceeds">A repayment amount exceeds the loan\'s outstanding balance.</string>
+    <string name="screens_meeting_conduct_error_repayment_exceeds">A repayment amount exceeds the loan's outstanding balance.</string>
     <string name="screens_meeting_conduct_error_corpus_insufficient">Corpus balance insufficient to disburse the approved loans.</string>
     <string name="screens_meeting_conduct_error_server">Server error. Please try again.</string>
     <string name="screens_meeting_conduct_error_auth">Session expired. Please log in again.</string>

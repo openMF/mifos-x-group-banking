@@ -122,6 +122,7 @@ internal fun ShareOutPreviewScreen(
         typeConfig: GroupTypeConfig,
         totalPool: Double,
         memberPayouts: List<MemberPayout>,
+        cycleNumber: Int,
     ) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -142,7 +143,7 @@ internal fun ShareOutPreviewScreen(
     EventsEffect(viewModel) { event ->
         when (event) {
             is ShareOutPreviewEvent.NavigateToShareOutExecute ->
-                onNavigateToShareOutExecute(event.groupId, event.typeConfig, event.totalPool, event.memberPayouts)
+                onNavigateToShareOutExecute(event.groupId, event.typeConfig, event.totalPool, event.memberPayouts, event.cycleNumber)
 
             ShareOutPreviewEvent.NavigateBack -> onNavigateBack()
 

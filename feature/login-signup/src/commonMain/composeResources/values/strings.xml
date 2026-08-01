@@ -38,8 +38,8 @@
 
     <string name="screens_login_signup_error_icon_cd">Error</string>
 
-    <string name="screens_login_signup_zero_groups_title">You\'re all set!</string>
-    <string name="screens_login_signup_zero_groups_message">You don\'t belong to any savings group yet. Create your first group or join one with an invite code.</string>
+    <string name="screens_login_signup_zero_groups_title">You're all set!</string>
+    <string name="screens_login_signup_zero_groups_message">You don't belong to any savings group yet. Create your first group or join one with an invite code.</string>
     <string name="screens_login_signup_zero_groups_illustration_cd">Empty groups illustration</string>
 
     <string name="screens_login_signup_action_create_group">Create Your First Group</string>
