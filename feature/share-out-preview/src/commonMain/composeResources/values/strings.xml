@@ -23,7 +23,7 @@
     <string name="screens_share_out_preview_col_savings">Savings</string>
     <string name="screens_share_out_preview_col_share">Share %</string>
     <string name="screens_share_out_preview_col_payout">Payout (KES)</string>
-    <string name="screens_share_out_preview_share_percent_format">%1$s%%</string>
+    <string name="screens_share_out_preview_share_percent_format">%1$s%</string>
 
     <string name="screens_share_out_preview_next_recipient_label">Next Recipient</string>
     <string name="screens_share_out_preview_your_position_label_format">Your position: %1$d</string>

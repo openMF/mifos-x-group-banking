@@ -10,7 +10,7 @@
 
     <string name="screens_share_out_execute_header_member_payouts">Member Payouts</string>
     <string name="screens_share_out_execute_header_rotation_payout">Rotation Payout</string>
-    <string name="screens_share_out_execute_member_share_format">KES %1$s (%2$s%%)</string>
+    <string name="screens_share_out_execute_member_share_format">KES %1$s (%2$s%)</string>
 
     <string name="screens_share_out_execute_offline_info_banner">You are offline. Share-out will be queued and executed automatically when you reconnect.</string>
 
