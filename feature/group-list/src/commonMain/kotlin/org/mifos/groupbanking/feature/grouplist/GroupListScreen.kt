@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.GroupOff
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +48,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.paging.rememberLoadMoreTrigger
 import kpt.core.designsystem.theme.spacing
@@ -72,6 +74,8 @@ import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_grou
 import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_error_title
 import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_fab_cd
 import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_loading_message
+import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_notifications_cd
+import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_notifications_deferred
 import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_search_empty_message
 import org.mifos.groupbanking.feature.grouplist.generated.resources.screens_group_list_title
 
@@ -102,6 +106,7 @@ internal fun GroupListScreen(
     val networkMessage = stringResource(Res.string.screens_group_list_error_network_message)
     val serverMessage = stringResource(Res.string.screens_group_list_error_server_message)
     val authMessage = stringResource(Res.string.screens_group_list_error_auth_message)
+    val notificationsDeferredMessage = stringResource(Res.string.screens_group_list_notifications_deferred)
 
     EventsEffect(viewModel) { event ->
         when (event) {
@@ -109,6 +114,8 @@ internal fun GroupListScreen(
                 onNavigateToGroupDashboard(event.groupId, event.viewerRole)
             GroupListEvent.NavigateToCreateGroup -> onNavigateToCreateGroup()
             GroupListEvent.NavigateToJoinGroup -> onNavigateToJoinGroup()
+            // G15 — deferred notifications centre: no navigation, just a snackbar.
+            GroupListEvent.NotificationsDeferred -> snackbarHostState.showSnackbar(notificationsDeferredMessage)
             is GroupListEvent.ShowSnackbar -> {
                 val resolved = messageKeyToText(event.message, networkMessage, serverMessage, authMessage)
                 snackbarHostState.showSnackbar(resolved)
@@ -147,10 +154,21 @@ internal fun GroupListContent(
 ) {
     val title = stringResource(Res.string.screens_group_list_title)
     val fabCd = stringResource(Res.string.screens_group_list_fab_cd)
+    // G15 — top-bar notification bell (`ui.yaml#components.top_bar.actions[notifications]`). The
+    // framework `TopAppBarAction` exposes no testTag slot, so this affordance is selected in UI
+    // tests / Maestro by its `contentDescription` (GroupListTestTags.NOTIFICATION_ACTION documents it).
+    val notificationsCd = stringResource(Res.string.screens_group_list_notifications_cd)
 
     KptScaffold(
         showNavigationIcon = false,
         title = title,
+        actions = listOf(
+            TopAppBarAction(
+                icon = Icons.Filled.Notifications,
+                contentDescription = notificationsCd,
+                onClick = { onAction(GroupListAction.OnOpenNotifications) },
+            ),
+        ),
         floatingActionButtonContent = FloatingActionButtonContent(
             onClick = { onAction(GroupListAction.OnCreateGroup) },
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,

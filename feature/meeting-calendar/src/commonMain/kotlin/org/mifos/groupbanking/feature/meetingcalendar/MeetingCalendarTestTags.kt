@@ -43,6 +43,35 @@ object MeetingCalendarTestTags {
     /** Retry CTA on the error state — [MeetingCalendarAction.Retry]. */
     const val ERROR_RETRY_BUTTON: String = "meeting_calendar_error_retry_button"
 
+    // -- G3 / F6 schedule editor (append-only, RULE-KMP-COMPOSE-UITEST-001 CU-5) --------------------
+
+    /** "Reschedule" text button on the upcoming card — [MeetingCalendarAction.OpenScheduleEditor]. */
+    const val RESCHEDULE_BUTTON: String = "meeting_calendar_reschedule_button"
+
+    /** "Set / Adjust Schedule" CTA in the no-upcoming card + empty state — [MeetingCalendarAction.OpenScheduleEditor]. */
+    const val SET_SCHEDULE_BUTTON: String = "meeting_calendar_set_schedule_button"
+
+    /** The schedule-editor modal bottom sheet surface — visible when `showScheduleEditor`. */
+    const val SCHEDULE_EDITOR_SHEET: String = "meeting_calendar_schedule_editor_sheet"
+
+    /** Meeting-day dropdown field in the schedule editor. */
+    const val SCHEDULE_DAY_FIELD: String = "meeting_calendar_schedule_day_field"
+
+    /** Meeting-time input field in the schedule editor. */
+    const val SCHEDULE_TIME_FIELD: String = "meeting_calendar_schedule_time_field"
+
+    /** Save CTA in the schedule editor — [MeetingCalendarAction.RescheduleMeeting]. */
+    const val SCHEDULE_CONFIRM_BUTTON: String = "meeting_calendar_schedule_confirm_button"
+
+    /** Cancel CTA in the schedule editor — [MeetingCalendarAction.DismissScheduleEditor]. */
+    const val SCHEDULE_CANCEL_BUTTON: String = "meeting_calendar_schedule_cancel_button"
+
+    /** The no-upcoming schedule card (replaces the former dead "Next meeting not scheduled" placeholder). */
+    const val NO_UPCOMING_CARD: String = "meeting_calendar_no_upcoming_card"
+
     /** Resolves the stable per-row test tag for a given meeting id. */
     fun rowTag(meetingId: String): String = "meeting_calendar_row_$meetingId"
+
+    /** Resolves the stable per-frequency segmented-button test tag (WEEKLY/BIWEEKLY/MONTHLY). */
+    fun frequencyTag(frequency: String): String = "meeting_calendar_frequency_$frequency"
 }

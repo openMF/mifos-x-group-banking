@@ -43,8 +43,10 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import org.mifos.groupbanking.core.data.repository.MeetingRepository
+import org.mifos.groupbanking.core.model.MeetingFrequency
 import org.mifos.groupbanking.core.model.MeetingListItem
 import org.mifos.groupbanking.core.model.MeetingStatus
+import org.mifos.groupbanking.core.model.RescheduleMeetingRequest
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import kotlin.test.AfterTest
@@ -208,6 +210,57 @@ class MeetingCalendarViewModelTest {
         }
     }
 
+    // ─── G3 / F6 schedule editor (Set/Adjust Schedule + Reschedule) ──────────
+
+    @Test
+    fun `OpenScheduleEditor opens the sheet and DismissScheduleEditor closes it`() = runTest(testDispatcher) {
+        val (_, _, viewModel) = buildViewModel()
+
+        viewModel.trySendAction(MeetingCalendarAction.OpenScheduleEditor)
+        assertTrue(viewModel.awaitState { it.showScheduleEditor }.showScheduleEditor)
+
+        viewModel.trySendAction(MeetingCalendarAction.DismissScheduleEditor)
+        assertFalse(viewModel.awaitState { !it.showScheduleEditor }.showScheduleEditor)
+    }
+
+    @Test
+    fun `OnScheduleFieldChange updates only the changed draft field`() = runTest(testDispatcher) {
+        val (_, _, viewModel) = buildViewModel()
+
+        viewModel.trySendAction(MeetingCalendarAction.OnScheduleFieldChange(day = "WEDNESDAY"))
+        viewModel.trySendAction(MeetingCalendarAction.OnScheduleFieldChange(time = "14:30"))
+        viewModel.trySendAction(MeetingCalendarAction.OnScheduleFieldChange(frequency = MeetingFrequency.BIWEEKLY))
+
+        val state = viewModel.awaitState { it.scheduleDay == "WEDNESDAY" && it.scheduleTime == "14:30" }
+        assertEquals("WEDNESDAY", state.scheduleDay)
+        assertEquals("14:30", state.scheduleTime)
+        assertEquals(MeetingFrequency.BIWEEKLY, state.scheduleFrequency)
+    }
+
+    @Test
+    fun `RescheduleMeeting offline-queues the payload, closes the sheet and emits ShowScheduleUpdated`() = runTest(testDispatcher) {
+        val (repository, _, viewModel) = buildViewModel(centerId = CENTER_ID)
+        viewModel.trySendAction(MeetingCalendarAction.OpenScheduleEditor)
+        viewModel.awaitState { it.showScheduleEditor }
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(
+                MeetingCalendarAction.RescheduleMeeting(day = "MONDAY", time = "10:00", frequency = MeetingFrequency.WEEKLY),
+            )
+            assertTrue(awaitItem() is MeetingCalendarEvent.ShowScheduleUpdated)
+        }
+
+        val queued = repository.lastReschedule
+        assertEquals(CENTER_ID, queued?.centerId)
+        assertEquals("MONDAY", queued?.day)
+        assertEquals("10:00", queued?.time)
+        assertEquals(MeetingFrequency.WEEKLY, queued?.frequency)
+
+        val state = viewModel.awaitState { !it.showScheduleEditor && !it.isRescheduling }
+        assertFalse(state.showScheduleEditor)
+        assertFalse(state.isRescheduling)
+    }
+
     // ─── ToggleViewMode ─────────────────────────────────────────────────────
 
     @Test
@@ -325,6 +378,13 @@ private class FakeMeetingRepository(
             fetchPolicy = fetchPolicy,
             ttl = 5.minutes,
         )
+    }
+
+    /** Records the last queued reschedule payload — G3 / F6 server-gated offline-queue write. */
+    var lastReschedule: RescheduleMeetingRequest? = null
+    override suspend fun rescheduleMeeting(request: RescheduleMeetingRequest): Long {
+        lastReschedule = request
+        return 1L
     }
 }
 

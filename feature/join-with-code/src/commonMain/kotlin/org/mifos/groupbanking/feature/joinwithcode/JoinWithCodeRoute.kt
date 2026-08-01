@@ -32,17 +32,17 @@ fun NavController.navigateToJoinWithCode(inviteCode: String? = null, navOptions:
 /**
  * Registers [JoinWithCodeScreen] on the host [NavGraphBuilder]. Every callback here closes a
  * [JoinWithCodeEvent] navigation branch consumed by the Container
- * (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3) — `flow.yaml#navigates_to` declares all 3 targets:
- * `group-dashboard` ([onNavigateToGroupDashboard]), `login-signup`
- * ([onNavigateToLoginSignup]), and `personal-dashboard` (the default `OnBack`/pop target, wired
- * by the caller's [onNavigateBack] — same pass-through convention as `LoginSignupRoute.kt` /
- * `GroupTypePickerRoute.kt`). No callback here carries a `= {}` default — every parameter is
- * required, so the nav host wiring this destination must supply a real implementation for all
- * 3 (DC3 count-assertion: 0 defaults / 0 overrides / 0 suppressed — a pure pass-through,
- * identical shape to the two sibling Route.kt files). See API.md#route.
+ * (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3) — `flow.yaml#navigates_to` declares both targets:
+ * `personal-dashboard` ([onNavigateToPersonalDashboard] — F5 post-join landing per member role,
+ * reconciled from `group-dashboard`) and `login-signup` ([onNavigateToLoginSignup] — pre-auth
+ * invite resume). [onNavigateBack] is the `OnBack`/pop target (same pass-through convention as
+ * `LoginSignupRoute.kt` / `GroupTypePickerRoute.kt`). No callback here carries a `= {}` default —
+ * every parameter is required, so the nav host wiring this destination must supply a real
+ * implementation for all 3 (DC3 count-assertion: 0 defaults / 0 overrides / 0 suppressed — a pure
+ * pass-through, identical shape to the two sibling Route.kt files). See API.md#route.
  */
 fun NavGraphBuilder.joinWithCodeScreen(
-    onNavigateToGroupDashboard: (groupId: String) -> Unit,
+    onNavigateToPersonalDashboard: () -> Unit,
     onNavigateToLoginSignup: (pendingInviteCode: String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
@@ -50,7 +50,7 @@ fun NavGraphBuilder.joinWithCodeScreen(
         val route = backStackEntry.toRoute<JoinWithCodeRoute>()
         JoinWithCodeScreen(
             inviteCode = route.inviteCode,
-            onNavigateToGroupDashboard = onNavigateToGroupDashboard,
+            onNavigateToPersonalDashboard = onNavigateToPersonalDashboard,
             onNavigateToLoginSignup = onNavigateToLoginSignup,
             onNavigateBack = onNavigateBack,
         )

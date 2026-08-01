@@ -28,18 +28,22 @@ fun NavController.navigateToOrganizerDashboard(navOptions: NavOptions? = null) =
 
 /**
  * Registers [OrganizerDashboardScreen] on the host [NavGraphBuilder]. [onNavigateToGroupList] closes
- * the KPI-card / All-Groups quick-nav / meeting-row / empty-state CTA taps (all target group-list);
- * [onNavigateToFieldOfficerDashboard] closes the optional-tier field-officer quick-nav tap. See
- * API.md#route.
+ * the Groups/Members/Share-Out KPI-card + All-Groups quick-nav + empty-state CTA taps (all target
+ * group-list); [onNavigateToFieldOfficerDashboard] closes the optional-tier field-officer quick-nav
+ * tap; [onNavigateToMeetingCalendar] (G7) closes the Today's-Schedule row + Meetings-Today KPI taps
+ * (both open the tapped group's meeting calendar). The `groupId` String is bridged to
+ * meeting-calendar's `center_id: Int` nav-param at the NavHost seam. See API.md#route.
  */
 fun NavGraphBuilder.organizerDashboardScreen(
     onNavigateToGroupList: () -> Unit,
     onNavigateToFieldOfficerDashboard: () -> Unit,
+    onNavigateToMeetingCalendar: (groupId: String) -> Unit,
 ) {
     composableWithRootPushTransitions<OrganizerDashboardRoute> {
         OrganizerDashboardScreen(
             onNavigateToGroupList = onNavigateToGroupList,
             onNavigateToFieldOfficerDashboard = onNavigateToFieldOfficerDashboard,
+            onNavigateToMeetingCalendar = onNavigateToMeetingCalendar,
         )
     }
 }

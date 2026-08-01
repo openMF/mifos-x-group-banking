@@ -200,7 +200,7 @@ class JoinWithCodeViewModelTest {
     }
 
     @Test
-    fun `TC-JWC-003 OnConfirmJoin success calls joinGroup and emits NavigateToGroupDashboard`() = runTest(testDispatcher) {
+    fun `TC-JWC-003 OnConfirmJoin success calls joinGroup and emits NavigateToPersonalDashboard`() = runTest(testDispatcher) {
         invitationRepository.validateCodeResult = NetworkResult.Success(sampleInvitation(groupId = 5))
         invitationRepository.fetchGroupPreviewResult = NetworkResult.Success(samplePreview(groupId = 5))
         invitationRepository.joinGroupResult = NetworkResult.Success(
@@ -215,7 +215,7 @@ class JoinWithCodeViewModelTest {
         viewModel.eventFlow.test {
             viewModel.trySendAction(JoinWithCodeAction.OnConfirmJoin)
             testDispatcher.scheduler.advanceUntilIdle()
-            assertEquals(JoinWithCodeEvent.NavigateToGroupDashboard(groupId = "5"), awaitItem())
+            assertEquals(JoinWithCodeEvent.NavigateToPersonalDashboard, awaitItem())
         }
 
         assertEquals(1, invitationRepository.joinGroupCallCount)

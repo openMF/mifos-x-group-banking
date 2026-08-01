@@ -88,6 +88,7 @@ data class LoanApplication(
 /** `api.yaml#dtos.PreviousMeetingSummary` — the read-only step-0 review card projection. */
 @Serializable
 data class PreviousMeetingSummary(
+    val meetingId: String = "",
     val meetingNumber: Int,
     val date: String,
     val totalCollected: Long,

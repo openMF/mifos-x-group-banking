@@ -130,6 +130,24 @@ val OrganizerDashboardState.screenState: OrganizerDashboardScreenState
 sealed interface OrganizerDashboardEvent {
     data object NavigateToGroupList : OrganizerDashboardEvent
     data object NavigateToFieldOfficerDashboard : OrganizerDashboardEvent
+
+    /**
+     * G7 — Today's-Schedule row tap ([OrganizerDashboardAction.OnMeetingGroupClick]) and the
+     * Meetings-Today KPI card ([OrganizerDashboardAction.OnViewMeetingsToday]) open the tapped
+     * group's meeting calendar (`ui.yaml#events.NavigateToMeetingCalendar` params `centerId: Int`).
+     * [groupId] is the domain-side identifier as it exists on [ScheduledMeeting.groupId] (a String);
+     * the NavHost seam bridges it to meeting-calendar's `center_id: Int` nav-param
+     * (`groupId.toIntOrNull() ?: 0`), matching the group-dashboard → meeting-calendar precedent.
+     */
+    data class NavigateToMeetingCalendar(val groupId: String) : OrganizerDashboardEvent
+
+    /**
+     * G4 — deferred-notifications side effect. The top-bar bell shows a snackbar informing the
+     * organizer the in-app notifications centre arrives in a later release (deferred per
+     * `release_plan.deferred[]`); no navigation until that screen ships
+     * (`ui.yaml#events.NotificationsDeferred`).
+     */
+    data object NotificationsDeferred : OrganizerDashboardEvent
     data class ShowSnackbar(val message: String) : OrganizerDashboardEvent
 }
 
@@ -153,6 +171,7 @@ sealed interface OrganizerDashboardAction {
     data object OnViewAllGroups : OrganizerDashboardAction
     data object OnViewFieldOfficer : OrganizerDashboardAction
     data class OnMeetingGroupClick(val groupId: String) : OrganizerDashboardAction
+    data object OnViewMeetingsToday : OrganizerDashboardAction
     data object OnOpenNotifications : OrganizerDashboardAction
     data object OnRefresh : OrganizerDashboardAction
     data object Retry : OrganizerDashboardAction
@@ -162,9 +181,6 @@ sealed interface OrganizerDashboardAction {
         data class StreamUpdated(val screenState: ScreenState<OrganizerDashboardSummary>) : Internal
     }
 }
-
-/** Snackbar message key emitted by the deferred-notifications action (top-bar bell). */
-internal const val ORGANIZER_NOTIFICATIONS_DEFERRED_KEY: String = "notifications_deferred"
 
 /**
  * MVI processor for the organizer-dashboard screen — a read-only "my groups" hub
@@ -204,6 +220,7 @@ internal class OrganizerDashboardViewModel(
             OrganizerDashboardAction.OnViewAllGroups -> handleViewAllGroups()
             OrganizerDashboardAction.OnViewFieldOfficer -> handleViewFieldOfficer()
             is OrganizerDashboardAction.OnMeetingGroupClick -> handleMeetingGroupClick(action.groupId)
+            OrganizerDashboardAction.OnViewMeetingsToday -> handleViewMeetingsToday()
             OrganizerDashboardAction.OnOpenNotifications -> handleOpenNotifications()
             OrganizerDashboardAction.OnRefresh -> handleRefresh()
             OrganizerDashboardAction.Retry -> handleRetry()
@@ -231,20 +248,35 @@ internal class OrganizerDashboardViewModel(
         sendEvent(OrganizerDashboardEvent.NavigateToFieldOfficerDashboard)
     }
 
-    // -- Today's-Schedule meeting row tap (ui.yaml effect: navigate, target: group-list) ----------
+    // -- Today's-Schedule meeting row tap (G7 — ui.yaml effect: navigate, target: meeting-calendar) --
 
     private fun handleMeetingGroupClick(groupId: String) {
         analytics.trackGroupOperation(operation = "schedule_group_tapped", groupId = groupId)
-        Logger.i(TAG) { "schedule meeting row tapped groupId=$groupId" }
-        // See OrganizerDashboardAction KDoc: the declared event carries no groupId param.
-        sendEvent(OrganizerDashboardEvent.NavigateToGroupList)
+        Logger.i(TAG) { "schedule meeting row tapped groupId=$groupId — opening meeting calendar" }
+        sendEvent(OrganizerDashboardEvent.NavigateToMeetingCalendar(groupId = groupId))
     }
 
-    // -- Notifications bell (ui.yaml effect: emit_event — NotificationsDeferred snackbar) ----------
+    // -- Meetings-Today KPI card (G7 — opens the earliest today's meeting's calendar) --------------
+    // ui.yaml#on_view_meetings_today: guard `meetingsTodayCount > 0`, navigate meeting-calendar with
+    // `todaySchedule.first().groupId`. When there are no meetings today the card is non-interactive
+    // (empty schedule) so this is a no-op guard rather than a broken navigate.
+
+    private fun handleViewMeetingsToday() {
+        val firstMeeting = state.todaySchedule.firstOrNull()
+        if (state.meetingsTodayCount <= 0 || firstMeeting == null) {
+            Logger.w(TAG) { "OnViewMeetingsToday ignored — no meetings scheduled today" }
+            return
+        }
+        analytics.trackGroupOperation(operation = "view_meetings_today", groupId = firstMeeting.groupId)
+        Logger.i(TAG) { "meetings-today KPI tapped — opening meeting calendar for groupId=${firstMeeting.groupId}" }
+        sendEvent(OrganizerDashboardEvent.NavigateToMeetingCalendar(groupId = firstMeeting.groupId))
+    }
+
+    // -- Notifications bell (G4 — ui.yaml effect: emit_event NotificationsDeferred snackbar) --------
 
     private fun handleOpenNotifications() {
         Logger.i(TAG) { "notifications tapped — deferred feature" }
-        sendEvent(OrganizerDashboardEvent.ShowSnackbar(message = ORGANIZER_NOTIFICATIONS_DEFERRED_KEY))
+        sendEvent(OrganizerDashboardEvent.NotificationsDeferred)
     }
 
     // -- Pull to refresh (data-flow.yaml on_refresh: bypass_and_refresh) ---------------------------

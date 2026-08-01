@@ -104,6 +104,7 @@ import org.mifos.groupbanking.feature.organizerdashboard.generated.resources.scr
 internal fun OrganizerDashboardScreen(
     onNavigateToGroupList: () -> Unit,
     onNavigateToFieldOfficerDashboard: () -> Unit,
+    onNavigateToMeetingCalendar: (groupId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OrganizerDashboardViewModel = koinViewModel(),
 ) {
@@ -119,12 +120,13 @@ internal fun OrganizerDashboardScreen(
         when (event) {
             OrganizerDashboardEvent.NavigateToGroupList -> onNavigateToGroupList()
             OrganizerDashboardEvent.NavigateToFieldOfficerDashboard -> onNavigateToFieldOfficerDashboard()
+            is OrganizerDashboardEvent.NavigateToMeetingCalendar -> onNavigateToMeetingCalendar(event.groupId)
+            OrganizerDashboardEvent.NotificationsDeferred -> snackbarHostState.showSnackbar(notificationsDeferredMsg)
             is OrganizerDashboardEvent.ShowSnackbar -> {
                 val resolved = when (event.message) {
                     "error_network" -> networkMsg
                     "error_server" -> serverMsg
                     "error_auth" -> authMsg
-                    ORGANIZER_NOTIFICATIONS_DEFERRED_KEY -> notificationsDeferredMsg
                     else -> event.message
                 }
                 snackbarHostState.showSnackbar(resolved)
@@ -288,7 +290,7 @@ private fun OrganizerContentSection(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                     OrganizerKpiCard(kpiShareOut, onClick = { onAction(OrganizerDashboardAction.OnViewAllGroups) }, modifier = Modifier.weight(1f))
-                    OrganizerKpiCard(kpiMeetings, onClick = { onAction(OrganizerDashboardAction.OnViewAllGroups) }, modifier = Modifier.weight(1f))
+                    OrganizerKpiCard(kpiMeetings, onClick = { onAction(OrganizerDashboardAction.OnViewMeetingsToday) }, modifier = Modifier.weight(1f))
                 }
             }
         }

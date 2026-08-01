@@ -144,7 +144,20 @@ fun MeetingConductState.deriveScreenState(): MeetingConductScreenState = when {
  */
 sealed interface MeetingConductEvent {
     data class NavigateToMeetingSummary(val meetingId: String, val meetingNumber: Int, val centerId: Int) : MeetingConductEvent
-    data class NavigateToPreviousMeetingReview(val meetingId: String, val centerId: Int) : MeetingConductEvent
+
+    /**
+     * G6 fix (`ui.yaml#view_full_previous_btn.on_click`): carries the REAL prior meeting's
+     * [meetingId] (String, from `previousMeetingSummary.meetingId` — NOT the meeting number) plus
+     * [meetingNumber] (the prior meeting's number, passed separately, no longer dropped), [centerId],
+     * and [launchedFrom]="conduct" so the review renders in conduct-context (shows the
+     * "Start Meeting #N" CTA).
+     */
+    data class NavigateToPreviousMeetingReview(
+        val meetingId: String,
+        val meetingNumber: Int,
+        val centerId: Int,
+        val launchedFrom: String,
+    ) : MeetingConductEvent
     data object NavigateBack : MeetingConductEvent
     data class ShowStepError(val message: String) : MeetingConductEvent
     data object ShowSubmitSuccess : MeetingConductEvent
@@ -442,8 +455,20 @@ internal class MeetingConductViewModel(
     // -- Navigation ---------------------------------------------------------------------------------
 
     private fun handleViewPrevious() {
-        if (state.previousMeetingSummary == null) return
-        sendEvent(MeetingConductEvent.NavigateToPreviousMeetingReview(meetingId = meetingId, centerId = centerId))
+        // G6: bind the PRIOR meeting's real id + number (previousMeetingSummary) — not the wizard's
+        // current meeting id, and never the meeting NUMBER bound to meeting_id. When the server has not
+        // supplied a prior meeting id yet (companion API pending), `meetingId` is blank; the
+        // previous-meeting-review keys primarily off (centerId, meetingNumber) so the review still
+        // resolves. launched_from="conduct" makes the review show the "Start Meeting #N" CTA.
+        val summary = state.previousMeetingSummary ?: return
+        sendEvent(
+            MeetingConductEvent.NavigateToPreviousMeetingReview(
+                meetingId = summary.meetingId,
+                meetingNumber = summary.meetingNumber,
+                centerId = centerId,
+                launchedFrom = "conduct",
+            ),
+        )
     }
 }
 

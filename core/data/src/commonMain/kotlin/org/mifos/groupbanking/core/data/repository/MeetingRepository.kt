@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import org.mifos.groupbanking.core.model.MeetingListItem
+import org.mifos.groupbanking.core.model.RescheduleMeetingRequest
 
 /**
  * Read surface for the meeting-calendar screen — the single-key merge of `get_center_meetings` +
@@ -49,4 +50,18 @@ interface MeetingRepository {
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
     ): ScreenDataStream<List<MeetingListItem>>
+
+    /**
+     * Adjust the group's recurring meeting schedule (G3 / F6, `ui.yaml#schedule_confirm_btn`, action
+     * `RescheduleMeeting`). Enqueues the [request] to the shared offline `sync_queue` for later drain
+     * and returns the generated queue row id.
+     *
+     * **Server-gated — the live network PUT is pending-device-verify.** The mapped companion tool
+     * `companion_update_calendar` (`PUT /centers/{centerId}/calendars/{calendarId}?command=updateCalendar`,
+     * mirrored to `dt_group_config`) is not deployed, so this method does NOT attempt a network call.
+     * It offline-queues the payload (operation `UPDATE_MEETING_CALENDAR`, table `dt_group_config`) so the
+     * write is durable and replays when the companion API + connectivity are available. Offline-first by
+     * construction — matches the `MeetingConductRepository.enqueueMeetingOffline` sync-queue seam.
+     */
+    suspend fun rescheduleMeeting(request: RescheduleMeetingRequest): Long
 }

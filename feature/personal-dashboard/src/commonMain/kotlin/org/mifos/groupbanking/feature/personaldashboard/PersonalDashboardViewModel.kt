@@ -195,6 +195,15 @@ sealed interface PersonalDashboardEvent {
 
     /** Profile overflow menu → `sync-status` (`ui.yaml#components.top_bar.overflow_menu.menu_sync_status`). */
     data object NavigateToSyncStatus : PersonalDashboardEvent
+
+    /**
+     * Notification bell tap → deferred in-app notifications centre (G14,
+     * `ui.yaml#components.top_bar.trailing.notification_icon.on_click`). The notifications screen
+     * ships in a later release (`release_plan.deferred[]`), so this event carries NO navigation —
+     * the Screen shows a snackbar (`notifications_deferred` key) informing the member. Closes the
+     * previously-dead badge icon that had no `on_click`.
+     */
+    data object NotificationsDeferred : PersonalDashboardEvent
 }
 
 /**
@@ -213,6 +222,9 @@ sealed interface PersonalDashboardAction {
     data object OnLoansCardClick : PersonalDashboardAction
     data object OnSettingsClick : PersonalDashboardAction
     data object OnSyncStatusClick : PersonalDashboardAction
+
+    /** Notification bell tap (`ui.yaml#components.top_bar.trailing.notification_icon`, G14). */
+    data object OnOpenNotifications : PersonalDashboardAction
 
     /** Async stream emissions — routed via `trySendAction`, never dispatched by the UI. */
     sealed interface Internal : PersonalDashboardAction {
@@ -287,6 +299,7 @@ internal class PersonalDashboardViewModel(
             PersonalDashboardAction.OnLoansCardClick -> handleLoansCardClick()
             PersonalDashboardAction.OnSettingsClick -> sendEvent(PersonalDashboardEvent.NavigateToSettings)
             PersonalDashboardAction.OnSyncStatusClick -> sendEvent(PersonalDashboardEvent.NavigateToSyncStatus)
+            PersonalDashboardAction.OnOpenNotifications -> handleOpenNotifications()
             is PersonalDashboardAction.Internal.StreamUpdated -> handleStreamUpdated(action.screenState)
         }
     }
@@ -297,6 +310,13 @@ internal class PersonalDashboardViewModel(
         Logger.i(TAG) { "loan card tapped clientId=${state.clientId} — navigating to personal-loans" }
         analytics.trackLoanOperation(operation = "view")
         sendEvent(PersonalDashboardEvent.NavigateToLoans(clientId = state.clientId))
+    }
+
+    // -- Notification bell tap (ui.yaml effect: emit_event — deferred notifications centre, G14) ----
+
+    private fun handleOpenNotifications() {
+        Logger.i(TAG) { "notification bell tapped — in-app notifications centre deferred to a later release" }
+        sendEvent(PersonalDashboardEvent.NotificationsDeferred)
     }
 
     // -- Group selector chip tap (ui.yaml effect: call_api, re-fetch for tapped groupId) ----------

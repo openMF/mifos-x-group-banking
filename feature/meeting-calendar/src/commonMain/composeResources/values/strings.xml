@@ -24,4 +24,31 @@
     <string name="screens_meeting_calendar_error_server_message">Server error. Please try again.</string>
     <string name="screens_meeting_calendar_error_auth_message">Session expired. Please log in again.</string>
     <string name="screens_meeting_calendar_action_retry">Retry</string>
+
+    <!-- G3 / F6 — schedule editor + Set/Adjust Schedule CTA (replaces the dead placeholder) -->
+    <string name="screens_meeting_calendar_reschedule_button">Reschedule</string>
+    <string name="screens_meeting_calendar_reschedule_button_a11y">Reschedule the next meeting or adjust the recurring schedule</string>
+    <string name="screens_meeting_calendar_no_upcoming_title">No Upcoming Meeting</string>
+    <string name="screens_meeting_calendar_no_upcoming_body">Meetings auto-generate from your group\'s recurring schedule. Set or adjust the schedule to see the next meeting.</string>
+    <string name="screens_meeting_calendar_no_upcoming_icon_cd">No upcoming meeting</string>
+    <string name="screens_meeting_calendar_set_schedule_button">Set / Adjust Schedule</string>
+    <string name="screens_meeting_calendar_set_schedule_button_a11y">Set or adjust the group meeting schedule</string>
+    <string name="screens_meeting_calendar_schedule_editor_title">Meeting Schedule</string>
+    <string name="screens_meeting_calendar_schedule_editor_a11y">Meeting schedule editor</string>
+    <string name="screens_meeting_calendar_schedule_day_label">Meeting Day</string>
+    <string name="screens_meeting_calendar_schedule_time_label">Meeting Time</string>
+    <string name="screens_meeting_calendar_schedule_frequency_label">Repeats</string>
+    <string name="screens_meeting_calendar_freq_weekly">Weekly</string>
+    <string name="screens_meeting_calendar_freq_biweekly">Fortnightly</string>
+    <string name="screens_meeting_calendar_freq_monthly">Monthly</string>
+    <string name="screens_meeting_calendar_day_monday">Monday</string>
+    <string name="screens_meeting_calendar_day_tuesday">Tuesday</string>
+    <string name="screens_meeting_calendar_day_wednesday">Wednesday</string>
+    <string name="screens_meeting_calendar_day_thursday">Thursday</string>
+    <string name="screens_meeting_calendar_day_friday">Friday</string>
+    <string name="screens_meeting_calendar_day_saturday">Saturday</string>
+    <string name="screens_meeting_calendar_day_sunday">Sunday</string>
+    <string name="screens_meeting_calendar_schedule_confirm">Save Schedule</string>
+    <string name="screens_meeting_calendar_schedule_cancel">Cancel</string>
+    <string name="screens_meeting_calendar_schedule_updated_toast">Meeting schedule updated</string>
 </resources>

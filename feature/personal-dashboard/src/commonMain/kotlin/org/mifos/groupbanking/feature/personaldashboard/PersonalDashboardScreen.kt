@@ -38,6 +38,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,6 +84,7 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_menu_sync_status
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_no_group_label
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_notification_icon_cd
+import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_notifications_deferred
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_overflow_menu_cd
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_recent_activity_title
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_retry_action
@@ -110,6 +113,10 @@ internal fun PersonalDashboardScreen(
     viewModel: PersonalDashboardViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    // Precomputed OUTSIDE EventsEffect — stringResource() is @Composable-only and the EventsEffect
+    // callback runs in a suspend (non-composable) scope (same convention as SavingsDashboardScreen).
+    val notificationsDeferredMessage = stringResource(Res.string.screens_personal_dashboard_notifications_deferred)
 
     EventsEffect(viewModel) { event ->
         when (event) {
@@ -123,12 +130,15 @@ internal fun PersonalDashboardScreen(
             is PersonalDashboardEvent.NavigateToLoans -> onNavigateToLoans(event.clientId)
             PersonalDashboardEvent.NavigateToSettings -> onNavigateToSettings()
             PersonalDashboardEvent.NavigateToSyncStatus -> onNavigateToSyncStatus()
+            // G14 — deferred notifications centre: no navigation, just a snackbar.
+            PersonalDashboardEvent.NotificationsDeferred -> snackbarHostState.showSnackbar(notificationsDeferredMessage)
         }
     }
 
     PersonalDashboardContent(
         state = state,
         onAction = viewModel::trySendAction,
+        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
@@ -148,6 +158,7 @@ internal fun PersonalDashboardContent(
     state: PersonalDashboardState,
     onAction: (PersonalDashboardAction) -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val hour = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour }
     val greetingKey = when {
@@ -161,6 +172,8 @@ internal fun PersonalDashboardContent(
     // from every screenState's top section so Settings / Sync Status are always one tap away.
     val onOpenSettings = { onAction(PersonalDashboardAction.OnSettingsClick) }
     val onOpenSyncStatus = { onAction(PersonalDashboardAction.OnSyncStatusClick) }
+    // G14 — notification bell tap → deferred-notifications snackbar (reachable from every state).
+    val onOpenNotifications = { onAction(PersonalDashboardAction.OnOpenNotifications) }
 
     KptScaffold(
         showNavigationIcon = false,
@@ -169,6 +182,7 @@ internal fun PersonalDashboardContent(
             isRefreshing = state.isRefreshing,
             onRefresh = { onAction(PersonalDashboardAction.OnRefresh) },
         ),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier.testTag(PersonalDashboardTestTags.SCREEN),
     ) {
         when (state.screenState) {
@@ -176,6 +190,7 @@ internal fun PersonalDashboardContent(
                 greeting = greeting,
                 onOpenSettings = onOpenSettings,
                 onOpenSyncStatus = onOpenSyncStatus,
+                onOpenNotifications = onOpenNotifications,
             )
 
             PersonalDashboardScreenState.Content -> PersonalDashboardContentSection(
@@ -184,12 +199,14 @@ internal fun PersonalDashboardContent(
                 onAction = onAction,
                 onOpenSettings = onOpenSettings,
                 onOpenSyncStatus = onOpenSyncStatus,
+                onOpenNotifications = onOpenNotifications,
             )
 
             PersonalDashboardScreenState.Empty -> PersonalDashboardEmptySection(
                 greeting = greeting,
                 onOpenSettings = onOpenSettings,
                 onOpenSyncStatus = onOpenSyncStatus,
+                onOpenNotifications = onOpenNotifications,
             )
 
             PersonalDashboardScreenState.Error -> PersonalDashboardErrorSection(
@@ -198,6 +215,7 @@ internal fun PersonalDashboardContent(
                 onRetry = { onAction(PersonalDashboardAction.OnRetry) },
                 onOpenSettings = onOpenSettings,
                 onOpenSyncStatus = onOpenSyncStatus,
+                onOpenNotifications = onOpenNotifications,
             )
         }
     }
@@ -205,9 +223,10 @@ internal fun PersonalDashboardContent(
 
 /**
  * Shared primary-colored header — `ui.yaml#components.top_bar` + `group_banner`. Renders the
- * time-of-day [greeting], a decorative (non-interactive — ui.yaml declares no `on_click`)
- * notifications bell, the active [groupName] + currency chip, and — only when [showChips] is
- * true (`myGroups.size > 1`) — the [GroupSelectorChipRow]. See API.md#screen.
+ * time-of-day [greeting], an interactive notifications bell ([onOpenNotifications] →
+ * [PersonalDashboardAction.OnOpenNotifications], G14 — was a dead badge icon with no `on_click`),
+ * the active [groupName] + currency chip, and — only when [showChips] is true (`myGroups.size > 1`)
+ * — the [GroupSelectorChipRow]. See API.md#screen.
  */
 @Composable
 internal fun PersonalDashboardTopSection(
@@ -219,6 +238,7 @@ internal fun PersonalDashboardTopSection(
     onGroupSelected: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSyncStatus: () -> Unit,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -238,12 +258,16 @@ internal fun PersonalDashboardTopSection(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.weight(1f),
                 )
-                Icon(
-                    imageVector = Icons.Filled.NotificationsNone,
-                    contentDescription = notificationCd,
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                IconButton(
+                    onClick = onOpenNotifications,
                     modifier = Modifier.testTag(PersonalDashboardTestTags.NOTIFICATION_ICON),
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.NotificationsNone,
+                        contentDescription = notificationCd,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
                 PersonalDashboardOverflowMenu(
                     onOpenSettings = onOpenSettings,
                     onOpenSyncStatus = onOpenSyncStatus,
@@ -353,6 +377,7 @@ internal fun PersonalDashboardLoadingSection(
     greeting: String,
     onOpenSettings: () -> Unit,
     onOpenSyncStatus: () -> Unit,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -366,6 +391,7 @@ internal fun PersonalDashboardLoadingSection(
             onGroupSelected = {},
             onOpenSettings = onOpenSettings,
             onOpenSyncStatus = onOpenSyncStatus,
+            onOpenNotifications = onOpenNotifications,
         )
         Column(
             modifier = Modifier.fillMaxWidth().padding(sp.lg),
@@ -401,6 +427,7 @@ internal fun PersonalDashboardContentSection(
     onAction: (PersonalDashboardAction) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSyncStatus: () -> Unit,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -417,6 +444,7 @@ internal fun PersonalDashboardContentSection(
                 onGroupSelected = { onAction(PersonalDashboardAction.OnSelectGroup(it)) },
                 onOpenSettings = onOpenSettings,
                 onOpenSyncStatus = onOpenSyncStatus,
+                onOpenNotifications = onOpenNotifications,
             )
         }
         item {
@@ -482,6 +510,7 @@ internal fun PersonalDashboardEmptySection(
     greeting: String,
     onOpenSettings: () -> Unit,
     onOpenSyncStatus: () -> Unit,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -500,6 +529,7 @@ internal fun PersonalDashboardEmptySection(
             onGroupSelected = {},
             onOpenSettings = onOpenSettings,
             onOpenSyncStatus = onOpenSyncStatus,
+            onOpenNotifications = onOpenNotifications,
         )
         Column(
             modifier = Modifier
@@ -542,6 +572,7 @@ internal fun PersonalDashboardErrorSection(
     onRetry: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSyncStatus: () -> Unit,
+    onOpenNotifications: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
@@ -560,6 +591,7 @@ internal fun PersonalDashboardErrorSection(
             onGroupSelected = {},
             onOpenSettings = onOpenSettings,
             onOpenSyncStatus = onOpenSyncStatus,
+            onOpenNotifications = onOpenNotifications,
         )
         Column(
             modifier = Modifier

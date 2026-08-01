@@ -181,7 +181,7 @@ internal fun MeetingConductScreen(
     meetingNumber: Int,
     centerId: Int,
     onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
-    onNavigateToPreviousMeetingReview: (meetingId: String, centerId: Int) -> Unit,
+    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, centerId: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingConductViewModel = koinViewModel(
@@ -210,7 +210,7 @@ internal fun MeetingConductScreen(
             is MeetingConductEvent.NavigateToMeetingSummary ->
                 onNavigateToMeetingSummary(event.meetingId, event.meetingNumber, event.centerId)
             is MeetingConductEvent.NavigateToPreviousMeetingReview ->
-                onNavigateToPreviousMeetingReview(event.meetingId, event.centerId)
+                onNavigateToPreviousMeetingReview(event.meetingId, event.meetingNumber, event.centerId, event.launchedFrom)
             MeetingConductEvent.NavigateBack -> onNavigateBack()
             is MeetingConductEvent.ShowStepError -> snackbarHostState.showSnackbar(resolve(event.message))
             MeetingConductEvent.ShowSubmitSuccess -> Unit // navigation follows immediately

@@ -130,13 +130,39 @@ class OrganizerDashboardViewModelTest {
     }
 
     @Test
-    fun `OnMeetingGroupClick navigates to group list`() = runTest(testDispatcher) {
+    fun `OnMeetingGroupClick navigates to that group's meeting calendar`() = runTest(testDispatcher) {
         repository.emit(ScreenState.Content(data = sampleDashboard()))
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.eventFlow.test {
             viewModel.trySendAction(OrganizerDashboardAction.OnMeetingGroupClick("ctr-001"))
-            assertEquals(OrganizerDashboardEvent.NavigateToGroupList, awaitItem())
+            assertEquals(OrganizerDashboardEvent.NavigateToMeetingCalendar("ctr-001"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `OnViewMeetingsToday opens the earliest today meeting's calendar`() = runTest(testDispatcher) {
+        repository.emit(ScreenState.Content(data = sampleDashboard()))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(OrganizerDashboardAction.OnViewMeetingsToday)
+            assertEquals(OrganizerDashboardEvent.NavigateToMeetingCalendar("ctr-001"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `OnViewMeetingsToday is ignored when no meetings are scheduled today`() = runTest(testDispatcher) {
+        repository.emit(
+            ScreenState.Content(
+                data = sampleDashboard().copy(meetingsTodayCount = 0, todaySchedule = emptyList()),
+            ),
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(OrganizerDashboardAction.OnViewMeetingsToday)
+            expectNoEvents()
         }
     }
 
@@ -163,12 +189,10 @@ class OrganizerDashboardViewModelTest {
     }
 
     @Test
-    fun `OnOpenNotifications emits a deferred snackbar`() = runTest(testDispatcher) {
+    fun `OnOpenNotifications emits the deferred-notifications event`() = runTest(testDispatcher) {
         viewModel.eventFlow.test {
             viewModel.trySendAction(OrganizerDashboardAction.OnOpenNotifications)
-            val event = awaitItem()
-            assertTrue(event is OrganizerDashboardEvent.ShowSnackbar)
-            assertEquals(ORGANIZER_NOTIFICATIONS_DEFERRED_KEY, (event as OrganizerDashboardEvent.ShowSnackbar).message)
+            assertEquals(OrganizerDashboardEvent.NotificationsDeferred, awaitItem())
         }
     }
 

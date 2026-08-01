@@ -50,6 +50,7 @@ private fun initialsOf(displayName: String): String =
         .ifBlank { "?" }
 
 fun MeetingRecordDetailDto.toDomainModel(): PreviousMeetingSummary = PreviousMeetingSummary(
+    meetingId = meetingId,
     meetingNumber = meetingNumber,
     date = actualDate,
     totalCollected = totalSavings + totalRepayments + totalFinesCollected,

@@ -22,6 +22,15 @@ object GroupListTestTags {
     /** Root [kpt.core.ui.scaffold.KptScaffold] surface — always rendered regardless of screenState. */
     const val SCREEN: String = "group_list_screen"
 
+    /**
+     * Top-bar notification bell — [GroupListAction.OnOpenNotifications] (G15, deferred-notifications
+     * snackbar). Rendered as a framework `TopAppBarAction`, which exposes NO `testTag`/`Modifier`
+     * slot, so UI tests / Maestro select this affordance by its `contentDescription`
+     * (`screens_group_list_notifications_cd`), not by this tag string; kept here for registry
+     * completeness + Maestro selector documentation.
+     */
+    const val NOTIFICATION_ACTION: String = "group_list_notification_action"
+
     /** Search input — `ui.yaml#components.search_bar`. Bound to [GroupListAction.OnSearch]. */
     const val SEARCH_FIELD: String = "group_list_search_field"
 

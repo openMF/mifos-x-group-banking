@@ -420,6 +420,9 @@ val DataModule = module {
             meetingCalendarStore = get(AppStoreRegistry.MeetingCalendar),
             networkMonitor = get(),
             fetchedAtRepository = get(),
+            // G3 / F6: the schedule-editor RescheduleMeeting write is server-gated (companion
+            // companion_update_calendar pending), so it offline-queues via the shared SyncQueueRepository.
+            syncQueueRepository = get(),
         )
     }
 

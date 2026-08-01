@@ -59,7 +59,7 @@ enum class InviteStatus { IDLE, VALIDATING, VALID, INVALID }
  * Screen-level render state for `join-with-code-screen` — verbatim mirror of
  * `ui.yaml#state_model.screen_state.members`. [Success] is intentionally **not** produced by
  * [JoinWithCodeState.deriveScreenState] — per `ui.yaml#states.success.description` it is a
- * transient marker superseded in the same frame by the `NavigateToGroupDashboard` event, so the
+ * transient marker superseded in the same frame by the `NavigateToPersonalDashboard` event, so the
  * derivation collapses it into [Preview]'s field-shape until the event fires and the Screen
  * layer navigates away. The member is still declared (for exhaustive `when` completeness on the
  * Screen layer) rather than omitted. See API.md#state.
@@ -158,7 +158,10 @@ fun JoinWithCodeState.deriveScreenState(): JoinWithCodeScreenState = when (error
  * `ui.yaml#state_model.JoinWithCodeViewModel.events`. See API.md#events.
  */
 sealed interface JoinWithCodeEvent {
-    data class NavigateToGroupDashboard(val groupId: String) : JoinWithCodeEvent
+    // F5 (2026-08-01): post-join landing reconciled to personal-dashboard per member role (was
+    // NavigateToGroupDashboard). Verbatim mirror of `ui.yaml#state_model.events.NavigateToPersonalDashboard`
+    // — no params, personal-dashboard nav_params:{} (identity + joined group resolve from the auth token).
+    data object NavigateToPersonalDashboard : JoinWithCodeEvent
     data class NavigateToLoginSignup(val pendingInviteCode: String) : JoinWithCodeEvent
     data object NavigateBack : JoinWithCodeEvent
     data class ShowSnackbar(val message: String) : JoinWithCodeEvent
@@ -436,7 +439,7 @@ internal class JoinWithCodeViewModel(
             success = true,
         )
         updateState { copy(isJoining = false) }
-        sendEvent(JoinWithCodeEvent.NavigateToGroupDashboard(groupId = result.groupId.toString()))
+        sendEvent(JoinWithCodeEvent.NavigateToPersonalDashboard)
     }
 
     private fun handleJoinFailed(error: NetworkError) {

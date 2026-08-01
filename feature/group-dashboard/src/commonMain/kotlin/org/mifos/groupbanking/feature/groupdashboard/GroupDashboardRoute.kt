@@ -33,20 +33,22 @@ fun NavController.navigateToGroupDashboard(groupId: String, viewerRole: String, 
  * Registers [GroupDashboardScreen] on the host [NavGraphBuilder]. Every callback here closes a
  * [GroupDashboardEvent] navigation branch consumed by the Container
  * (RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3) — matching `flow.yaml#navigates_to`
- * (`meeting-calendar`, `member-list`, `loan-list`, `share-out-preview`) plus the two flagged
- * additions documented on [GroupDashboardEvent]'s class KDoc ([onNavigateToMemberSavingsDetail],
- * [onNavigateBack]). None of `meeting-calendar` / `member-list` / `loan-list` /
- * `share-out-preview` / `member-savings-detail` are yet-generated feature modules in this
- * codebase — typed nav-arg contracts for the caller to wire, mirroring `GroupListRoute.kt`'s
- * identical not-yet-generated-target convention. No callback carries a `= {}` default — DC3
- * count-assertion: 6 defaults / 6 overrides / 0 suppressed. See API.md#route.
+ * (`meeting-calendar`, `member-list`, `loan-list`, `share-out-preview`, `savings-dashboard` (G9),
+ * `settings` + `sync-status` (G13)) plus the flagged [onNavigateBack] addition documented on
+ * [GroupDashboardEvent]'s class KDoc. [onNavigateToSavingsDashboard] (G9) self-scopes the MEMBER
+ * "My Savings" tap to the group's savings-dashboard (replacing the prior member-savings-detail
+ * mis-route); [onNavigateToSettings] / [onNavigateToSyncStatus] (G13) close the top-bar overflow
+ * menu items. No callback carries a `= {}` default — DC3 count-assertion: 8 defaults / 8 overrides
+ * / 0 suppressed. See API.md#route.
  */
 fun NavGraphBuilder.groupDashboardScreen(
     onNavigateToMeetingCalendar: (groupId: String) -> Unit,
     onNavigateToMemberList: (groupId: String) -> Unit,
     onNavigateToLoanList: (groupId: String, viewerRole: String) -> Unit,
     onNavigateToShareOut: (groupId: String, distributionStrategy: String) -> Unit,
-    onNavigateToMemberSavingsDetail: (groupId: String) -> Unit,
+    onNavigateToSavingsDashboard: (groupId: String) -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToSyncStatus: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composableWithRootPushTransitions<GroupDashboardRoute> { backStackEntry ->
@@ -58,7 +60,9 @@ fun NavGraphBuilder.groupDashboardScreen(
             onNavigateToMemberList = onNavigateToMemberList,
             onNavigateToLoanList = onNavigateToLoanList,
             onNavigateToShareOut = onNavigateToShareOut,
-            onNavigateToMemberSavingsDetail = onNavigateToMemberSavingsDetail,
+            onNavigateToSavingsDashboard = onNavigateToSavingsDashboard,
+            onNavigateToSettings = onNavigateToSettings,
+            onNavigateToSyncStatus = onNavigateToSyncStatus,
             onNavigateBack = onNavigateBack,
         )
     }

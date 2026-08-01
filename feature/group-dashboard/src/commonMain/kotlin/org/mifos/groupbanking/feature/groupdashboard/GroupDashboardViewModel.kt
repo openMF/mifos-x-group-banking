@@ -174,6 +174,8 @@ data class GroupDashboardState(
     val nextRecipientName: String? = null,
     val nextRecipientPosition: Int? = null,
     val shareOutProjection: Double? = null,
+    /** G13 — top-bar overflow (more_vert) dropdown open state (`ui.yaml#state.isMoreMenuExpanded`). */
+    val isMoreMenuExpanded: Boolean = false,
     @Transient
     val error: GroupDashboardError? = null,
 )
@@ -199,13 +201,19 @@ val GroupDashboardState.screenState: GroupDashboardScreenState
  *   declare a matching navigate event. Mirrors `GroupTypePickerEvent.NavigateBack` /
  *   `JoinWithCodeEvent.NavigateBack`'s identical precedent in this codebase. Leaving `OnBack` as a
  *   true no-op would be a dead back button (RULE-IMPL-DEAD-CLICKABLE-001) — implemented for real.
- * - [NavigateToMemberSavingsDetail] — `ui.yaml#components.quick_actions_section
- *   .member_actions_grid.view_savings_button.on_click` wires the declared `OnViewSavings` action
- *   with a fully-authored `action_contract` (`effect: navigate`, target `member-savings-detail`),
- *   but no matching event is declared either.
+ * - [NavigateToSavingsDashboard] (G9, idea-evolve 2026-08-01) — `ui.yaml#components
+ *   .quick_actions_section.member_actions_grid.view_savings_button.on_click` wires the declared
+ *   `OnViewSavings` action to `target: savings-dashboard` (self-scoped, `params: { groupId,
+ *   typeConfig }`), replacing the prior `member-savings-detail` target that needed a `memberId`
+ *   this dashboard does not carry. This dashboard holds a per-group
+ *   [org.mifos.groupbanking.core.model.GroupInstanceConfig], NOT the COMP-DT-003 catalogue
+ *   `GroupTypeConfig` that savings-dashboard's `typeConfig` nav-param declares (the documented
+ *   `GroupTypeConfig`-vs-instance drift), so the event carries only [groupId]; savings-dashboard's
+ *   `typeConfig` nav-param degrades to its default at this seam (contribution-model-adaptive text
+ *   only) and the screen re-renders totals/tabs/rows from its own real load — see
+ *   `SavingsDashboardRoute` KDoc "drift bridge". `NavigateToMeetingCalendar` also mirrors this.
  *
- * Reported to the caller for an idea-layer `ui.yaml#state_model.events.members` update (add
- * `NavigateBack` + `NavigateToMemberSavingsDetail`) rather than left unreachable.
+ * [NavigateToSettings] / [NavigateToSyncStatus] (G13) close the top-bar overflow menu items.
  * See API.md#events.
  */
 sealed interface GroupDashboardEvent {
@@ -213,32 +221,37 @@ sealed interface GroupDashboardEvent {
     data class NavigateToMemberList(val groupId: String) : GroupDashboardEvent
     data class NavigateToLoanList(val groupId: String) : GroupDashboardEvent
     data class NavigateToShareOut(val groupId: String, val distributionStrategy: String) : GroupDashboardEvent
+
+    /** G9 — MEMBER "My Savings" self-scoped to the group's savings dashboard (see class KDoc). */
+    data class NavigateToSavingsDashboard(val groupId: String) : GroupDashboardEvent
+
+    /** G13 — top-bar overflow menu → shared settings screen. */
+    data object NavigateToSettings : GroupDashboardEvent
+
+    /** G13 — top-bar overflow menu → shared offline sync-status dashboard. */
+    data object NavigateToSyncStatus : GroupDashboardEvent
     data object ShowCorpusBlockedDialog : GroupDashboardEvent
     data class ShowSnackbar(val message: String) : GroupDashboardEvent
 
     /** Flagged addition — see class KDoc "Two additions". */
     data object NavigateBack : GroupDashboardEvent
-
-    /** Flagged addition — see class KDoc "Two additions". */
-    data class NavigateToMemberSavingsDetail(val groupId: String) : GroupDashboardEvent
 }
 
 /**
- * User intents dispatched to `GroupDashboardViewModel`. The 8 top-level members are a verbatim
- * mirror of `ui.yaml#state_model.GroupDashboardViewModel.actions.members` —
+ * User intents dispatched to `GroupDashboardViewModel`. The 11 top-level members are a verbatim
+ * mirror of `ui.yaml#state_model.GroupDashboardViewModel.actions.members` (incl. the G13
+ * `OnMoreOptions` / `OnGroupSettings` / `OnSyncStatus` overflow-menu actions) —
  * RULE-IMPL-DEAD-CLICKABLE-001 Rule 1. Several ui.yaml components share the SAME declared action
  * across both role-gated grids (e.g. `view_meetings_button` in `member_actions_grid` also
  * dispatches [OnStartMeeting], `view_loans_member_button` also dispatches [OnViewLoans]) — the
  * role-adaptive branching lives inside the handler, not a second action member, per the shared
  * top_bar `OnMoreOptions` precedent documented below.
  *
- * **Idea-layer gap (flagged, not invented here):** `ui.yaml#components.top_bar.actions[0]`
- * declares an `OnMoreOptions` `on_click` (effect: `transform_state`, expands a
- * `Compose-DropdownMenu` overflow menu) that is NOT present in `state_model.actions.members`. Per
- * RULE-IMPL-DEAD-CLICKABLE-001 SP-07 Rule 1 this addition-from-component is NOT added to this
- * sealed interface silently — it is a pure local Compose UI toggle (no ViewModel state), so no
- * ViewModel wiring is needed once `ui.yaml#state_model.actions.members` is updated with it (or it
- * is confirmed Screen-layer-only). Reported to the caller.
+ * **G13 (idea-evolve 2026-08-01):** `ui.yaml#components.top_bar.actions[0]` now declares
+ * [OnMoreOptions] (effect: `transform_state`, toggles [GroupDashboardState.isMoreMenuExpanded]) plus
+ * the overflow menu items [OnGroupSettings] (→ settings) / [OnSyncStatus] (→ sync-status), all
+ * present in `state_model.actions.members`. The dropdown open state is now REAL ViewModel state
+ * (`isMoreMenuExpanded`), not a Screen-local `remember` toggle.
  * [Internal] is the sanctioned async-result-routing sub-interface (never a user intent) per
  * `training-layer/TRAINING_MASTER.yaml#patterns.actions` — mirrors `GroupListAction.Internal`.
  * See API.md#actions.
@@ -249,6 +262,9 @@ sealed interface GroupDashboardAction {
     data object OnViewLoans : GroupDashboardAction
     data object OnShareOut : GroupDashboardAction
     data object OnViewSavings : GroupDashboardAction
+    data object OnMoreOptions : GroupDashboardAction
+    data object OnGroupSettings : GroupDashboardAction
+    data object OnSyncStatus : GroupDashboardAction
     data object OnRefresh : GroupDashboardAction
     data object Retry : GroupDashboardAction
     data object OnBack : GroupDashboardAction
@@ -361,6 +377,9 @@ internal class GroupDashboardViewModel(
             GroupDashboardAction.OnViewLoans -> handleViewLoans()
             GroupDashboardAction.OnShareOut -> handleShareOut()
             GroupDashboardAction.OnViewSavings -> handleViewSavings()
+            GroupDashboardAction.OnMoreOptions -> handleMoreOptions()
+            GroupDashboardAction.OnGroupSettings -> handleGroupSettings()
+            GroupDashboardAction.OnSyncStatus -> handleSyncStatus()
             GroupDashboardAction.OnRefresh -> handleRefresh()
             GroupDashboardAction.Retry -> handleRetry()
             GroupDashboardAction.OnBack -> handleBack()
@@ -436,12 +455,31 @@ internal class GroupDashboardViewModel(
         sendEvent(GroupDashboardEvent.NavigateToShareOut(groupId, distributionStrategy))
     }
 
-    // -- View Savings (member, read-only) — see GroupDashboardEvent class KDoc "flagged addition" --
+    // -- View Savings (member, read-only) — G9: self-scoped to the group's savings-dashboard --------
 
     private fun handleViewSavings() {
         analytics.trackGroupOperation(operation = "view_savings", groupId = groupId)
-        Logger.i(TAG) { "OnViewSavings groupId=$groupId" }
-        sendEvent(GroupDashboardEvent.NavigateToMemberSavingsDetail(groupId))
+        Logger.i(TAG) { "OnViewSavings groupId=$groupId — opening savings dashboard" }
+        sendEvent(GroupDashboardEvent.NavigateToSavingsDashboard(groupId))
+    }
+
+    // -- Top-bar overflow menu (G13 — transform_state toggle + two navigate items) ------------------
+
+    private fun handleMoreOptions() {
+        Logger.i(TAG) { "OnMoreOptions groupId=$groupId — toggling overflow menu" }
+        updateState { copy(isMoreMenuExpanded = !isMoreMenuExpanded) }
+    }
+
+    private fun handleGroupSettings() {
+        Logger.i(TAG) { "OnGroupSettings groupId=$groupId — opening settings" }
+        updateState { copy(isMoreMenuExpanded = false) }
+        sendEvent(GroupDashboardEvent.NavigateToSettings)
+    }
+
+    private fun handleSyncStatus() {
+        Logger.i(TAG) { "OnSyncStatus groupId=$groupId — opening sync status" }
+        updateState { copy(isMoreMenuExpanded = false) }
+        sendEvent(GroupDashboardEvent.NavigateToSyncStatus)
     }
 
     // -- Pull-to-refresh (data-flow.yaml on_refresh: bypass_and_refresh) -----------------------------

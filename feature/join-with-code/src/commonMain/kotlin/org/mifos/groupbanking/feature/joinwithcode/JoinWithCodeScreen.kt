@@ -80,7 +80,7 @@ import org.mifos.groupbanking.feature.joinwithcode.generated.resources.screens_j
 @Composable
 internal fun JoinWithCodeScreen(
     inviteCode: String?,
-    onNavigateToGroupDashboard: (groupId: String) -> Unit,
+    onNavigateToPersonalDashboard: () -> Unit,
     onNavigateToLoginSignup: (pendingInviteCode: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -91,7 +91,7 @@ internal fun JoinWithCodeScreen(
 
     EventsEffect(viewModel) { event ->
         when (event) {
-            is JoinWithCodeEvent.NavigateToGroupDashboard -> onNavigateToGroupDashboard(event.groupId)
+            JoinWithCodeEvent.NavigateToPersonalDashboard -> onNavigateToPersonalDashboard()
             is JoinWithCodeEvent.NavigateToLoginSignup -> onNavigateToLoginSignup(event.pendingInviteCode)
             JoinWithCodeEvent.NavigateBack -> onNavigateBack()
             // Declared for JoinWithCodeEvent exhaustiveness (ui.yaml#state_model.events) — not
@@ -161,7 +161,7 @@ internal fun JoinWithCodeContent(
 
             // Transient/unreachable — see JoinWithCodeScreenState.Success KDoc. Rendered the same
             // as Joining so a stray recomposition never shows a blank frame while the
-            // NavigateToGroupDashboard event (emitted the same frame it would occur) is consumed.
+            // NavigateToPersonalDashboard event (emitted the same frame it would occur) is consumed.
             JoinWithCodeScreenState.Success -> GroupPreviewSection(state = state, onAction = onAction, isJoining = true)
 
             JoinWithCodeScreenState.ErrorInvalidCode,

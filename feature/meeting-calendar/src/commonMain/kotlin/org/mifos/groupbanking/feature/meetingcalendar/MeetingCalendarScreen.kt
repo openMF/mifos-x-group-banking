@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.EventNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -41,12 +42,15 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +63,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.groupbanking.core.model.MeetingListItem
 import org.mifos.groupbanking.core.model.MeetingStatus
+import org.mifos.groupbanking.feature.meetingcalendar.components.ScheduleEditorBottomSheet
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.Res
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_action_retry
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_collected_amount
@@ -72,7 +77,15 @@ import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screen
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_error_title
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_loading_message
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_meeting_number
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_no_upcoming_body
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_no_upcoming_icon_cd
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_no_upcoming_title
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_past_header
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_reschedule_button
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_reschedule_button_a11y
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_schedule_updated_toast
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_set_schedule_button
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_set_schedule_button_a11y
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_row_subtitle_attended
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_start_meeting
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_status_completed
@@ -94,7 +107,7 @@ import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screen
 internal fun MeetingCalendarScreen(
     centerId: Int,
     onNavigateToConduct: (meetingId: String, meetingNumber: Int) -> Unit,
-    onNavigateToReview: (meetingId: String, meetingNumber: Int) -> Unit,
+    onNavigateToReview: (meetingId: String, meetingNumber: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingCalendarViewModel = koinViewModel(parameters = { parametersOf(centerId) }),
@@ -105,15 +118,18 @@ internal fun MeetingCalendarScreen(
     val networkMessage = stringResource(Res.string.screens_meeting_calendar_error_network_message)
     val serverMessage = stringResource(Res.string.screens_meeting_calendar_error_server_message)
     val authMessage = stringResource(Res.string.screens_meeting_calendar_error_auth_message)
+    val scheduleUpdatedMessage = stringResource(Res.string.screens_meeting_calendar_schedule_updated_toast)
 
     EventsEffect(viewModel) { event ->
         when (event) {
             is MeetingCalendarEvent.NavigateToConduct -> onNavigateToConduct(event.meetingId, event.meetingNumber)
-            is MeetingCalendarEvent.NavigateToReview -> onNavigateToReview(event.meetingId, event.meetingNumber)
+            is MeetingCalendarEvent.NavigateToReview ->
+                onNavigateToReview(event.meetingId, event.meetingNumber, event.launchedFrom)
             is MeetingCalendarEvent.ShowError -> {
                 val resolved = messageKeyToText(event.message, networkMessage, serverMessage, authMessage)
                 snackbarHostState.showSnackbar(resolved)
             }
+            is MeetingCalendarEvent.ShowScheduleUpdated -> snackbarHostState.showSnackbar(scheduleUpdatedMessage)
         }
     }
 
@@ -179,6 +195,23 @@ internal fun MeetingCalendarContent(
                     MeetingCalendarError.Auth -> stringResource(Res.string.screens_meeting_calendar_error_auth_message)
                 },
                 onRetry = { onAction(MeetingCalendarAction.Retry) },
+            )
+        }
+
+        // G3 / F6 — schedule-editor sheet overlays whenever showScheduleEditor (Content or Empty).
+        if (state.showScheduleEditor) {
+            ScheduleEditorBottomSheet(
+                scheduleDay = state.scheduleDay,
+                scheduleTime = state.scheduleTime,
+                scheduleFrequency = state.scheduleFrequency,
+                isRescheduling = state.isRescheduling,
+                onFieldChange = { day, time, frequency ->
+                    onAction(MeetingCalendarAction.OnScheduleFieldChange(day = day, time = time, frequency = frequency))
+                },
+                onConfirm = { day, time, frequency ->
+                    onAction(MeetingCalendarAction.RescheduleMeeting(day = day, time = time, frequency = frequency))
+                },
+                onDismiss = { onAction(MeetingCalendarAction.DismissScheduleEditor) },
             )
         }
     }
@@ -252,7 +285,14 @@ internal fun MeetingCalendarContentSection(
                     UpcomingMeetingCard(
                         meeting = upcoming,
                         onStart = { onAction(MeetingCalendarAction.StartMeeting(upcoming.meetingId, upcoming.meetingNumber)) },
+                        onReschedule = { onAction(MeetingCalendarAction.OpenScheduleEditor) },
                     )
+                }
+            } else {
+                // G3 / F6 — replaces the former dead "Next meeting not scheduled" placeholder with a
+                // real Set/Adjust-Schedule CTA that opens the schedule editor.
+                item(key = "no_upcoming_card") {
+                    NoUpcomingScheduleCard(onSetSchedule = { onAction(MeetingCalendarAction.OpenScheduleEditor) })
                 }
             }
             item(key = "past_header") {
@@ -274,10 +314,11 @@ internal fun MeetingCalendarContentSection(
     }
 }
 
-/** Pinned upcoming-meeting card with the green "Start Meeting" CTA (`ui.yaml#upcoming_meeting_card`). */
+/** Pinned upcoming-meeting card with the green "Start Meeting" CTA + "Reschedule" affordance (`ui.yaml#upcoming_meeting_card`). */
 @Composable
-private fun UpcomingMeetingCard(meeting: MeetingListItem, onStart: () -> Unit) {
+private fun UpcomingMeetingCard(meeting: MeetingListItem, onStart: () -> Unit, onReschedule: () -> Unit) {
     val sp = MaterialTheme.spacing
+    val rescheduleA11y = stringResource(Res.string.screens_meeting_calendar_reschedule_button_a11y)
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = sp.sm).testTag(MeetingCalendarTestTags.UPCOMING_CARD),
         shape = RoundedCornerShape(16.dp),
@@ -305,6 +346,71 @@ private fun UpcomingMeetingCard(meeting: MeetingListItem, onStart: () -> Unit) {
                 Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = null)
                 Text(
                     text = stringResource(Res.string.screens_meeting_calendar_start_meeting),
+                    modifier = Modifier.padding(start = sp.xs),
+                )
+            }
+            TextButton(
+                onClick = onReschedule,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 44.dp)
+                    .semantics { contentDescription = rescheduleA11y }
+                    .testTag(MeetingCalendarTestTags.RESCHEDULE_BUTTON),
+            ) {
+                Icon(imageVector = Icons.Filled.EditCalendar, contentDescription = null)
+                Text(
+                    text = stringResource(Res.string.screens_meeting_calendar_reschedule_button),
+                    modifier = Modifier.padding(start = sp.xs),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * `ui.yaml#no_upcoming_schedule_card` (G3 / F6) — shown in Content when there is no upcoming meeting.
+ * Replaces the former dead "Next meeting not scheduled" placeholder with a real "Set / Adjust Schedule"
+ * CTA that opens the schedule editor.
+ */
+@Composable
+private fun NoUpcomingScheduleCard(onSetSchedule: () -> Unit) {
+    val sp = MaterialTheme.spacing
+    val iconCd = stringResource(Res.string.screens_meeting_calendar_no_upcoming_icon_cd)
+    val ctaA11y = stringResource(Res.string.screens_meeting_calendar_set_schedule_button_a11y)
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = sp.sm).testTag(MeetingCalendarTestTags.NO_UPCOMING_CARD),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(sp.lg), verticalArrangement = Arrangement.spacedBy(sp.sm)) {
+            Icon(
+                imageVector = Icons.Filled.EditCalendar,
+                contentDescription = iconCd,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(32.dp),
+            )
+            Text(
+                text = stringResource(Res.string.screens_meeting_calendar_no_upcoming_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = stringResource(Res.string.screens_meeting_calendar_no_upcoming_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(
+                onClick = onSetSchedule,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = sp.touchTargetMin)
+                    .semantics { contentDescription = ctaA11y }
+                    .testTag(MeetingCalendarTestTags.SET_SCHEDULE_BUTTON),
+                colors = ButtonDefaults.buttonColors(),
+            ) {
+                Icon(imageVector = Icons.Filled.EditCalendar, contentDescription = null)
+                Text(
+                    text = stringResource(Res.string.screens_meeting_calendar_set_schedule_button),
                     modifier = Modifier.padding(start = sp.xs),
                 )
             }
@@ -395,6 +501,7 @@ internal fun MeetingCalendarEmptySection(
 ) {
     val sp = MaterialTheme.spacing
     val iconCd = stringResource(Res.string.screens_meeting_calendar_empty_icon_cd)
+    val ctaA11y = stringResource(Res.string.screens_meeting_calendar_set_schedule_button_a11y)
     Column(modifier = modifier.fillMaxSize()) {
         ViewModeToggleRow(viewMode = state.viewMode, onToggle = { onAction(MeetingCalendarAction.ToggleViewMode) })
         Column(
@@ -415,6 +522,23 @@ internal fun MeetingCalendarEmptySection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = sp.sm),
             )
+            // G3 / F6 — Set Meeting Schedule CTA on the fully-empty calendar (replaces the dead-end).
+            Button(
+                onClick = { onAction(MeetingCalendarAction.OpenScheduleEditor) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = sp.touchTargetMin)
+                    .padding(top = sp.lg)
+                    .semantics { contentDescription = ctaA11y }
+                    .testTag(MeetingCalendarTestTags.SET_SCHEDULE_BUTTON),
+                colors = ButtonDefaults.buttonColors(),
+            ) {
+                Icon(imageVector = Icons.Filled.EditCalendar, contentDescription = null)
+                Text(
+                    text = stringResource(Res.string.screens_meeting_calendar_set_schedule_button),
+                    modifier = Modifier.padding(start = sp.xs),
+                )
+            }
         }
     }
 }

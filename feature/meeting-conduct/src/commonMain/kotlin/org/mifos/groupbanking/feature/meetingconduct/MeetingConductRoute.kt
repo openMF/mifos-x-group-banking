@@ -47,7 +47,7 @@ fun NavController.navigateToMeetingConduct(
  */
 fun NavGraphBuilder.meetingConductScreen(
     onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
-    onNavigateToPreviousMeetingReview: (meetingId: String, centerId: Int) -> Unit,
+    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, centerId: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composableWithRootPushTransitions<MeetingConductRoute> { backStackEntry ->

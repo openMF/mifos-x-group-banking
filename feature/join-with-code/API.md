@@ -29,7 +29,7 @@ Koin `parametersOf(...)` — see `#di`).
 field): `Initial` · `Validating` · `Preview` · `Joining` · `Success` · `ErrorInvalidCode` ·
 `ErrorExpired` · `ErrorAlreadyMember` · `ErrorNetwork`. `Success` is never returned by
 `deriveScreenState()` — per `ui.yaml#states.success` it is transient, superseded in the same
-frame by the `NavigateToGroupDashboard` event; the member exists for Screen-layer `when`
+frame by the `NavigateToPersonalDashboard` event; the member exists for Screen-layer `when`
 exhaustiveness only.
 
 `JoinError`: `InvalidCode` · `ExpiredCode` · `AlreadyMember` · `Network` · `Auth` — each carries
@@ -41,7 +41,7 @@ exhaustiveness only.
 |---|---|---|---|
 | `OnCodeChange` | `value: String` | — (auto-validates at 6 chars) | uppercases/truncates `inviteCode`, clears `inviteStatus`/`error`/`groupPreview`; dispatches validate at 6 chars |
 | `OnValidateCode` | — | `NavigateToLoginSignup` on 401 | `validateCode` → expiry/already-used check → `fetchGroupPreview` → `Preview` |
-| `OnConfirmJoin` | — | `NavigateToLoginSignup` (unauth or non-numeric clientId) \| `NavigateToGroupDashboard` (success) | resolves `clientId` from `AuthRepository.currentSession`, calls `joinGroup` |
+| `OnConfirmJoin` | — | `NavigateToLoginSignup` (unauth or non-numeric clientId) \| `NavigateToPersonalDashboard` (success) | resolves `clientId` from `AuthRepository.currentSession`, calls `joinGroup` |
 | `OnBack` | — | `NavigateBack` | pure navigate |
 | `OnRetry` | — | — | no-op unless `error.retry==true`; clears error, re-dispatches validate |
 
@@ -51,8 +51,8 @@ exhaustiveness only.
 
 ## events
 
-`NavigateToGroupDashboard(groupId: String)` · `NavigateToLoginSignup(pendingInviteCode: String)` ·
-`NavigateBack` · `ShowSnackbar(message: String)`.
+`NavigateToPersonalDashboard` (F5 — no params, personal-dashboard nav_params:{}) ·
+`NavigateToLoginSignup(pendingInviteCode: String)` · `NavigateBack` · `ShowSnackbar(message: String)`.
 
 ## di
 
@@ -74,7 +74,7 @@ collects `JoinWithCodeViewModel.stateFlow` via `collectAsStateWithLifecycle`, co
 `JoinWithCodeEvent`s through `EventsEffect`, and delegates to the stateless
 `JoinWithCodeContent`. Takes `inviteCode: String?` (deep-link nav-arg forwarded to the
 ViewModel via Koin `parametersOf(inviteCode)`) plus 3 required nav callbacks
-(`onNavigateToGroupDashboard`, `onNavigateToLoginSignup`, `onNavigateBack` — no `= {}`
+(`onNavigateToPersonalDashboard`, `onNavigateToLoginSignup`, `onNavigateBack` — no `= {}`
 defaults).
 
 `JoinWithCodeContent` (stateless, `internal`) — `state: JoinWithCodeState, onAction:
@@ -101,12 +101,12 @@ uppercase `OutlinedTextField`, sanitization happens in the ViewModel), `GroupPre
 
 `JoinWithCodeRoute(val inviteCode: String? = null)` — `@Serializable data class`, path
 `/groups/join`. `NavController.navigateToJoinWithCode(inviteCode, navOptions)` +
-`NavGraphBuilder.joinWithCodeScreen(onNavigateToGroupDashboard, onNavigateToLoginSignup,
+`NavGraphBuilder.joinWithCodeScreen(onNavigateToPersonalDashboard, onNavigateToLoginSignup,
 onNavigateBack)`. Pure pass-through (0 defaults / 0 overrides / 0 suppressed —
 RULE-PROTO-COMPOSE-DEAD-CLICK-001 DC3 count-assertion), identical shape to
-`LoginSignupRoute.kt` / `GroupTypePickerRoute.kt`. `flow.yaml#navigates_to` declares all 3
-targets this Route closes: `group-dashboard`, `login-signup`, `personal-dashboard` (the
-`OnBack`/pop target). The `app://groups/join?code={inviteCode}` deep-link URI itself is not
+`LoginSignupRoute.kt` / `GroupTypePickerRoute.kt`. `flow.yaml#navigates_to` declares the
+targets this Route closes: `personal-dashboard` (F5 post-join landing) + `login-signup`;
+`onNavigateBack` is the `OnBack`/pop target. The `app://groups/join?code={inviteCode}` deep-link URI itself is not
 yet registered as a platform `NavDeepLink`/intent-filter — flagged as an infra follow-up, the
 same as `GroupTypePickerRoute.kt`'s `group-create` nav-arg gap.
 

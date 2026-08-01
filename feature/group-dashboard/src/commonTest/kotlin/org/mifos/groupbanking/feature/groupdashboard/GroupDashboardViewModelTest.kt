@@ -248,12 +248,49 @@ class GroupDashboardViewModelTest {
     }
 
     @Test
-    fun `OnViewSavings emits NavigateToMemberSavingsDetail`() = runTest(testDispatcher) {
+    fun `OnViewSavings emits NavigateToSavingsDashboard`() = runTest(testDispatcher) {
         createViewModel(viewerRole = "MEMBER")
         viewModel.eventFlow.test {
             viewModel.trySendAction(GroupDashboardAction.OnViewSavings)
-            assertEquals(GroupDashboardEvent.NavigateToMemberSavingsDetail(GROUP_ID), awaitItem())
+            assertEquals(GroupDashboardEvent.NavigateToSavingsDashboard(GROUP_ID), awaitItem())
         }
+    }
+
+    @Test
+    fun `OnMoreOptions toggles isMoreMenuExpanded`() = runTest(testDispatcher) {
+        assertFalse(viewModel.stateFlow.value.isMoreMenuExpanded)
+
+        viewModel.trySendAction(GroupDashboardAction.OnMoreOptions)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(viewModel.stateFlow.value.isMoreMenuExpanded)
+
+        viewModel.trySendAction(GroupDashboardAction.OnMoreOptions)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(viewModel.stateFlow.value.isMoreMenuExpanded)
+    }
+
+    @Test
+    fun `OnGroupSettings closes the menu and emits NavigateToSettings`() = runTest(testDispatcher) {
+        viewModel.trySendAction(GroupDashboardAction.OnMoreOptions)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(GroupDashboardAction.OnGroupSettings)
+            assertEquals(GroupDashboardEvent.NavigateToSettings, awaitItem())
+        }
+        assertFalse(viewModel.stateFlow.value.isMoreMenuExpanded)
+    }
+
+    @Test
+    fun `OnSyncStatus closes the menu and emits NavigateToSyncStatus`() = runTest(testDispatcher) {
+        viewModel.trySendAction(GroupDashboardAction.OnMoreOptions)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(GroupDashboardAction.OnSyncStatus)
+            assertEquals(GroupDashboardEvent.NavigateToSyncStatus, awaitItem())
+        }
+        assertFalse(viewModel.stateFlow.value.isMoreMenuExpanded)
     }
 
     @Test

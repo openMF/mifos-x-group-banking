@@ -22,7 +22,7 @@ object PersonalDashboardTestTags {
     /** Root [kpt.core.ui.scaffold.KptScaffold] surface — always rendered regardless of screenState. */
     const val SCREEN: String = "personal_dashboard_screen"
 
-    /** Decorative notifications bell — no declared `on_click` in ui.yaml, not interactive. */
+    /** Notifications bell icon-button — [PersonalDashboardAction.OnOpenNotifications] (G14, deferred-notifications snackbar). */
     const val NOTIFICATION_ICON: String = "personal_dashboard_notification_icon"
 
     /** Primary-colored group banner (name + currency chip + optional selector row). */

@@ -128,6 +128,7 @@ private fun PersonalDashboardTopSectionPreview() {
             onGroupSelected = {},
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }
@@ -140,6 +141,7 @@ private fun PersonalDashboardLoadingSectionPreview() {
             greeting = "Good morning, Amina Wanjiru",
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }
@@ -162,6 +164,7 @@ private fun PersonalDashboardContentSectionAccumulatingPreview() {
             onAction = {},
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }
@@ -176,6 +179,7 @@ private fun PersonalDashboardContentSectionRotatingPreview() {
             onAction = {},
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }
@@ -188,6 +192,7 @@ private fun PersonalDashboardEmptySectionPreview() {
             greeting = "Good morning, Amina Wanjiru",
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }
@@ -202,6 +207,7 @@ private fun PersonalDashboardErrorSectionPreview() {
             onRetry = {},
             onOpenSettings = {},
             onOpenSyncStatus = {},
+            onOpenNotifications = {},
         )
     }
 }

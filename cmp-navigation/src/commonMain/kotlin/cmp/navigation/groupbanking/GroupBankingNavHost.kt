@@ -227,9 +227,9 @@ fun GroupBankingNavHost(
 
                 // 5. join-with-code → dashboard (joiner is a MEMBER) / re-auth
                 joinWithCodeScreen(
-                    onNavigateToGroupDashboard = { groupId ->
-                        navController.navigateToGroupDashboard(groupId = groupId, viewerRole = "MEMBER")
-                    },
+                    // F5 — joiner lands on their own personal-dashboard (identity + joined group
+                    // resolve from the auth token); replaces the prior group-dashboard landing.
+                    onNavigateToPersonalDashboard = { navController.navigateToPersonalDashboard() },
                     // Pre-auth invite resume (TC-LS-010): carry the entered code back to
                     // login-signup so a subsequent login/signup success resumes the join.
                     onNavigateToLoginSignup = { pendingInviteCode ->
@@ -325,6 +325,13 @@ fun GroupBankingNavHost(
                 organizerDashboardScreen(
                     onNavigateToGroupList = { navController.navigateToGroupList() },
                     onNavigateToFieldOfficerDashboard = { navController.navigateToFieldOfficerDashboard() },
+                    // G7 — Today's-Schedule row + Meetings-Today KPI open the tapped group's meeting
+                    // calendar. group-dashboard forwards a `groupId: String`; meeting-calendar's
+                    // nav_param is `center_id: Int` — same toIntOrNull drift bridge as the
+                    // group-dashboard → meeting-calendar seam below.
+                    onNavigateToMeetingCalendar = { groupId ->
+                        navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
+                    },
                 )
 
                 // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list
@@ -351,16 +358,18 @@ fun GroupBankingNavHost(
                     // drift ShareOutPreviewRoute's "drift bridge" KDoc documents); navigate by
                     // groupId alone, the companion preview response drives poolModel/shareoutFormula.
                     onNavigateToShareOut = { groupId, _ -> navController.navigateToShareOutPreview(groupId = groupId) },
-                    // group-dashboard `OnViewSavings` → the group-level savings-dashboard
+                    // G9 — group-dashboard `OnViewSavings` → the group-level savings-dashboard
                     // (`idea-layer/screens/savings-dashboard/ui.yaml#entry_points[0]`: "OnViewSavings
                     // (all roles)"), NOT member-savings-detail. GroupDashboardViewModel emits this as
-                    // `NavigateToMemberSavingsDetail(groupId)` carrying only groupId (a flagged
-                    // idea-layer drift, see that VM's KDoc + SavingsDashboardRoute KDoc "drift
-                    // bridge"): the catalogue GroupTypeConfig this screen's nav_params want is not
-                    // available at this seam, so we navigate by groupId alone.
-                    onNavigateToMemberSavingsDetail = { groupId ->
+                    // `NavigateToSavingsDashboard(groupId)` carrying only groupId (the dashboard holds
+                    // GroupInstanceConfig, not the catalogue GroupTypeConfig savings-dashboard's
+                    // nav_param wants — flagged idea-layer drift; typeConfig degrades to default here).
+                    onNavigateToSavingsDashboard = { groupId ->
                         navController.navigateToSavingsDashboard(groupId = groupId)
                     },
+                    // G13 — top-bar overflow menu → shared param-less destinations.
+                    onNavigateToSettings = { navController.navigateToSettings() },
+                    onNavigateToSyncStatus = { navController.navigateToSyncStatus() },
                     onNavigateBack = { navController.popBackStack() },
                 )
 
@@ -463,15 +472,15 @@ fun GroupBankingNavHost(
                             centerId = centerId,
                         )
                     },
-                    // → previous-meeting-review (past-meeting drill-down, calendar-launched).
-                    // `centerId` is now forwarded from the calendar route (was previously the
-                    // `centerId = 0` drift bridge).
-                    onNavigateToReview = { meetingId, meetingNumber, centerId ->
+                    // G5 → previous-meeting-review (past-meeting drill-down, calendar-launched).
+                    // `centerId` + `launchedFrom` ("calendar") are forwarded from the calendar screen's
+                    // event (was previously the `centerId = 0` drift bridge + a hardcoded launchedFrom).
+                    onNavigateToReview = { meetingId, meetingNumber, centerId, launchedFrom ->
                         navController.navigateToPreviousMeetingReview(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
                             centerId = centerId,
-                            launchedFrom = "calendar",
+                            launchedFrom = launchedFrom,
                         )
                     },
                     onNavigateBack = { navController.popBackStack() },
@@ -491,15 +500,15 @@ fun GroupBankingNavHost(
                             centerId = centerId,
                         )
                     },
-                    // → previous-meeting-review (step-0 drill-down, conduct-launched).
-                    // TODO(nav): meeting-conduct's callback forwards (meetingId, centerId) but not
-                    // meeting_number — passing 0 until that sibling callback carries it (see drain-request).
-                    onNavigateToPreviousMeetingReview = { meetingId, centerId ->
+                    // G6 → previous-meeting-review (step-0 drill-down, conduct-launched). The callback
+                    // now forwards the real meetingId (String) + meetingNumber (Int, no longer dropped)
+                    // + centerId + launchedFrom ("conduct") — resolves the prior meeting_number=0 drift.
+                    onNavigateToPreviousMeetingReview = { meetingId, meetingNumber, centerId, launchedFrom ->
                         navController.navigateToPreviousMeetingReview(
                             meetingId = meetingId,
-                            meetingNumber = 0,
+                            meetingNumber = meetingNumber,
                             centerId = centerId,
-                            launchedFrom = "conduct",
+                            launchedFrom = launchedFrom,
                         )
                     },
                     onNavigateBack = { navController.popBackStack() },

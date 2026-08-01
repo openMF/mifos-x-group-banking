@@ -306,6 +306,18 @@ class GroupListViewModelTest {
         }
     }
 
+    @Test
+    fun `OnOpenNotifications emits NotificationsDeferred`() = runTest(testDispatcher) {
+        // G15 — the top-bar bell is a deferred affordance: it emits NotificationsDeferred
+        // (snackbar), never a navigation event.
+        val (_, viewModel) = buildViewModel()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(GroupListAction.OnOpenNotifications)
+            assertEquals(GroupListEvent.NotificationsDeferred, awaitItem())
+        }
+    }
+
     // ─── OnRefresh / Retry ──────────────────────────────────────────────────
 
     @Test

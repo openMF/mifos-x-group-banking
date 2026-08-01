@@ -138,6 +138,15 @@ sealed interface GroupListEvent {
     data class NavigateToGroupDashboard(val groupId: String, val viewerRole: String) : GroupListEvent
     data object NavigateToCreateGroup : GroupListEvent
     data object NavigateToJoinGroup : GroupListEvent
+
+    /**
+     * Notification bell tap → deferred in-app notifications centre (G15,
+     * `ui.yaml#components.top_bar.actions[notifications].on_click`). The notifications screen ships
+     * in a later release (`release_plan.deferred[]`), so this event carries NO navigation — the
+     * Screen shows a snackbar (`notifications_deferred` key). Distinct from [ShowSnackbar], which
+     * carries a dynamic error message-key; this is the fixed deferred-notifications affordance.
+     */
+    data object NotificationsDeferred : GroupListEvent
     data class ShowSnackbar(val message: String) : GroupListEvent
 }
 
@@ -153,12 +162,10 @@ sealed interface GroupListEvent {
  * `training-layer/TRAINING_MASTER.yaml#patterns.actions` — mirrors
  * `GroupTypePickerAction.Internal`.
  *
- * **Idea-layer gap (flagged, not invented here):** ui.yaml's `top_bar` component declares an
- * `OnOpenNotifications` `on_click` (effect: `emit_event`, target: a deferred notifications
- * snackbar) that is NOT present in `state_model.actions.members`. Per the interactive-action
- * naming convention (RULE-IMPL-DEAD-CLICKABLE-001 SP-07) this addition-from-component MUST be
- * reported to the caller for an idea-layer `ui.yaml#state_model.actions.members` update — it
- * is intentionally NOT added to this sealed interface silently.
+ * **G15 (resolved idea-layer gap):** ui.yaml's `top_bar` now declares `OnOpenNotifications` in
+ * `state_model.actions.members` (and a matching `NotificationsDeferred` event) — the previously
+ * dead top-bar bell is now wired to a real deferred-notifications snackbar affordance. [OnOpenNotifications]
+ * mirrors that declaration verbatim (RULE-IMPL-DEAD-CLICKABLE-001 SP-07 Rule 2).
  * See API.md#actions.
  */
 sealed interface GroupListAction {
@@ -167,6 +174,9 @@ sealed interface GroupListAction {
     data object OnClearSearch : GroupListAction
     data object OnCreateGroup : GroupListAction
     data object OnJoinGroup : GroupListAction
+
+    /** Top-bar notification bell tap (`ui.yaml#components.top_bar.actions[notifications]`, G15). */
+    data object OnOpenNotifications : GroupListAction
     data object OnRefresh : GroupListAction
     data object Retry : GroupListAction
     data object OnLoadMoreTap : GroupListAction
@@ -224,6 +234,7 @@ internal class GroupListViewModel(
             GroupListAction.OnClearSearch -> handleClearSearch()
             GroupListAction.OnCreateGroup -> handleCreateGroup()
             GroupListAction.OnJoinGroup -> handleJoinGroup()
+            GroupListAction.OnOpenNotifications -> handleOpenNotifications()
             GroupListAction.OnRefresh -> handleRefresh()
             GroupListAction.Retry -> handleRetry()
             GroupListAction.OnLoadMoreTap -> handleLoadMoreTap()
@@ -271,6 +282,13 @@ internal class GroupListViewModel(
         analytics.trackGroupOperation(operation = "join")
         Logger.i(TAG) { "join group tapped" }
         sendEvent(GroupListEvent.NavigateToJoinGroup)
+    }
+
+    // -- Notification bell tap (ui.yaml effect: emit_event — deferred notifications centre, G15) ---
+
+    private fun handleOpenNotifications() {
+        Logger.i(TAG) { "notification bell tapped — in-app notifications centre deferred to a later release" }
+        sendEvent(GroupListEvent.NotificationsDeferred)
     }
 
     // -- Pull to refresh (data-flow.yaml on_refresh: bypass_and_refresh via GroupRepository) ------

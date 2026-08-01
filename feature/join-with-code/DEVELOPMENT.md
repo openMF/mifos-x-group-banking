@@ -5,7 +5,7 @@
 ## 1. Module Identity
 
 `:feature:join-with-code` — invite-code entry + group-preview confirmation flow (deep-link or
-manual 6-char code → validate → preview → confirm join → group-dashboard). Namespace
+manual 6-char code → validate → preview → confirm join → personal-dashboard). Namespace
 `org.mifos.groupbanking.feature.joinwithcode`. Source of truth:
 `idea-layer/screens/join-with-code/{ui,api,docs,flow,data-flow,tests}.yaml`.
 
@@ -28,7 +28,7 @@ manual 6-char code → validate → preview → confirm join → group-dashboard
 (`SessionChecked`, `ValidateFailed`, `ValidateExpired`, `ValidateAlreadyMember`, `PreviewLoaded`,
 `JoinSucceeded`, `JoinFailed`).
 
-**Event variants** (`JoinWithCodeEvent`): `NavigateToGroupDashboard(groupId)`,
+**Event variants** (`JoinWithCodeEvent`): `NavigateToPersonalDashboard`,
 `NavigateToLoginSignup(pendingInviteCode)`, `NavigateBack`, `ShowSnackbar(message)`.
 
 ## 3. Consumers
@@ -69,7 +69,7 @@ emits `NavigateToLoginSignup(pendingInviteCode)`.
 `feature/join-with-code/src/commonTest/kotlin/org/mifos/groupbanking/feature/joinwithcode/JoinWithCodeViewModelTest.kt`
 — 12 `@Test` functions covering initial state, deep-link auto-validate, code-change sanitize +
 auto-validate threshold, successful validate → Preview, expired/already-member/invalid-code/
-network error paths, retry re-dispatch, successful confirm-join → NavigateToGroupDashboard,
+network error paths, retry re-dispatch, successful confirm-join → NavigateToPersonalDashboard,
 unauthenticated confirm-join → NavigateToLoginSignup, confirm-join 400 → AlreadyMember, and
 OnBack.
 

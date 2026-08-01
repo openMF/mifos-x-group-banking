@@ -22,8 +22,17 @@ object GroupDashboardTestTags {
     /** Root [kpt.core.ui.scaffold.KptScaffold] surface — always rendered regardless of screenState. */
     const val SCREEN: String = "group_dashboard_screen"
 
-    /** Top-bar overflow icon — `ui.yaml#components.top_bar.actions[0]` (`OnMoreOptions`, local UI toggle). */
+    /** Top-bar overflow icon — `ui.yaml#components.top_bar.actions[0]` (`OnMoreOptions` toggles `isMoreMenuExpanded`). */
     const val MORE_OPTIONS_BUTTON: String = "group_dashboard_more_options_button"
+
+    /** G13 — top-bar overflow dropdown surface (`ui.yaml#components.top_bar.actions[0].menu`). */
+    const val MORE_MENU: String = "group_dashboard_more_menu"
+
+    /** G13 — overflow menu "Settings" item — [GroupDashboardAction.OnGroupSettings] (→ settings). */
+    const val MENU_SETTINGS_ITEM: String = "group_dashboard_menu_settings_item"
+
+    /** G13 — overflow menu "Sync Status" item — [GroupDashboardAction.OnSyncStatus] (→ sync-status). */
+    const val MENU_SYNC_STATUS_ITEM: String = "group_dashboard_menu_sync_status_item"
 
     /** `ui.yaml#components.group_header_card`. */
     const val HEADER_CARD: String = "group_dashboard_header_card"

@@ -13,6 +13,9 @@
     <string name="screens_group_list_last_met">Last met: %1$s</string>
     <string name="screens_group_list_card_cd">%1$s, cycle %2$d, %3$d members, health %4$s</string>
 
+    <string name="screens_group_list_notifications_cd">Notifications</string>
+    <string name="screens_group_list_notifications_deferred">Notifications are coming in a later update.</string>
+
     <string name="screens_group_list_fab_cd">Create new savings group</string>
     <string name="screens_group_list_action_create">Create Group</string>
     <string name="screens_group_list_action_join">Join with Code</string>

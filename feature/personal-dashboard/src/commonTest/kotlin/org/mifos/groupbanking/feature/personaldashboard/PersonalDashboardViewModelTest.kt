@@ -203,6 +203,17 @@ class PersonalDashboardViewModelTest {
     }
 
     @Test
+    fun `OnOpenNotifications emits NotificationsDeferred without navigating`() = runTest(testDispatcher) {
+        // G14 — the notification bell is a deferred affordance: it emits NotificationsDeferred
+        // (snackbar), never a navigation event.
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(PersonalDashboardAction.OnOpenNotifications)
+            val event = awaitItem()
+            assertTrue(event is PersonalDashboardEvent.NotificationsDeferred)
+        }
+    }
+
+    @Test
     fun `stream NoNetwork maps to Network error`() = runTest(testDispatcher) {
         repository.emit(null, ScreenState.NoNetwork())
         testDispatcher.scheduler.advanceUntilIdle()

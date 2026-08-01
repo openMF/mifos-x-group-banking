@@ -4,6 +4,7 @@
     <string name="screens_personal_dashboard_greeting_afternoon">Good afternoon, %1$s</string>
     <string name="screens_personal_dashboard_greeting_evening">Good evening, %1$s</string>
     <string name="screens_personal_dashboard_notification_icon_cd">Notifications</string>
+    <string name="screens_personal_dashboard_notifications_deferred">Notifications are coming in a later update.</string>
 
     <string name="screens_personal_dashboard_currency_kes">KES</string>
     <string name="screens_personal_dashboard_no_group_label">No group yet</string>

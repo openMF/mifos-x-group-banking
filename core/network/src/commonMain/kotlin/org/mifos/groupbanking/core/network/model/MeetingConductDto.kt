@@ -24,6 +24,7 @@ import kotlinx.serialization.Serializable
 /** `GET /datatables/dt_meeting_record/{centerId}` — previous meeting summary row (`get_previous_meeting_record`). */
 @Serializable
 data class MeetingRecordDetailDto(
+    @SerialName("meetingId") val meetingId: String = "",
     @SerialName("meetingNumber") val meetingNumber: Int = 0,
     @SerialName("actualDate") val actualDate: String = "",
     @SerialName("totalSavings") val totalSavings: Long = 0L,

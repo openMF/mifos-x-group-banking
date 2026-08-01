@@ -52,7 +52,10 @@ also triggers `SessionManager.endSession()`).
 | `OnViewMembers` | — | emits `NavigateToMemberList(groupId)` |
 | `OnViewLoans` | — | emits `NavigateToLoanList(groupId)` (shared by both role grids) |
 | `OnShareOut` | — | ORGANIZER/TREASURER + `isCycleEnd` only; else `ShowSnackbar(share_out_not_available)`; unauthorized-role dispatch is defensively logged + ignored |
-| `OnViewSavings` | — | member role only; emits `NavigateToMemberSavingsDetail(groupId)` |
+| `OnViewSavings` | — | member role only; emits `NavigateToSavingsDashboard(groupId)` (G9 — self-scoped to the group's savings dashboard) |
+| `OnMoreOptions` | — | G13 — toggles `isMoreMenuExpanded` (top-bar overflow dropdown) |
+| `OnGroupSettings` | — | G13 — closes the menu + emits `NavigateToSettings` |
+| `OnSyncStatus` | — | G13 — closes the menu + emits `NavigateToSyncStatus` |
 | `OnRefresh` | — | `dashboardStream.refreshFresh()`; sets `isLoading = true` |
 | `Retry` | — | `dashboardStream.retry()`; sets `isLoading = true`, clears `error` |
 | `OnBack` | — | emits `NavigateBack` |
@@ -68,8 +71,10 @@ also triggers `SessionManager.endSession()`).
 | `NavigateToShareOut` | `groupId: String, distributionStrategy: String` | `OnShareOut` (cycle-end + authorized role) |
 | `ShowCorpusBlockedDialog` | — | `OnStartMeeting` when `isCorpusInsufficient` (management role) |
 | `ShowSnackbar` | `message: String` (messageKey) | `OnShareOut` (not cycle-end), `Unauthenticated` (401) |
+| `NavigateToSavingsDashboard` | `groupId: String` | `OnViewSavings` (G9) — MEMBER "My Savings" self-scoped to the group's savings-dashboard (replaces the prior `member-savings-detail` mis-route); `typeConfig` nav-param degrades to default at this seam (dashboard holds `GroupInstanceConfig`, not the catalogue `GroupTypeConfig`) |
+| `NavigateToSettings` | — | `OnGroupSettings` (G13) — overflow menu → shared settings screen |
+| `NavigateToSyncStatus` | — | `OnSyncStatus` (G13) — overflow menu → shared sync-status dashboard |
 | `NavigateBack` | — | `OnBack` — flagged addition, `ui.yaml#events.members` doesn't declare it but `top_bar.on_navigation_click` wires `OnBack` with a full `action_contract` |
-| `NavigateToMemberSavingsDetail` | `groupId: String` | `OnViewSavings` — flagged addition, same class of gap as `NavigateBack` |
 
 ## di
 
@@ -86,20 +91,21 @@ types). Included in `KoinModules.kt#featureModule`. `GroupDashboardRepository` r
 
 **Container** — `GroupDashboardScreen(groupId, viewerRole, onNavigateToMeetingCalendar,
 onNavigateToMemberList, onNavigateToLoanList, onNavigateToShareOut,
-onNavigateToMemberSavingsDetail, onNavigateBack, modifier, viewModel)`. Collects
-`GroupDashboardViewModel.stateFlow` via `collectAsStateWithLifecycle`, consumes
-`GroupDashboardEvent`s through `EventsEffect` (6 nav branches + `ShowCorpusBlockedDialog` → local
-dialog state + `ShowSnackbar` → resolved snackbar), delegates rendering to the stateless
-`GroupDashboardContent`. `groupId`/`viewerRole` are forwarded to `koinViewModel(parameters = {
-parametersOf(groupId, viewerRole) })`.
+onNavigateToSavingsDashboard, onNavigateToSettings, onNavigateToSyncStatus, onNavigateBack,
+modifier, viewModel)`. Collects `GroupDashboardViewModel.stateFlow` via
+`collectAsStateWithLifecycle`, consumes `GroupDashboardEvent`s through `EventsEffect` (7 nav
+branches + `ShowCorpusBlockedDialog` → local dialog state + `ShowSnackbar` → resolved snackbar),
+delegates rendering to the stateless `GroupDashboardContent`. `groupId`/`viewerRole` are forwarded
+to `koinViewModel(parameters = { parametersOf(groupId, viewerRole) })`.
 
 **Content** — `GroupDashboardContent(state: GroupDashboardState, onAction: (GroupDashboardAction)
 -> Unit, modifier, snackbarHostState)`. State-driven per `GroupDashboardState.screenState`
 (Loading / Content / Error). Pull-to-refresh wired at the `KptScaffold` level, dispatching
 `GroupDashboardAction.OnRefresh` (`isRefreshing` is a constant `false` — `GroupDashboardState`
 carries no distinct refresh-in-progress flag; `OnRefresh` swaps the whole screen to the Loading
-skeleton). Top-bar overflow icon toggles a local `DropdownMenu` (pure Compose UI state, no
-ViewModel action — no menu items declared anywhere in `ui.yaml`, none invented).
+skeleton). Top-bar overflow icon dispatches `OnMoreOptions`, toggling `state.isMoreMenuExpanded`
+(G13 — real ViewModel state); the `DropdownMenu` renders two declared items — Settings (→ settings)
+and Sync Status (→ sync-status), each dispatching its typed action.
 
 Sub-composables (all `internal`, previewed individually):
 - `GroupDashboardLoadingSection` / `GroupDashboardSkeletonBlock` — Loading state, 4 shimmer blocks.
@@ -112,30 +118,27 @@ Reusable components (`components/` package): `GroupHeaderCard`, `CorpusMetricCar
 management/member grids), `GroupSavingsSummaryCard`, `ActivityFeedSection` + `ActivityRow`,
 `CorpusBlockedDialog`.
 
-**Flagged idea-layer gaps (not invented)**:
-1. `top_bar.actions[0]` (`OnMoreOptions`, overflow icon) has no matching `GroupDashboardAction`
-   member and no declared menu-item set for `group-dashboard-more-menu` — implemented as a real
-   local Compose toggle (not a dead click, `effect: transform_state` per its own
-   `action_contract`) with an empty `DropdownMenu` body.
-2. `flow.yaml#navigates_to[]` lists `meeting-calendar` / `member-list` / `loan-list` /
-   `share-out-preview` — it does **not** list `member-savings-detail`, even though
-   `ui.yaml#components.view_savings_button.on_click.target` declares it and
-   `GroupDashboardEvent.NavigateToMemberSavingsDetail` is wired end-to-end. This is a genuine
-   `flow.yaml` completeness gap (RULE-UI-SOURCE-001 US4 nav-check) surfaced here, not silently
-   patched around — `flow.yaml#navigates_to[]` needs `member-savings-detail` appended.
+**Resolved (was a flagged idea-layer gap)**:
+1. `top_bar.actions[0]` (`OnMoreOptions`, overflow icon) is now a declared `GroupDashboardAction`
+   member with a declared menu-item set (Settings, Sync Status) — `effect: transform_state` toggles
+   `isMoreMenuExpanded` and the two items dispatch `OnGroupSettings` / `OnSyncStatus`.
+2. `flow.yaml#navigates_to[]` now lists `savings-dashboard` (G9), `settings` + `sync-status` (G13);
+   `OnViewSavings` self-scopes MEMBER "My Savings" to `savings-dashboard` (replacing the prior
+   `member-savings-detail` mis-route that needed a `memberId` this dashboard does not carry).
 
 ## route
 
 `GroupDashboardRoute` (`@Serializable data class(groupId: String, viewerRole: String)`) — path
 `/groups/{groupId}`. `NavController.navigateToGroupDashboard(groupId, viewerRole, navOptions)`.
 `NavGraphBuilder.groupDashboardScreen(onNavigateToMeetingCalendar, onNavigateToMemberList,
-onNavigateToLoanList, onNavigateToShareOut, onNavigateToMemberSavingsDetail, onNavigateBack)`
-registers the composable destination via `composableWithRootPushTransitions`.
+onNavigateToLoanList, onNavigateToShareOut, onNavigateToSavingsDashboard, onNavigateToSettings,
+onNavigateToSyncStatus, onNavigateBack)` registers the composable destination via
+`composableWithRootPushTransitions`.
 
-Nav-arg contract — all 6 callbacks close a `GroupDashboardEvent` branch, none carries a `= {}`
-default (DC3 count-assertion: 0 defaults / 0 overrides / 0 suppressed). `meeting-calendar` /
-`member-list` / `loan-list` / `share-out-preview` / `member-savings-detail` are not yet generated
-feature modules in this codebase — typed callbacks for the host to wire later.
+Nav-arg contract — all 8 callbacks close a `GroupDashboardEvent` branch, none carries a `= {}`
+default (DC3 count-assertion: 8 defaults / 8 overrides / 0 suppressed). Targets `meeting-calendar` /
+`member-list` / `loan-list` / `share-out-preview` / `savings-dashboard` / `settings` / `sync-status`
+are all wired at the NavHost seam.
 
 ## preview
 
