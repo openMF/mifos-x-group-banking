@@ -100,16 +100,22 @@ val DataModule = module {
     single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get()) }
 
     // login-signup Demo Explore offline guest session (ui.yaml#demo_confirm_dialog,
-    // flow.yaml#on_demo_confirm). Seeds the organizer-dashboard read cache from the bundled
-    // PROJECT_DEMO_DATA fixture + persists a synthetic demo session — 100% offline, no companion
-    // API / Fineract. Not a Store5 read-store (business_logic.kind: processor) — a session-scoped
-    // seed manager, same branch as SyncManager / UserLogoutManager below. Depends on
-    // CompanionSessionStore (DatastoreModule) + OrganizerDashboardDao (DatabaseModule) +
-    // FetchedAtRepository (below).
+    // flow.yaml#on_demo_confirm). Seeds the offline read caches the Demo-Explore mode browses —
+    // organizer-dashboard (landing) + group-list + group-dashboard + member-list + loan-list — from
+    // the bundled PROJECT_DEMO_DATA fixture, then persists a synthetic demo session. 100% offline,
+    // no companion API / Fineract. NOT seeded: savings-dashboard (its SavingsRepository is
+    // Store5-free / network-only — no Room SourceOfTruth to write). Not a Store5 read-store
+    // (business_logic.kind: processor) — a session-scoped seed manager, same branch as SyncManager /
+    // UserLogoutManager below. Depends on CompanionSessionStore (DatastoreModule) + the four read
+    // DAOs it seeds (DatabaseModule) + FetchedAtRepository (below).
     single<DemoSessionManager> {
         DemoSessionManagerImpl(
             sessionStore = get(),
             organizerDashboardDao = get<AppDatabase>().organizerDashboardDao,
+            groupListDao = get<AppDatabase>().groupListDao,
+            groupDashboardDao = get<AppDatabase>().groupDashboardDao,
+            memberListDao = get<AppDatabase>().memberListDao,
+            loanListDao = get<AppDatabase>().loanListDao,
             fetchedAtRepository = get(),
         )
     }
