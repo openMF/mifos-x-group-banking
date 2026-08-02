@@ -332,6 +332,10 @@ fun GroupBankingNavHost(
                     onNavigateToMeetingCalendar = { groupId ->
                         navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
                     },
+                    // Top-bar overflow menu → shared settings + sync-status (both param-less,
+                    // already registered) — gives the organizer a Settings entry on their landing.
+                    onNavigateToSettings = { navController.navigateToSettings() },
+                    onNavigateToSyncStatus = { navController.navigateToSyncStatus() },
                 )
 
                 // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list

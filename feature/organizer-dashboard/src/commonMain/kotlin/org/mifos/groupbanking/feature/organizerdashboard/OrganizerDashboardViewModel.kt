@@ -104,6 +104,8 @@ data class OrganizerDashboardState(
     val pendingShareOutCount: Int = 0,
     val meetingsTodayCount: Int = 0,
     val fieldOfficerEnabled: Boolean = false,
+    /** G13 — top-bar overflow (more_vert) dropdown open state (`ui.yaml#state.isMoreMenuExpanded`). */
+    val isMoreMenuExpanded: Boolean = false,
     @Transient
     val todaySchedule: List<ScheduledMeeting> = emptyList(),
     @Transient
@@ -148,6 +150,12 @@ sealed interface OrganizerDashboardEvent {
      * (`ui.yaml#events.NotificationsDeferred`).
      */
     data object NotificationsDeferred : OrganizerDashboardEvent
+
+    /** G13 — top-bar overflow menu → shared settings screen. */
+    data object NavigateToSettings : OrganizerDashboardEvent
+
+    /** G13 — top-bar overflow menu → shared offline sync-status dashboard. */
+    data object NavigateToSyncStatus : OrganizerDashboardEvent
     data class ShowSnackbar(val message: String) : OrganizerDashboardEvent
 }
 
@@ -173,6 +181,15 @@ sealed interface OrganizerDashboardAction {
     data class OnMeetingGroupClick(val groupId: String) : OrganizerDashboardAction
     data object OnViewMeetingsToday : OrganizerDashboardAction
     data object OnOpenNotifications : OrganizerDashboardAction
+
+    /** G13 — top-bar overflow (more_vert) toggle; flips [OrganizerDashboardState.isMoreMenuExpanded]. */
+    data object OnMoreOptions : OrganizerDashboardAction
+
+    /** G13 — overflow menu "Settings" item (collapses the menu + navigates to settings). */
+    data object OnOpenSettings : OrganizerDashboardAction
+
+    /** G13 — overflow menu "Sync Status" item (collapses the menu + navigates to sync-status). */
+    data object OnSyncStatus : OrganizerDashboardAction
     data object OnRefresh : OrganizerDashboardAction
     data object Retry : OrganizerDashboardAction
 
@@ -222,6 +239,9 @@ internal class OrganizerDashboardViewModel(
             is OrganizerDashboardAction.OnMeetingGroupClick -> handleMeetingGroupClick(action.groupId)
             OrganizerDashboardAction.OnViewMeetingsToday -> handleViewMeetingsToday()
             OrganizerDashboardAction.OnOpenNotifications -> handleOpenNotifications()
+            OrganizerDashboardAction.OnMoreOptions -> handleMoreOptions()
+            OrganizerDashboardAction.OnOpenSettings -> handleOpenSettings()
+            OrganizerDashboardAction.OnSyncStatus -> handleSyncStatus()
             OrganizerDashboardAction.OnRefresh -> handleRefresh()
             OrganizerDashboardAction.Retry -> handleRetry()
             is OrganizerDashboardAction.Internal.StreamUpdated -> handleStreamUpdated(action.screenState)
@@ -277,6 +297,25 @@ internal class OrganizerDashboardViewModel(
     private fun handleOpenNotifications() {
         Logger.i(TAG) { "notifications tapped — deferred feature" }
         sendEvent(OrganizerDashboardEvent.NotificationsDeferred)
+    }
+
+    // -- Top-bar overflow menu (G13 — transform_state toggle + two navigate items) -----------------
+
+    private fun handleMoreOptions() {
+        Logger.i(TAG) { "OnMoreOptions — toggling overflow menu" }
+        updateState { copy(isMoreMenuExpanded = !isMoreMenuExpanded) }
+    }
+
+    private fun handleOpenSettings() {
+        Logger.i(TAG) { "OnOpenSettings — opening settings" }
+        updateState { copy(isMoreMenuExpanded = false) }
+        sendEvent(OrganizerDashboardEvent.NavigateToSettings)
+    }
+
+    private fun handleSyncStatus() {
+        Logger.i(TAG) { "OnSyncStatus — opening sync status" }
+        updateState { copy(isMoreMenuExpanded = false) }
+        sendEvent(OrganizerDashboardEvent.NavigateToSyncStatus)
     }
 
     // -- Pull to refresh (data-flow.yaml on_refresh: bypass_and_refresh) ---------------------------

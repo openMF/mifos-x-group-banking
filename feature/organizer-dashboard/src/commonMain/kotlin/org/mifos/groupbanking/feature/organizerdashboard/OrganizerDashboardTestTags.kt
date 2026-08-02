@@ -23,6 +23,18 @@ object OrganizerDashboardTestTags {
     /** Notifications top-bar action — `ui.yaml#components.top_bar.notifications`. */
     const val NOTIFICATIONS_ACTION: String = "organizer_dashboard_notifications_action"
 
+    /** G13 — top-bar overflow (more_vert) action — `OnMoreOptions` toggles `isMoreMenuExpanded`. */
+    const val MORE_OPTIONS_ACTION: String = "organizer_dashboard_more_options_action"
+
+    /** G13 — top-bar overflow dropdown surface. */
+    const val MORE_MENU: String = "organizer_dashboard_more_menu"
+
+    /** G13 — overflow menu "Settings" item — [OrganizerDashboardAction.OnOpenSettings] (→ settings). */
+    const val MENU_SETTINGS_ITEM: String = "organizer_dashboard_menu_settings_item"
+
+    /** G13 — overflow menu "Sync Status" item — [OrganizerDashboardAction.OnSyncStatus] (→ sync-status). */
+    const val MENU_SYNC_STATUS_ITEM: String = "organizer_dashboard_menu_sync_status_item"
+
     /** Loading spinner surface — `OrganizerDashboardScreenState.Loading`. */
     const val LOADING_INDICATOR: String = "organizer_dashboard_loading_indicator"
 

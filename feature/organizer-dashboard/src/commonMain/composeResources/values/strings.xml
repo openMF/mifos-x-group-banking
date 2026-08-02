@@ -2,6 +2,9 @@
 <resources>
     <string name="screens_organizer_dashboard_top_bar_title">Dashboard</string>
     <string name="screens_organizer_dashboard_notifications_cd">Notifications</string>
+    <string name="screens_organizer_dashboard_more_options_cd">More options</string>
+    <string name="screens_organizer_dashboard_menu_settings">Settings</string>
+    <string name="screens_organizer_dashboard_menu_sync_status">Sync Status</string>
     <string name="screens_organizer_dashboard_notifications_deferred">Notifications centre is coming in a later release.</string>
     <string name="screens_organizer_dashboard_loading_message">Loading dashboard…</string>
 
