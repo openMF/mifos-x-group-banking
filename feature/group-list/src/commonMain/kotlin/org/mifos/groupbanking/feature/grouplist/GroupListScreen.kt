@@ -218,7 +218,9 @@ internal fun GroupListFabContent(fabCd: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
-        modifier = Modifier.semantics { contentDescription = fabCd },
+        modifier = Modifier
+            .testTag(GroupListTestTags.FAB_CREATE)
+            .semantics { contentDescription = fabCd },
     ) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         Text(text = stringResource(Res.string.screens_group_list_action_create))

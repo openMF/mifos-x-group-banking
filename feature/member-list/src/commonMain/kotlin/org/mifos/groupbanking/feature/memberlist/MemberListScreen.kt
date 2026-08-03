@@ -216,7 +216,9 @@ internal fun MemberListFabContent(fabCd: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.xs),
-        modifier = Modifier.semantics { contentDescription = fabCd },
+        modifier = Modifier
+            .testTag(MemberListTestTags.FAB_ADD_MEMBER)
+            .semantics { contentDescription = fabCd },
     ) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         Text(text = stringResource(Res.string.screens_member_list_action_add_member))
