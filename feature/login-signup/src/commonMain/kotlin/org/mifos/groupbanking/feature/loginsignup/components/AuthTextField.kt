@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -114,6 +115,10 @@ fun AuthTextField(
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isPassword) KeyboardType.Password else keyboardType,
+            // Never auto-capitalise: the email/phone/username identifier must be entered exactly as
+            // typed (Fineract usernames are case-sensitive) — sentence-case would capitalise the
+            // first letter and break login for a self-registered account.
+            capitalization = KeyboardCapitalization.None,
         ),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
