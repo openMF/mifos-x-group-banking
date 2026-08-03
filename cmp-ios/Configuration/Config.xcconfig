@@ -2,5 +2,5 @@
 // To change: edit gradle/fork.properties (or libs.versions.toml for app.id),
 // then re-run ./gradlew syncForkConfig
 APP_BUNDLE_ID = org.mifos.groupbanking
-APP_NAME = CommonPurse
-TEAM_ID = XXXXXXXXXX
+APP_NAME = MifosSave
+TEAM_ID = L432S2FZP5

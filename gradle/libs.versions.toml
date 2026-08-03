@@ -4,11 +4,11 @@ kmpProductFlavors = "2.8.3"
 
 # ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.groupbanking"
-appDisplayName   = "CommonPurse"
+appDisplayName   = "MifosSave"
 baseNamespace    = "kpt"
-desktopAppName   = "CommonPurse"     # JVM package name, dock name
+desktopAppName   = "MifosSave"     # JVM package name, dock name
 projectName      = "mifos-x-group-banking"
-iosTeamId        = "XXXXXXXXXX"
+iosTeamId        = "L432S2FZP5"
 # ─────────────────────────────────────────────────────────────────────────────────────────────────
 # Android
 androidDesugarJdkLibs = "2.1.5"
