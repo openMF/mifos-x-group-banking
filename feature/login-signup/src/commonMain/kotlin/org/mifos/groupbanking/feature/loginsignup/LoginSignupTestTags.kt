@@ -80,4 +80,21 @@ object LoginSignupTestTags {
 
     /** "Cancel" dismiss button inside the Demo Explore dialog. */
     const val DEMO_CANCEL_BUTTON: String = "login_signup_demo_cancel_button"
+
+    // -- Signup password-requirement chips (live Fineract-policy feedback) --------------------------
+
+    /** "12+ characters" rule chip — filled when `passwordRequirements.hasMinLength`. */
+    const val PASSWORD_RULE_LEN: String = "login_signup_password_rule_len"
+
+    /** "Upper & lower" rule chip — filled when `passwordRequirements.hasMixedCase`. */
+    const val PASSWORD_RULE_CASE: String = "login_signup_password_rule_case"
+
+    /** "Number" rule chip — filled when `passwordRequirements.hasDigit`. */
+    const val PASSWORD_RULE_DIGIT: String = "login_signup_password_rule_digit"
+
+    /** "Symbol" rule chip — filled when `passwordRequirements.hasSymbol`. */
+    const val PASSWORD_RULE_SYMBOL: String = "login_signup_password_rule_symbol"
+
+    /** "No repeats" rule chip — filled when `passwordRequirements.hasNoRepeats`. */
+    const val PASSWORD_RULE_NOREPEAT: String = "login_signup_password_rule_norepeat"
 }

@@ -113,6 +113,25 @@ private fun AuthFormSectionSignupErrorPreview() {
 
 @Preview
 @Composable
+private fun AuthFormSectionSignupPasswordChipsPreview() {
+    KptTheme {
+        AuthFormSection(
+            state = LoginSignupState(
+                mode = AuthMode.Signup,
+                name = "Amina Otieno",
+                emailPhone = "+254798765432",
+                password = "Savings26",
+                // Partially-satisfied verdict — length + no-repeats still failing.
+                passwordRequirements = evaluatePasswordRequirements("Savings26"),
+            ),
+            onAction = {},
+            isLoading = false,
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun ZeroGroupsSectionPreview() {
     KptTheme {
         ZeroGroupsSection(onAction = {})

@@ -36,6 +36,13 @@ private const val TAG = "LoginSignupViewModel"
 
 private const val MIN_NAME_LENGTH = 2
 private const val MIN_PASSWORD_LENGTH_SIGNUP = 8
+
+// Fineract password-policy target surfaced live via the signup password-requirement chips
+// (ui.yaml#components.password_requirement_chips). These are ADVISORY per-rule feedback — the
+// submit-enable gate still uses the min-8 [validatePassword] check (see class KDoc / handleSignupTap)
+// so existing behaviour + tests are preserved; the chips guide users toward a policy-compliant
+// password so signup stops bouncing off a raw Fineract 400.
+private const val STRONG_PASSWORD_MIN_LENGTH = 12
 private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 private val E164_PHONE_REGEX = Regex("^\\+[1-9]\\d{6,14}$")
 // Sign-in also accepts a username: 3-30 chars, starts alphanumeric, then letters/digits/._-
@@ -115,6 +122,32 @@ sealed interface LoginSignupError {
 }
 
 /**
+ * Live per-rule verdict for the signup password, mirroring the Fineract password policy. Each
+ * flag is recomputed from the current [LoginSignupState.password] by [evaluatePasswordRequirements]
+ * on every [LoginSignupAction.OnPasswordChange] and rendered as a filled/muted chip
+ * (ui.yaml#components.password_requirement_chips). ADVISORY only — see [STRONG_PASSWORD_MIN_LENGTH].
+ * See API.md#state.
+ */
+@Serializable
+@Immutable
+data class PasswordRequirements(
+    /** ≥ [STRONG_PASSWORD_MIN_LENGTH] characters. */
+    val hasMinLength: Boolean = false,
+    /** Contains BOTH an upper- and a lower-case letter. */
+    val hasMixedCase: Boolean = false,
+    /** Contains at least one digit. */
+    val hasDigit: Boolean = false,
+    /** Contains at least one non-alphanumeric symbol. */
+    val hasSymbol: Boolean = false,
+    /** No two adjacent identical characters. */
+    val hasNoRepeats: Boolean = false,
+) {
+    /** True only when every Fineract-policy rule is satisfied. */
+    val allSatisfied: Boolean
+        get() = hasMinLength && hasMixedCase && hasDigit && hasSymbol && hasNoRepeats
+}
+
+/**
  * MVI state for `LoginSignupViewModel`. Field set + defaults are a verbatim mirror of
  * ui.yaml#state_model.LoginSignupViewModel.state. [groupMemberships] and [screenState]/[error]
  * are `@Transient` — [GroupMembership] is an external core/model type that carries a
@@ -130,6 +163,9 @@ data class LoginSignupState(
     val name: String = "",
     val emailPhone: String = "",
     val password: String = "",
+    // Live per-rule verdict for the signup password (ui.yaml#components.password_requirement_chips),
+    // recomputed on every OnPasswordChange. Advisory feedback only — see PasswordRequirements KDoc.
+    val passwordRequirements: PasswordRequirements = PasswordRequirements(),
     val pin: String = "",
     val isSubmitting: Boolean = false,
     val validationErrors: Map<String, String> = emptyMap(),
@@ -303,6 +339,7 @@ internal class LoginSignupViewModel(
                 name = "",
                 emailPhone = "",
                 password = "",
+                passwordRequirements = PasswordRequirements(),
                 validationErrors = emptyMap(),
                 error = null,
             )
@@ -323,7 +360,11 @@ internal class LoginSignupViewModel(
 
     private fun handlePasswordChange(value: String) {
         updateState {
-            copy(password = value, validationErrors = validationErrors - "password")
+            copy(
+                password = value,
+                passwordRequirements = evaluatePasswordRequirements(value),
+                validationErrors = validationErrors - "password",
+            )
         }
     }
 
@@ -512,6 +553,7 @@ internal class LoginSignupViewModel(
                         sessionToken = session.sessionToken,
                         groupMemberships = session.groupMemberships,
                         password = "",
+                        passwordRequirements = PasswordRequirements(),
                         screenState = screenStateFor(session.groupMemberships),
                         error = null,
                     )
@@ -546,6 +588,7 @@ internal class LoginSignupViewModel(
                         groupMemberships = session.groupMemberships,
                         name = "",
                         password = "",
+                        passwordRequirements = PasswordRequirements(),
                         screenState = screenStateFor(session.groupMemberships),
                         error = null,
                     )
@@ -709,6 +752,22 @@ private fun validateName(name: String): String? =
 
 private fun validateEmailPhone(value: String): String? =
     if (value.isBlank() || !isValidEmailOrPhone(value)) "error_email_phone_invalid" else null
+
+/**
+ * Pure per-rule evaluation of the signup password against the Fineract password policy, surfaced
+ * live via the requirement chips. An empty password yields an all-`false` verdict so no chip lights
+ * up before the user types. See [PasswordRequirements].
+ */
+internal fun evaluatePasswordRequirements(password: String): PasswordRequirements {
+    if (password.isEmpty()) return PasswordRequirements()
+    return PasswordRequirements(
+        hasMinLength = password.length >= STRONG_PASSWORD_MIN_LENGTH,
+        hasMixedCase = password.any { it.isUpperCase() } && password.any { it.isLowerCase() },
+        hasDigit = password.any { it.isDigit() },
+        hasSymbol = password.any { !it.isLetterOrDigit() },
+        hasNoRepeats = password.zipWithNext().none { (a, b) -> a == b },
+    )
+}
 
 /** `requireStrong` gates the signup-only min-8-length strength check per ui.yaml#password_field. */
 private fun validatePassword(password: String, requireStrong: Boolean): String? = when {

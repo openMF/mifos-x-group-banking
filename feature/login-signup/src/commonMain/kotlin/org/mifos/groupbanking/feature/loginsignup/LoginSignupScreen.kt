@@ -22,7 +22,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -39,8 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.KptButton
@@ -55,7 +61,9 @@ import org.mifos.groupbanking.feature.loginsignup.components.AuthDividerLabeled
 import org.mifos.groupbanking.feature.loginsignup.components.AuthErrorBanner
 import org.mifos.groupbanking.feature.loginsignup.components.AuthModeToggleTabs
 import org.mifos.groupbanking.feature.loginsignup.components.AuthTextField
+import org.mifos.groupbanking.feature.loginsignup.components.AuthTrustFooter
 import org.mifos.groupbanking.feature.loginsignup.components.DemoExploreConfirmDialog
+import org.mifos.groupbanking.feature.loginsignup.components.PasswordRequirementChips
 import org.mifos.groupbanking.feature.loginsignup.components.ZeroGroupsEmptyState
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.Res
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_accept_invitation_cd
@@ -68,8 +76,13 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_demo_explore
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_create_account_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_demo_explore_cd
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_alt_actions
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_new_login
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_new_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_or
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_login
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_signup
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_login
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_account_exists
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_biometric_failed
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_invalid_credentials
@@ -220,8 +233,31 @@ internal fun AuthFormSection(
             .padding(horizontal = sp.lg),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val isSignup = state.mode == AuthMode.Signup
+
         Spacer(Modifier.height(sp.xxl))
         AuthBrandHeader()
+        Spacer(Modifier.height(sp.xl))
+
+        Text(
+            text = stringResource(
+                if (isSignup) Res.string.screens_login_signup_headline_signup else Res.string.screens_login_signup_headline_login,
+            ),
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 23.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(sp.xs))
+        Text(
+            text = stringResource(
+                if (isSignup) Res.string.screens_login_signup_subtitle_signup else Res.string.screens_login_signup_subtitle_login,
+            ),
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
         Spacer(Modifier.height(sp.lg))
 
         AppCard(modifier = Modifier.fillMaxWidth().testTag(LoginSignupTestTags.AUTH_CARD)) {
@@ -245,6 +281,7 @@ internal fun AuthFormSection(
                         placeholder = stringResource(Res.string.screens_login_signup_field_name_placeholder),
                         onValueChange = { onAction(LoginSignupAction.OnNameChange(it)) },
                         enabled = !isLoading,
+                        leadingIcon = Icons.Filled.Person,
                         errorMessage = state.validationErrors["name"]?.let { validationMessage(it) },
                         contentDescription = stringResource(Res.string.screens_login_signup_field_name_cd),
                         modifier = Modifier.testTag(LoginSignupTestTags.FIELD_NAME),
@@ -271,6 +308,7 @@ internal fun AuthFormSection(
                     ),
                     onValueChange = { onAction(LoginSignupAction.OnEmailPhoneChange(it)) },
                     enabled = !isLoading,
+                    leadingIcon = Icons.Filled.MailOutline,
                     keyboardType = if (isLoginMode) KeyboardType.Text else KeyboardType.Email,
                     errorMessage = state.validationErrors["emailPhone"]?.let { validationMessage(it) },
                     contentDescription = stringResource(
@@ -295,10 +333,17 @@ internal fun AuthFormSection(
                     onValueChange = { onAction(LoginSignupAction.OnPasswordChange(it)) },
                     enabled = !isLoading,
                     isPassword = true,
+                    leadingIcon = Icons.Filled.Lock,
                     errorMessage = state.validationErrors["password"]?.let { validationMessage(it) },
                     contentDescription = stringResource(Res.string.screens_login_signup_field_password_cd),
                     modifier = Modifier.testTag(LoginSignupTestTags.FIELD_PASSWORD),
                 )
+
+                // Live Fineract password-policy chips — signup only (ui.yaml#password_requirement_chips).
+                if (isSignup) {
+                    Spacer(Modifier.height(sp.md))
+                    PasswordRequirementChips(requirements = state.passwordRequirements)
+                }
 
                 if (state.mode == AuthMode.Login) {
                     TextButton(
@@ -385,7 +430,13 @@ internal fun AuthFormSection(
                 if (!isLoading) {
                     Spacer(Modifier.height(sp.lg))
                     AuthDividerLabeled(
-                        label = stringResource(Res.string.screens_login_signup_divider_alt_actions),
+                        label = stringResource(
+                            if (isSignup) {
+                                Res.string.screens_login_signup_divider_new_signup
+                            } else {
+                                Res.string.screens_login_signup_divider_new_login
+                            },
+                        ),
                         modifier = Modifier.testTag(LoginSignupTestTags.ALT_ACTIONS_DIVIDER),
                     )
                     Spacer(Modifier.height(sp.md))
@@ -431,6 +482,8 @@ internal fun AuthFormSection(
                 Spacer(Modifier.height(sp.lg))
             }
         }
+        Spacer(Modifier.height(sp.lg))
+        AuthTrustFooter()
         Spacer(Modifier.height(sp.xxl))
     }
 }

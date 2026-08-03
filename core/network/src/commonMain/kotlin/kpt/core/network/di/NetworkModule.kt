@@ -17,6 +17,7 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
+import org.mifos.groupbanking.core.network.auth.companionAuthHeaderPlugin
 import org.mifos.groupbanking.core.network.config.BatchSyncApiConfig
 import org.mifos.groupbanking.core.network.config.ChangePinApiConfig
 import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
@@ -152,6 +153,11 @@ val NetworkModule = module {
                 retryOnServerErrors(maxRetries = 3)
                 exponentialDelay()
             }
+            // Attach the companion session bearer token to EVERY request from this shared client,
+            // so the server can resolve the authenticated caller (real name on the organizer
+            // dashboard, and any per-user-scoped endpoint) — not just the explicit /me call.
+            // Skips pre-login calls (no session yet) and never overwrites an explicit header.
+            install(companionAuthHeaderPlugin(get()))
         }
     }
     single<CompanionAuthApi> { CompanionAuthApiImpl(httpClient = get()) }

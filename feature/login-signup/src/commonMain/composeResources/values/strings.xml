@@ -2,6 +2,34 @@
 <resources>
     <string name="screens_login_signup_title">Welcome to MifosX</string>
     <string name="screens_login_signup_logo_cd">Mifos X logo</string>
+
+    <!-- CommonPurse brand lockup (auth header). -->
+    <string name="screens_login_signup_brand_mark_cd">CommonPurse logo — a ring of members around a shared purse</string>
+    <string name="screens_login_signup_wordmark_common">Common</string>
+    <string name="screens_login_signup_wordmark_purse">Purse</string>
+    <string name="screens_login_signup_tagline">Save together · Lend together · Grow together</string>
+
+    <!-- Mode-specific headline + subtitle above the auth card. -->
+    <string name="screens_login_signup_headline_login">Welcome back</string>
+    <string name="screens_login_signup_headline_signup">Start a group</string>
+    <string name="screens_login_signup_subtitle_login">Sign in to your savings group</string>
+    <string name="screens_login_signup_subtitle_signup">Create your account, then form your first circle</string>
+
+    <!-- Password show/hide toggle. -->
+    <string name="screens_login_signup_password_show_cd">Show password</string>
+    <string name="screens_login_signup_password_hide_cd">Hide password</string>
+
+    <!-- Signup password-requirement chips (live Fineract-policy feedback). -->
+    <string name="screens_login_signup_password_requirements_cd">Password requirements</string>
+    <string name="screens_login_signup_password_rule_len">12+ characters</string>
+    <string name="screens_login_signup_password_rule_case">Upper &amp; lower</string>
+    <string name="screens_login_signup_password_rule_digit">Number</string>
+    <string name="screens_login_signup_password_rule_symbol">Symbol</string>
+    <string name="screens_login_signup_password_rule_norepeat">No repeats</string>
+
+    <!-- Trust footer. -->
+    <string name="screens_login_signup_trust_footer">Secured on Fineract · your group's ledger</string>
+    <string name="screens_login_signup_trust_footer_cd">Security note</string>
     <string name="screens_login_signup_mode_toggle_cd">Switch between Sign In and Sign Up modes</string>
     <string name="screens_login_signup_tab_login">Sign In</string>
     <string name="screens_login_signup_tab_signup">Sign Up</string>
@@ -63,6 +91,8 @@
     <string name="screens_login_signup_forgot_password_snackbar">To reset your password, use the web portal or contact your group organizer.</string>
 
     <string name="screens_login_signup_divider_alt_actions">New here?</string>
+    <string name="screens_login_signup_divider_new_login">New to CommonPurse?</string>
+    <string name="screens_login_signup_divider_new_signup">Already invited?</string>
 
     <string name="screens_login_signup_action_accept_invitation">Accept an Invitation</string>
     <string name="screens_login_signup_accept_invitation_cd">Accept a group invitation using an invite code</string>
@@ -71,9 +101,12 @@
     <string name="screens_login_signup_demo_explore_cd">Explore the app as a demo user without an account</string>
 
     <string name="screens_login_signup_demo_dialog_title">Explore as a demo user</string>
-    <string name="screens_login_signup_demo_dialog_body">This is a demo user logging in to explore the application.</string>
+    <string name="screens_login_signup_demo_dialog_body">Browse a sample savings group — Mwangaza Women's Group, with real balances, members and meetings.</string>
+    <!-- Legally-worded note shown in the highlighted note card — DO NOT change this copy. -->
+    <string name="screens_login_signup_demo_dialog_legal_note">This is a demo user logging in to explore the application.</string>
     <string name="screens_login_signup_demo_dialog_note">No real account is created and nothing is saved to a server. You can sign up or accept an invitation any time.</string>
-    <string name="screens_login_signup_demo_dialog_cancel">Cancel</string>
+    <string name="screens_login_signup_demo_dialog_icon_cd">Pooled savings coin</string>
+    <string name="screens_login_signup_demo_dialog_cancel">Not now</string>
     <string name="screens_login_signup_demo_dialog_confirm">Continue</string>
     <string name="screens_login_signup_demo_dialog_cd">Demo Explore confirmation dialog</string>
     <string name="screens_login_signup_demo_dialog_cancel_cd">Cancel and return to the sign in form</string>
