@@ -11,6 +11,8 @@ package org.mifos.groupbanking.core.store.personaldashboard.impl
 
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDate
+import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
@@ -39,6 +41,15 @@ import kotlin.time.Clock
  * other group is cached under its own `groupId`, one Room row per group (dynamic-key read).
  */
 const val MEMBER_DASHBOARD_DEFAULT_KEY: String = "__default__"
+
+/**
+ * Room table backing this store's SourceOfTruth. Declared for the [daoFlow]/[notifyingWrite]
+ * RoomChangeBus bridge so a SoT write re-fans-out to the open `cached(refresh = false)` reader
+ * subscription — without it, Room 3 alpha's InvalidationTracker did NOT re-emit the observeByKey
+ * Flow after the fetcher's upsert on device, leaving the ScreenDataStream stuck in Loading even
+ * though the fetch succeeded (200) and the row was written.
+ */
+private const val MEMBER_DASHBOARD_TABLE: String = "member_dashboard_cache"
 
 /**
  * Builds the **dynamic-key** read-only NETWORK_WITH_CACHE [Store] for the personal-dashboard member
@@ -85,15 +96,22 @@ fun provideMemberDashboardStore(
             }
         },
         sourceOfTruth = SourceOfTruth.of(
+            // daoFlow re-queries whenever RoomChangeBus reports a member_dashboard_cache write, so
+            // the fetcher's SoT upsert re-fans-out to this open reader (fixing the stuck-Loading gap).
             reader = { key: String ->
-                dao.observeByKey(key).map { row -> row?.toDomain() }
+                daoFlow(MEMBER_DASHBOARD_TABLE) { dao.observeByKey(key) }.map { row -> row?.toDomain() }
             },
+            // notifyingWrite fires the RoomChangeBus signal AFTER a successful upsert so the reader wakes.
             writer = { key: String, dashboard: MemberDashboard ->
-                dao.replaceForKey(dashboard.toEntity(key))
+                notifyingWrite(MEMBER_DASHBOARD_TABLE) { dao.replaceForKey(dashboard.toEntity(key)) }
                 validator.markFresh()
             },
-            delete = { key: String -> dao.deleteByKey(key) },
-            deleteAll = { dao.deleteAll() },
+            delete = { key: String ->
+                notifyingWrite(MEMBER_DASHBOARD_TABLE) { dao.deleteByKey(key) }
+            },
+            deleteAll = {
+                notifyingWrite(MEMBER_DASHBOARD_TABLE) { dao.deleteAll() }
+            },
         ),
         validator = validator,
     )

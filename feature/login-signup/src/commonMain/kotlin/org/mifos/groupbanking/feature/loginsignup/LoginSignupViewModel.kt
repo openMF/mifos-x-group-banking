@@ -390,6 +390,12 @@ internal class LoginSignupViewModel(
             return
         }
 
+        // A fresh password login navigates to the landing screen on success by itself. Consume the
+        // biometric auto-prompt here so the post-login `currentSession` emission does NOT also fire
+        // PromptBiometric → refreshSession → a SECOND navigation. That double-navigation spawned a
+        // duplicate dashboard instance whose data stream raced/was cancelled, leaving the visible
+        // screen stuck on the skeleton while the first instance had already loaded Content.
+        hasAutoPromptedBiometric = true
         loginJob?.cancel()
         loginJob = viewModelScope.launch {
             updateState {
@@ -418,6 +424,9 @@ internal class LoginSignupViewModel(
             return
         }
 
+        // Fresh signup navigates on success itself — consume the biometric auto-prompt so the
+        // post-signup currentSession emission does not fire a second, duplicate navigation.
+        hasAutoPromptedBiometric = true
         signupJob?.cancel()
         signupJob = viewModelScope.launch {
             updateState {
@@ -497,6 +506,8 @@ internal class LoginSignupViewModel(
     }
 
     private fun handleDemoConfirm() {
+        // Demo entry navigates on seed success itself — consume the biometric auto-prompt.
+        hasAutoPromptedBiometric = true
         demoJob?.cancel()
         demoJob = viewModelScope.launch {
             // Close the dialog and enter the seeding state; the offline fixture hydrates via
