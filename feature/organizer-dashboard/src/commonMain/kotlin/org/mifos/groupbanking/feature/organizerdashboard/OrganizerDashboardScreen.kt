@@ -179,11 +179,13 @@ internal fun OrganizerDashboardContent(
                 icon = Icons.Filled.Notifications,
                 contentDescription = notificationsCd,
                 onClick = { onAction(OrganizerDashboardAction.OnOpenNotifications) },
+                testTag = OrganizerDashboardTestTags.NOTIFICATIONS_ACTION,
             ),
             TopAppBarAction(
                 icon = Icons.Filled.MoreVert,
                 contentDescription = moreOptionsCd,
                 onClick = { onAction(OrganizerDashboardAction.OnMoreOptions) },
+                testTag = OrganizerDashboardTestTags.MORE_OPTIONS_ACTION,
             ),
         ),
         pullToRefreshState = rememberKptPullToRefreshState(

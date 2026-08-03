@@ -167,6 +167,7 @@ internal fun GroupListContent(
                 icon = Icons.Filled.Notifications,
                 contentDescription = notificationsCd,
                 onClick = { onAction(GroupListAction.OnOpenNotifications) },
+                testTag = GroupListTestTags.NOTIFICATION_ACTION,
             ),
         ),
         floatingActionButtonContent = FloatingActionButtonContent(

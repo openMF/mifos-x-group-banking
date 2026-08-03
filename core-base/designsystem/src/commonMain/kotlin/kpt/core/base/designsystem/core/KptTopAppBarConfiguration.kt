@@ -141,6 +141,12 @@ data class TopAppBarAction(
     val contentDescription: String,
     val onClick: () -> Unit,
     val enabled: Boolean = true,
+    /**
+     * Optional stable test tag applied to the action's IconButton so UI/E2E tests
+     * (Maestro, runComposeUiTest) can select it deterministically. When null the
+     * action carries only its [contentDescription] (the prior behaviour).
+     */
+    val testTag: String? = null,
 )
 
 @DslMarker

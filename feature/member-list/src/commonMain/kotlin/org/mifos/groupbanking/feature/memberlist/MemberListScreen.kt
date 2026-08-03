@@ -171,6 +171,7 @@ internal fun MemberListContent(
                 icon = Icons.Filled.GroupAdd,
                 contentDescription = inviteCd,
                 onClick = { onAction(MemberListAction.OnInviteMember) },
+                testTag = MemberListTestTags.INVITE_ACTION,
             ),
         ),
         floatingActionButtonContent = FloatingActionButtonContent(
