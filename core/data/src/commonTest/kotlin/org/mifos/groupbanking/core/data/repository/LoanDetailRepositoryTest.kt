@@ -5,28 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import org.mifos.groupbanking.core.database.loandetail.dao.LoanDetailDao
@@ -39,8 +31,6 @@ import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApi
 import org.mifos.groupbanking.core.store.loandetail.impl.provideLoanDetailStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * TDD coverage for [LoanDetailRepositoryImpl] — verifies the repository surfaces the single-key
@@ -126,7 +116,9 @@ private class FakeLoanDetailApi(
 private class FakeLoanDetailDao : LoanDetailDao {
     private val rows = MutableStateFlow<List<LoanDetailCacheEntity>>(emptyList())
 
-    fun seed(entity: LoanDetailCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: LoanDetailCacheEntity) {
+        rows.value = listOf(entity)
+    }
 
     override fun observeByKey(loanId: Long): Flow<LoanDetailCacheEntity?> =
         rows.map { list -> list.firstOrNull { it.loanId == loanId } }
@@ -141,7 +133,9 @@ private class FakeLoanDetailDao : LoanDetailDao {
         rows.value = rows.value.filterNot { it.loanId == loanId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: LoanDetailCacheEntity) {
         upsert(entity)

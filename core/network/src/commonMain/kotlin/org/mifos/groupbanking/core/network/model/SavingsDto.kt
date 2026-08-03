@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -121,16 +121,29 @@ data class SavingsDataPointDto(
  */
 @Serializable(with = SavingsStatementTypeDto.Serializer::class)
 enum class SavingsStatementTypeDto {
-    @SerialName("DEPOSIT") DEPOSIT,
-    @SerialName("WITHDRAWAL") WITHDRAWAL,
-    @SerialName("INTEREST_POSTING") INTEREST_POSTING,
-    @SerialName("FEE_DEDUCTION") FEE_DEDUCTION,
-    @SerialName("TRANSFER") TRANSFER,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("DEPOSIT")
+    DEPOSIT,
+
+    @SerialName("WITHDRAWAL")
+    WITHDRAWAL,
+
+    @SerialName("INTEREST_POSTING")
+    INTEREST_POSTING,
+
+    @SerialName("FEE_DEDUCTION")
+    FEE_DEDUCTION,
+
+    @SerialName("TRANSFER")
+    TRANSFER,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
     ;
 
     internal object Serializer : KSerializer<SavingsStatementTypeDto> by unknownFallbackEnumSerializer(
-        "SavingsStatementTypeDto", entries, UNKNOWN,
+        "SavingsStatementTypeDto",
+        entries,
+        UNKNOWN,
     )
 }
 

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -54,16 +54,35 @@ data class GroupTypeConfigDto(
  */
 @Serializable
 enum class GroupTypeSlugDto {
-    @SerialName("VSLA") VSLA,
-    @SerialName("ROSCA") ROSCA,
-    @SerialName("ASCA") ASCA,
-    @SerialName("SILC") SILC,
-    @SerialName("SHG") SHG,
-    @SerialName("SACCO") SACCO,
-    @SerialName("CBO_VILLAGE_BANK") CBO_VILLAGE_BANK,
-    @SerialName("BURIAL_WELFARE") BURIAL_WELFARE,
-    @SerialName("JLG") JLG,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("VSLA")
+    VSLA,
+
+    @SerialName("ROSCA")
+    ROSCA,
+
+    @SerialName("ASCA")
+    ASCA,
+
+    @SerialName("SILC")
+    SILC,
+
+    @SerialName("SHG")
+    SHG,
+
+    @SerialName("SACCO")
+    SACCO,
+
+    @SerialName("CBO_VILLAGE_BANK")
+    CBO_VILLAGE_BANK,
+
+    @SerialName("BURIAL_WELFARE")
+    BURIAL_WELFARE,
+
+    @SerialName("JLG")
+    JLG,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**
@@ -73,10 +92,17 @@ enum class GroupTypeSlugDto {
  */
 @Serializable
 enum class SavingsMechanismDto {
-    @SerialName("ACCUMULATING") ACCUMULATING,
-    @SerialName("ROTATING_PAYOUT") ROTATING_PAYOUT,
-    @SerialName("NONE") NONE,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("ACCUMULATING")
+    ACCUMULATING,
+
+    @SerialName("ROTATING_PAYOUT")
+    ROTATING_PAYOUT,
+
+    @SerialName("NONE")
+    NONE,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**
@@ -86,8 +112,15 @@ enum class SavingsMechanismDto {
  */
 @Serializable
 enum class ContributionModeDto {
-    @SerialName("SHARE_BASED_VARIABLE") SHARE_BASED_VARIABLE,
-    @SerialName("FIXED") FIXED,
-    @SerialName("MINIMAL") MINIMAL,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("SHARE_BASED_VARIABLE")
+    SHARE_BASED_VARIABLE,
+
+    @SerialName("FIXED")
+    FIXED,
+
+    @SerialName("MINIMAL")
+    MINIMAL,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }

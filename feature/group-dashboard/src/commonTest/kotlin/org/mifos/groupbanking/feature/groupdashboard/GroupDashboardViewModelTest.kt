@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.groupdashboard
 
@@ -19,13 +19,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 import kpt.core.analytics.KptAnalyticsTracker
 import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.observability.ConsoleCrashReporter
@@ -50,6 +43,13 @@ import org.mifos.groupbanking.core.model.GroupTypeSlug
 import org.mifos.groupbanking.core.model.SavingsMechanism
 import org.mifos.groupbanking.core.model.ViewerRole
 import org.mifos.groupbanking.core.model.ViewerRoleInfo
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * See API.md#viewmodel — `GroupDashboardViewModelTest` exercises the [ScreenState] ->
@@ -375,6 +375,7 @@ private fun testCorpus(currentBalance: Double) = GroupCorpus(
     openingBalance = 0.0,
     totalContributionsThisCycle = 0.0,
     totalLoansOutstanding = 0.0,
+    isCycleEnd = false,
     lastUpdated = "2026-07-20T00:00:00Z",
     rotationPosition = null,
     nextRecipientName = null,
@@ -425,6 +426,7 @@ private fun accumulatingDashboard(role: ViewerRole = ViewerRole.ORGANIZER): Grou
         openingBalance = 0.0,
         totalContributionsThisCycle = 52500.0,
         totalLoansOutstanding = 5000.0,
+        isCycleEnd = false,
         lastUpdated = "2026-07-20T00:00:00Z",
         rotationPosition = null,
         nextRecipientName = null,
@@ -480,6 +482,7 @@ private fun rotatingDashboard(): GroupDashboard = GroupDashboard(
         openingBalance = 0.0,
         totalContributionsThisCycle = 0.0,
         totalLoansOutstanding = 0.0,
+        isCycleEnd = false,
         lastUpdated = "2026-07-20T00:00:00Z",
         rotationPosition = 7,
         nextRecipientName = "Amina Hassan",

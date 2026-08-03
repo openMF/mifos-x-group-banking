@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -67,16 +67,35 @@ data class GroupPageDto(
  */
 @Serializable
 enum class GroupTypeDto {
-    @SerialName("VSLA") VSLA,
-    @SerialName("ROSCA") ROSCA,
-    @SerialName("ASCA") ASCA,
-    @SerialName("SILC") SILC,
-    @SerialName("SHG") SHG,
-    @SerialName("SACCO") SACCO,
-    @SerialName("CBO") CBO,
-    @SerialName("BURIAL") BURIAL,
-    @SerialName("JLG") JLG,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("VSLA")
+    VSLA,
+
+    @SerialName("ROSCA")
+    ROSCA,
+
+    @SerialName("ASCA")
+    ASCA,
+
+    @SerialName("SILC")
+    SILC,
+
+    @SerialName("SHG")
+    SHG,
+
+    @SerialName("SACCO")
+    SACCO,
+
+    @SerialName("CBO")
+    CBO,
+
+    @SerialName("BURIAL")
+    BURIAL,
+
+    @SerialName("JLG")
+    JLG,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**
@@ -86,12 +105,23 @@ enum class GroupTypeDto {
  */
 @Serializable
 enum class ViewerRoleDto {
-    @SerialName("ORGANIZER") ORGANIZER,
-    @SerialName("MEMBER") MEMBER,
-    @SerialName("TREASURER") TREASURER,
-    @SerialName("CHAIRPERSON") CHAIRPERSON,
-    @SerialName("SECRETARY") SECRETARY,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("ORGANIZER")
+    ORGANIZER,
+
+    @SerialName("MEMBER")
+    MEMBER,
+
+    @SerialName("TREASURER")
+    TREASURER,
+
+    @SerialName("CHAIRPERSON")
+    CHAIRPERSON,
+
+    @SerialName("SECRETARY")
+    SECRETARY,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**
@@ -104,8 +134,15 @@ enum class ViewerRoleDto {
  */
 @Serializable
 enum class HealthIndicatorDto {
-    @SerialName("GREEN") GREEN,
-    @SerialName("AMBER") AMBER,
-    @SerialName("RED") RED,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("GREEN")
+    GREEN,
+
+    @SerialName("AMBER")
+    AMBER,
+
+    @SerialName("RED")
+    RED,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
@@ -29,8 +29,8 @@ import kotlin.time.Instant
  * package even when `private`, so they are consolidated here as `internal` singles.
  */
 internal class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor {
-    private val _status = MutableStateFlow(initialStatus)
-    override val networkStatus: StateFlow<NetworkStatus> = _status.asStateFlow()
+    private val _networkStatus = MutableStateFlow(initialStatus)
+    override val networkStatus: StateFlow<NetworkStatus> = _networkStatus.asStateFlow()
     override val isOnline: StateFlow<Boolean> =
         MutableStateFlow(initialStatus is NetworkStatus.Available).asStateFlow()
     override val networkChanges: SharedFlow<NetworkChangeEvent> =
@@ -42,5 +42,7 @@ internal class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor
 internal class InMemoryFetchedAtRepository : FetchedAtRepository {
     private val map = mutableMapOf<String, Instant>()
     override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) { map[storeKey] = instant }
+    override suspend fun write(storeKey: String, instant: Instant) {
+        map[storeKey] = instant
+    }
 }

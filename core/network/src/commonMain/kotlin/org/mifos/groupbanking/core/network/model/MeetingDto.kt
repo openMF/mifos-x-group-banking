@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -40,10 +40,17 @@ data class MeetingListItemDto(
  */
 @Serializable
 enum class MeetingStatusDto {
-    @SerialName("UPCOMING") UPCOMING,
-    @SerialName("COMPLETED") COMPLETED,
-    @SerialName("MISSED") MISSED,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("UPCOMING")
+    UPCOMING,
+
+    @SerialName("COMPLETED")
+    COMPLETED,
+
+    @SerialName("MISSED")
+    MISSED,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.groupdashboard
 
@@ -202,7 +202,9 @@ private class FakeGroupDashboardApi(
 private class FakeGroupDashboardDao : GroupDashboardDao {
     private val rows = MutableStateFlow<List<GroupDashboardCacheEntity>>(emptyList())
 
-    fun seed(entity: GroupDashboardCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: GroupDashboardCacheEntity) {
+        rows.value = listOf(entity)
+    }
     fun currentRows(): List<GroupDashboardCacheEntity> = rows.value
 
     override fun observeByKey(groupId: String): Flow<GroupDashboardCacheEntity?> =
@@ -218,7 +220,9 @@ private class FakeGroupDashboardDao : GroupDashboardDao {
         rows.value = rows.value.filterNot { it.groupId == groupId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: GroupDashboardCacheEntity) {
         upsert(entity)
@@ -258,6 +262,7 @@ private fun groupCorpusDto() = GroupCorpusDto(
     openingBalance = 500.0,
     totalContributionsThisCycle = 300.0,
     totalLoansOutstanding = 80.0,
+    isCycleEnd = false,
     lastUpdated = "2026-07-18T12:00:00Z",
     rotationPosition = null,
     nextRecipientName = null,
@@ -308,6 +313,7 @@ private fun cacheEntity(groupId: String, name: String): GroupDashboardCacheEntit
             openingBalance = 500.0,
             totalContributionsThisCycle = 300.0,
             totalLoansOutstanding = 80.0,
+            isCycleEnd = false,
             lastUpdated = "2026-07-18T12:00:00Z",
             rotationPosition = null,
             nextRecipientName = null,

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.model
 
@@ -100,8 +100,10 @@ class SyncClassifierTest {
             item(1L, "LOAN_REQUEST", SyncStatus.PENDING),
             item(2L, "LOAN_REQUEST", SyncStatus.PENDING),
             item(3L, "CREATE_MEMBER", SyncStatus.PENDING),
-            item(4L, "CREATE_MEMBER", SyncStatus.SYNCED), // not pending — excluded
-            item(5L, "ASSIGN_MEMBER_ROLE", SyncStatus.FAILED), // not pending — excluded
+            // not pending — excluded
+            item(4L, "CREATE_MEMBER", SyncStatus.SYNCED),
+            // not pending — excluded
+            item(5L, "ASSIGN_MEMBER_ROLE", SyncStatus.FAILED),
         )
         val result = pendingByType(items)
         assertEquals(2, result[EntityType.LOAN])

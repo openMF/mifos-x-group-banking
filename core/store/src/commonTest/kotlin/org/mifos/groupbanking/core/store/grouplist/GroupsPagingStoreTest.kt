@@ -5,14 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.grouplist
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
@@ -226,7 +226,9 @@ private class FakeGroupListDao : GroupListDao {
         rows.value = rows.value.filterNot { it.pageIndex == pageIndex }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replacePage(pageIndex: Int, entities: List<GroupListEntity>) {
         replacePageWasAtomic = true

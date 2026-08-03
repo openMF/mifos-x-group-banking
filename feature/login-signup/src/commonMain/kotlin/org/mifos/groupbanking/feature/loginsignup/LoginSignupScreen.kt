@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loginsignup
 
@@ -43,8 +43,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,19 +70,15 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_accept_invitation
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_biometric
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_create_account
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_demo_explore
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_forgot_password
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_sign_in
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_biometric_cd
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_action_demo_explore
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_create_account_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_demo_explore_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_new_login
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_new_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_divider_or
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_login
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_signup
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_login
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_account_exists
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_biometric_failed
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_error_invalid_credentials
@@ -104,7 +100,11 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_field_password_placeholder_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_forgot_password_cd
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_forgot_password_snackbar
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_login
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_headline_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_sign_in_cd
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_login
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_subtitle_signup
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_title
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_email_phone_invalid
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_validation_identifier_invalid

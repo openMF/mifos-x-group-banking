@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
@@ -174,7 +174,9 @@ private class FakeLoanRepaymentDetailApi(
 private class FakeLoanRepaymentDetailDao : LoanDetailDao {
     private val rows = MutableStateFlow<List<LoanDetailCacheEntity>>(emptyList())
 
-    fun seed(entity: LoanDetailCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: LoanDetailCacheEntity) {
+        rows.value = listOf(entity)
+    }
     fun currentRows(): List<LoanDetailCacheEntity> = rows.value
 
     override fun observeByKey(loanId: Long): Flow<LoanDetailCacheEntity?> =
@@ -190,7 +192,9 @@ private class FakeLoanRepaymentDetailDao : LoanDetailDao {
         rows.value = rows.value.filterNot { it.loanId == loanId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: LoanDetailCacheEntity) {
         upsert(entity)

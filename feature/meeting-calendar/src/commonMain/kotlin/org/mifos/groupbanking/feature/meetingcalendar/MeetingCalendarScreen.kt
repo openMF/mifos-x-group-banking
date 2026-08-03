@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.meetingcalendar
 
@@ -83,10 +83,10 @@ import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screen
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_past_header
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_reschedule_button
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_reschedule_button_a11y
+import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_row_subtitle_attended
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_schedule_updated_toast
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_set_schedule_button
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_set_schedule_button_a11y
-import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_row_subtitle_attended
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_start_meeting
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_status_completed
 import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screens_meeting_calendar_status_missed

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.personaldashboard
 
@@ -169,7 +169,9 @@ private class FakeMemberDashboardApi(
 private class FakeMemberDashboardDao : MemberDashboardDao {
     private val rows = MutableStateFlow<List<MemberDashboardCacheEntity>>(emptyList())
 
-    fun seed(entity: MemberDashboardCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: MemberDashboardCacheEntity) {
+        rows.value = listOf(entity)
+    }
     fun currentRows(): List<MemberDashboardCacheEntity> = rows.value
 
     override fun observeByKey(cacheKey: String): Flow<MemberDashboardCacheEntity?> =
@@ -185,7 +187,9 @@ private class FakeMemberDashboardDao : MemberDashboardDao {
         rows.value = rows.value.filterNot { it.cacheKey == cacheKey }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: MemberDashboardCacheEntity) {
         upsert(entity)
@@ -217,6 +221,9 @@ private fun dashboardDto(memberName: String) = MemberDashboardResponseDto(
 private fun cacheEntity(cacheKey: String, memberName: String) = MemberDashboardCacheEntity(
     cacheKey = cacheKey,
     memberName = memberName,
+    clientId = 301L,
+    groupLinkedSavingsId = 401L,
+    individualSavingsId = 411L,
     selectedGroupId = "g1",
     selectedGroupName = "Umoja VSLA",
     selectedGroupPoolModel = "ACCUMULATING",

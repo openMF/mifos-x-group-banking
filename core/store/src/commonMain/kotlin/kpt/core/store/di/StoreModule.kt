@@ -17,16 +17,16 @@ import org.koin.dsl.module
 import org.mifos.groupbanking.core.store.fieldofficerdashboard.impl.provideFieldOfficerDashboardStore
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import org.mifos.groupbanking.core.store.grouplist.impl.provideGroupsPagingStore
+import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import org.mifos.groupbanking.core.store.loandetail.impl.provideLoanDetailStore
 import org.mifos.groupbanking.core.store.loanlist.impl.provideLoansPagingStore
-import org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore
 import org.mifos.groupbanking.core.store.meetingcalendar.impl.provideMeetingCalendarStore
-import org.mifos.groupbanking.core.store.previousmeetingreview.impl.provideMeetingAttendanceStore
-import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
+import org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore
 import org.mifos.groupbanking.core.store.memberlist.impl.provideMembersPagingStore
 import org.mifos.groupbanking.core.store.memberprofile.impl.provideMemberProfileStore
 import org.mifos.groupbanking.core.store.organizerdashboard.impl.provideOrganizerDashboardStore
 import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
+import org.mifos.groupbanking.core.store.previousmeetingreview.impl.provideMeetingAttendanceStore
 
 /**
  * Koin module for app-level Store wiring.

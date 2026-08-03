@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loginsignup
 
@@ -107,7 +107,10 @@ class LoginSignupViewModelTest {
 
     @Test
     fun `OnLoginTap with invalid form sets validationErrors and does not call repository`() = runTest(testDispatcher) {
-        viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("not-an-email"))
+        // A space-containing value is invalid under all three sign-in identifier rules
+        // (email / E.164 phone / username) — sign-in now accepts usernames, so a bare
+        // token like "not-an-email" is a VALID username and would not error.
+        viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("invalid identifier"))
         viewModel.trySendAction(LoginSignupAction.OnPasswordChange(""))
         testDispatcher.scheduler.advanceUntilIdle()
 

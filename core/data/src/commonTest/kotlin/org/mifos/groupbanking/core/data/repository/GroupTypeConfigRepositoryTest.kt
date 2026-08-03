@@ -5,27 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import org.mifos.groupbanking.core.database.grouptypepicker.dao.GroupTypeConfigDao
@@ -39,8 +31,6 @@ import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConf
 import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * TDD coverage for [GroupTypeConfigRepositoryImpl] — verifies the repository surfaces the store
@@ -120,7 +110,9 @@ private class FakeGroupTypeConfigApi(
 private class FakeGroupTypeConfigDao : GroupTypeConfigDao {
     private val rows = MutableStateFlow<List<GroupTypeConfigEntity>>(emptyList())
 
-    fun seed(entities: List<GroupTypeConfigEntity>) { rows.value = entities }
+    fun seed(entities: List<GroupTypeConfigEntity>) {
+        rows.value = entities
+    }
 
     override fun observeAll(): Flow<List<GroupTypeConfigEntity>> = rows
 
@@ -130,7 +122,9 @@ private class FakeGroupTypeConfigDao : GroupTypeConfigDao {
         rows.value = byKey.values.toList()
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceAll(entities: List<GroupTypeConfigEntity>) {
         deleteAll()

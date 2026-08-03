@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.personaldashboard
 
@@ -20,13 +20,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 import kpt.core.analytics.KptAnalyticsTracker
 import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.observability.ConsoleCrashReporter
@@ -43,6 +36,13 @@ import org.mifos.groupbanking.core.model.MemberDashboard
 import org.mifos.groupbanking.core.model.SavingsMechanism
 import org.mifos.groupbanking.core.model.SavingsTransaction
 import org.mifos.groupbanking.core.model.TransactionType
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * See API.md#viewmodel — PersonalDashboardViewModelTest exercises every declared
@@ -187,7 +187,9 @@ class PersonalDashboardViewModelTest {
             viewModel.trySendAction(PersonalDashboardAction.OnSavingsCardClick)
             val event = awaitItem()
             assertTrue(event is PersonalDashboardEvent.NavigateToSavings)
-            assertEquals("grp-001", (event as PersonalDashboardEvent.NavigateToSavings).groupId)
+            assertEquals(301L, (event as PersonalDashboardEvent.NavigateToSavings).clientId)
+            assertEquals(401L, event.groupLinkedSavingsId)
+            assertEquals(411L, event.individualSavingsId)
             assertEquals("ACCUMULATING", event.poolModel)
         }
     }
@@ -248,6 +250,9 @@ class PersonalDashboardViewModelTest {
 
 private fun accumulatingDashboard(): MemberDashboard = MemberDashboard(
     memberName = "Amina Hassan",
+    clientId = 301L,
+    groupLinkedSavingsId = 401L,
+    individualSavingsId = 411L,
     myGroups = listOf(GroupSummary("grp-001", "Mwangaza VSLA", SavingsMechanism.ACCUMULATING)),
     selectedGroup = GroupSummary("grp-001", "Mwangaza VSLA", SavingsMechanism.ACCUMULATING),
     poolModel = SavingsMechanism.ACCUMULATING,
@@ -268,6 +273,9 @@ private fun accumulatingDashboard(): MemberDashboard = MemberDashboard(
 
 private fun rotatingDashboard(): MemberDashboard = MemberDashboard(
     memberName = "Amina Hassan",
+    clientId = 301L,
+    groupLinkedSavingsId = 401L,
+    individualSavingsId = 411L,
     myGroups = listOf(GroupSummary("grp-003", "Jirani ROSCA", SavingsMechanism.ROTATING_PAYOUT)),
     selectedGroup = GroupSummary("grp-003", "Jirani ROSCA", SavingsMechanism.ROTATING_PAYOUT),
     poolModel = SavingsMechanism.ROTATING_PAYOUT,

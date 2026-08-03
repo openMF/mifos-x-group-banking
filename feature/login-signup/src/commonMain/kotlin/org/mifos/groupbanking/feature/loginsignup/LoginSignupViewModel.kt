@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loginsignup
 
@@ -45,6 +45,7 @@ private const val MIN_PASSWORD_LENGTH_SIGNUP = 8
 private const val STRONG_PASSWORD_MIN_LENGTH = 12
 private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 private val E164_PHONE_REGEX = Regex("^\\+[1-9]\\d{6,14}$")
+
 // Sign-in also accepts a username: 3-30 chars, starts alphanumeric, then letters/digits/._-
 private val USERNAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{2,29}$")
 

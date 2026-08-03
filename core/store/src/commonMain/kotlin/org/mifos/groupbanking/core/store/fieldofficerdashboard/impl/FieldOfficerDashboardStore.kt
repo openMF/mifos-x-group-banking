@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.fieldofficerdashboard.impl
 
@@ -130,8 +130,7 @@ private fun <T> NetworkResult<T, NetworkError>.dataOrThrow(): T = when (this) {
 }
 
 /** Unwraps a best-effort read: returns data on success, or an empty envelope on failure. */
-private fun NetworkResult<org.mifos.groupbanking.core.network.model.PagedCentersResponseDto, NetworkError>.dataOrEmpty():
-    org.mifos.groupbanking.core.network.model.PagedCentersResponseDto = when (this) {
+private fun NetworkResult<org.mifos.groupbanking.core.network.model.PagedCentersResponseDto, NetworkError>.dataOrEmpty(): org.mifos.groupbanking.core.network.model.PagedCentersResponseDto = when (this) {
     is NetworkResult.Success -> data
     is NetworkResult.Error -> org.mifos.groupbanking.core.network.model.PagedCentersResponseDto()
 }

@@ -5,8 +5,8 @@ kmpProductFlavors = "2.8.3"
 # ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.groupbanking"
 appDisplayName   = "CommonPurse"
-baseNamespace    = "org.mifos"
-desktopAppName   = "Mifos - Money Toolkit"     # JVM package name, dock name
+baseNamespace    = "kpt"
+desktopAppName   = "CommonPurse"     # JVM package name, dock name
 projectName      = "mifos-x-group-banking"
 iosTeamId        = "XXXXXXXXXX"
 # ─────────────────────────────────────────────────────────────────────────────────────────────────

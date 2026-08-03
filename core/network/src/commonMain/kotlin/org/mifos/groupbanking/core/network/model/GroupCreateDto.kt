@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -141,14 +141,23 @@ data class OfficeDto(
  */
 @Serializable(with = ContributionModelDto.Serializer::class)
 enum class ContributionModelDto {
-    @SerialName("FIXED_AMOUNT") FIXED_AMOUNT,
-    @SerialName("SHARE_BASED_VARIABLE") SHARE_BASED_VARIABLE,
-    @SerialName("FIXED_NEGOTIATED") FIXED_NEGOTIATED,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("FIXED_AMOUNT")
+    FIXED_AMOUNT,
+
+    @SerialName("SHARE_BASED_VARIABLE")
+    SHARE_BASED_VARIABLE,
+
+    @SerialName("FIXED_NEGOTIATED")
+    FIXED_NEGOTIATED,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
     ;
 
     internal object Serializer : KSerializer<ContributionModelDto> by unknownFallbackEnumSerializer(
-        "ContributionModelDto", entries, UNKNOWN,
+        "ContributionModelDto",
+        entries,
+        UNKNOWN,
     )
 }
 
@@ -159,12 +168,23 @@ enum class ContributionModelDto {
  */
 @Serializable
 enum class ShareoutFormulaDto {
-    @SerialName("NONE") NONE,
-    @SerialName("PRORATA_SHARES") PRORATA_SHARES,
-    @SerialName("PRORATA_SAVINGS") PRORATA_SAVINGS,
-    @SerialName("EQUAL") EQUAL,
-    @SerialName("INVESTMENT_PROPORTIONAL") INVESTMENT_PROPORTIONAL,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("NONE")
+    NONE,
+
+    @SerialName("PRORATA_SHARES")
+    PRORATA_SHARES,
+
+    @SerialName("PRORATA_SAVINGS")
+    PRORATA_SAVINGS,
+
+    @SerialName("EQUAL")
+    EQUAL,
+
+    @SerialName("INVESTMENT_PROPORTIONAL")
+    INVESTMENT_PROPORTIONAL,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**
@@ -174,15 +194,28 @@ enum class ShareoutFormulaDto {
  */
 @Serializable(with = PayoutOrderMethodDto.Serializer::class)
 enum class PayoutOrderMethodDto {
-    @SerialName("FIXED_ORDER") FIXED_ORDER,
-    @SerialName("LOTTERY") LOTTERY,
-    @SerialName("AUCTION") AUCTION,
-    @SerialName("NEED_BASED") NEED_BASED,
-    @SerialName("NA") NA,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("FIXED_ORDER")
+    FIXED_ORDER,
+
+    @SerialName("LOTTERY")
+    LOTTERY,
+
+    @SerialName("AUCTION")
+    AUCTION,
+
+    @SerialName("NEED_BASED")
+    NEED_BASED,
+
+    @SerialName("NA")
+    NA,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
     ;
 
     internal object Serializer : KSerializer<PayoutOrderMethodDto> by unknownFallbackEnumSerializer(
-        "PayoutOrderMethodDto", entries, UNKNOWN,
+        "PayoutOrderMethodDto",
+        entries,
+        UNKNOWN,
     )
 }

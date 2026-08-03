@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
@@ -14,7 +14,6 @@ import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.model.CreateGroupRequest
 import org.mifos.groupbanking.core.model.GroupCreationResult
 import org.mifos.groupbanking.core.model.Office
-import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApi
 
 /**
  * Group-create wizard repository (COMP-GRP-001). Wraps `GroupCreateApi` (core/network).

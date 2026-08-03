@@ -25,9 +25,8 @@ import kpt.feature.home.di.HomeModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.mifos.groupbanking.feature.groupcreate.di.GroupCreateModule
 import org.mifos.groupbanking.feature.fieldofficerdashboard.di.FieldOfficerDashboardModule
-import org.mifos.groupbanking.feature.organizerdashboard.di.OrganizerDashboardModule
+import org.mifos.groupbanking.feature.groupcreate.di.GroupCreateModule
 import org.mifos.groupbanking.feature.groupdashboard.di.GroupDashboardModule
 import org.mifos.groupbanking.feature.grouplist.di.GroupListModule
 import org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule
@@ -39,30 +38,25 @@ import org.mifos.groupbanking.feature.loanmarkdefaulteddialog.di.LoanMarkDefault
 import org.mifos.groupbanking.feature.loanrepaymentdialog.di.LoanRepaymentDialogModule
 import org.mifos.groupbanking.feature.loanrequest.di.LoanRequestModule
 import org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule
+import org.mifos.groupbanking.feature.meetingcalendar.di.MeetingCalendarModule
 import org.mifos.groupbanking.feature.meetingconduct.di.MeetingConductModule
 import org.mifos.groupbanking.feature.meetingsummary.di.MeetingSummaryModule
-import org.mifos.groupbanking.feature.previousmeetingreview.di.PreviousMeetingReviewModule
-import org.mifos.groupbanking.feature.meetingcalendar.di.MeetingCalendarModule
 import org.mifos.groupbanking.feature.memberadd.di.MemberAddModule
 import org.mifos.groupbanking.feature.memberinvite.di.MemberInviteModule
 import org.mifos.groupbanking.feature.memberlist.di.MemberListModule
 import org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule
 import org.mifos.groupbanking.feature.membersavingsdetail.di.MemberSavingsDetailModule
+import org.mifos.groupbanking.feature.organizerdashboard.di.OrganizerDashboardModule
 import org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule
 import org.mifos.groupbanking.feature.personalloans.di.PersonalLoansModule
 import org.mifos.groupbanking.feature.personalsavings.di.PersonalSavingsModule
+import org.mifos.groupbanking.feature.previousmeetingreview.di.PreviousMeetingReviewModule
 import org.mifos.groupbanking.feature.savingsdashboard.di.SavingsDashboardModule
+import org.mifos.groupbanking.feature.settingslogoutdialog.di.SettingsLogoutDialogModule
 import org.mifos.groupbanking.feature.shareoutexecute.di.ShareOutExecuteModule
 import org.mifos.groupbanking.feature.shareoutpreview.di.ShareOutPreviewModule
-// `org.mifos.groupbanking.feature.settings.di.SettingsModule` — the REAL, now-sole group-banking
-// `settings-screen` MVI module (idea-layer/screens/settings/ui.yaml). The legacy
-// `kpt.feature.settings.SettingsModule`/`SettingsScreen`/`SettingsRoute` shell has been migrated
-// away (Screen/Route/TestTags/DI all superseded — see `feature/settings/src/commonMain/kotlin/
-// kpt/feature/settings/*` removal notes); the `GroupBankingSettingsModule` alias is kept so this
-// import line and the `includes(...)` call site below don't need touching again.
-import org.mifos.groupbanking.feature.settings.di.SettingsModule as GroupBankingSettingsModule
-import org.mifos.groupbanking.feature.settingslogoutdialog.di.SettingsLogoutDialogModule
 import org.mifos.groupbanking.feature.syncstatus.di.SyncStatusModule
+import org.mifos.groupbanking.feature.settings.di.SettingsModule as GroupBankingSettingsModule
 
 object KoinModules {
     private val dataModule = module {
@@ -83,40 +77,39 @@ object KoinModules {
 
     private val featureModule = module {
         includes(
-            // shell (framework) — kept
             HomeModule,
             LoginSignupModule,
             GroupTypePickerModule,
             GroupListModule,
-            JoinWithCodeModule, // <- added by kmp-viewmodel-gen
-            PersonalDashboardModule, // <- added by kmp-viewmodel-gen
-            GroupCreateModule, // <- added by kmp-viewmodel-gen
-            GroupDashboardModule, // <- added by kmp-viewmodel-gen
-            MemberListModule, // <- added by kmp-viewmodel-gen
-            MemberProfileModule, // <- added by kmp-viewmodel-gen
-            MemberAddModule, // <- added by kmp-viewmodel-gen
-            MemberInviteModule, // <- added by kmp-viewmodel-gen
-            LoanListModule, // <- added by kmp-viewmodel-gen
-            LoanDetailModule, // <- added by kmp-viewmodel-gen
-            LoanApplyModule, // <- added by kmp-viewmodel-gen
-            LoanRequestModule, // <- added by kmp-viewmodel-gen
-            PersonalLoansModule, // <- added by kmp-viewmodel-gen
-            LoanRepaymentDialogModule, // <- added by kmp-viewmodel-gen
-            LoanMarkDefaultedDialogModule, // <- added by kmp-viewmodel-gen
-            SyncStatusModule, // <- added by kmp-viewmodel-gen
-            SettingsLogoutDialogModule, // <- added by kmp-viewmodel-gen
-            GroupBankingSettingsModule, // <- added by kmp-viewmodel-gen (real settings-screen VM; legacy SettingsModule migrated away)
-            PersonalSavingsModule, // <- added by kmp-viewmodel-gen
-            MemberSavingsDetailModule, // <- added by kmp-viewmodel-gen
-            SavingsDashboardModule, // <- added by kmp-viewmodel-gen
-            ShareOutPreviewModule, // <- added by kmp-viewmodel-gen
-            ShareOutExecuteModule, // <- added by kmp-viewmodel-gen
-            MeetingSummaryModule, // <- added by kmp-viewmodel-gen
-            MeetingCalendarModule, // <- added by kmp-viewmodel-gen
-            FieldOfficerDashboardModule, // <- added by kmp-viewmodel-gen
-            OrganizerDashboardModule, // <- added by kmp-viewmodel-gen
-            MeetingConductModule, // <- added by kmp-viewmodel-gen
-            PreviousMeetingReviewModule, // <- added by kmp-viewmodel-gen
+            JoinWithCodeModule,
+            PersonalDashboardModule,
+            GroupCreateModule,
+            GroupDashboardModule,
+            MemberListModule,
+            MemberProfileModule,
+            MemberAddModule,
+            MemberInviteModule,
+            LoanListModule,
+            LoanDetailModule,
+            LoanApplyModule,
+            LoanRequestModule,
+            PersonalLoansModule,
+            LoanRepaymentDialogModule,
+            LoanMarkDefaultedDialogModule,
+            SyncStatusModule,
+            SettingsLogoutDialogModule,
+            GroupBankingSettingsModule,
+            PersonalSavingsModule,
+            MemberSavingsDetailModule,
+            SavingsDashboardModule,
+            ShareOutPreviewModule,
+            ShareOutExecuteModule,
+            MeetingSummaryModule,
+            MeetingCalendarModule,
+            FieldOfficerDashboardModule,
+            OrganizerDashboardModule,
+            MeetingConductModule,
+            PreviousMeetingReviewModule,
         )
     }
 

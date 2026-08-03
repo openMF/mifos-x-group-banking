@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.personaldashboard
 
@@ -53,8 +53,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kpt.core.base.ui.effects.EventsEffect
@@ -88,6 +86,8 @@ import org.mifos.groupbanking.feature.personaldashboard.generated.resources.scre
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_overflow_menu_cd
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_recent_activity_title
 import org.mifos.groupbanking.feature.personaldashboard.generated.resources.screens_personal_dashboard_retry_action
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Container for `personal-dashboard-screen`. Collects [PersonalDashboardViewModel] state via

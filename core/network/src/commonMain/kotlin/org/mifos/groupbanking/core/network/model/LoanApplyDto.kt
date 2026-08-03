@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -299,18 +299,37 @@ data class ApplyLoanResponseDto(
  */
 @Serializable(with = LoanPurposeDto.Serializer::class)
 enum class LoanPurposeDto {
-    @SerialName("MEDICAL") MEDICAL,
-    @SerialName("EDUCATION") EDUCATION,
-    @SerialName("BUSINESS") BUSINESS,
-    @SerialName("EMERGENCY") EMERGENCY,
-    @SerialName("OTHER") OTHER,
-    @SerialName("SCHOOL_FEES") SCHOOL_FEES,
-    @SerialName("FARMING") FARMING,
-    @SerialName("HOME_IMPROVEMENT") HOME_IMPROVEMENT,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("MEDICAL")
+    MEDICAL,
+
+    @SerialName("EDUCATION")
+    EDUCATION,
+
+    @SerialName("BUSINESS")
+    BUSINESS,
+
+    @SerialName("EMERGENCY")
+    EMERGENCY,
+
+    @SerialName("OTHER")
+    OTHER,
+
+    @SerialName("SCHOOL_FEES")
+    SCHOOL_FEES,
+
+    @SerialName("FARMING")
+    FARMING,
+
+    @SerialName("HOME_IMPROVEMENT")
+    HOME_IMPROVEMENT,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
     ;
 
     internal object Serializer : KSerializer<LoanPurposeDto> by unknownFallbackEnumSerializer(
-        "LoanPurposeDto", entries, UNKNOWN,
+        "LoanPurposeDto",
+        entries,
+        UNKNOWN,
     )
 }

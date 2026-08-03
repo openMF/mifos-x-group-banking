@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loanrequest
 
@@ -72,10 +72,10 @@ import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_loan_multiplier_hint
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_max_loan_icon_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_max_loan_label
-import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_ok_button
-import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_ok_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_offline_banner
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_offline_banner_cd
+import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_ok_button
+import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_ok_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_principal_label
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_purpose_business
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_purpose_cd
@@ -90,6 +90,7 @@ import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_retry_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_savings_balance_label
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_savings_icon_cd
+import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_submit_button
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_submit_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_submitting_cd
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_success_dialog_cd
@@ -98,7 +99,6 @@ import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_success_offline_title
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_success_online_body
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_success_online_title
-import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_submit_button
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_topbar_title
 import org.mifos.groupbanking.feature.loanrequest.generated.resources.screens_loan_request_total_repayment_label
 

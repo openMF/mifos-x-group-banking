@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
 
@@ -43,7 +43,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -122,7 +121,6 @@ import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_loan_summary
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_loan_vote_against
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_loan_vote_for
-import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_loan_vote_tally
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_next
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_next_cd
 import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens_meeting_conduct_no_active_loans_body
@@ -799,8 +797,11 @@ private fun LoanApplicationCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    if (approved) stringResource(Res.string.screens_meeting_conduct_loan_approved)
-                    else stringResource(Res.string.screens_meeting_conduct_loan_approve),
+                    if (approved) {
+                        stringResource(Res.string.screens_meeting_conduct_loan_approved)
+                    } else {
+                        stringResource(Res.string.screens_meeting_conduct_loan_approve)
+                    },
                 )
             }
         }
@@ -907,8 +908,11 @@ private fun WizardFooter(
                     .semantics { contentDescription = nextCd },
             ) {
                 Text(
-                    if (isLast) stringResource(Res.string.screens_meeting_conduct_submit_meeting)
-                    else stringResource(Res.string.screens_meeting_conduct_next),
+                    if (isLast) {
+                        stringResource(Res.string.screens_meeting_conduct_submit_meeting)
+                    } else {
+                        stringResource(Res.string.screens_meeting_conduct_next)
+                    },
                 )
             }
         }

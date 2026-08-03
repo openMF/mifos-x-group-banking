@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.mapper
 
@@ -19,7 +19,6 @@ import org.mifos.groupbanking.core.network.model.MemberProfileDto
 import org.mifos.groupbanking.core.network.model.MemberRoleDto
 import org.mifos.groupbanking.core.network.model.MemberRoleInfoDto
 import org.mifos.groupbanking.core.network.model.MemberSavingsAccountDto
-import org.mifos.groupbanking.core.network.model.UpdateMemberRoleRequestDto
 import org.mifos.groupbanking.core.network.model.UpdateMemberRoleResponseDto
 import kotlin.test.Test
 import kotlin.test.assertEquals

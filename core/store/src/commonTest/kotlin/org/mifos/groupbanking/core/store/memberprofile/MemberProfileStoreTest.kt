@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.memberprofile
 
@@ -184,7 +184,9 @@ private class FakeMemberProfileApi(
 private class FakeMemberProfileDao : MemberProfileCacheDao {
     private val rows = MutableStateFlow<List<MemberProfileCacheEntity>>(emptyList())
 
-    fun seed(entity: MemberProfileCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: MemberProfileCacheEntity) {
+        rows.value = listOf(entity)
+    }
     fun currentRows(): List<MemberProfileCacheEntity> = rows.value
 
     override fun observeByKey(clientId: String): Flow<MemberProfileCacheEntity?> =
@@ -200,7 +202,9 @@ private class FakeMemberProfileDao : MemberProfileCacheDao {
         rows.value = rows.value.filterNot { it.clientId == clientId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: MemberProfileCacheEntity) {
         upsert(entity)

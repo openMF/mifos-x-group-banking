@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.shareoutpreview
 
@@ -63,7 +63,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.groupbanking.core.model.GroupTypeConfig
 import org.mifos.groupbanking.core.model.MemberPayout
-import org.mifos.groupbanking.core.model.ShareOutPreview
 import org.mifos.groupbanking.feature.shareoutpreview.generated.resources.Res
 import org.mifos.groupbanking.feature.shareoutpreview.generated.resources.screens_share_out_preview_a11y_confirm_button
 import org.mifos.groupbanking.feature.shareoutpreview.generated.resources.screens_share_out_preview_a11y_error_state

@@ -5,28 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import org.mifos.groupbanking.core.database.personaldashboard.dao.MemberDashboardDao
@@ -39,8 +31,6 @@ import org.mifos.groupbanking.core.store.personaldashboard.impl.MEMBER_DASHBOARD
 import org.mifos.groupbanking.core.store.personaldashboard.impl.provideMemberDashboardStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * TDD coverage for [MemberDashboardRepositoryImpl] — verifies the repository surfaces the
@@ -124,7 +114,9 @@ private class FakeMemberDashboardApi(
 private class FakeMemberDashboardDao : MemberDashboardDao {
     private val rows = MutableStateFlow<List<MemberDashboardCacheEntity>>(emptyList())
 
-    fun seed(entity: MemberDashboardCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: MemberDashboardCacheEntity) {
+        rows.value = listOf(entity)
+    }
 
     override fun observeByKey(cacheKey: String): Flow<MemberDashboardCacheEntity?> =
         rows.map { list -> list.firstOrNull { it.cacheKey == cacheKey } }
@@ -139,7 +131,9 @@ private class FakeMemberDashboardDao : MemberDashboardDao {
         rows.value = rows.value.filterNot { it.cacheKey == cacheKey }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: MemberDashboardCacheEntity) {
         upsert(entity)
@@ -168,6 +162,9 @@ private fun dashboardDto(memberName: String) = MemberDashboardResponseDto(
 private fun cacheEntity(cacheKey: String, memberName: String) = MemberDashboardCacheEntity(
     cacheKey = cacheKey,
     memberName = memberName,
+    clientId = 301L,
+    groupLinkedSavingsId = 401L,
+    individualSavingsId = 411L,
     selectedGroupId = "group-1",
     selectedGroupName = "Umoja VSLA",
     selectedGroupPoolModel = "ACCUMULATING",

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.meetingsummary
 
@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
@@ -69,7 +68,6 @@ import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_corpus_chip_format
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_corpus_reconciliation_header
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_done_btn
-import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_done_btn_a11y
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_error_auth
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_error_icon_cd
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_error_network

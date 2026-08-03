@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.memberlist
 
@@ -465,8 +465,8 @@ private fun available(): NetworkStatus.Available =
     NetworkStatus.Available(NetworkInfo(type = NetworkType.WiFi, isMetered = false))
 
 private class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor {
-    private val _status = MutableStateFlow(initialStatus)
-    override val networkStatus: StateFlow<NetworkStatus> = _status.asStateFlow()
+    private val _networkStatus = MutableStateFlow(initialStatus)
+    override val networkStatus: StateFlow<NetworkStatus> = _networkStatus.asStateFlow()
     override val isOnline: StateFlow<Boolean> =
         MutableStateFlow(initialStatus is NetworkStatus.Available).asStateFlow()
     override val networkChanges: SharedFlow<NetworkChangeEvent> =

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.datastore.session
 
@@ -29,7 +29,8 @@ private const val TAG = "CompanionSessionStore"
 internal data class PersistedCompanionSession(
     val userId: String,
     val sessionToken: String,
-    val tokenExpiresAt: String, // ISO-8601 — avoids requiring a custom kotlinx.datetime.Instant serializer.
+    // ISO-8601 — avoids requiring a custom kotlinx.datetime.Instant serializer.
+    val tokenExpiresAt: String,
 )
 
 /**

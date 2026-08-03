@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loanlist
 
@@ -34,6 +34,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kpt.core.analytics.KptAnalyticsTracker
 import kpt.core.base.analytics.NoOpAnalyticsHelper
+import kpt.core.base.network.NetworkError
+import kpt.core.base.network.NetworkResult
 import kpt.core.base.observability.ConsoleCrashReporter
 import kpt.core.base.security.SecurityPolicy
 import kpt.core.base.security.SessionManager
@@ -117,6 +119,9 @@ class LoanListViewModelTest {
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
             crashReporter = ConsoleCrashReporter(),
             groupId = groupId,
+            // MEMBER is in none of the capability role-sets (LOAN_APPLY_ROLES etc.), so the
+            // base-state capability flags stay false — matching these tests' assertions.
+            viewerRole = "MEMBER",
         )
         createdViewModels += viewModel
         return Triple(repository, sessionManager, viewModel)
@@ -468,14 +473,19 @@ private class FakeLoanRepository(
             fetchPolicy = fetchPolicy,
         )
     }
+
+    override suspend fun getLoansForClient(clientId: Long): NetworkResult<List<LoanSummary>, NetworkError> {
+        failWith?.let { return NetworkResult.Error(NetworkError.UNKNOWN) }
+        return NetworkResult.Success(pagesByIndex.values.flatten())
+    }
 }
 
 private fun available(): NetworkStatus.Available =
     NetworkStatus.Available(NetworkInfo(type = NetworkType.WiFi, isMetered = false))
 
 private class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor {
-    private val _status = MutableStateFlow(initialStatus)
-    override val networkStatus: StateFlow<NetworkStatus> = _status.asStateFlow()
+    private val _networkStatus = MutableStateFlow(initialStatus)
+    override val networkStatus: StateFlow<NetworkStatus> = _networkStatus.asStateFlow()
     override val isOnline: StateFlow<Boolean> =
         MutableStateFlow(initialStatus is NetworkStatus.Available).asStateFlow()
     override val networkChanges: SharedFlow<NetworkChangeEvent> =

@@ -31,7 +31,9 @@ kotlin {
             implementation(projects.core.analytics)
 
             implementation(projects.coreBase.common)
-            implementation(projects.coreBase.network)
+            // api: LoanRepository (public) returns NetworkResult<..., NetworkError> from
+            // core-base:network, so the type must be visible to consumers that implement/observe it.
+            api(projects.coreBase.network)
             api(projects.core.store)
 
             implementation(libs.kotlinx.coroutines.core)

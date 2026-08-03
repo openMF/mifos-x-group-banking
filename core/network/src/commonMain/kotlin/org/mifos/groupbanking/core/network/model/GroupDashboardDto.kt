@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.model
 
@@ -112,14 +112,23 @@ data class GroupInstanceConfigDto(
  */
 @Serializable(with = GroupContributionModelDto.Serializer::class)
 enum class GroupContributionModelDto {
-    @SerialName("FIXED_AMOUNT") FIXED_AMOUNT,
-    @SerialName("SHARE_BASED_VARIABLE") SHARE_BASED_VARIABLE,
-    @SerialName("FIXED_NEGOTIATED") FIXED_NEGOTIATED,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("FIXED_AMOUNT")
+    FIXED_AMOUNT,
+
+    @SerialName("SHARE_BASED_VARIABLE")
+    SHARE_BASED_VARIABLE,
+
+    @SerialName("FIXED_NEGOTIATED")
+    FIXED_NEGOTIATED,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
     ;
 
     internal object Serializer : KSerializer<GroupContributionModelDto> by unknownFallbackEnumSerializer(
-        "GroupContributionModelDto", entries, UNKNOWN,
+        "GroupContributionModelDto",
+        entries,
+        UNKNOWN,
     )
 }
 
@@ -196,12 +205,23 @@ data class ActivityItemDto(
  */
 @Serializable
 enum class ActivityTypeDto {
-    @SerialName("MEETING") MEETING,
-    @SerialName("DEPOSIT") DEPOSIT,
-    @SerialName("LOAN") LOAN,
-    @SerialName("PENALTY") PENALTY,
-    @SerialName("SHARE_OUT") SHARE_OUT,
-    @SerialName("UNKNOWN") UNKNOWN,
+    @SerialName("MEETING")
+    MEETING,
+
+    @SerialName("DEPOSIT")
+    DEPOSIT,
+
+    @SerialName("LOAN")
+    LOAN,
+
+    @SerialName("PENALTY")
+    PENALTY,
+
+    @SerialName("SHARE_OUT")
+    SHARE_OUT,
+
+    @SerialName("UNKNOWN")
+    UNKNOWN,
 }
 
 /**

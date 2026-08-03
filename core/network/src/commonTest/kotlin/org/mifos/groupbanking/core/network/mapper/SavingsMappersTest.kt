@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.mapper
 
@@ -26,9 +26,9 @@ import org.mifos.groupbanking.core.network.model.SavingsStatementTypeDto
 import org.mifos.groupbanking.core.network.model.WeeklyContributionPointDto
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.test.assertFailsWith
 
 /**
  * TDD RED-first coverage for the shared Savings DTO<->domain mappers (`SavingsMappers.kt`). Every

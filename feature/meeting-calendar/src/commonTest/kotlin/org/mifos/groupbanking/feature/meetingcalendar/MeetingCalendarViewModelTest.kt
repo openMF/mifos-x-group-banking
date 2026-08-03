@@ -5,27 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.meetingcalendar
 
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -37,18 +29,15 @@ import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.observability.ConsoleCrashReporter
 import kpt.core.base.security.SecurityPolicy
 import kpt.core.base.security.SessionManager
-import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.infra.StoreFactory
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.screen.asScreenStream
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.screenDataStreamForTesting
 import org.mifos.groupbanking.core.data.repository.MeetingRepository
 import org.mifos.groupbanking.core.model.MeetingFrequency
 import org.mifos.groupbanking.core.model.MeetingListItem
 import org.mifos.groupbanking.core.model.MeetingStatus
 import org.mifos.groupbanking.core.model.RescheduleMeetingRequest
-import org.mobilenativefoundation.store.store5.Fetcher
-import org.mobilenativefoundation.store.store5.SourceOfTruth
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -56,16 +45,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * Exercises every declared [MeetingCalendarAction] path plus the
  * [kpt.core.base.store.screen.ScreenState]->[MeetingCalendarState] mapping, per
- * RULE-TDD-METHODOLOGY-001 / RULE-IMPL-DEAD-CLICKABLE-001. Builds a REAL Store5-backed
- * [FakeMeetingRepository] (via the public `Store.asScreenStream(...)` extension + an in-memory
- * `Fetcher`/`SourceOfTruth`) rather than a hand-rolled stub — mirrors `LoanListViewModelTest`.
+ * RULE-TDD-METHODOLOGY-001 / RULE-IMPL-DEAD-CLICKABLE-001. Drives the ViewModel through a
+ * [FakeMeetingRepository] whose single-key stream is backed by [screenDataStreamForTesting]
+ * (buffered [ScreenState] flow + refresh trigger) — the shared single-key convention used by
+ * `FakeGroupDashboardRepository` / `FakeLoanDetailRepository`.
  */
 class MeetingCalendarViewModelTest {
 
@@ -206,7 +193,7 @@ class MeetingCalendarViewModelTest {
 
         viewModel.eventFlow.test {
             viewModel.trySendAction(MeetingCalendarAction.OpenPastMeeting("MTG-2", 2))
-            assertEquals(MeetingCalendarEvent.NavigateToReview("MTG-2", 2), awaitItem())
+            assertEquals(MeetingCalendarEvent.NavigateToReview("MTG-2", 2, CENTER_ID), awaitItem())
         }
     }
 
@@ -329,10 +316,12 @@ private fun meeting(
 private class FakeConnectException(message: String) : Exception(message)
 
 /**
- * In-memory [MeetingRepository] fake. Builds a REAL `Store<Int, List<MeetingListItem>>` per call (an
- * in-memory [Fetcher] + [SourceOfTruth]) and exposes it via the same public `.asScreenStream(...)`
- * extension the production `MeetingRepositoryImpl` uses — so the ViewModel exercises the real
- * offline-first pipeline (Loading -> Content/Empty/Error/NoNetwork/Unauthenticated, refresh, retry).
+ * Single-key stream fake — mirrors `FakeGroupDashboardRepository` / `FakeLoanDetailRepository`
+ * (the shared single-key convention): a buffered [ScreenState] flow + a `refreshTrigger`, wired
+ * through [screenDataStreamForTesting], rather than a live Store5. The screen state is re-derived
+ * from (`failWith`, `online`, `meetings`) on subscription and on every refresh/retry, so tests
+ * drive it purely through the constructor fixture + `trySendAction(RefreshMeetings)` — no live
+ * Store5 fetch/source-of-truth machinery, so empty/refresh settle deterministically.
  */
 private class FakeMeetingRepository(
     meetings: List<MeetingListItem> = emptyList(),
@@ -342,42 +331,28 @@ private class FakeMeetingRepository(
 
     var meetings: List<MeetingListItem> = meetings
     var failWith: Throwable? = failWith
+    var online: Boolean = online
 
-    private val networkMonitor: NetworkMonitor = FakeNetworkMonitor(
-        if (online) available() else NetworkStatus.Unavailable,
-    )
-    private val cache = mutableMapOf<Int, MutableStateFlow<List<MeetingListItem>?>>()
+    private val stateFlow = MutableStateFlow<ScreenState<List<MeetingListItem>>>(ScreenState.Loading)
+    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    private fun flowFor(centerId: Int): MutableStateFlow<List<MeetingListItem>?> =
-        cache.getOrPut(centerId) { MutableStateFlow(null) }
+    private fun resolve(): ScreenState<List<MeetingListItem>> = when {
+        failWith is FakeConnectException -> ScreenState.Error(failWith!!, isNetworkError = true)
+        failWith?.message?.contains("401") == true -> ScreenState.Unauthenticated
+        failWith != null -> ScreenState.Error(failWith!!, isNetworkError = false)
+        !online -> ScreenState.NoNetwork()
+        meetings.isEmpty() -> ScreenState.Empty
+        else -> ScreenState.Content(meetings)
+    }
 
     override fun meetingsStream(
         centerId: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<List<MeetingListItem>> {
-        val store = StoreFactory.createStore<Int, List<MeetingListItem>, List<MeetingListItem>>(
-            fetcher = Fetcher.of { _: Int ->
-                failWith?.let { throw it }
-                meetings
-            },
-            sourceOfTruth = SourceOfTruth.of(
-                reader = { key: Int -> flowFor(key) },
-                writer = { key: Int, value: List<MeetingListItem> -> flowFor(key).value = value },
-                delete = { key: Int -> flowFor(key).value = null },
-                deleteAll = { cache.values.forEach { it.value = null } },
-            ),
-        )
-        return store.asScreenStream(
-            key = centerId,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = InMemoryFetchedAtRepository(),
-            cacheKey = "test:meeting-calendar:$centerId",
-            scope = scope,
-            isEmpty = { it.isEmpty() },
-            fetchPolicy = fetchPolicy,
-            ttl = 5.minutes,
-        )
+        stateFlow.value = resolve()
+        scope.launch { refreshTrigger.collect { stateFlow.value = resolve() } }
+        return screenDataStreamForTesting(state = stateFlow, refreshTrigger = refreshTrigger)
     }
 
     /** Records the last queued reschedule payload — G3 / F6 server-gated offline-queue write. */
@@ -385,27 +360,5 @@ private class FakeMeetingRepository(
     override suspend fun rescheduleMeeting(request: RescheduleMeetingRequest): Long {
         lastReschedule = request
         return 1L
-    }
-}
-
-private fun available(): NetworkStatus.Available =
-    NetworkStatus.Available(NetworkInfo(type = NetworkType.WiFi, isMetered = false))
-
-private class FakeNetworkMonitor(initialStatus: NetworkStatus) : NetworkMonitor {
-    private val _status = MutableStateFlow(initialStatus)
-    override val networkStatus: StateFlow<NetworkStatus> = _status.asStateFlow()
-    override val isOnline: StateFlow<Boolean> =
-        MutableStateFlow(initialStatus is NetworkStatus.Available).asStateFlow()
-    override val networkChanges: SharedFlow<NetworkChangeEvent> =
-        MutableSharedFlow<NetworkChangeEvent>().asSharedFlow()
-    override fun close() = Unit
-}
-
-@OptIn(ExperimentalTime::class)
-private class InMemoryFetchedAtRepository : FetchedAtRepository {
-    private val map = mutableMapOf<String, Instant>()
-    override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) {
-        map[storeKey] = instant
     }
 }

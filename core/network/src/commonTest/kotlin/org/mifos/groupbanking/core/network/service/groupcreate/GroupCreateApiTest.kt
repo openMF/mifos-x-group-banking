@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.service.groupcreate
 
@@ -66,7 +66,12 @@ class GroupCreateApiTest {
         }
         val client = HttpClient(engine) {
             install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true; coerceInputValues = true })
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        coerceInputValues = true
+                    },
+                )
             }
         }
         return GroupCreateApiImpl(client)

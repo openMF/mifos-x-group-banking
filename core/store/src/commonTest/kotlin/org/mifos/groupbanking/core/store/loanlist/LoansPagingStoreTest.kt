@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.loanlist
 
@@ -238,6 +238,11 @@ private class FakeLoanApi(
         val pageIndex = offset / limit
         return NetworkResult.Success(pages[groupId to pageIndex] ?: LoanPageDto(totalFilteredRecords = 0))
     }
+
+    override suspend fun getClientLoans(clientId: Long): NetworkResult<List<LoanSummaryDto>, NetworkError> {
+        error?.let { return NetworkResult.Error(it) }
+        return NetworkResult.Success(emptyList())
+    }
 }
 
 private class FakeLoanListDao : LoanListDao {
@@ -276,7 +281,9 @@ private class FakeLoanListDao : LoanListDao {
         rows.value = rows.value.filterNot { it.groupId == groupId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replacePage(groupId: String, pageIndex: Int, entities: List<LoanListEntity>) {
         replacePageWasAtomic = true

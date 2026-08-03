@@ -5,28 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.data.repository
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import org.mifos.groupbanking.core.database.groupdashboard.dao.GroupDashboardDao
@@ -52,8 +44,6 @@ import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboard
 import org.mifos.groupbanking.core.store.groupdashboard.impl.provideGroupDashboardStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * TDD coverage for [GroupDashboardRepositoryImpl] — verifies the repository surfaces the composite
@@ -147,7 +137,9 @@ private class FakeGroupDashboardApi(offline: Boolean = false) : GroupDashboardAp
 private class FakeGroupDashboardDao : GroupDashboardDao {
     private val rows = MutableStateFlow<List<GroupDashboardCacheEntity>>(emptyList())
 
-    fun seed(entity: GroupDashboardCacheEntity) { rows.value = listOf(entity) }
+    fun seed(entity: GroupDashboardCacheEntity) {
+        rows.value = listOf(entity)
+    }
 
     override fun observeByKey(groupId: String): Flow<GroupDashboardCacheEntity?> =
         rows.map { list -> list.firstOrNull { it.groupId == groupId } }
@@ -162,7 +154,9 @@ private class FakeGroupDashboardDao : GroupDashboardDao {
         rows.value = rows.value.filterNot { it.groupId == groupId }
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceForKey(entity: GroupDashboardCacheEntity) {
         upsert(entity)
@@ -202,6 +196,7 @@ private fun groupCorpusDto() = GroupCorpusDto(
     openingBalance = 500.0,
     totalContributionsThisCycle = 300.0,
     totalLoansOutstanding = 80.0,
+    isCycleEnd = false,
     lastUpdated = "2026-07-18T12:00:00Z",
     rotationPosition = null,
     nextRecipientName = null,
@@ -251,6 +246,7 @@ private fun cacheEntity(groupId: String, name: String): GroupDashboardCacheEntit
             openingBalance = 500.0,
             totalContributionsThisCycle = 300.0,
             totalLoansOutstanding = 80.0,
+            isCycleEnd = false,
             lastUpdated = "2026-07-18T12:00:00Z",
             rotationPosition = null,
             nextRecipientName = null,

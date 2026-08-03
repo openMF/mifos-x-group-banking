@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.feature.loandetail
 
@@ -19,13 +19,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 import kpt.core.analytics.KptAnalyticsTracker
 import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.observability.ConsoleCrashReporter
@@ -44,6 +37,13 @@ import org.mifos.groupbanking.core.model.LoanDetailTab
 import org.mifos.groupbanking.core.model.RepaymentRowStatus
 import org.mifos.groupbanking.core.model.RepaymentScheduleRow
 import org.mifos.groupbanking.core.model.RepaymentTransaction
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * See API.md#viewmodel — `LoanDetailViewModelTest` exercises the [ScreenState] ->
@@ -68,6 +68,9 @@ class LoanDetailViewModelTest {
             crashReporter = ConsoleCrashReporter(),
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
             loanId = loanId,
+            // MEMBER is in none of the capability role-sets (RECORD_REPAYMENT_ROLES etc.), so
+            // canRecordRepayment / canMarkDefaulted stay false — matching these tests' assertions.
+            viewerRole = "MEMBER",
         )
     }
 

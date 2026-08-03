@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.mapper
 
@@ -24,11 +24,11 @@ import org.mifos.groupbanking.core.network.model.CenterDetailDto
 import org.mifos.groupbanking.core.network.model.CorpusRecordDto
 import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
-import org.mifos.groupbanking.core.network.model.MeetingActiveLoanDto
 import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
 import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
 import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
+import org.mifos.groupbanking.core.network.model.MeetingActiveLoanDto
 import org.mifos.groupbanking.core.network.model.MeetingDisbursalPayloadDto
 import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
 import org.mifos.groupbanking.core.network.model.MeetingRepaymentPayloadDto

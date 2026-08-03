@@ -48,10 +48,11 @@ class AppDatabaseTest {
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 10 in the v9→v10 migration that added `sync_queue`.
-        // Update this constant when bumping AppDatabase.VERSION so the guardrail
-        // stays meaningful.
-        assertEquals(10, AppDatabase.VERSION)
+        // Bumped to 16 in the v15→v16 migration that added the
+        // clientId / groupLinkedSavingsId / individualSavingsId columns to
+        // `member_dashboard_cache`. Update this constant when bumping
+        // AppDatabase.VERSION so the guardrail stays meaningful.
+        assertEquals(16, AppDatabase.VERSION)
     }
 
     @Test

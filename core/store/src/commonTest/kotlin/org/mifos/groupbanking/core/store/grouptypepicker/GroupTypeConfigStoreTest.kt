@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.store.grouptypepicker
 
@@ -17,6 +17,7 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.database.grouptypepicker.dao.GroupTypeConfigDao
 import org.mifos.groupbanking.core.database.grouptypepicker.entity.GroupTypeConfigEntity
+import org.mifos.groupbanking.core.model.GroupTypeConfig
 import org.mifos.groupbanking.core.network.model.ContributionModeDto
 import org.mifos.groupbanking.core.network.model.GroupTypeConfigDto
 import org.mifos.groupbanking.core.network.model.GroupTypeSlugDto
@@ -28,7 +29,6 @@ import org.mifos.groupbanking.core.store.grouptypepicker.impl.provideGroupTypeCo
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
-import org.mifos.groupbanking.core.model.GroupTypeConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -128,7 +128,9 @@ private class FakeGroupTypeConfigApi(
 private class FakeGroupTypeConfigDao : GroupTypeConfigDao {
     private val rows = MutableStateFlow<List<GroupTypeConfigEntity>>(emptyList())
 
-    fun seed(entities: List<GroupTypeConfigEntity>) { rows.value = entities }
+    fun seed(entities: List<GroupTypeConfigEntity>) {
+        rows.value = entities
+    }
     fun currentRows(): List<GroupTypeConfigEntity> = rows.value
 
     override fun observeAll(): Flow<List<GroupTypeConfigEntity>> = rows
@@ -139,7 +141,9 @@ private class FakeGroupTypeConfigDao : GroupTypeConfigDao {
         rows.value = byKey.values.toList()
     }
 
-    override suspend fun deleteAll() { rows.value = emptyList() }
+    override suspend fun deleteAll() {
+        rows.value = emptyList()
+    }
 
     override suspend fun replaceAll(entities: List<GroupTypeConfigEntity>) {
         deleteAll()
