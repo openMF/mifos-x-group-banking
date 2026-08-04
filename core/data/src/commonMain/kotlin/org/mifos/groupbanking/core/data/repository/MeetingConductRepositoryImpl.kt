@@ -24,6 +24,7 @@ import org.mifos.groupbanking.core.network.mapper.toDomainModel
 import org.mifos.groupbanking.core.network.mapper.toDto
 import org.mifos.groupbanking.core.network.mapper.toGroupMembers
 import org.mifos.groupbanking.core.network.mapper.toJsonPayload
+import org.mifos.groupbanking.core.network.mapper.toLoanApplications
 import org.mifos.groupbanking.core.network.mapper.toLoanSummaries
 import org.mifos.groupbanking.core.network.mapper.toRecordDto
 import org.mifos.groupbanking.core.network.service.meetingconduct.MeetingConductApi
@@ -56,11 +57,13 @@ class MeetingConductRepositoryImpl(
         val membersDeferred = async { api.getGroupMembers(centerId) }
         val corpusDeferred = async { api.getGroupCorpus(centerId) }
         val loansDeferred = async { api.getActiveLoans(groupId) }
+        val pendingAppsDeferred = async { api.getPendingLoanApplications(groupId) }
 
         val previousResult = previousDeferred.await()
         val membersResult = membersDeferred.await()
         val corpusResult = corpusDeferred.await()
         val loansResult = loansDeferred.await()
+        val pendingAppsResult = pendingAppsDeferred.await()
 
         // Members are the only hard-required read — a members failure blocks the wizard
         // (api.yaml#get_group_members: 404 → members required).
@@ -75,6 +78,9 @@ class MeetingConductRepositoryImpl(
         val members = (membersResult as NetworkResult.Success).data.toGroupMembers()
         val corpus = (corpusResult as? NetworkResult.Success)?.data
         val activeLoans = (loansResult as? NetworkResult.Success)?.data?.toLoanSummaries().orEmpty()
+        // Tolerant read (companion GET /companion/groups/{groupId}/loan-requests) — a failure/404
+        // degrades to no pending applications rather than blocking the wizard.
+        val pendingApplications = (pendingAppsResult as? NetworkResult.Success)?.data?.toLoanApplications().orEmpty()
 
         val data = MeetingConductData(
             previousMeetingSummary = previousSummary,
@@ -82,13 +88,13 @@ class MeetingConductRepositoryImpl(
             openingCorpus = corpus?.corpusBalance ?: 0L,
             cashOnHand = corpus?.cashOnHand ?: 0L,
             activeLoans = activeLoans,
-            // pendingLoanApplications gap (CFF1) — no api.yaml endpoint loads it; see interface KDoc.
-            pendingLoanApplications = emptyList(),
+            // CFF1 gap closed — loaded from the companion group loan-requests facade.
+            pendingLoanApplications = pendingApplications,
         )
         Logger.i(TAG) {
             "loadMeetingData: succeeded centerId=$centerId members=${members.size} " +
                 "openingCorpus=${data.openingCorpus} activeLoans=${activeLoans.size} " +
-                "hasPrevious=${previousSummary != null}"
+                "pendingApplications=${pendingApplications.size} hasPrevious=${previousSummary != null}"
         }
         NetworkResult.Success(data)
     }

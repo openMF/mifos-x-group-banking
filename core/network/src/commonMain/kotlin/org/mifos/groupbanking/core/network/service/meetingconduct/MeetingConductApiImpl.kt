@@ -35,6 +35,7 @@ import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
 import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
 import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
+import org.mifos.groupbanking.core.network.model.MeetingLoanApplicationDto
 import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
 import org.mifos.groupbanking.core.network.model.SavingsTransactionRequestDto
 import org.mifos.groupbanking.core.network.model.UpdateCorpusRequestDto
@@ -47,6 +48,8 @@ private const val LOAN_VOTE_DATATABLE = "/datatables/dt_loan_vote"
 private const val CENTERS_PATH = "/centers"
 private const val LOANS_PATH = "/loans"
 private const val SAVINGS_ACCOUNTS_PATH = "/savingsaccounts"
+private const val GROUP_LOAN_REQUESTS_PATH = "/companion/groups"
+private const val LOAN_APPLICATIONS_PATH = "/companion/loan-applications"
 
 /**
  * Plain-Ktor implementation of [MeetingConductApi]. This class is the ONLY layer in the
@@ -91,6 +94,14 @@ class MeetingConductApiImpl(
                 parameter("loanStatus", "active")
             }
         }
+    }
+
+    override suspend fun getPendingLoanApplications(
+        groupId: Int,
+    ): NetworkResult<List<MeetingLoanApplicationDto>, NetworkError> {
+        val path = "$GROUP_LOAN_REQUESTS_PATH/$groupId/loan-requests"
+        Logger.d(TAG) { "getPendingLoanApplications: GET $path" }
+        return requestAsNetworkResult(op = "getPendingLoanApplications") { httpClient.get(path) }
     }
 
     override suspend fun getLoanVotes(loanId: String): NetworkResult<LoanVoteRecordDto, NetworkError> {
@@ -157,11 +168,13 @@ class MeetingConductApiImpl(
         loanId: String,
         request: LoanDisbursalRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
-        val path = "$LOANS_PATH/$loanId/transactions"
-        Logger.d(TAG) { "postLoanDisbursal: POST $path?command=disburse loanId=$loanId" }
+        // loanId is the application id (== borrower clientId). The companion materialises the approved
+        // request into a live Fineract loan (create → approve → disburse); this is NOT a raw
+        // /loans/{id}/transactions disburse (an application has no Fineract loan yet).
+        val path = "$LOAN_APPLICATIONS_PATH/$loanId/disburse"
+        Logger.d(TAG) { "postLoanDisbursal: POST $path (approve+materialise application clientId=$loanId)" }
         return requestAsNetworkResult(op = "postLoanDisbursal") {
             httpClient.post(path) {
-                parameter("command", "disburse")
                 contentType(ContentType.Application.Json)
                 setBody(request)
             }

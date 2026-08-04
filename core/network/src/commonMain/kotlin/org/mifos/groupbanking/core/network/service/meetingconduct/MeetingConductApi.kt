@@ -20,6 +20,7 @@ import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
 import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
 import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
+import org.mifos.groupbanking.core.network.model.MeetingLoanApplicationDto
 import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
 import org.mifos.groupbanking.core.network.model.SavingsTransactionRequestDto
 import org.mifos.groupbanking.core.network.model.UpdateCorpusRequestDto
@@ -49,6 +50,13 @@ interface MeetingConductApi {
     /** `GET /datatables/dt_loan_vote/{loanId}` (`get_loan_votes`). 404 → no votes yet. */
     suspend fun getLoanVotes(loanId: String): NetworkResult<LoanVoteRecordDto, NetworkError>
 
+    /**
+     * `GET /companion/groups/{groupId}/loan-requests` (`get_pending_loan_applications`). The group's
+     * PENDING loan requests for the meeting-conduct review step (step 5). 404/empty → no applications.
+     * Closes the CFF1 gap: this list was previously hard-coded empty in the repository.
+     */
+    suspend fun getPendingLoanApplications(groupId: Int): NetworkResult<List<MeetingLoanApplicationDto>, NetworkError>
+
     /** `POST /datatables/dt_meeting_record` (`post_meeting_record`, priority 1). */
     suspend fun postMeetingRecord(request: CreateMeetingRecordRequestDto): NetworkResult<DataTableEntryResponseDto, NetworkError>
 
@@ -67,7 +75,13 @@ interface MeetingConductApi {
         request: LoanRepaymentRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError>
 
-    /** `POST /loans/{loanId}/transactions?command=disburse` (`post_loan_disbursal`, priority 5). */
+    /**
+     * `POST /companion/loan-applications/{clientId}/disburse` (`post_loan_disbursal`, priority 5).
+     * [loanId] is the application id (== the borrower's clientId from [getPendingLoanApplications]).
+     * The companion materialises the approved request into a live Fineract loan (create → approve →
+     * disburse), so this is NOT a raw Fineract loan-transaction disburse (an application has no
+     * Fineract loan yet). See `HandleDisburseLoanApplication`.
+     */
     suspend fun postLoanDisbursal(
         loanId: String,
         request: LoanDisbursalRequestDto,

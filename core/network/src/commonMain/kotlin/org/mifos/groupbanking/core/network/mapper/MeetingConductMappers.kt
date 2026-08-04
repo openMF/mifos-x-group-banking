@@ -14,6 +14,7 @@ import org.mifos.groupbanking.core.model.meeting.AttendanceSubmission
 import org.mifos.groupbanking.core.model.meeting.CorpusRecord
 import org.mifos.groupbanking.core.model.meeting.DisbursalSubmission
 import org.mifos.groupbanking.core.model.meeting.GroupMember
+import org.mifos.groupbanking.core.model.meeting.LoanApplication
 import org.mifos.groupbanking.core.model.meeting.LoanSummary
 import org.mifos.groupbanking.core.model.meeting.LoanVoteRecord
 import org.mifos.groupbanking.core.model.meeting.MeetingSubmissionRequest
@@ -29,6 +30,7 @@ import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
 import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
 import org.mifos.groupbanking.core.network.model.MeetingActiveLoanDto
+import org.mifos.groupbanking.core.network.model.MeetingLoanApplicationDto
 import org.mifos.groupbanking.core.network.model.MeetingDisbursalPayloadDto
 import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
 import org.mifos.groupbanking.core.network.model.MeetingRepaymentPayloadDto
@@ -132,7 +134,24 @@ fun RepaymentSubmission.toDto(date: String): LoanRepaymentRequestDto = LoanRepay
 
 fun DisbursalSubmission.toDisbursalDto(date: String): LoanDisbursalRequestDto = LoanDisbursalRequestDto(
     actualDisbursementDate = date,
+    amount = amount,
 )
+
+/**
+ * `GET /companion/groups/{groupId}/loan-requests` row -> domain [LoanApplication] for the
+ * meeting-conduct review step. [MeetingLoanApplicationDto.id] carries the borrower's clientId so the
+ * approve→disburse action (`postLoanDisbursal`) resolves the client from the application id.
+ */
+fun MeetingLoanApplicationDto.toDomainModel(): LoanApplication = LoanApplication(
+    id = id,
+    memberId = memberId,
+    memberName = memberName,
+    requestedAmount = requestedAmount,
+    purpose = purpose,
+)
+
+/** Batch converter for the pending loan-application list. */
+fun List<MeetingLoanApplicationDto>.toLoanApplications(): List<LoanApplication> = map { it.toDomainModel() }
 
 fun MeetingSubmissionRequest.toCorpusUpdateDto(): UpdateCorpusRequestDto = UpdateCorpusRequestDto(
     corpusBalance = closingCorpus,
