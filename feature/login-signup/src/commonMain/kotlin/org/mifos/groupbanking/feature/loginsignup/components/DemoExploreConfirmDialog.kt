@@ -155,7 +155,7 @@ fun DemoExploreConfirmDialog(
 
 /**
  * Amber "pooled-coin" mark for the demo dialog — concentric `secondaryContainer` + `secondary`
- * circles with a white check glyph centred, echoing the shared-purse pool of [MifosSaveBrandMark].
+ * circles with a white check glyph centred, echoing the shared-savings pool of [MifosSaveBrandMark].
  */
 @Composable
 private fun DemoPooledCoinIcon(modifier: Modifier = Modifier) {

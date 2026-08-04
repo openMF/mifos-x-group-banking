@@ -30,7 +30,7 @@ private const val MEMBER_COUNT = 6
 
 /**
  * The MifosSave brand mark — a ring of [MEMBER_COUNT] small `colorScheme.primary` circles (the
- * members) arranged evenly around a filled `colorScheme.secondary` centre circle (the shared-purse
+ * members) arranged evenly around a filled `colorScheme.secondary` centre circle (the shared-savings
  * pool). Drawn as a pure Compose [Canvas] so it inherits the live theme colours (the theme is being
  * re-coloured to MifosSave green + amber in parallel — no hardcoded hex here). Decorative
  * container-level [contentDescription] is set for a11y; the individual circles carry none.
@@ -52,7 +52,7 @@ fun MifosSaveBrandMark(modifier: Modifier = Modifier, markSize: Dp = 56.dp) {
         val memberRadius = radius * 0.13f
         val ringRadius = radius * 0.72f
 
-        // Shared-purse pool (amber centre).
+        // Shared-savings pool (amber centre).
         drawCircle(color = poolColor, radius = poolRadius, center = centre)
 
         // Members evenly spaced around the ring, starting at the top (−90°).

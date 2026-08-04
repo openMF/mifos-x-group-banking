@@ -9,7 +9,7 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
-    <string name="app_name">KPT Design</string>
+    <string name="app_name">MifosSave</string>
     <string name="home">Startseite</string>
     <string name="profile">Profil</string>
     <string name="settings">Einstellungen</string>

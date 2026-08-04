@@ -27,8 +27,8 @@ import kpt.core.designsystem.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.Res
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_tagline
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_wordmark_common
-import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_wordmark_purse
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_wordmark_mifos
+import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_wordmark_save
 
 /**
  * MifosSave brand lockup shown above the login/signup card — the [MifosSaveBrandMark] ring
@@ -44,7 +44,7 @@ fun AuthBrandHeader(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(sp.md))
         Row {
             Text(
-                text = stringResource(Res.string.screens_login_signup_wordmark_common),
+                text = stringResource(Res.string.screens_login_signup_wordmark_mifos),
                 // Serif wordmark is a deliberate brand contrast against the app's Outfit sans body
                 // font; size comes from the design-system type scale, family stays serif.
                 style = MaterialTheme.typography.titleLarge.copy(
@@ -54,7 +54,7 @@ fun AuthBrandHeader(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = stringResource(Res.string.screens_login_signup_wordmark_purse),
+                text = stringResource(Res.string.screens_login_signup_wordmark_save),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.SemiBold,
