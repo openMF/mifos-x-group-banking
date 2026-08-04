@@ -53,16 +53,15 @@ private const val CONFIRMATION_PHRASE = "SHARE OUT"
 internal val ROTATION_FORMULAS = setOf("FIXED_ORDER", "LOTTERY", "AUCTION")
 
 /**
- * **KNOWN GAP — the preview→execute handoff carries only `{groupId, typeConfig, totalPool,
- * memberPayouts}`** (`ShareOutPreviewEvent.NavigateToShareOutExecute`). `api.yaml#body` for
- * COMP-DIST-001 additionally requires `cycleNumber` + `shareoutFormula`, and COMP-DIST-002 requires
- * the rotation `recipientMemberId` — none of which `ui.yaml#nav_params` name. [DEFAULT_CYCLE_NUMBER]
- * is the sentinel sent for `cycleNumber` until the preview's `NavigateToShareOutExecute` event (which
- * DOES hold `cycleNumber` in `ShareOutPreviewState`) is enriched to forward it. A real companion
- * backend echoes/validates it server-side; the value is audit-only, never a client branch. Flagged
- * for the cross-feature repair station (RULE-IMPLEMENT-CROSS-FEATURE-FIT-001 CFF1) — same
- * documented-gap class as `MemberAddViewModel`'s `UNRESOLVED_OFFICE_ID` / `GroupCreateViewModel`'s
- * `shareoutFormula` default.
+ * `cycleNumber` CFF1 gap CLOSED: the real cycle number is now threaded end-to-end —
+ * `ShareOutPreviewState.cycleNumber` → `ShareOutPreviewEvent.NavigateToShareOutExecute.cycleNumber`
+ * → the preview screen's `onNavigateToShareOutExecute` callback → `GroupBankingNavHost`'s
+ * `navigateToShareOutExecute(cycleNumber = …)` → `ShareOutExecuteRoute.cycleNumber` → this VM's
+ * `cycleNumber` constructor param (`parametersOf`). [DEFAULT_CYCLE_NUMBER] is now only the
+ * constructor/state DEFAULT (e.g. a deep-link that skips the preview), NOT a sentinel on the
+ * preview→execute path. The value is audit-only (echoed/validated server-side, never a client
+ * branch). Remaining CFF1 item: the ROTATING_PAYOUT `recipientMemberId`/`memberPayouts` handoff
+ * (the ACCUMULATING path — the demo/device-verify surface — is fully wired).
  */
 private const val DEFAULT_CYCLE_NUMBER = 0
 
