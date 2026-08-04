@@ -12,10 +12,10 @@
     <string name="screens_login_signup_title">Welcome to MifosX</string>
     <string name="screens_login_signup_logo_cd">Mifos X logo</string>
 
-    <!-- CommonPurse brand lockup (auth header). -->
-    <string name="screens_login_signup_brand_mark_cd">CommonPurse logo — a ring of members around a shared purse</string>
-    <string name="screens_login_signup_wordmark_common">Common</string>
-    <string name="screens_login_signup_wordmark_purse">Purse</string>
+    <!-- MifosSave brand lockup (auth header). -->
+    <string name="screens_login_signup_brand_mark_cd">MifosSave logo — a ring of members around a shared purse</string>
+    <string name="screens_login_signup_wordmark_common">Mifos</string>
+    <string name="screens_login_signup_wordmark_purse">Save</string>
     <string name="screens_login_signup_tagline">Save together · Lend together · Grow together</string>
 
     <!-- Mode-specific headline + subtitle above the auth card. -->
@@ -100,7 +100,7 @@
     <string name="screens_login_signup_forgot_password_snackbar">To reset your password, use the web portal or contact your group organizer.</string>
 
     <string name="screens_login_signup_divider_alt_actions">New here?</string>
-    <string name="screens_login_signup_divider_new_login">New to CommonPurse?</string>
+    <string name="screens_login_signup_divider_new_login">New to MifosSave?</string>
     <string name="screens_login_signup_divider_new_signup">Already invited?</string>
 
     <string name="screens_login_signup_action_accept_invitation">Accept an Invitation</string>

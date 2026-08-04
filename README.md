@@ -2,10 +2,10 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/branding/logo_dark.svg">
-  <img src="docs/assets/branding/logo.svg" alt="CommonPurse — five members in a ring around a shared fund" width="150" />
+  <img src="docs/assets/branding/logo.svg" alt="MifosSave — five members in a ring around a shared fund" width="150" />
 </picture>
 
-<h1>CommonPurse</h1>
+<h1>MifosSave</h1>
 
 <p>Offline-first community banking for VSLA / ROSCA / SHG groups — built on Mifos Fineract.</p>
 
@@ -23,7 +23,7 @@
 
 </div>
 
-> **CommonPurse** digitizes the full lifecycle of self-funded community banking groups — meetings, savings, lending, and share-out — with offline-first KMP and a Mifos Fineract backend.
+> **MifosSave** digitizes the full lifecycle of self-funded community banking groups — meetings, savings, lending, and share-out — with offline-first KMP and a Mifos Fineract backend.
 
 ---
 
@@ -44,7 +44,7 @@ Existing digital solutions are either **online-only**, lack **Fineract integrati
 
 A Kotlin Multiplatform mobile app that digitises every step of the community banking lifecycle — from group creation and member onboarding, through meeting-driven savings collection and loan disbursement, to periodic share-out — all working **offline-first** with automatic sync to Mifos Fineract when connectivity returns.
 
-### Why CommonPurse
+### Why MifosSave
 
 | | |
 |---|---|
@@ -58,7 +58,7 @@ A Kotlin Multiplatform mobile app that digitises every step of the community ban
 
 ## 👥 Who It's For
 
-CommonPurse ships as **two client surfaces** in a single codebase:
+MifosSave ships as **two client surfaces** in a single codebase:
 
 ### 🛠 Admin Client (staff auth)
 
@@ -192,7 +192,7 @@ open cmp-ios/iosApp/iosApp.xcodeproj
 
 ### Backend Configuration
 
-CommonPurse talks to **Mifos Fineract**. The default sandbox is configured for development:
+MifosSave talks to **Mifos Fineract**. The default sandbox is configured for development:
 
 ```
 Base URL: https://sandbox.mifos.community/fineract-provider/api/v1
@@ -233,7 +233,7 @@ See:
 
 | Element | Value |
 |---------|-------|
-| Display name | **CommonPurse** |
+| Display name | **MifosSave** |
 | Primary | `#2E7D32` — Forest Green (growth, trust; WCAG AAA on white) |
 | Accent | `#FF8F00` — Amber |
 | Typography | Noto Sans (large scale for low-literacy users) |
@@ -244,7 +244,7 @@ See:
 
 ## 🧭 Repository Layout
 
-This repo holds the **source code** for CommonPurse. It was scaffolded from [openMF/kmp-project-template](https://github.com/openMF/kmp-project-template) and customised for the group-banking domain (`org.mifos.groupbanking`).
+This repo holds the **source code** for MifosSave. It was scaffolded from [openMF/kmp-project-template](https://github.com/openMF/kmp-project-template) and customised for the group-banking domain (`org.mifos.groupbanking`).
 
 The full product cycle (idea, server contract, design tokens, feature plan, implementation pipeline) lives in the parent **claude-product-cycle** workspace under `workspaces/mifos-x/mifos-x-group-banking/`.
 

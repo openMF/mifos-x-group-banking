@@ -12,7 +12,7 @@ package kpt.core.designsystem.theme
 import androidx.compose.ui.graphics.Color
 
 // ── Light scheme ─────────────────────────────────────────────────────────────
-// Primary — CommonPurse Green (VSLA trust/growth, the shared purse).
+// Primary — MifosSave Green (VSLA trust/growth, the shared purse).
 val primaryLight = Color(0xFF1C6B44)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFE4F0E7)

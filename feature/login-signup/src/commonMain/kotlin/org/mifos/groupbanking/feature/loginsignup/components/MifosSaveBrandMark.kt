@@ -29,14 +29,14 @@ import kotlin.math.sin
 private const val MEMBER_COUNT = 6
 
 /**
- * The CommonPurse brand mark — a ring of [MEMBER_COUNT] small `colorScheme.primary` circles (the
+ * The MifosSave brand mark — a ring of [MEMBER_COUNT] small `colorScheme.primary` circles (the
  * members) arranged evenly around a filled `colorScheme.secondary` centre circle (the shared-purse
  * pool). Drawn as a pure Compose [Canvas] so it inherits the live theme colours (the theme is being
- * re-coloured to CommonPurse green + amber in parallel — no hardcoded hex here). Decorative
+ * re-coloured to MifosSave green + amber in parallel — no hardcoded hex here). Decorative
  * container-level [contentDescription] is set for a11y; the individual circles carry none.
  */
 @Composable
-fun CommonPurseBrandMark(modifier: Modifier = Modifier, markSize: Dp = 56.dp) {
+fun MifosSaveBrandMark(modifier: Modifier = Modifier, markSize: Dp = 56.dp) {
     val memberColor = MaterialTheme.colorScheme.primary
     val poolColor = MaterialTheme.colorScheme.secondary
     val cd = stringResource(Res.string.screens_login_signup_brand_mark_cd)

@@ -31,8 +31,8 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_wordmark_purse
 
 /**
- * CommonPurse brand lockup shown above the login/signup card — the [CommonPurseBrandMark] ring
- * mark, the two-tone serif "CommonPurse" wordmark ("Common" in onSurface, "Purse" in primary), and
+ * MifosSave brand lockup shown above the login/signup card — the [MifosSaveBrandMark] ring
+ * mark, the two-tone serif "MifosSave" wordmark ("Mifos" in onSurface, "Save" in primary), and
  * the tagline. Colours resolve from [MaterialTheme.colorScheme] so the mark + wordmark pick up the
  * brand recolour automatically. Mirrors `ui.yaml#components.auth_header_logo`. See API.md#screen.
  */
@@ -40,7 +40,7 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
 fun AuthBrandHeader(modifier: Modifier = Modifier) {
     val sp = MaterialTheme.spacing
     Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        CommonPurseBrandMark(markSize = 56.dp)
+        MifosSaveBrandMark(markSize = 56.dp)
         Spacer(Modifier.height(sp.md))
         Row {
             Text(

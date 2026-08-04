@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  CommonPurse — light-theme logo.
+  MifosSave — light-theme logo.
   Concept: a community circle of 5 members ringing a shared pool (the corpus).
   Primary green = brand anchor. Amber dot = the shared fund.
   ViewBox 200×200, no padding; safe to crop / use as adaptive-icon foreground.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
-  <title id="title">CommonPurse</title>
+  <title id="title">MifosSave</title>
   <desc id="desc">Five members in a ring around a shared fund — the group savings pool.</desc>
 
   <!-- outer ring: the community boundary -->

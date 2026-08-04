@@ -60,7 +60,7 @@ import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_lo
  * dialog, it never seeds directly. Cancel dispatches `OnDemoCancel`; Continue dispatches
  * `OnDemoConfirm`, which flips `isSeedingDemo` — while seeding the dialog stays up with a spinner
  * on the confirm button and both actions disabled (no accidental re-tap / dismiss mid-seed).
- * Styled to the CommonPurse look: an amber pooled-coin mark, serif title, and an amber Continue
+ * Styled to the MifosSave look: an amber pooled-coin mark, serif title, and an amber Continue
  * CTA. The highlighted note card carries the verbatim, legally-worded demo-login line. See
  * API.md#screen.
  */
@@ -155,7 +155,7 @@ fun DemoExploreConfirmDialog(
 
 /**
  * Amber "pooled-coin" mark for the demo dialog — concentric `secondaryContainer` + `secondary`
- * circles with a white check glyph centred, echoing the shared-purse pool of [CommonPurseBrandMark].
+ * circles with a white check glyph centred, echoing the shared-purse pool of [MifosSaveBrandMark].
  */
 @Composable
 private fun DemoPooledCoinIcon(modifier: Modifier = Modifier) {
