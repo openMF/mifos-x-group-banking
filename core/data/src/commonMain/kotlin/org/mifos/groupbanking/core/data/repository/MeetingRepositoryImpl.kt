@@ -53,7 +53,12 @@ class MeetingRepositoryImpl(
             fetchedAtRepository = fetchedAtRepository,
             cacheKey = "$CACHE_KEY_PREFIX$centerId",
             scope = scope,
-            isEmpty = { it.isEmpty() },
+            // A fetched meetings list is "present" even when empty — `isEmpty = { false }` so an
+            // empty result maps to Content, then the ViewModel's `.emptyIfContent { it.isEmpty() }`
+            // maps that empty Content to ScreenState.Empty. Using `isEmpty = { it.isEmpty() }` here
+            // was wrong: DecisionEngine's no-data branch maps (empty + online + no-error) to Loading,
+            // never Empty, so a group with zero scheduled meetings loaded forever.
+            isEmpty = { false },
             fetchPolicy = fetchPolicy,
             ttl = AppStoreRegistry.Ttl.MEETING_CALENDAR,
         )

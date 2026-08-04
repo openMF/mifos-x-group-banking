@@ -21,6 +21,7 @@ import kpt.core.base.observability.CrashSeverity
 import kpt.core.base.security.SessionManager
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.emptyIfContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import org.mifos.groupbanking.core.data.repository.MeetingRepository
 import org.mifos.groupbanking.core.model.MeetingFrequency
@@ -258,9 +259,13 @@ internal class MeetingCalendarViewModel(
         )
         analytics.trackSync(syncType = "view_meetings")
         viewModelScope.launch {
-            meetingsStream.state.collect { screenState ->
-                trySendAction(MeetingCalendarAction.Internal.StreamUpdated(screenState))
-            }
+            // emptyIfContent maps an empty-list Content to ScreenState.Empty (the "no meetings
+            // scheduled" state). Without it, an empty meetings list can never reach the Empty state.
+            meetingsStream.state
+                .emptyIfContent { it.isEmpty() }
+                .collect { screenState ->
+                    trySendAction(MeetingCalendarAction.Internal.StreamUpdated(screenState))
+                }
         }
     }
 
