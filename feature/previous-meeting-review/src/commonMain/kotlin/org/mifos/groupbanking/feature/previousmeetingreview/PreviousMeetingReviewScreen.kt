@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -77,6 +79,8 @@ import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_not_found
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_server
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_state_title
+import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_body
+import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_title
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_fines_label
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_kes_amount_format
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_loan_disbursed_chip_format
@@ -199,6 +203,14 @@ internal fun PreviousMeetingReviewContentSection(
     val detail = state.meetingDetail ?: return
     val sp = MaterialTheme.spacing
 
+    // A blank actualDate is the "not conducted yet" snapshot (the record read 404'd — this
+    // scheduled/past slot has no dt_meeting_record). Show a clear explanatory state instead of the
+    // zero-metric cards, which would read as a broken empty review.
+    if (detail.actualDate.isBlank()) {
+        NotConductedSection()
+        return
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize().testTag(PreviousMeetingReviewTestTags.CONTENT_LIST),
         verticalArrangement = Arrangement.spacedBy(sp.md),
@@ -216,6 +228,38 @@ internal fun PreviousMeetingReviewContentSection(
             item { StartMeetingCta(nextMeetingNumber = state.nextMeetingNumber ?: (state.meetingNumber + 1), onAction = onAction) }
         }
         item { Box(modifier = Modifier.height(sp.xl)) }
+    }
+}
+
+/**
+ * Shown when the reviewed meeting has no record (a never-conducted scheduled/past slot — the record
+ * read 404'd, surfaced by the store as the blank-date [emptyNotConductedSummary]). A friendly
+ * explanatory state, NOT the zero-metric cards (which would read as a broken empty review) and NOT
+ * the hard error screen (a missing record is not a failure).
+ */
+@Composable
+private fun NotConductedSection(modifier: Modifier = Modifier) {
+    val sp = MaterialTheme.spacing
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(sp.xl)
+            .testTag(PreviousMeetingReviewTestTags.NOT_CONDUCTED_SECTION),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.screens_previous_meeting_review_not_conducted_title),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(sp.sm))
+        Text(
+            text = stringResource(Res.string.screens_previous_meeting_review_not_conducted_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

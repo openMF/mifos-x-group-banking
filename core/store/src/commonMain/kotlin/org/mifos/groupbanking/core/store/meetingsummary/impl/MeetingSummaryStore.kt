@@ -71,7 +71,18 @@ fun provideMeetingSummaryStore(
             val (centerId, meetingNumber) = key.decodeMeetingKey()
             when (val result = api.getMeetingRecord(centerId = centerId, meetingNumber = meetingNumber)) {
                 is NetworkResult.Success -> result.data.toDomainModel()
-                is NetworkResult.Error -> throw MeetingRecordFetchException(result.error)
+                // 404 = this meeting has NO record because it was never conducted (a scheduled/past
+                // slot with no dt_meeting_record — e.g. a synthesized VSLA calendar date). Surface an
+                // empty "not-conducted" snapshot as Content rather than throwing to Store5's error
+                // channel, so the review screen shows a zero-activity meeting instead of a misleading
+                // "Server error" (same tolerant-read pattern as MeetingConductRepositoryImpl's
+                // getPreviousMeetingRecord 404 → null). Every OTHER error still throws.
+                is NetworkResult.Error ->
+                    if (result.error == NetworkError.NOT_FOUND) {
+                        emptyNotConductedSummary(centerId, meetingNumber)
+                    } else {
+                        throw MeetingRecordFetchException(result.error)
+                    }
             }
         },
         sourceOfTruth = SourceOfTruth.of(
@@ -111,6 +122,32 @@ private fun String.decodeMeetingKey(): Pair<Int, Int> {
 class MeetingRecordFetchException(
     val networkError: NetworkError,
 ) : Exception("Meeting record fetch failed: $networkError")
+
+/**
+ * The zero-activity [MeetingSummaryData] returned for a meeting with no `dt_meeting_record` (a
+ * scheduled/past slot that was never conducted — a 404 from the record read). [actualDate] is blank
+ * (the signal a consumer can branch on to render a "not conducted yet" note); every total is 0 and
+ * both breakdown lists are empty. Carries the [meetingNumber] so the review header still reads
+ * "Meeting #N". [meetingId] uses the `"{centerId}-{meetingNumber}"` calendar-key shape.
+ */
+internal fun emptyNotConductedSummary(centerId: Int, meetingNumber: Int): MeetingSummaryData =
+    MeetingSummaryData(
+        meetingId = "$centerId-$meetingNumber",
+        meetingNumber = meetingNumber,
+        actualDate = "",
+        attendanceCount = 0,
+        totalMemberCount = 0,
+        groupSavingsCollected = 0L,
+        individualSavingsCollected = 0L,
+        totalSavingsCollected = 0L,
+        loansDisbursed = 0L,
+        loansRepaid = 0L,
+        finesCollected = 0L,
+        openingCorpus = 0L,
+        closingCorpus = 0L,
+        savingsBreakdown = emptyList<SavingsBreakdownItem>(),
+        loanItems = emptyList<LoanSummaryItem>(),
+    )
 
 // ---------------------------------------------------------------------------
 // Inline entity <-> domain mapping — private to this store (LoanDetailStore precedent). core/store

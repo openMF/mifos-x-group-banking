@@ -58,6 +58,9 @@ object PreviousMeetingReviewTestTags {
     /** Full-screen error surface — `PreviousMeetingReviewScreenState.Error`. */
     const val ERROR_SECTION: String = "previous_meeting_review_error_section"
 
+    /** "Not conducted yet" surface — Content whose record is the blank-date not-conducted snapshot. */
+    const val NOT_CONDUCTED_SECTION: String = "previous_meeting_review_not_conducted_section"
+
     /** Retry CTA on the error state — [PreviousMeetingReviewAction.Retry]. */
     const val ERROR_RETRY_BUTTON: String = "previous_meeting_review_error_retry_button"
 

@@ -49,6 +49,8 @@
     <string name="screens_previous_meeting_review_error_network">No internet. Showing cached data.</string>
     <string name="screens_previous_meeting_review_error_server">Server error. Please try again.</string>
     <string name="screens_previous_meeting_review_error_not_found">Meeting record not found.</string>
+    <string name="screens_previous_meeting_review_not_conducted_title">Not conducted yet</string>
+    <string name="screens_previous_meeting_review_not_conducted_body">This meeting hasn\'t been conducted, so there\'s no record to review. Its savings, loans, and attendance will appear here once the meeting is held.</string>
     <string name="screens_previous_meeting_review_error_auth">Session expired. Please log in again.</string>
     <string name="screens_previous_meeting_review_action_retry">Retry</string>
 </resources>
