@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kpt.core.designsystem.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.Res
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.screens_login_signup_trust_footer
@@ -37,7 +37,7 @@ fun AuthTrustFooter(modifier: Modifier = Modifier) {
     val footerCd = stringResource(Res.string.screens_login_signup_trust_footer_cd)
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -48,7 +48,7 @@ fun AuthTrustFooter(modifier: Modifier = Modifier) {
         )
         Text(
             text = stringResource(Res.string.screens_login_signup_trust_footer),
-            fontSize = 11.sp,
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

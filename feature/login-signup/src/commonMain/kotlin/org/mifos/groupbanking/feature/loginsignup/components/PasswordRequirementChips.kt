@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
+import kpt.core.designsystem.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.groupbanking.feature.loginsignup.LoginSignupTestTags
 import org.mifos.groupbanking.feature.loginsignup.PasswordRequirements
@@ -53,8 +53,8 @@ fun PasswordRequirementChips(
         modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = requirementsCd },
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
     ) {
         PasswordRuleChip(
             label = stringResource(Res.string.screens_login_signup_password_rule_len),
@@ -108,7 +108,7 @@ private fun PasswordRuleChip(
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.sm, vertical = MaterialTheme.spacing.xs),
         )
     }
 }

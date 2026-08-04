@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.KptButton
@@ -243,9 +242,11 @@ internal fun AuthFormSection(
             text = stringResource(
                 if (isSignup) Res.string.screens_login_signup_headline_signup else Res.string.screens_login_signup_headline_login,
             ),
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 23.sp,
+            // Serif headline is a brand element; size from the type scale, family stays serif.
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.SemiBold,
+            ),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
@@ -254,7 +255,7 @@ internal fun AuthFormSection(
             text = stringResource(
                 if (isSignup) Res.string.screens_login_signup_subtitle_signup else Res.string.screens_login_signup_subtitle_login,
             ),
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )

@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kpt.core.designsystem.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.groupbanking.feature.loginsignup.generated.resources.Res
@@ -46,23 +45,27 @@ fun AuthBrandHeader(modifier: Modifier = Modifier) {
         Row {
             Text(
                 text = stringResource(Res.string.screens_login_signup_wordmark_common),
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 21.sp,
+                // Serif wordmark is a deliberate brand contrast against the app's Outfit sans body
+                // font; size comes from the design-system type scale, family stays serif.
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.SemiBold,
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = stringResource(Res.string.screens_login_signup_wordmark_purse),
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 21.sp,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.SemiBold,
+                ),
                 color = MaterialTheme.colorScheme.primary,
             )
         }
         Spacer(Modifier.height(sp.xs))
         Text(
             text = stringResource(Res.string.screens_login_signup_tagline),
-            fontSize = 11.sp,
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )

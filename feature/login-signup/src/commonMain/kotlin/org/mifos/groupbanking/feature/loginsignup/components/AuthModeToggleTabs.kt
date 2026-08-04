@@ -66,7 +66,7 @@ fun AuthModeToggleTabs(
             .fillMaxWidth()
             .semantics { contentDescription = modeToggleDescription },
     ) {
-        Row(modifier = Modifier.padding(4.dp)) {
+        Row(modifier = Modifier.padding(MaterialTheme.spacing.xs)) {
             AuthModeSegment(
                 label = loginLabel,
                 selected = selectedMode == AuthMode.Login,

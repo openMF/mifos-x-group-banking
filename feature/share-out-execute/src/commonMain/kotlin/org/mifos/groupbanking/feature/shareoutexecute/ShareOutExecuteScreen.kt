@@ -242,7 +242,7 @@ internal fun ShareOutExecuteContent(
         Column(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(MaterialTheme.spacing.lg),
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md),
             ) {
                 item(key = "summary") { SummaryCard(state = state) }
