@@ -75,22 +75,25 @@ class SavingsRepositoryImpl(
         val groupLinkedResult = groupLinkedDeferred.await()
         val individualResult = individualDeferred?.await()
 
-        // First failure wins, checked in declaration order (group-linked, then individual)
-        // regardless of completion order — deterministic error surfacing.
-        if (groupLinkedResult is NetworkResult.Error) {
+        // A NOT_FOUND means the member simply has no savings account of that kind yet (a just-joined
+        // member, or a group with no group-linked account) — a valid EMPTY state, NOT a load failure.
+        // Surfacing it as an error made the whole "My Savings" screen show "Could not load savings"
+        // for anyone without a funded account. Only a REAL error (5xx / unauthorized / transport)
+        // fails the load; NOT_FOUND degrades to no transactions. First real-failure wins, checked in
+        // declaration order (group-linked, then individual) for deterministic error surfacing.
+        if (groupLinkedResult is NetworkResult.Error && groupLinkedResult.error != NetworkError.NOT_FOUND) {
             Logger.e(TAG) { "loadMemberSavings: group-linked read failed: ${groupLinkedResult.error}" }
             return@coroutineScope groupLinkedResult
         }
-        if (individualResult is NetworkResult.Error) {
+        if (individualResult is NetworkResult.Error && individualResult.error != NetworkError.NOT_FOUND) {
             Logger.e(TAG) { "loadMemberSavings: individual read failed: ${individualResult.error}" }
             return@coroutineScope individualResult
         }
 
-        // Every early-return above handled the Error branch — by this point group-linked is
-        // guaranteed Success, and individualResult is either null or Success, so the `as` cast
-        // below is safe.
+        // By this point any surviving Error is a NOT_FOUND → treat as "no account" (empty list for
+        // group-linked; null for individual, which the screen renders as "no individual account").
         val bundle = MemberSavingsBundle(
-            groupLinkedTransactions = (groupLinkedResult as NetworkResult.Success).data.toDomainModels(),
+            groupLinkedTransactions = (groupLinkedResult as? NetworkResult.Success)?.data?.toDomainModels().orEmpty(),
             individualTransactions = (individualResult as? NetworkResult.Success)?.data?.toDomainModels(),
         )
         Logger.i(TAG) {

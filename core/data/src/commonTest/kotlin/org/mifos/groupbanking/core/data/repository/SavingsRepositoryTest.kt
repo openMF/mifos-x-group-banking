@@ -253,7 +253,7 @@ class SavingsRepositoryTest {
     }
 
     @Test
-    fun loadMemberSavings_individualReadFails_propagatesErrorWhenGroupLinkedSucceeds() = runTest {
+    fun loadMemberSavings_individualNotFound_degradesToNullIndividualWhenGroupLinkedSucceeds() = runTest {
         val api = FakeSavingsApi(
             savingsTransactionsResults = mapOf(
                 501L to NetworkResult.Success(listOf(groupLinkedEntryDto)),
@@ -264,7 +264,47 @@ class SavingsRepositoryTest {
 
         val result = repo.loadMemberSavings(groupLinkedSavingsId = 501L, individualSavingsId = 777L)
 
-        assertEquals(NetworkResult.Error(NetworkError.NOT_FOUND), result)
+        // NOT_FOUND is NOT a load failure — the individual account simply doesn't exist for a member
+        // who only has a group-linked account. It degrades to a null individual list, and the
+        // group-linked list still renders.
+        check(result is NetworkResult.Success)
+        assertEquals(1, result.data.groupLinkedTransactions.size)
+        assertNull(result.data.individualTransactions)
+    }
+
+    @Test
+    fun loadMemberSavings_groupLinkedNotFound_degradesToEmptyInsteadOfError() = runTest {
+        // A just-joined member with no funded account yet: BOTH reads 404. The screen must show a
+        // graceful zero/empty "My Savings" state, never "Could not load savings".
+        val api = FakeSavingsApi(
+            savingsTransactionsResults = mapOf(
+                501L to NetworkResult.Error(NetworkError.NOT_FOUND),
+                777L to NetworkResult.Error(NetworkError.NOT_FOUND),
+            ),
+        )
+        val repo = SavingsRepositoryImpl(api)
+
+        val result = repo.loadMemberSavings(groupLinkedSavingsId = 501L, individualSavingsId = 777L)
+
+        check(result is NetworkResult.Success)
+        assertTrue(result.data.groupLinkedTransactions.isEmpty())
+        assertNull(result.data.individualTransactions)
+    }
+
+    @Test
+    fun loadMemberSavings_realServerError_stillPropagates() = runTest {
+        // A genuine 5xx must STILL surface as an error — only NOT_FOUND is degraded.
+        val api = FakeSavingsApi(
+            savingsTransactionsResults = mapOf(
+                501L to NetworkResult.Error(NetworkError.SERVER),
+                777L to NetworkResult.Success(listOf(individualEntryDto)),
+            ),
+        )
+        val repo = SavingsRepositoryImpl(api)
+
+        val result = repo.loadMemberSavings(groupLinkedSavingsId = 501L, individualSavingsId = 777L)
+
+        assertEquals(NetworkResult.Error(NetworkError.SERVER), result)
     }
 
     // ---------- getMemberSavingsDetail ----------
