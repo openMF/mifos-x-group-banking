@@ -69,15 +69,21 @@ class LoanRequestViewModelTest {
         clientId: Long = 10L,
         savingsBalance: Double = 5000.0,
         loanMultiplier: Double = 3.0,
-    ): LoanRequestViewModel = LoanRequestViewModel(
-        repository = repository,
-        networkMonitor = networkMonitor,
-        analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
-        crashReporter = ConsoleCrashReporter(),
-        clientId = clientId,
-        savingsBalance = savingsBalance,
-        loanMultiplier = loanMultiplier,
-    )
+    ): LoanRequestViewModel {
+        // The VM re-resolves the real savings balance at mount via repository.memberSavingsBalance
+        // (the nav-param is a seed, not authoritative). Seed the fake to the SAME value so the
+        // resolve confirms — not overrides — the nav-param and maxLoanAmount stays consistent.
+        repository.memberSavingsBalanceResult = NetworkResult.Success(savingsBalance)
+        return LoanRequestViewModel(
+            repository = repository,
+            networkMonitor = networkMonitor,
+            analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
+            crashReporter = ConsoleCrashReporter(),
+            clientId = clientId,
+            savingsBalance = savingsBalance,
+            loanMultiplier = loanMultiplier,
+        )
+    }
 
     private fun fillValidForm(viewModel: LoanRequestViewModel) {
         viewModel.trySendAction(LoanRequestAction.OnAmountChange("3000"))
