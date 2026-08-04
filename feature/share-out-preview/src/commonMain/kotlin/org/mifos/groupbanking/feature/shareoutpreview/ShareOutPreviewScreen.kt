@@ -405,7 +405,7 @@ private fun FormulaChip(shareoutFormula: String, modifier: Modifier = Modifier) 
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = sp.md, vertical = sp.xs)
             .semantics { contentDescription = chipCd }
             .testTag(ShareOutPreviewTestTags.FORMULA_CHIP),
     )

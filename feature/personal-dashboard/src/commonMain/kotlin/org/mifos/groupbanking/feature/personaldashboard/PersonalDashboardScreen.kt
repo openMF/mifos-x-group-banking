@@ -452,23 +452,25 @@ internal fun PersonalDashboardContentSection(
             )
         }
         item {
-            Box(modifier = Modifier.fillMaxWidth().offset(y = -sp.xl).padding(horizontal = sp.lg)) {
+            // All three summary cards in ONE column with a single, consistent `spacedBy(sp.md)` gap
+            // (was three separately-`offset` items whose chained lifts left UNEVEN gaps — 12dp between
+            // savings→loans but ~0dp between loans→share-out). The column floats up by `-sp.xl` so only
+            // the FIRST card (savings) overlaps the header's green apron; the rest flow evenly below.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = -sp.xl)
+                    .padding(horizontal = sp.lg),
+                verticalArrangement = Arrangement.spacedBy(sp.md),
+            ) {
                 SavingsSummaryCard(
                     groupLinkedBalance = state.groupLinkedSavingsBalance,
                     individualBalance = state.individualSavingsBalance,
                     onClick = { onAction(PersonalDashboardAction.OnSavingsCardClick) },
                 )
-            }
-        }
-        item {
-            Box(modifier = Modifier.fillMaxWidth().offset(y = -sp.md).padding(horizontal = sp.lg)) {
                 LoanSummaryCard(
                     onClick = { onAction(PersonalDashboardAction.OnLoansCardClick) },
                 )
-            }
-        }
-        item {
-            Box(modifier = Modifier.fillMaxWidth().offset(y = -sp.md).padding(horizontal = sp.lg)) {
                 ShareoutProjectionCard(
                     poolModel = state.poolModel,
                     shareOutProjection = state.shareOutProjection,

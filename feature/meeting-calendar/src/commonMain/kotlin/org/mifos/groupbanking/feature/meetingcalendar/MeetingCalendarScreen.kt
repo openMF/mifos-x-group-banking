@@ -487,7 +487,7 @@ private fun StatusChip(status: MeetingStatus) {
             text = label,
             style = MaterialTheme.typography.labelSmall,
             color = content,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.sm, vertical = MaterialTheme.spacing.xs),
         )
     }
 }

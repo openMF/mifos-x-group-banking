@@ -948,7 +948,7 @@ private fun StepHeading(text: String) {
 @Composable
 private fun InfoRow(label: String, value: String, valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface, emphasize: Boolean = false) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.xs),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(label, style = if (emphasize) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium)
