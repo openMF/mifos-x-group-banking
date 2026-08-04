@@ -228,7 +228,7 @@ sealed interface ShareOutExecuteAction {
     sealed interface Internal : ShareOutExecuteAction {
         data class ConnectivityChanged(val online: Boolean) : Internal
         data class BiometricResult(val outcome: BiometricOutcome) : Internal
-        data class ShareOutExecuted(val result: NetworkResult<ShareOutExecuteResult, NetworkError>, val isRetry: Boolean) : Internal
+        data class ShareOutExecuted(val result: NetworkResult<ShareOutExecuteResult, NetworkError>) : Internal
         data class RotationExecuted(val result: NetworkResult<RotationPayoutExecuteResult, NetworkError>) : Internal
     }
 }
@@ -311,7 +311,7 @@ internal class ShareOutExecuteViewModel(
             ShareOutExecuteAction.OnDone -> sendEvent(ShareOutExecuteEvent.NavigateToGroupDashboard(groupId))
             is ShareOutExecuteAction.Internal.ConnectivityChanged -> updateState { copy(isOnline = action.online) }
             is ShareOutExecuteAction.Internal.BiometricResult -> handleBiometricResult(action.outcome)
-            is ShareOutExecuteAction.Internal.ShareOutExecuted -> handleShareOutExecuted(action.result, action.isRetry)
+            is ShareOutExecuteAction.Internal.ShareOutExecuted -> handleShareOutExecuted(action.result)
             is ShareOutExecuteAction.Internal.RotationExecuted -> handleRotationExecuted(action.result)
         }
     }
@@ -378,7 +378,7 @@ internal class ShareOutExecuteViewModel(
             } else {
                 val request = buildShareOutRequest(current, payoutsToExecute)
                 val result = repository.executeShareOut(groupId, request)
-                trySendAction(ShareOutExecuteAction.Internal.ShareOutExecuted(result, isRetry))
+                trySendAction(ShareOutExecuteAction.Internal.ShareOutExecuted(result))
             }
         }
     }
@@ -420,7 +420,7 @@ internal class ShareOutExecuteViewModel(
 
     // -- Async result routing -----------------------------------------------------------------------
 
-    private fun handleShareOutExecuted(result: NetworkResult<ShareOutExecuteResult, NetworkError>, isRetry: Boolean) {
+    private fun handleShareOutExecuted(result: NetworkResult<ShareOutExecuteResult, NetworkError>) {
         when (result) {
             is NetworkResult.Success -> applyShareOutSuccess(result.data)
             is NetworkResult.Error -> applyExecuteError(result.error)

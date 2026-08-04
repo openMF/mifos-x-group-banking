@@ -26,6 +26,7 @@ import org.mifos.groupbanking.core.model.FieldOfficerDashboard
 import org.mifos.groupbanking.core.model.GroupHealthSummary
 import org.mifos.groupbanking.core.model.HealthIndicator
 import org.mifos.groupbanking.core.network.mapper.aggregateFieldOfficerDashboard
+import org.mifos.groupbanking.core.network.model.PagedCentersResponseDto
 import org.mifos.groupbanking.core.network.service.fieldofficerdashboard.FieldOfficerApi
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
@@ -130,9 +131,9 @@ private fun <T> NetworkResult<T, NetworkError>.dataOrThrow(): T = when (this) {
 }
 
 /** Unwraps a best-effort read: returns data on success, or an empty envelope on failure. */
-private fun NetworkResult<org.mifos.groupbanking.core.network.model.PagedCentersResponseDto, NetworkError>.dataOrEmpty(): org.mifos.groupbanking.core.network.model.PagedCentersResponseDto = when (this) {
+private fun NetworkResult<PagedCentersResponseDto, NetworkError>.dataOrEmpty(): PagedCentersResponseDto = when (this) {
     is NetworkResult.Success -> data
-    is NetworkResult.Error -> org.mifos.groupbanking.core.network.model.PagedCentersResponseDto()
+    is NetworkResult.Error -> PagedCentersResponseDto()
 }
 
 // ---------------------------------------------------------------------------

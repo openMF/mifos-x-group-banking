@@ -130,7 +130,14 @@ private val accumulatingActivity: List<ActivityItem> = listOf(
 )
 
 private val rotatingActivity: List<ActivityItem> = listOf(
-    ActivityItem(id = "ACT-301-001", type = ActivityType.SHARE_OUT, description = "Payout disbursed to member #3", amount = 20000.00, date = "2026-05-01", memberName = "Fatuma Ali"),
+    ActivityItem(
+        id = "ACT-301-001",
+        type = ActivityType.SHARE_OUT,
+        description = "Payout disbursed to member #3",
+        amount = 20000.00,
+        date = "2026-05-01",
+        memberName = "Fatuma Ali",
+    ),
     ActivityItem(id = "ACT-301-002", type = ActivityType.DEPOSIT, description = "Monthly contribution", amount = 2000.00, date = "2026-05-01", memberName = "Amina Hassan"),
     ActivityItem(id = "ACT-301-003", type = ActivityType.MEETING, description = "Monthly meeting — cycle 3 recorded", amount = null, date = "2026-05-01", memberName = null),
 )

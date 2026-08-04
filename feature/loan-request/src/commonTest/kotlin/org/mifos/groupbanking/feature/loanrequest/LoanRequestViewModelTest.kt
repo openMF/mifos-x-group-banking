@@ -412,6 +412,11 @@ private class FakeLoanRequestRepository : LoanRequestRepository {
         lastEnqueuePayload = payload
         return enqueueReturnId
     }
+
+    var memberSavingsBalanceResult: NetworkResult<Double, NetworkError> = NetworkResult.Success(0.0)
+
+    override suspend fun memberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError> =
+        memberSavingsBalanceResult
 }
 
 private class FakeNetworkMonitor(initiallyOnline: Boolean) : NetworkMonitor {

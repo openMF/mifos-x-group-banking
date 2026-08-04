@@ -74,9 +74,11 @@ class LoanRequestApiImpl(
     override suspend fun getMemberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError> {
         val path = "$CLIENT_ACCOUNTS_PATH_PREFIX/$clientId/accounts"
         Logger.d(TAG) { "getMemberSavingsBalance: GET $path" }
-        return when (val result = requestAsNetworkResult<ClientAccountsDto>(op = "getMemberSavingsBalance") {
-            httpClient.get(path)
-        }) {
+        return when (
+            val result = requestAsNetworkResult<ClientAccountsDto>(op = "getMemberSavingsBalance") {
+                httpClient.get(path)
+            }
+        ) {
             is NetworkResult.Success ->
                 NetworkResult.Success(result.data.savingsAccounts.sumOf { it.accountBalance })
             is NetworkResult.Error -> result

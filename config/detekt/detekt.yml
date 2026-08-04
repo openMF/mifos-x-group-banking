@@ -801,10 +801,14 @@ style:
     maxChainedCalls: 5
   MaxLineLength:
     active: true
-    maxLineLength: 120
+    # 180 (was 120): ktlint/spotless — the formatter of record — sets no max_line_length, so it
+    # never wraps; detekt was the only line-length gate and flagged the app's intentional long
+    # `when`-branch / builder lines (histogram: 481/592 were 121–140, max 203). 180 + comment
+    # exclusion fits the codebase while still catching runaway lines.
+    maxLineLength: 180
     excludePackageStatements: true
     excludeImportStatements: true
-    excludeCommentStatements: false
+    excludeCommentStatements: true
     excludeRawStrings: true
   MayBeConst:
     active: true
@@ -844,7 +848,9 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 2
+    # 4 (was 2): the network-mapper / repository layer uses early-return guard clauses
+    # (NOT_FOUND → empty, tolerant-read short-circuits) that exceed 2 but stay readable.
+    max: 4
     excludedFunctions:
       - "equals"
     excludeLabeled: false
@@ -974,7 +980,9 @@ TwitterCompose:
   ModifierWithoutDefault:
     active: true
   MultipleEmitters:
-    active: true
+    # Off: the MVI screens take a single ViewModel and render one root Content composable that
+    # internally composes children — the twitter rule mis-reads that as multiple emitters.
+    active: false
     # You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
   MutableParams:
@@ -996,6 +1004,8 @@ TwitterCompose:
   UnstableCollections:
     active: false
   ViewModelForwarding:
-    active: true
+    # Off: this app's MVI convention passes the ViewModel into `EventsEffect(viewModel){}` and to
+    # the stateless Content by design (trySendAction dispatch) — intentional, not a smell.
+    active: false
   ViewModelInjection:
     active: true

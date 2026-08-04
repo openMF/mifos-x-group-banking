@@ -40,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -48,6 +47,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,14 +79,14 @@ import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_not_found
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_server
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_error_state_title
-import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_body
-import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_title
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_fines_label
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_kes_amount_format
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_loan_disbursed_chip_format
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_loan_section_header
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_loan_supporting_format
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_loans_disbursed_label
+import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_body
+import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_not_conducted_title
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_savings_section_header
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_savings_supporting_format
 import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_start_meeting_btn_format

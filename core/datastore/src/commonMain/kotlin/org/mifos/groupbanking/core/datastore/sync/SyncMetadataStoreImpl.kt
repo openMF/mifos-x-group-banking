@@ -19,7 +19,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 private const val LAST_SYNC_AT_EPOCH_MS_KEY = "last_synced_at_epoch_ms"
-private const val TAG = "SyncMetadataStore"
 
 /**
  * [SyncMetadataStore] backed directly by the PLAIN (non-secure) [Settings] instance —

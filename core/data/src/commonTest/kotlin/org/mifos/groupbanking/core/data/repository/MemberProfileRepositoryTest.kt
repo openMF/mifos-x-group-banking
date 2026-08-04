@@ -163,7 +163,13 @@ private class FakeMemberProfileApi(
         NetworkResult.Success(
             MemberAccountsDto(
                 savingsAccounts = listOf(
-                    MemberSavingsAccountDto(id = 1L, productName = "Voluntary Savings", accountNo = "SA-1", balance = 720.0, status = FineractStatusDto(id = 300, value = "Active")),
+                    MemberSavingsAccountDto(
+                        id = 1L,
+                        productName = "Voluntary Savings",
+                        accountNo = "SA-1",
+                        balance = 720.0,
+                        status = FineractStatusDto(id = 300, value = "Active"),
+                    ),
                 ),
                 loanAccounts = emptyList(),
             ),

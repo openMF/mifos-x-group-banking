@@ -34,8 +34,6 @@ import org.mifos.groupbanking.core.data.demo.DemoSessionManager
 import org.mifos.groupbanking.core.data.demo.DemoSessionManagerImpl
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
-import org.mifos.groupbanking.core.data.repository.LocalCacheCleaner
-import org.mifos.groupbanking.core.data.repository.RoomLocalCacheCleaner
 import org.mifos.groupbanking.core.data.repository.ChangePinRepository
 import org.mifos.groupbanking.core.data.repository.ChangePinRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.FieldOfficerDashboardRepository
@@ -62,6 +60,7 @@ import org.mifos.groupbanking.core.data.repository.LoanRequestRepository
 import org.mifos.groupbanking.core.data.repository.LoanRequestRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepository
 import org.mifos.groupbanking.core.data.repository.LoanWriteoffRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LocalCacheCleaner
 import org.mifos.groupbanking.core.data.repository.MeetingConductRepository
 import org.mifos.groupbanking.core.data.repository.MeetingConductRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.MeetingRepository
@@ -82,6 +81,7 @@ import org.mifos.groupbanking.core.data.repository.OrganizerDashboardRepository
 import org.mifos.groupbanking.core.data.repository.OrganizerDashboardRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.PreviousMeetingReviewRepository
 import org.mifos.groupbanking.core.data.repository.PreviousMeetingReviewRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.RoomLocalCacheCleaner
 import org.mifos.groupbanking.core.data.repository.SavingsRepository
 import org.mifos.groupbanking.core.data.repository.SavingsRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.ShareOutRepository

@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.mapper
 
+import kotlinx.serialization.json.Json
 import org.mifos.groupbanking.core.model.ContributionModel
 import org.mifos.groupbanking.core.model.CreateGroupRequest
 import org.mifos.groupbanking.core.model.CreateGroupTypeConfig
@@ -27,7 +28,6 @@ import org.mifos.groupbanking.core.network.model.OfficeDto
 import org.mifos.groupbanking.core.network.model.PayoutOrderMethodDto
 import org.mifos.groupbanking.core.network.model.SavingsMechanismDto
 import org.mifos.groupbanking.core.network.model.ShareoutFormulaDto
-import kotlinx.serialization.json.Json
 import kotlin.jvm.JvmName
 
 /**

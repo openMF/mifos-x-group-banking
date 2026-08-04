@@ -53,16 +53,6 @@ import org.mifos.groupbanking.core.model.ScheduledMeeting
 // when its count > 0).
 // ---------------------------------------------------------------------------
 
-/** One KPI datum — value + label + icon + a flag driving the nonzero error accent. */
-internal data class OrganizerKpiCardData(
-    val value: String,
-    val label: String,
-    val icon: ImageVector,
-    val testTag: String,
-    val emphasizeNonZero: Boolean = false,
-    val nonZero: Boolean = false,
-)
-
 /**
  * One tappable KPI card (`ui.yaml#components.kpi_summary_row.*`). All four cards navigate to
  * group-list on tap ([onClick]). When [OrganizerKpiCardData.emphasizeNonZero] and

@@ -9,6 +9,7 @@
  */
 package org.mifos.groupbanking.core.network.mapper
 
+import kotlinx.serialization.json.Json
 import org.mifos.groupbanking.core.model.CreateInviteRequest
 import org.mifos.groupbanking.core.model.GeneratedInvite
 import org.mifos.groupbanking.core.model.MemberRole
@@ -16,7 +17,6 @@ import org.mifos.groupbanking.core.model.PendingInvite
 import org.mifos.groupbanking.core.network.model.CreateInviteRequestDto
 import org.mifos.groupbanking.core.network.model.GeneratedInviteDto
 import org.mifos.groupbanking.core.network.model.PendingInviteDto
-import kotlinx.serialization.json.Json
 
 /**
  * Wire<->domain mappers for the member-invite (organizer-side) client stack. `role_to_assign`

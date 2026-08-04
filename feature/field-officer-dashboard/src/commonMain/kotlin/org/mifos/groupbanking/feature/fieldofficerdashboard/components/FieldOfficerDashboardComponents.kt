@@ -56,15 +56,6 @@ import org.mifos.groupbanking.feature.fieldofficerdashboard.FieldOfficerDashboar
 // KPI summary cards — ui.yaml#components.kpi_cards_row (4 cards, distinct MD3 container tokens)
 // ---------------------------------------------------------------------------
 
-/** One KPI datum — value string + label + icon + the MD3 container/onContainer color pair. */
-internal data class KpiCardData(
-    val value: String,
-    val label: String,
-    val icon: ImageVector,
-    val container: Color,
-    val onContainer: Color,
-)
-
 /**
  * Horizontally-scrollable row of 4 non-interactive KPI cards, each using its declared MD3 container
  * token (primaryContainer / secondaryContainer / tertiaryContainer / errorContainer) —

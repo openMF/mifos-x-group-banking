@@ -30,8 +30,8 @@ import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
 import org.mifos.groupbanking.core.network.model.LoanVoteRecordDto
 import org.mifos.groupbanking.core.network.model.MeetingActiveLoanDto
-import org.mifos.groupbanking.core.network.model.MeetingLoanApplicationDto
 import org.mifos.groupbanking.core.network.model.MeetingDisbursalPayloadDto
+import org.mifos.groupbanking.core.network.model.MeetingLoanApplicationDto
 import org.mifos.groupbanking.core.network.model.MeetingRecordDetailDto
 import org.mifos.groupbanking.core.network.model.MeetingRepaymentPayloadDto
 import org.mifos.groupbanking.core.network.model.MeetingSavingsPayloadDto

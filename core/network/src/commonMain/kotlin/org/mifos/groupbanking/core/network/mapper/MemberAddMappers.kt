@@ -9,13 +9,13 @@
  */
 package org.mifos.groupbanking.core.network.mapper
 
+import kotlinx.serialization.json.Json
 import org.mifos.groupbanking.core.model.CreateMemberRequest
 import org.mifos.groupbanking.core.model.MemberCreationResult
 import org.mifos.groupbanking.core.network.model.CreateMemberRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMemberResponseDto
 import org.mifos.groupbanking.core.network.model.MemberAddOfflinePayloadDto
 import org.mifos.groupbanking.core.network.model.UpdateMemberRoleRequestDto
-import kotlinx.serialization.json.Json
 
 /**
  * Domain <-> DTO mappers for the member-add create-chain

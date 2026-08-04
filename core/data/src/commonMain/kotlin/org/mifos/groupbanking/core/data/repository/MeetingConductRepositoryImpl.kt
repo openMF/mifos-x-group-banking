@@ -124,49 +124,46 @@ class MeetingConductRepositoryImpl(
                 "savings=${request.savings.size} repayments=${request.repayments.size} disbursals=${request.disbursals.size}"
         }
 
-        // Priority 1 — meeting record.
-        api.postMeetingRecord(request.toRecordDto()).errorOrNull()?.let {
-            Logger.e(TAG) { "submitMeeting: postMeetingRecord failed: $it" }
-            return NetworkResult.Error(it)
-        }
-
-        // Priority 2 — per-member attendance.
-        for (attendance in request.attendance) {
-            api.postMeetingAttendance(attendance.toDto(request.meetingId)).errorOrNull()?.let {
-                Logger.e(TAG) { "submitMeeting: postMeetingAttendance failed memberId=${attendance.memberId}: $it" }
-                return NetworkResult.Error(it)
+        // Ordered, lazily-evaluated write steps (Priority 1 record → 2 attendance → 3 savings →
+        // 4 repayments → 5 disbursals → 6 corpus PATCH). `firstNotNullOfOrNull` runs them in order
+        // and stops at the FIRST failure — the same sequential short-circuit as before, now with a
+        // single Error/Success return pair. Each step logs its own failure before surfacing it.
+        val steps: List<suspend () -> NetworkError?> = buildList {
+            add {
+                api.postMeetingRecord(request.toRecordDto()).errorOrNull()
+                    ?.also { Logger.e(TAG) { "submitMeeting: postMeetingRecord failed: $it" } }
+            }
+            request.attendance.forEach { attendance ->
+                add {
+                    api.postMeetingAttendance(attendance.toDto(request.meetingId)).errorOrNull()
+                        ?.also { Logger.e(TAG) { "submitMeeting: postMeetingAttendance failed memberId=${attendance.memberId}: $it" } }
+                }
+            }
+            request.savings.forEach { savings ->
+                add {
+                    api.postSavingsTransaction(savings.savingsAccountId, savings.toDto(request.actualDate)).errorOrNull()
+                        ?.also { Logger.e(TAG) { "submitMeeting: postSavingsTransaction failed savingsId=${savings.savingsAccountId}: $it" } }
+                }
+            }
+            request.repayments.forEach { repayment ->
+                add {
+                    api.postLoanRepayment(repayment.loanId, repayment.toDto(request.actualDate)).errorOrNull()
+                        ?.also { Logger.e(TAG) { "submitMeeting: postLoanRepayment failed loanId=${repayment.loanId}: $it" } }
+                }
+            }
+            request.disbursals.forEach { disbursal ->
+                add {
+                    api.postLoanDisbursal(disbursal.loanId, disbursal.toDisbursalDto(request.actualDate)).errorOrNull()
+                        ?.also { Logger.e(TAG) { "submitMeeting: postLoanDisbursal failed loanId=${disbursal.loanId}: $it" } }
+                }
+            }
+            add {
+                api.updateCorpus(request.centerId, request.toCorpusUpdateDto()).errorOrNull()
+                    ?.also { Logger.e(TAG) { "submitMeeting: updateCorpus failed: $it" } }
             }
         }
 
-        // Priority 3 — per-entry savings deposits.
-        for (savings in request.savings) {
-            api.postSavingsTransaction(savings.savingsAccountId, savings.toDto(request.actualDate)).errorOrNull()?.let {
-                Logger.e(TAG) { "submitMeeting: postSavingsTransaction failed savingsId=${savings.savingsAccountId}: $it" }
-                return NetworkResult.Error(it)
-            }
-        }
-
-        // Priority 4 — per-loan repayments.
-        for (repayment in request.repayments) {
-            api.postLoanRepayment(repayment.loanId, repayment.toDto(request.actualDate)).errorOrNull()?.let {
-                Logger.e(TAG) { "submitMeeting: postLoanRepayment failed loanId=${repayment.loanId}: $it" }
-                return NetworkResult.Error(it)
-            }
-        }
-
-        // Priority 5 — per-approved disbursals (corpus-gated in the ViewModel before this call).
-        for (disbursal in request.disbursals) {
-            api.postLoanDisbursal(disbursal.loanId, disbursal.toDisbursalDto(request.actualDate)).errorOrNull()?.let {
-                Logger.e(TAG) { "submitMeeting: postLoanDisbursal failed loanId=${disbursal.loanId}: $it" }
-                return NetworkResult.Error(it)
-            }
-        }
-
-        // Priority 6 — terminal corpus PATCH.
-        api.updateCorpus(request.centerId, request.toCorpusUpdateDto()).errorOrNull()?.let {
-            Logger.e(TAG) { "submitMeeting: updateCorpus failed: $it" }
-            return NetworkResult.Error(it)
-        }
+        steps.firstNotNullOfOrNull { it() }?.let { return NetworkResult.Error(it) }
 
         Logger.i(TAG) { "submitMeeting: succeeded meetingId=${request.meetingId} (all 6 priorities posted)" }
         return NetworkResult.Success(MeetingSubmitResult(meetingId = request.meetingId, isOffline = false))
