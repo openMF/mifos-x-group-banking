@@ -52,6 +52,11 @@ class LoanRequestRepositoryImpl(
         }
     }
 
+    override suspend fun memberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError> {
+        Logger.d(TAG) { "memberSavingsBalance: resolving for clientId=$clientId" }
+        return api.getMemberSavingsBalance(clientId)
+    }
+
     override suspend fun enqueueOffline(payload: LoanRequestPayload): Long {
         val payloadJson = payload.toDto().toJsonPayload()
         Logger.i(TAG) { "enqueueOffline: queuing $LOAN_REQUEST_OPERATION_TYPE for clientId=${payload.clientId}" }

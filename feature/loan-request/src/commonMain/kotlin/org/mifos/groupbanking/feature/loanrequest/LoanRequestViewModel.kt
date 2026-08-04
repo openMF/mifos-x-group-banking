@@ -229,6 +229,9 @@ sealed interface LoanRequestAction {
             val result: NetworkResult<LoanRequestResult, NetworkError>,
         ) : Internal
         data class EnqueueResult(val queueId: Long) : Internal
+
+        /** Result of the mount-time savings-balance resolve — recomputes [maxLoanAmount]. */
+        data class SavingsBalanceLoaded(val balance: Double) : Internal
     }
 }
 
@@ -308,6 +311,17 @@ internal class LoanRequestViewModel(
                 trySendAction(LoanRequestAction.Internal.ConnectivityChanged(online))
             }
         }
+        // Resolve the member's real savings balance at mount — the nav-param savingsBalance is not
+        // reliably populated upstream (personal-dashboard/personal-loans threading gap), which left
+        // eligibility (max borrow) stuck at 0. Best-effort: on failure the nav-param value stands.
+        viewModelScope.launch {
+            when (val result = repository.memberSavingsBalance(clientId)) {
+                is NetworkResult.Success ->
+                    trySendAction(LoanRequestAction.Internal.SavingsBalanceLoaded(result.data))
+                is NetworkResult.Error ->
+                    Logger.w(TAG) { "memberSavingsBalance resolve failed (${result.error}) — keeping nav-param savingsBalance" }
+            }
+        }
     }
 
     override fun handleAction(action: LoanRequestAction) {
@@ -321,6 +335,7 @@ internal class LoanRequestViewModel(
             is LoanRequestAction.Internal.ConnectivityChanged -> handleConnectivityChanged(action.online)
             is LoanRequestAction.Internal.SubmitResult -> handleSubmitResult(action.payload, action.result)
             is LoanRequestAction.Internal.EnqueueResult -> handleEnqueueResult(action.queueId)
+            is LoanRequestAction.Internal.SavingsBalanceLoaded -> handleSavingsBalanceLoaded(action.balance)
         }
     }
 
@@ -339,6 +354,26 @@ internal class LoanRequestViewModel(
                 repaymentEstimate = estimate,
                 isFormValid = computeFormValid(
                     amount = value,
+                    amountError = amountError,
+                    purpose = purpose,
+                    isSubmitting = isSubmitting,
+                ),
+            )
+        }
+    }
+
+    // Mount-time savings resolve (Internal.SavingsBalanceLoaded): recompute the eligibility ceiling
+    // from the member's REAL savings, then re-validate any amount already typed against the new max.
+    private fun handleSavingsBalanceLoaded(balance: Double) {
+        updateState {
+            val newMax = balance * loanMultiplier
+            val amountError = validateAmount(requestedAmount, newMax)
+            copy(
+                savingsBalance = balance,
+                maxLoanAmount = newMax,
+                requestedAmountError = amountError,
+                isFormValid = computeFormValid(
+                    amount = requestedAmount,
                     amountError = amountError,
                     purpose = purpose,
                     isSubmitting = isSubmitting,

@@ -13,6 +13,7 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -23,6 +24,7 @@ import io.ktor.serialization.ContentConvertException
 import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
+import org.mifos.groupbanking.core.network.model.ClientAccountsDto
 import org.mifos.groupbanking.core.network.model.LoanRequestPayloadDto
 import org.mifos.groupbanking.core.network.model.LoanRequestResponseDto
 
@@ -68,7 +70,21 @@ class LoanRequestApiImpl(
             }
         }
     }
+
+    override suspend fun getMemberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError> {
+        val path = "$CLIENT_ACCOUNTS_PATH_PREFIX/$clientId/accounts"
+        Logger.d(TAG) { "getMemberSavingsBalance: GET $path" }
+        return when (val result = requestAsNetworkResult<ClientAccountsDto>(op = "getMemberSavingsBalance") {
+            httpClient.get(path)
+        }) {
+            is NetworkResult.Success ->
+                NetworkResult.Success(result.data.savingsAccounts.sumOf { it.accountBalance })
+            is NetworkResult.Error -> result
+        }
+    }
 }
+
+private const val CLIENT_ACCOUNTS_PATH_PREFIX = "/clients"
 
 /**
  * Executes [block], catches transport/serialization exceptions, and maps the resulting

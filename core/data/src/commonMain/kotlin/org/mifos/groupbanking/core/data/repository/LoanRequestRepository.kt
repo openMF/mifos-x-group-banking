@@ -65,4 +65,12 @@ interface LoanRequestRepository {
      * Returns the generated `sync_queue` row id. Never calls the network.
      */
     suspend fun enqueueOffline(payload: LoanRequestPayload): Long
+
+    /**
+     * Resolves the member's current savings balance (loan-eligibility input) via the wrapped
+     * `LoanRequestApi.getMemberSavingsBalance`. The loan-request screen fetches this at mount rather
+     * than trusting the upstream nav-param `savingsBalance`, which `personal-dashboard`/
+     * `personal-loans` do not reliably populate (documented threading gap).
+     */
+    suspend fun memberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError>
 }
