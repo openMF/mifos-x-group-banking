@@ -108,6 +108,7 @@ import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_m
 import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_share_subject
 import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_snack_code_copied
 import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_snack_link_copied
+import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_snack_queued_offline
 import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_snack_revoked
 import org.mifos.groupbanking.feature.memberinvite.generated.resources.screens_member_invite_topbar_title
 
@@ -139,6 +140,7 @@ internal fun MemberInviteScreen(
     val codeCopied = stringResource(Res.string.screens_member_invite_snack_code_copied)
     val linkCopied = stringResource(Res.string.screens_member_invite_snack_link_copied)
     val revoked = stringResource(Res.string.screens_member_invite_snack_revoked)
+    val queuedOffline = stringResource(Res.string.screens_member_invite_snack_queued_offline)
     val networkError = stringResource(Res.string.screens_member_invite_error_network)
     val serverError = stringResource(Res.string.screens_member_invite_error_server)
     val authError = stringResource(Res.string.screens_member_invite_error_auth)
@@ -161,6 +163,7 @@ internal fun MemberInviteScreen(
                     "snack_code_copied" -> codeCopied
                     "snack_link_copied" -> linkCopied
                     "snack_invite_revoked" -> revoked
+                    "snack_invite_queued_offline" -> queuedOffline
                     "error_network" -> networkError
                     "error_server" -> serverError
                     "error_auth" -> authError

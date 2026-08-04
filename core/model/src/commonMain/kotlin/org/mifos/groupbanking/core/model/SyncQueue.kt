@@ -40,8 +40,11 @@ enum class SyncStatus {
  * [SyncQueueRepository.observeCounts]).
  *
  * [payloadJson] is the opaque serialized operation payload — the enqueuing feature owns its
- * encode/decode; the queue never inspects it. [targetTable] names the Fineract datatable the
- * replayed write lands on (e.g. `dt_loan_request`). [attemptCount] increments once per sync attempt
+ * encode/decode; the queue never inspects it. [targetTable] carries the replay route in one of TWO
+ * conventions read by `BatchSyncMappers.toBatchOperation`: a bare Fineract datatable name (e.g.
+ * `dt_loan_request`, replayed as `POST datatables/<name>`) OR a full companion route starting with
+ * `/` (e.g. `/companion/groups/24/shareout/execute`, replayed verbatim) for orchestration writes
+ * that are not a plain datatable row-append. [attemptCount] increments once per sync attempt
  * ([SyncQueueRepository.markSyncing]); [lastError] holds the most recent failure reason for the
  * sync-status UI.
  *

@@ -53,6 +53,7 @@
     <string name="screens_member_invite_snack_code_copied">Invite code copied</string>
     <string name="screens_member_invite_snack_link_copied">Invite link copied</string>
     <string name="screens_member_invite_snack_revoked">Invite revoked</string>
+    <string name="screens_member_invite_snack_queued_offline">You\'re offline — the invite is queued and will be sent automatically once you\'re back online.</string>
 
     <string name="screens_member_invite_error_validation">Please enter a valid phone number or email address.</string>
     <string name="screens_member_invite_error_network">No internet connection. Please check your network and try again.</string>

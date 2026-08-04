@@ -17,10 +17,13 @@ import org.mifos.groupbanking.core.model.MemberCreationResult
 import org.mifos.groupbanking.core.network.mapper.toAssignMemberRoleRequestDto
 import org.mifos.groupbanking.core.network.mapper.toCreateMemberRequestDto
 import org.mifos.groupbanking.core.network.mapper.toDomainModel
+import org.mifos.groupbanking.core.network.mapper.toOfflinePayloadJson
 import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApi
 
 private const val TAG = "MemberAddRepository"
 private const val DEFAULT_PHOTO_FILE_NAME = "member-photo.jpg"
+private const val CREATE_MEMBER_OPERATION_TYPE = "CREATE_MEMBER"
+private const val CREATE_MEMBER_TARGET_ROUTE = "/companion/members"
 
 /**
  * See [MemberAddRepository] KDoc for the Store5-branch rationale (`business_logic.kind:
@@ -31,6 +34,7 @@ private const val DEFAULT_PHOTO_FILE_NAME = "member-photo.jpg"
  */
 class MemberAddRepositoryImpl(
     private val api: MemberAddApi,
+    private val syncQueueRepository: SyncQueueRepository,
 ) : MemberAddRepository {
 
     override suspend fun createMember(
@@ -97,6 +101,16 @@ class MemberAddRepositoryImpl(
                 }
             }
         }
+    }
+
+    override suspend fun enqueueOffline(request: CreateMemberRequest): Long {
+        val payloadJson = request.toOfflinePayloadJson()
+        Logger.i(TAG) { "enqueueOffline: queuing $CREATE_MEMBER_OPERATION_TYPE for groupId=${request.groupId}" }
+        return syncQueueRepository.enqueue(
+            operationType = CREATE_MEMBER_OPERATION_TYPE,
+            targetTable = CREATE_MEMBER_TARGET_ROUTE,
+            payloadJson = payloadJson,
+        )
     }
 }
 

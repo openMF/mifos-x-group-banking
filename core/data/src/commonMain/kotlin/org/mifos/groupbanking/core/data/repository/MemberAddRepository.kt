@@ -69,6 +69,20 @@ interface MemberAddRepository {
      * (commonMain-safe: no `java.io.File`/`NSData` crosses this boundary), captured by the
      * caller via `ImagePickerHelper` per `api.yaml#dependencies.services`.
      */
+    /**
+     * Durably enqueues [request] to the offline write-queue ([SyncQueueRepository]) when
+     * `NetworkMonitor` reports offline, returning the generated queue row id. The row targets the
+     * companion orchestration route `/companion/members` (`HandleCreateMember`) so the sync-drain
+     * replays the WHOLE create-chain (create-client + assign-role) server-side in one op — the
+     * online two-call chain (`POST /clients` -> `POST /datatables/dt_member_role/{clientId}`) can't
+     * be a single queue row because the role write depends on the not-yet-minted clientId. An
+     * offline member-add is queued and later drained, never silently dropped (the prior offline
+     * branch surfaced a `Network` error and lost it). The ViewModel calls this in its pre-flight
+     * `!networkMonitor.isOnline.value` branch instead of [createMember]. Photo upload is not part
+     * of the offline path (a queued create carries no bytes — the photo can be re-attached online).
+     */
+    suspend fun enqueueOffline(request: CreateMemberRequest): Long
+
     suspend fun createMember(
         request: CreateMemberRequest,
         photoBytes: ByteArray? = null,

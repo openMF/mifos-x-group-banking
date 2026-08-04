@@ -321,7 +321,7 @@ val DataModule = module {
     // (NetworkModule) directly. Surfaces NetworkResult, never .asScreenStream()/.write() — same
     // branch as InvitationRepository/MeetingConductRepository/LoanApplyRepository above. DISTINCT
     // from InvitationRepository (recipient-side join flow) — organizer-vs-recipient bounded context.
-    single<MemberInviteRepository> { MemberInviteRepositoryImpl(api = get()) }
+    single<MemberInviteRepository> { MemberInviteRepositoryImpl(api = get(), syncQueueRepository = get()) }
 
     // group-create wizard (COMP-GRP-001 + raw Fineract /offices) — Store5-free mutation
     // orchestration for createGroup (business_logic.kind: processor, no read-stream to cache),
@@ -330,14 +330,14 @@ val DataModule = module {
     // getOffices is pending a future kmp-store-gen OfficeStore for its declared
     // stale-while-revalidate cache_strategy (SC2) — see GroupCreateRepository KDoc; not
     // half-built here, this repo's getOffices is a plain pass-through today.
-    single<GroupCreateRepository> { GroupCreateRepositoryImpl(api = get()) }
+    single<GroupCreateRepository> { GroupCreateRepositoryImpl(api = get(), syncQueueRepository = get()) }
 
     // member-add create-chain (create_client -> assign_member_role -> optional upload_photo) —
     // Store5-free mutation orchestration (business_logic.kind: processor, offline-queue-backed,
     // no read-stream to cache), wraps MemberAddApi (NetworkModule) directly. Surfaces
     // NetworkResult, never .asScreenStream()/.write() — same branch as
     // AuthRepository/InvitationRepository/GroupCreateRepository above.
-    single<MemberAddRepository> { MemberAddRepositoryImpl(api = get()) }
+    single<MemberAddRepository> { MemberAddRepositoryImpl(api = get(), syncQueueRepository = get()) }
 
     // loan-apply form (get_group_members + 5-way parallel combine into LoanApplyTemplate +
     // create_new_loan submit) — Store5-free today (business_logic.kind: composite, no

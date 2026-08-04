@@ -161,6 +161,7 @@ data class GroupCreateState(
     @Transient
     val error: GroupCreateError? = null,
     val isOffline: Boolean = false,
+    val isOfflineQueued: Boolean = false,
 ) {
     /** True when Step 2's contribution model is share-based (VSLA/SILC/ASCA — `shareValue` etc). */
     val isShareBasedContribution: Boolean
@@ -478,18 +479,24 @@ internal class GroupCreateViewModel(
             updateState { copy(isSubmitting = true, error = null, validationErrors = emptyMap()) }
             analytics.trackGroupOperation(operation = "create", groupType = state.groupTypeName)
 
+            val request = buildCreateGroupRequest(state, typeConfig, userId)
+
             if (!networkMonitor.isOnline.value) {
-                Logger.w(TAG) { "createGroup attempted while offline — queue-offline fallback" }
+                // Offline pre-flight: durably queue the create so the drain replays it via the
+                // companion /batches self-dispatch (targetTable = "/companion/groups") — never drop
+                // the write. Queued, not errored: no `error = Network` (that would render an Error
+                // screen for a perfectly-saved offline op).
+                val queueId = groupCreateRepository.enqueueOffline(request)
+                Logger.i(TAG) { "createGroup offline — enqueued queueId=$queueId for later sync" }
                 crashReporter.recordMessage(
-                    message = "group-create: submit attempted while offline",
+                    message = "group-create: submit queued offline (queueId=$queueId)",
                     level = CrashSeverity.Info,
                 )
-                updateState { copy(isSubmitting = false, isOffline = true, error = GroupCreateError.Network) }
+                updateState { copy(isSubmitting = false, isOffline = true, isOfflineQueued = true) }
                 sendEvent(GroupCreateEvent.ShowOfflineSyncDialog)
                 return@launch
             }
 
-            val request = buildCreateGroupRequest(state, typeConfig, userId)
             val result = groupCreateRepository.createGroup(request)
             trySendAction(GroupCreateAction.Internal.SubmitResult(result))
         }

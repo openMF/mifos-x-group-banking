@@ -17,9 +17,11 @@ import org.mifos.groupbanking.core.model.GeneratedInvite
 import org.mifos.groupbanking.core.model.PendingInvite
 import org.mifos.groupbanking.core.network.mapper.toDomainModel
 import org.mifos.groupbanking.core.network.mapper.toDto
+import org.mifos.groupbanking.core.network.mapper.toJsonPayload
 import org.mifos.groupbanking.core.network.service.memberinvite.MemberInviteApi
 
 private const val TAG = "MemberInviteRepository"
+private const val CREATE_INVITE_OPERATION_TYPE = "CREATE_INVITE"
 
 /**
  * See [MemberInviteRepository] KDoc for the Store5-free (submit-mutation) branch rationale. No
@@ -29,6 +31,7 @@ private const val TAG = "MemberInviteRepository"
  */
 class MemberInviteRepositoryImpl(
     private val api: MemberInviteApi,
+    private val syncQueueRepository: SyncQueueRepository,
 ) : MemberInviteRepository {
 
     override suspend fun createInvite(request: CreateInviteRequest): NetworkResult<GeneratedInvite, NetworkError> {
@@ -73,5 +76,16 @@ class MemberInviteRepositoryImpl(
                 result
             }
         }
+    }
+
+    override suspend fun enqueueOffline(request: CreateInviteRequest): Long {
+        val payloadJson = request.toDto().toJsonPayload()
+        val targetRoute = "/companion/datatables/invitations/${request.groupId}"
+        Logger.i(TAG) { "enqueueOffline: queuing $CREATE_INVITE_OPERATION_TYPE groupId=${request.groupId}" }
+        return syncQueueRepository.enqueue(
+            operationType = CREATE_INVITE_OPERATION_TYPE,
+            targetTable = targetRoute,
+            payloadJson = payloadJson,
+        )
     }
 }

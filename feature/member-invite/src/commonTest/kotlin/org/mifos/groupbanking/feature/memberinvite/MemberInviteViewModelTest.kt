@@ -190,7 +190,7 @@ class MemberInviteViewModelTest {
     // -- Generate: offline ---------------------------------------------------------------------
 
     @Test
-    fun `OnGenerateInvite while offline sets a network error and does not call the api`() = runTest(testDispatcher) {
+    fun `OnGenerateInvite while offline enqueues to the sync queue and does not call the api`() = runTest(testDispatcher) {
         networkMonitor.setOnline(false)
         val viewModel = buildViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
@@ -202,8 +202,13 @@ class MemberInviteViewModelTest {
 
         val state = viewModel.stateFlow.value
         assertTrue(state.isOffline)
-        assertEquals(MemberInviteError.Network, state.error)
+        assertTrue(state.isOfflineQueued)
+        // Queued, NOT errored — a durably-queued offline invite is not a failure.
+        assertNull(state.error)
+        // Offline: the network create is NOT attempted; the write is enqueued instead.
         assertEquals(0, repository.createCallCount)
+        assertEquals(1, repository.enqueueOfflineCallCount)
+        assertEquals("+254798765432", repository.lastEnqueuedRequest?.invitedEmailPhone)
     }
 
     // -- Generate: transport error -------------------------------------------------------------
@@ -352,11 +357,21 @@ private class FakeMemberInviteRepository : MemberInviteRepository {
         private set
     var lastRevokeRowId: Long? = null
         private set
+    var enqueueOfflineCallCount: Int = 0
+        private set
+    var lastEnqueuedRequest: CreateInviteRequest? = null
+        private set
 
     override suspend fun createInvite(request: CreateInviteRequest): NetworkResult<GeneratedInvite, NetworkError> {
         createCallCount++
         lastCreateRequest = request
         return createResult
+    }
+
+    override suspend fun enqueueOffline(request: CreateInviteRequest): Long {
+        enqueueOfflineCallCount++
+        lastEnqueuedRequest = request
+        return 9L
     }
 
     override suspend fun listPendingInvites(groupId: Long): NetworkResult<List<PendingInvite>, NetworkError> {

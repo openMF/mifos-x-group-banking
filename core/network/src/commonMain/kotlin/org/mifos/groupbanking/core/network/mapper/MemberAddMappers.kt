@@ -13,7 +13,9 @@ import org.mifos.groupbanking.core.model.CreateMemberRequest
 import org.mifos.groupbanking.core.model.MemberCreationResult
 import org.mifos.groupbanking.core.network.model.CreateMemberRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMemberResponseDto
+import org.mifos.groupbanking.core.network.model.MemberAddOfflinePayloadDto
 import org.mifos.groupbanking.core.network.model.UpdateMemberRoleRequestDto
+import kotlinx.serialization.json.Json
 
 /**
  * Domain <-> DTO mappers for the member-add create-chain
@@ -64,6 +66,46 @@ fun CreateMemberRequest.toAssignMemberRoleRequestDto(): UpdateMemberRoleRequestD
     groupId = groupId.toLong(),
     assignedDate = activationDate,
 )
+
+/**
+ * Server-parity Json config reused for the member-add SyncQueue payload (same private-to-file
+ * precedent as `LoanRequestMappers.syncQueueJson`).
+ */
+private val memberAddSyncQueueJson = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
+
+/**
+ * Serializes this [CreateMemberRequest] to the FLATTENED [MemberAddOfflinePayloadDto] JSON body the
+ * companion orchestration route `POST /companion/members` expects, for
+ * `SyncQueueRepository.enqueue(targetTable = "/companion/members")` when `cmp-network-monitor`
+ * reports offline. Collapses the online two-call chain (create-client + assign-role) into one
+ * queueable op that the companion (`HandleCreateMember`) replays server-side on drain — an offline
+ * member-add is durably queued, not dropped (the prior offline branch surfaced a `Network` error
+ * and lost it). `role` is the uppercase enum name (== [org.mifos.groupbanking.core.network.model.MemberRoleDto]
+ * wire value); `assignedDate` reuses [CreateMemberRequest.activationDate], matching the online
+ * `toAssignMemberRoleRequestDto`.
+ */
+fun CreateMemberRequest.toOfflinePayloadJson(
+    locale: String = "en",
+    dateFormat: String = "dd MMMM yyyy",
+): String {
+    val dto = MemberAddOfflinePayloadDto(
+        firstname = firstName,
+        lastname = lastName,
+        mobileNo = phone,
+        active = true,
+        activationDate = activationDate,
+        officeId = officeId,
+        groupId = groupId.toLong(),
+        locale = locale,
+        dateFormat = dateFormat,
+        role = role.name,
+        assignedDate = activationDate,
+    )
+    return memberAddSyncQueueJson.encodeToString(MemberAddOfflinePayloadDto.serializer(), dto)
+}
 
 /**
  * Assembles the composite create-chain result from step 1's wire response plus the ORIGINAL

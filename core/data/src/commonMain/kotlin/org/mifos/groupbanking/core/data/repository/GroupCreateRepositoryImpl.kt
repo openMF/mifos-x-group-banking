@@ -18,9 +18,12 @@ import org.mifos.groupbanking.core.model.Office
 import org.mifos.groupbanking.core.network.mapper.toDomainModel
 import org.mifos.groupbanking.core.network.mapper.toDomainModels
 import org.mifos.groupbanking.core.network.mapper.toDto
+import org.mifos.groupbanking.core.network.mapper.toJsonPayload
 import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApi
 
 private const val TAG = "GroupCreateRepository"
+private const val CREATE_GROUP_OPERATION_TYPE = "CREATE_GROUP"
+private const val CREATE_GROUP_TARGET_ROUTE = "/companion/groups"
 
 /**
  * See [GroupCreateRepository] KDoc for the Store5-branch rationale (`business_logic.kind:
@@ -31,6 +34,7 @@ private const val TAG = "GroupCreateRepository"
  */
 class GroupCreateRepositoryImpl(
     private val api: GroupCreateApi,
+    private val syncQueueRepository: SyncQueueRepository,
 ) : GroupCreateRepository {
 
     override suspend fun getOffices(orderBy: String): NetworkResult<List<Office>, NetworkError> {
@@ -61,5 +65,15 @@ class GroupCreateRepositoryImpl(
                 result
             }
         }
+    }
+
+    override suspend fun enqueueOffline(request: CreateGroupRequest): Long {
+        val payloadJson = request.toDto().toJsonPayload()
+        Logger.i(TAG) { "enqueueOffline: queuing $CREATE_GROUP_OPERATION_TYPE name=${request.name}" }
+        return syncQueueRepository.enqueue(
+            operationType = CREATE_GROUP_OPERATION_TYPE,
+            targetTable = CREATE_GROUP_TARGET_ROUTE,
+            payloadJson = payloadJson,
+        )
     }
 }

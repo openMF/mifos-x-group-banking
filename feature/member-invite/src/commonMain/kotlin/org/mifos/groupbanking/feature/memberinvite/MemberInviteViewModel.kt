@@ -107,6 +107,7 @@ data class MemberInviteState(
     val validationError: String? = null,
     val error: MemberInviteError? = null,
     val isOffline: Boolean = false,
+    val isOfflineQueued: Boolean = false,
 )
 
 /**
@@ -260,26 +261,34 @@ internal class MemberInviteViewModel(
             return
         }
 
-        if (!networkMonitor.isOnline.value) {
-            Logger.w(TAG) { "OnGenerateInvite attempted while offline groupId=$groupId" }
-            crashReporter.recordMessage(
-                message = "member-invite: generate attempted while offline groupId=$groupId",
-                level = CrashSeverity.Info,
-            )
-            updateState { copy(isOffline = true, error = MemberInviteError.Network) }
-            return
-        }
-
         generateJob?.cancel()
         generateJob = viewModelScope.launch {
-            updateState { copy(isGenerating = true, error = null, validationError = null) }
-            analytics.trackClientOperation(operation = "invite")
             val request = CreateInviteRequest(
                 groupId = groupId.toLongOrNull() ?: 0L,
                 invitedEmailPhone = contact,
                 roleToAssign = state.selectedRole,
                 expiresAt = Clock.System.now().plus(INVITE_VALIDITY_DAYS.days).toString(),
             )
+
+            if (!networkMonitor.isOnline.value) {
+                // Offline pre-flight: durably queue the invite so the drain replays it via the
+                // companion /batches self-dispatch (targetTable = "/companion/datatables/
+                // invitations/{groupId}") — never drop the write. Queued, not errored: no
+                // `error = Network` (a queued offline op is not a failure). The shareable code is
+                // minted server-side on drain, so the organizer is told it will send once online.
+                val queueId = repository.enqueueOffline(request)
+                Logger.i(TAG) { "OnGenerateInvite offline — enqueued queueId=$queueId groupId=$groupId" }
+                crashReporter.recordMessage(
+                    message = "member-invite: generate queued offline (queueId=$queueId) groupId=$groupId",
+                    level = CrashSeverity.Info,
+                )
+                updateState { copy(isOffline = true, isOfflineQueued = true, isGenerating = false) }
+                sendEvent(MemberInviteEvent.ShowSnackbar(message = "snack_invite_queued_offline"))
+                return@launch
+            }
+
+            updateState { copy(isGenerating = true, error = null, validationError = null) }
+            analytics.trackClientOperation(operation = "invite")
             val result = repository.createInvite(request)
             trySendAction(MemberInviteAction.Internal.GenerateResult(result))
         }

@@ -164,6 +164,7 @@ data class MemberAddState(
     val isSubmitting: Boolean = false,
     val isSubmitSuccess: Boolean = false,
     val isOffline: Boolean = false,
+    val isOfflineQueued: Boolean = false,
     @Transient
     val error: MemberAddError? = null,
     val showPhotoPicker: Boolean = false,
@@ -355,18 +356,24 @@ internal class MemberAddViewModel(
             updateState { copy(isSubmitting = true, error = null, validationErrors = emptyMap()) }
             analytics.trackClientOperation(operation = "create")
 
+            val request = buildCreateMemberRequest(state)
+
             if (!networkMonitor.isOnline.value) {
-                Logger.w(TAG) { "createMember attempted while offline — queue-offline fallback groupId=$groupId" }
+                // Offline pre-flight: durably queue the whole add-member chain so the drain replays
+                // it via the companion /batches self-dispatch to POST /companion/members
+                // (targetTable = "/companion/members"), which does create-client + assign-role
+                // server-side — never drop the write. Queued, not errored: no `error = Network`.
+                val queueId = repository.enqueueOffline(request)
+                Logger.i(TAG) { "createMember offline — enqueued queueId=$queueId groupId=$groupId" }
                 crashReporter.recordMessage(
-                    message = "member-add: submit attempted while offline groupId=$groupId",
+                    message = "member-add: submit queued offline (queueId=$queueId) groupId=$groupId",
                     level = CrashSeverity.Info,
                 )
-                updateState { copy(isSubmitting = false, isOffline = true, error = MemberAddError.Network) }
+                updateState { copy(isSubmitting = false, isOffline = true, isOfflineQueued = true) }
                 sendEvent(MemberAddEvent.ShowOfflineSyncDialog)
                 return@launch
             }
 
-            val request = buildCreateMemberRequest(state)
             // Photo-bytes deferral — see class KDoc "Photo-bytes deferral" for the full rationale.
             val result = repository.createMember(request = request, photoBytes = null)
             trySendAction(MemberAddAction.Internal.SubmitResult(result))

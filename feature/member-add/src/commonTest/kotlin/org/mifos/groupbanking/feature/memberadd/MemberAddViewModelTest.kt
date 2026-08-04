@@ -271,7 +271,7 @@ class MemberAddViewModelTest {
     // -- Submit while offline ------------------------------------------------------------------------
 
     @Test
-    fun `OnSubmit while offline shows the offline sync dialog and does not call the repository`() = runTest(testDispatcher) {
+    fun `OnSubmit while offline enqueues to the sync queue and does not call createMember`() = runTest(testDispatcher) {
         networkMonitor.setOnline(false)
         val viewModel = buildViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
@@ -284,8 +284,12 @@ class MemberAddViewModelTest {
 
         val state = viewModel.stateFlow.value
         assertTrue(state.isOffline)
-        assertEquals(MemberAddError.Network, state.error)
+        assertTrue(state.isOfflineQueued)
+        // Queued, NOT errored — a durably-queued offline member-add is not a failure.
+        assertNull(state.error)
+        // Offline: the network create-chain is NOT attempted; the write is enqueued instead.
         assertEquals(0, memberAddRepository.createMemberCallCount)
+        assertEquals(1, memberAddRepository.enqueueOfflineCallCount)
     }
 
     // -- Submit transport error -----------------------------------------------------------------------
@@ -382,6 +386,10 @@ private class FakeMemberAddRepository : MemberAddRepository {
         private set
     var lastPhotoBytes: ByteArray? = null
         private set
+    var enqueueOfflineCallCount: Int = 0
+        private set
+    var lastEnqueuedRequest: CreateMemberRequest? = null
+        private set
 
     override suspend fun createMember(
         request: CreateMemberRequest,
@@ -391,6 +399,12 @@ private class FakeMemberAddRepository : MemberAddRepository {
         lastRequest = request
         lastPhotoBytes = photoBytes
         return createMemberResult
+    }
+
+    override suspend fun enqueueOffline(request: CreateMemberRequest): Long {
+        enqueueOfflineCallCount++
+        lastEnqueuedRequest = request
+        return 11L
     }
 }
 

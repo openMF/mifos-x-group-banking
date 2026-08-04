@@ -75,4 +75,15 @@ interface GroupCreateRepository {
      * attempt and surfaces whatever `GroupCreateApi.createGroup` returns.
      */
     suspend fun createGroup(request: CreateGroupRequest): NetworkResult<GroupCreationResult, NetworkError>
+
+    /**
+     * Durably enqueues [request] to the offline write-queue ([SyncQueueRepository]) when
+     * `NetworkMonitor` reports offline, returning the generated queue row id. The row targets the
+     * full companion route `/companion/groups` so the sync-drain replays it through the companion's
+     * `/batches` self-dispatch back to `HandleCreateGroup` — an offline group-create is queued and
+     * later drained, never silently dropped (the prior offline branch surfaced an error dialog and
+     * lost the write). The ViewModel calls this in its pre-flight `!networkMonitor.isOnline.value`
+     * branch instead of [createGroup].
+     */
+    suspend fun enqueueOffline(request: CreateGroupRequest): Long
 }

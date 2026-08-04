@@ -36,19 +36,25 @@ import kotlin.jvm.JvmName
  *   caller can correlate the response row back to the originating queue row via the SAME index
  *   the caller used to build the request list.
  *
- * [relativeUrl] is derived as `"datatables/${targetTable}"` — every shipped enqueue call-site
- * (`CREATE_MEMBER`, `ASSIGN_MEMBER_ROLE`, `UPLOAD_MEMBER_PHOTO`, `LOAN_REQUEST`) targets a
- * Fineract datatable row (`SyncQueueItem.targetTable` kdoc: "the Fineract datatable the replayed
- * write lands on, e.g. `dt_loan_request`"), so every batched replay is a datatable `POST`.
- * [method] is always `"POST"` for the same reason (queued writes are always creates/appends to a
- * datatable row from the client's perspective — the datatable's OWN row-level semantics, e.g. an
- * upsert-by-entityId, are Fineract's concern, not the queue's). [body] is
- * [SyncQueueItem.payloadJson] verbatim — the queue never inspects or re-encodes it (same
- * "opaque payload" contract as `SyncQueueRepository.enqueue`'s kdoc).
+ * [relativeUrl] follows the TWO-CONVENTION [SyncQueueItem.targetTable] contract:
+ *  - a bare datatable name (e.g. `"dt_loan_request"`, no leading `/`) → `"datatables/$targetTable"`
+ *    (the shipped `LOAN_REQUEST` / `SUBMIT_MEETING` datatable-write call-sites), and
+ *  - a full companion route beginning with `/` (e.g. `"/companion/groups/24/shareout/execute"`,
+ *    the `SHARE_OUT_EXECUTE` / `ROTATION_PAYOUT_EXECUTE` orchestration call-sites) → used VERBATIM.
+ * Both forms are self-dispatched by the companion's `/batches` handler, which normalises the leading
+ * slash and strips any `/fineract-provider/api/v1` prefix before routing to its own mux — so a
+ * command-feature replay (share-out, rotation payout, loan apply, loan repayment) lands on its
+ * orchestration handler, not a bogus `datatables//companion/...` path.
+ * [method] is always `"POST"` (every queued write is a create/append/execute from the client's
+ * perspective — the target's OWN row/command semantics are Fineract/companion's concern, not the
+ * queue's). [body] is [SyncQueueItem.payloadJson] verbatim — the queue never inspects or re-encodes
+ * it (same "opaque payload" contract as `SyncQueueRepository.enqueue`'s kdoc).
  */
 fun SyncQueueItem.toBatchOperation(requestId: Int): BatchOperation = BatchOperation(
     requestId = requestId,
-    relativeUrl = "datatables/$targetTable",
+    // Leading-slash targetTable is a full companion route (share-out/rotation/loan orchestration);
+    // a bare name is a Fineract datatable the replay POSTs a row to.
+    relativeUrl = if (targetTable.startsWith("/")) targetTable else "datatables/$targetTable",
     method = "POST",
     body = payloadJson,
 )

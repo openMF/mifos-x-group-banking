@@ -48,6 +48,25 @@ class BatchSyncMappersTest {
     }
 
     @Test
+    fun toBatchOperation_fullCompanionRoute_isUsedVerbatim_notDatatablePrefixed() {
+        // The SHARE_OUT_EXECUTE / ROTATION_PAYOUT_EXECUTE call-sites enqueue a full companion route
+        // (leading `/`), NOT a bare datatable name — it must replay to that orchestration handler,
+        // never a bogus `datatables//companion/...` path.
+        val shareOutQueueItem = loanRequestQueueItem.copy(
+            operationType = "SHARE_OUT_EXECUTE",
+            targetTable = "/companion/groups/24/shareout/execute",
+        )
+        val op = shareOutQueueItem.toBatchOperation(requestId = 1)
+        assertEquals("/companion/groups/24/shareout/execute", op.relativeUrl)
+    }
+
+    @Test
+    fun toBatchOperation_bareDatatableName_stillGetsDatatablesPrefix() {
+        val op = loanRequestQueueItem.toBatchOperation(requestId = 1)
+        assertEquals("datatables/dt_loan_request", op.relativeUrl)
+    }
+
+    @Test
     fun toBatchOperation_methodIsAlwaysPost() {
         val op = loanRequestQueueItem.toBatchOperation(requestId = 1)
         assertEquals("POST", op.method)

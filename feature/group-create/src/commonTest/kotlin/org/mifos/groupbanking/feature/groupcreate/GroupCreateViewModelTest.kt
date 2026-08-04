@@ -266,7 +266,7 @@ class GroupCreateViewModelTest {
     }
 
     @Test
-    fun `OnSubmit while offline shows offline sync dialog and does not call the repository`() = runTest(testDispatcher) {
+    fun `OnSubmit while offline enqueues to the sync queue and shows the offline sync dialog`() = runTest(testDispatcher) {
         networkMonitor.setOnline(false)
         val viewModel = buildViewModel(vslaTypeConfig())
         testDispatcher.scheduler.advanceUntilIdle()
@@ -279,8 +279,13 @@ class GroupCreateViewModelTest {
 
         val state = viewModel.stateFlow.value
         assertTrue(state.isOffline)
-        assertEquals(GroupCreateError.Network, state.error)
+        assertTrue(state.isOfflineQueued)
+        // Queued, NOT errored — a durably-queued offline write is not a failure.
+        assertNull(state.error)
+        // Offline: the network create is NOT attempted; the write is enqueued instead.
         assertEquals(0, groupCreateRepository.createGroupCallCount)
+        assertEquals(1, groupCreateRepository.enqueueOfflineCallCount)
+        assertEquals(42L, groupCreateRepository.lastEnqueuedRequest?.userId)
     }
 
     @Test
@@ -402,6 +407,10 @@ private class FakeGroupCreateRepository : GroupCreateRepository {
         private set
     var lastRequest: CreateGroupRequest? = null
         private set
+    var enqueueOfflineCallCount: Int = 0
+        private set
+    var lastEnqueuedRequest: CreateGroupRequest? = null
+        private set
 
     override suspend fun getOffices(orderBy: String): NetworkResult<List<Office>, NetworkError> = officesResult
 
@@ -409,6 +418,12 @@ private class FakeGroupCreateRepository : GroupCreateRepository {
         createGroupCallCount++
         lastRequest = request
         return createGroupResult
+    }
+
+    override suspend fun enqueueOffline(request: CreateGroupRequest): Long {
+        enqueueOfflineCallCount++
+        lastEnqueuedRequest = request
+        return 7L
     }
 }
 

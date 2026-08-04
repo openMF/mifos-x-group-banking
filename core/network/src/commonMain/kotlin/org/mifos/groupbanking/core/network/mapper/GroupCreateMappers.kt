@@ -27,6 +27,7 @@ import org.mifos.groupbanking.core.network.model.OfficeDto
 import org.mifos.groupbanking.core.network.model.PayoutOrderMethodDto
 import org.mifos.groupbanking.core.network.model.SavingsMechanismDto
 import org.mifos.groupbanking.core.network.model.ShareoutFormulaDto
+import kotlinx.serialization.json.Json
 import kotlin.jvm.JvmName
 
 /**
@@ -197,3 +198,26 @@ fun PayoutOrderMethod.toDto(): PayoutOrderMethodDto = when (this) {
     PayoutOrderMethod.NA -> PayoutOrderMethodDto.NA
     PayoutOrderMethod.UNKNOWN -> PayoutOrderMethodDto.UNKNOWN
 }
+
+// ---------- offline SyncQueue serialization ----------
+
+/**
+ * Server-parity Json config (mirrors `NetworkModule`'s client config — `ignoreUnknownKeys` +
+ * `coerceInputValues`) reused for the group-create SyncQueue payload round-trip. Kept private to
+ * this file — the offline-queue payload is always this project's own wire shape (same precedent as
+ * `LoanRequestMappers.syncQueueJson`).
+ */
+private val groupCreateSyncQueueJson = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
+
+/**
+ * Serializes this [CreateGroupRequestDto] to the exact JSON body the ONLINE `GroupCreateApi.createGroup`
+ * POSTs to `/companion/groups`, for `SyncQueueRepository.enqueue(targetTable = "/companion/groups")`
+ * to persist when `cmp-network-monitor` reports offline. The queued row replays through the
+ * companion's `/batches` self-dispatch back to `HandleCreateGroup` — so an offline group-create is
+ * durably queued and drained, not silently dropped.
+ */
+fun CreateGroupRequestDto.toJsonPayload(): String =
+    groupCreateSyncQueueJson.encodeToString(CreateGroupRequestDto.serializer(), this)
