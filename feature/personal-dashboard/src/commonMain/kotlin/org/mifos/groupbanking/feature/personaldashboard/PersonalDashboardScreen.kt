@@ -246,7 +246,11 @@ internal fun PersonalDashboardTopSection(
     val currencyLabel = stringResource(Res.string.screens_personal_dashboard_currency_kes)
 
     Surface(color = MaterialTheme.colorScheme.primary, modifier = modifier.fillMaxWidth()) {
-        Column {
+        // Bottom apron of green below the group banner: the Savings card floats up over the header
+        // via `offset(y = -sp.xl)` — without this green landing zone that offset lands the card ON
+        // the group banner (covering it). The apron equals the card's lift so the card overlaps only
+        // green, keeping the banner fully visible above it.
+        Column(modifier = Modifier.padding(bottom = sp.xl)) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(sp.lg),
                 horizontalArrangement = Arrangement.SpaceBetween,
