@@ -103,7 +103,7 @@ koinAnnotationsVersion = "4.2.2"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.5.3"
+kmptoolkit = "3.5.9"
 
 # CMP Libraries
 compose-plugin = "1.11.1"
