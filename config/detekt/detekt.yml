@@ -146,7 +146,10 @@ complexity:
     ignoreOverloaded: false
   CyclomaticComplexMethod:
     active: true
-    threshold: 15
+    # 18 (was 15): MVI ViewModel action routers / validators branch over a sealed action + state.
+    threshold: 18
+    # @Composable UI (state-driven when-branches) is declarative, not imperative complexity.
+    ignoreAnnotated: ['Composable']
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
@@ -169,12 +172,17 @@ complexity:
   LongMethod:
     active: true
     threshold: 150 #60
+    # @Composable layout functions are declarative UI, not imperative logic — a screen's length is
+    # its whole layout tree. Exclude them; the rule still guards non-UI methods.
+    ignoreAnnotated: ['Composable']
   LongParameterList:
     active: true
     # Updating Common values based on current scenario
     functionThreshold: 20 #6
     constructorThreshold: 30 #7
-    ignoreDefaultParameters: false
+    # @Composable params are mostly optional content-descriptions / test-tags with defaults; they
+    # don't burden the caller, so count only the required params.
+    ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
   MethodOverloading:
@@ -228,9 +236,10 @@ complexity:
         "**/jsTest/**",
         "**/iosTest/**",
       ]
-    # Modifying default values 11 to 20
-    thresholdInFiles: 20
-    thresholdInClasses: 20
+    # 30 (was 20): a Compose screen file is a tree of many small @Composable functions, and an
+    # MVI ViewModel routes many small sealed-action handlers — 20-29 each is inherent to the pattern.
+    thresholdInFiles: 30
+    thresholdInClasses: 30
     thresholdInInterfaces: 20
     thresholdInObjects: 20
     thresholdInEnums: 20

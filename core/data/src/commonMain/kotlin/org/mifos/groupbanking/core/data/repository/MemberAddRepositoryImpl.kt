@@ -66,39 +66,45 @@ class MemberAddRepositoryImpl(
                     }
                     is NetworkResult.Success -> {
                         Logger.i(TAG) { "createMember: assignMemberRole succeeded clientId=$clientId" }
-
-                        // Optional, best-effort final step — a photo-upload failure never fails
-                        // the overall create-chain (photo capture is optional per
-                        // ui.yaml#actions.OnPhotoRemoved).
-                        val photoUploaded = if (photoBytes != null) {
-                            when (
-                                val uploadResult = api.uploadMemberPhoto(
-                                    clientId = clientId.toString(),
-                                    photoBytes = photoBytes,
-                                    fileName = request.photoFileName(),
-                                )
-                            ) {
-                                is NetworkResult.Success -> {
-                                    Logger.i(TAG) { "createMember: uploadMemberPhoto succeeded clientId=$clientId" }
-                                    true
-                                }
-                                is NetworkResult.Error -> {
-                                    Logger.e(TAG) {
-                                        "createMember: uploadMemberPhoto failed (non-fatal, member " +
-                                            "still created): ${uploadResult.error}"
-                                    }
-                                    false
-                                }
-                            }
-                        } else {
-                            false
-                        }
-
+                        // Optional, best-effort final step — a photo-upload failure never fails the
+                        // create-chain (photo capture is optional per ui.yaml#actions.OnPhotoRemoved).
+                        val photoUploaded = uploadMemberPhotoBestEffort(clientId, photoBytes, request.photoFileName())
                         NetworkResult.Success(
                             createResult.data.toDomainModel(request = request, photoUploaded = photoUploaded),
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Best-effort member-photo upload — returns whether the photo was stored. A null [photoBytes]
+     * (no photo captured) or an upload failure both return `false` WITHOUT failing the surrounding
+     * create-member chain (the client + role are already committed on the server).
+     */
+    private suspend fun uploadMemberPhotoBestEffort(
+        clientId: Long,
+        photoBytes: ByteArray?,
+        fileName: String,
+    ): Boolean {
+        if (photoBytes == null) return false
+        return when (
+            val uploadResult = api.uploadMemberPhoto(
+                clientId = clientId.toString(),
+                photoBytes = photoBytes,
+                fileName = fileName,
+            )
+        ) {
+            is NetworkResult.Success -> {
+                Logger.i(TAG) { "createMember: uploadMemberPhoto succeeded clientId=$clientId" }
+                true
+            }
+            is NetworkResult.Error -> {
+                Logger.e(TAG) {
+                    "createMember: uploadMemberPhoto failed (non-fatal, member still created): ${uploadResult.error}"
+                }
+                false
             }
         }
     }

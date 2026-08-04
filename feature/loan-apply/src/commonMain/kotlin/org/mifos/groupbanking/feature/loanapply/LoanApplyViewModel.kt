@@ -413,8 +413,12 @@ internal class LoanApplyViewModel(
         val member = state.selectedMember
         val product = state.selectedProduct
         val amount = state.requestedAmount.toDoubleOrNull()
-        if (member == null || product == null || amount == null || state.amountError != null) {
-            Logger.w(TAG) { "OnSubmit blocked — form incomplete or invalid groupId=$groupId" }
+        if (member == null || product == null || amount == null) {
+            Logger.w(TAG) { "OnSubmit blocked — form incomplete groupId=$groupId" }
+            return
+        }
+        if (state.amountError != null) {
+            Logger.w(TAG) { "OnSubmit blocked — requested amount invalid groupId=$groupId" }
             return
         }
 
