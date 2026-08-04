@@ -117,7 +117,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun getOffices_success_returnsMappedOfficesInOrder() = runTest {
         val api = FakeGroupCreateApi(officesResult = NetworkResult.Success(officeDtos))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.getOffices()
 
@@ -131,7 +131,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun getOffices_defaultsOrderByToName() = runTest {
         val api = FakeGroupCreateApi(officesResult = NetworkResult.Success(officeDtos))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         repo.getOffices()
 
@@ -141,7 +141,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun getOffices_emptyList_returnsSuccessWithEmptyList() = runTest {
         val api = FakeGroupCreateApi(officesResult = NetworkResult.Success(emptyList()))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.getOffices()
 
@@ -152,7 +152,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun getOffices_unauthorized_returnsErrorUnchanged() = runTest {
         val api = FakeGroupCreateApi(officesResult = NetworkResult.Error(NetworkError.UNAUTHORIZED))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.getOffices()
 
@@ -162,7 +162,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun getOffices_serverError_returnsErrorUnchanged() = runTest {
         val api = FakeGroupCreateApi(officesResult = NetworkResult.Error(NetworkError.SERVER))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.getOffices()
 
@@ -178,7 +178,7 @@ class GroupCreateRepositoryTest {
                 CreateGroupResponseDto(groupId = "grp-100", fineractCenterId = 55, inviteCode = "ABC123"),
             ),
         )
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createGroup(createRequest)
 
@@ -194,7 +194,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun createGroup_validationError_returnsErrorUnchanged() = runTest {
         val api = FakeGroupCreateApi(createGroupResult = NetworkResult.Error(NetworkError.BAD_REQUEST))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createGroup(createRequest)
 
@@ -206,7 +206,7 @@ class GroupCreateRepositoryTest {
         // 409 (group name taken) has no dedicated NetworkError bucket — surfaces as UNKNOWN,
         // same convention as the Service layer; the repository does not re-bucket it.
         val api = FakeGroupCreateApi(createGroupResult = NetworkResult.Error(NetworkError.UNKNOWN))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createGroup(createRequest)
 
@@ -222,7 +222,7 @@ class GroupCreateRepositoryTest {
         // returns. Simulated here as NetworkError.UNKNOWN (the Service's transport-failure
         // mapping), which is exactly what a real offline attempt returns.
         val api = FakeGroupCreateApi(createGroupResult = NetworkResult.Error(NetworkError.UNKNOWN))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createGroup(createRequest)
 
@@ -232,7 +232,7 @@ class GroupCreateRepositoryTest {
     @Test
     fun createGroup_serverError_returnsErrorUnchanged() = runTest {
         val api = FakeGroupCreateApi(createGroupResult = NetworkResult.Error(NetworkError.SERVER))
-        val repo = GroupCreateRepositoryImpl(api)
+        val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createGroup(createRequest)
 

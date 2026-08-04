@@ -108,7 +108,7 @@ class MemberAddRepositoryTest {
             assignRoleResult = NetworkResult.Success(assignRoleResponseDto),
             uploadPhotoResult = NetworkResult.Success(uploadPhotoResponseDto),
         )
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = byteArrayOf(1, 2, 3, 4))
 
@@ -127,7 +127,7 @@ class MemberAddRepositoryTest {
             assignRoleResult = NetworkResult.Success(assignRoleResponseDto),
             uploadPhotoResult = NetworkResult.Success(uploadPhotoResponseDto),
         )
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         repo.createMember(request, photoBytes = byteArrayOf(1, 2, 3))
 
@@ -142,7 +142,7 @@ class MemberAddRepositoryTest {
             createClientResult = NetworkResult.Success(createResponseDto),
             assignRoleResult = NetworkResult.Success(assignRoleResponseDto),
         )
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = null)
 
@@ -157,7 +157,7 @@ class MemberAddRepositoryTest {
     @Test
     fun createMember_createClientFails_shortCircuitsAndNeverCallsAssignRoleOrUploadPhoto() = runTest {
         val api = FakeMemberAddApi(createClientResult = NetworkResult.Error(NetworkError.BAD_REQUEST))
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = byteArrayOf(1, 2, 3))
 
@@ -175,7 +175,7 @@ class MemberAddRepositoryTest {
             createClientResult = NetworkResult.Success(createResponseDto),
             assignRoleResult = NetworkResult.Error(NetworkError.BAD_REQUEST),
         )
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = byteArrayOf(1, 2, 3))
 
@@ -193,7 +193,7 @@ class MemberAddRepositoryTest {
             assignRoleResult = NetworkResult.Success(assignRoleResponseDto),
             uploadPhotoResult = NetworkResult.Error(NetworkError.SERVER),
         )
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = byteArrayOf(1, 2, 3))
 
@@ -216,7 +216,7 @@ class MemberAddRepositoryTest {
         // strategy: queue_for_sync). This test proves the repository surfaces the raw transport
         // error untouched, so that seam can key off it.
         val api = FakeMemberAddApi(createClientResult = NetworkResult.Error(NetworkError.UNKNOWN))
-        val repo = MemberAddRepositoryImpl(api)
+        val repo = MemberAddRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createMember(request, photoBytes = null)
 

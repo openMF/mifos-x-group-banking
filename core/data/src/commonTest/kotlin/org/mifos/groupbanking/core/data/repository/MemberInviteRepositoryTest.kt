@@ -86,7 +86,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun createInvite_success_mapsWireResponseAndThreadsGroupIdAndRoleIntoRequest() = runTest {
         val api = FakeMemberInviteApi(createResult = NetworkResult.Success(generatedDto))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createInvite(
             CreateInviteRequest(
@@ -109,7 +109,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun createInvite_conflict_returnsErrorForCallerToSurface() = runTest {
         val api = FakeMemberInviteApi(createResult = NetworkResult.Error(NetworkError.UNKNOWN))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.createInvite(
             CreateInviteRequest(
@@ -128,7 +128,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun listPendingInvites_success_mapsEachRowAndParsesWireRole() = runTest {
         val api = FakeMemberInviteApi(listResult = NetworkResult.Success(listOf(pendingDto)))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.listPendingInvites(42)
 
@@ -142,7 +142,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun listPendingInvites_serverError_returnsError() = runTest {
         val api = FakeMemberInviteApi(listResult = NetworkResult.Error(NetworkError.SERVER))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.listPendingInvites(42)
 
@@ -154,7 +154,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun revokeInvite_success_returnsUnitAndThreadsPathParams() = runTest {
         val api = FakeMemberInviteApi(revokeResult = NetworkResult.Success(RevokeInviteResponseDto(resourceId = 12)))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.revokeInvite(groupId = 42, rowId = 12)
 
@@ -166,7 +166,7 @@ class MemberInviteRepositoryTest {
     @Test
     fun revokeInvite_notFound_returnsErrorForOptimisticUndo() = runTest {
         val api = FakeMemberInviteApi(revokeResult = NetworkResult.Error(NetworkError.NOT_FOUND))
-        val repo = MemberInviteRepositoryImpl(api)
+        val repo = MemberInviteRepositoryImpl(api, NoOpSyncQueueRepository())
 
         val result = repo.revokeInvite(groupId = 42, rowId = 99)
 

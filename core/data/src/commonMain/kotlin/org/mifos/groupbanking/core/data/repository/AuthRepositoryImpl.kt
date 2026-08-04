@@ -33,6 +33,7 @@ private const val TAG = "AuthRepository"
 class AuthRepositoryImpl(
     private val api: CompanionAuthApi,
     private val sessionStore: CompanionSessionStore,
+    private val cacheCleaner: LocalCacheCleaner,
 ) : AuthRepository {
 
     override val currentSession: Flow<AuthSession?> = sessionStore.session
@@ -85,6 +86,13 @@ class AuthRepositoryImpl(
 
     override suspend fun clearSession() {
         sessionStore.clear()
-        Logger.i(TAG) { "session cleared" }
+        // Wipe ALL locally-cached user-scoped state (per-user dashboards, loans, savings, member
+        // lists, freshness stamps, AND the offline sync-queue). Room caches are keyed by domain id
+        // (e.g. member_dashboard_cache by groupId), NOT by user — so without this, the NEXT user to
+        // sign in on this device reads the PREVIOUS user's cached rows (e.g. the personal dashboard
+        // greeting stuck on the prior member's name). Clearing on logout is exactly the contract the
+        // logout dialog already promises ("Any unsynced changes will be lost").
+        cacheCleaner.clearAll()
+        Logger.i(TAG) { "session cleared + local caches wiped" }
     }
 }

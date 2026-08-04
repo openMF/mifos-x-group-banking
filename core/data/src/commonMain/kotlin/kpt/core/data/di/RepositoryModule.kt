@@ -34,6 +34,8 @@ import org.mifos.groupbanking.core.data.demo.DemoSessionManager
 import org.mifos.groupbanking.core.data.demo.DemoSessionManagerImpl
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.data.repository.AuthRepositoryImpl
+import org.mifos.groupbanking.core.data.repository.LocalCacheCleaner
+import org.mifos.groupbanking.core.data.repository.RoomLocalCacheCleaner
 import org.mifos.groupbanking.core.data.repository.ChangePinRepository
 import org.mifos.groupbanking.core.data.repository.ChangePinRepositoryImpl
 import org.mifos.groupbanking.core.data.repository.FieldOfficerDashboardRepository
@@ -97,7 +99,8 @@ val DataModule = module {
 
     // login-signup client stack (COMP-AUTH-001/002/003) — Store5-free (business_logic.kind:
     // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
-    single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get()) }
+    single<LocalCacheCleaner> { RoomLocalCacheCleaner(database = get<AppDatabase>()) }
+    single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get(), cacheCleaner = get()) }
 
     // login-signup Demo Explore offline guest session (ui.yaml#demo_confirm_dialog,
     // flow.yaml#on_demo_confirm). Seeds the offline read caches the Demo-Explore mode browses —

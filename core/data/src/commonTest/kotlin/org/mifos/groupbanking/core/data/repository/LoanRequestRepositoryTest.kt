@@ -35,6 +35,9 @@ private class FakeLoanRequestApi(
         callCount++
         return result ?: error("result not stubbed")
     }
+
+    override suspend fun getMemberSavingsBalance(clientId: Long): NetworkResult<Double, NetworkError> =
+        NetworkResult.Success(0.0)
 }
 
 private class FakeLoanRequestSyncQueueRepository : SyncQueueRepository {

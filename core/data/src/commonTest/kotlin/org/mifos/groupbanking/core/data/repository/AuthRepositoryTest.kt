@@ -74,6 +74,13 @@ private class FakeCompanionSessionStore : CompanionSessionStore {
     }
 }
 
+private class FakeLocalCacheCleaner : LocalCacheCleaner {
+    var clearAllCallCount = 0
+    override suspend fun clearAll() {
+        clearAllCallCount++
+    }
+}
+
 /**
  * TDD RED-first coverage for [AuthRepository] / [AuthRepositoryImpl]. No try-catch anywhere in
  * the repository under test (Mandatory Rule 4) — every branch below is a plain `when` over the
@@ -94,7 +101,7 @@ class AuthRepositoryTest {
     fun selfRegister_success_persistsSessionAndReturnsMappedDomain() = runTest {
         val api = FakeCompanionAuthApi(selfRegisterResult = NetworkResult.Success(successDto))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.selfRegister(SelfRegistration("Amina", "amina@example.com", "hunter22"))
 
@@ -109,7 +116,7 @@ class AuthRepositoryTest {
     fun selfRegister_conflictError_doesNotPersistSessionAndReturnsError() = runTest {
         val api = FakeCompanionAuthApi(selfRegisterResult = NetworkResult.Error(NetworkError.UNKNOWN))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.selfRegister(SelfRegistration("Amina", "amina@example.com", "hunter22"))
 
@@ -121,7 +128,7 @@ class AuthRepositoryTest {
     fun selfRegister_validationError400_doesNotPersistSession() = runTest {
         val api = FakeCompanionAuthApi(selfRegisterResult = NetworkResult.Error(NetworkError.BAD_REQUEST))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.selfRegister(SelfRegistration("", "", ""))
 
@@ -135,7 +142,7 @@ class AuthRepositoryTest {
     fun login_success_persistsSessionAndReturnsMappedDomain() = runTest {
         val api = FakeCompanionAuthApi(loginResult = NetworkResult.Success(successDto))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.login(LoginCredentials("amina@example.com", "hunter22"))
 
@@ -149,7 +156,7 @@ class AuthRepositoryTest {
     fun login_unauthorized_doesNotPersistSessionAndReturnsError() = runTest {
         val api = FakeCompanionAuthApi(loginResult = NetworkResult.Error(NetworkError.UNAUTHORIZED))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.login(LoginCredentials("amina@example.com", "wrong"))
 
@@ -161,7 +168,7 @@ class AuthRepositoryTest {
     fun login_rateLimited_doesNotPersistSession() = runTest {
         val api = FakeCompanionAuthApi(loginResult = NetworkResult.Error(NetworkError.TOO_MANY_REQUESTS))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.login(LoginCredentials("amina@example.com", "hunter22"))
 
@@ -176,7 +183,7 @@ class AuthRepositoryTest {
         val profileDto = UserProfileDto("u-1", "Amina", "amina@example.com", emptyList())
         val api = FakeCompanionAuthApi(meResult = NetworkResult.Success(profileDto))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.refreshSession("tok-abc")
 
@@ -189,7 +196,7 @@ class AuthRepositoryTest {
     fun refreshSession_expiredToken401_returnsError() = runTest {
         val api = FakeCompanionAuthApi(meResult = NetworkResult.Error(NetworkError.UNAUTHORIZED))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.refreshSession("expired-token")
 
@@ -200,7 +207,7 @@ class AuthRepositoryTest {
     fun refreshSession_serverError_returnsError() = runTest {
         val api = FakeCompanionAuthApi(meResult = NetworkResult.Error(NetworkError.SERVER))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         val result = repo.refreshSession("tok")
 
@@ -211,7 +218,7 @@ class AuthRepositoryTest {
 
     @Test
     fun currentSession_startsNullWhenNoSessionPersisted() = runTest {
-        val repo = AuthRepositoryImpl(FakeCompanionAuthApi(), FakeCompanionSessionStore())
+        val repo = AuthRepositoryImpl(FakeCompanionAuthApi(), FakeCompanionSessionStore(), FakeLocalCacheCleaner())
 
         assertNull(repo.currentSession.first())
     }
@@ -220,7 +227,7 @@ class AuthRepositoryTest {
     fun currentSession_emitsSavedSessionAfterSuccessfulLogin() = runTest {
         val api = FakeCompanionAuthApi(loginResult = NetworkResult.Success(successDto))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
 
         repo.login(LoginCredentials("amina@example.com", "hunter22"))
 
@@ -231,12 +238,27 @@ class AuthRepositoryTest {
     fun clearSession_delegatesToSessionStoreAndClearsCurrentSession() = runTest {
         val api = FakeCompanionAuthApi(loginResult = NetworkResult.Success(successDto))
         val sessionStore = FakeCompanionSessionStore()
-        val repo = AuthRepositoryImpl(api, sessionStore)
+        val repo = AuthRepositoryImpl(api, sessionStore, FakeLocalCacheCleaner())
         repo.login(LoginCredentials("amina@example.com", "hunter22"))
 
         repo.clearSession()
 
         assertEquals(1, sessionStore.clearCallCount)
         assertNull(repo.currentSession.first())
+    }
+
+    @Test
+    fun clearSession_wipesAllLocalCaches_soTheNextUserSeesNoStaleData() = runTest {
+        val api = FakeCompanionAuthApi(loginResult = NetworkResult.Success(successDto))
+        val sessionStore = FakeCompanionSessionStore()
+        val cacheCleaner = FakeLocalCacheCleaner()
+        val repo = AuthRepositoryImpl(api, sessionStore, cacheCleaner)
+        repo.login(LoginCredentials("amina@example.com", "hunter22"))
+
+        repo.clearSession()
+
+        // Logout MUST wipe the user-scoped Room caches (dashboards/loans/savings are keyed by
+        // domain id, not user) so the next sign-in on this device never reads the prior user's rows.
+        assertEquals(1, cacheCleaner.clearAllCallCount)
     }
 }
