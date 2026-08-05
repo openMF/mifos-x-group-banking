@@ -16,12 +16,12 @@ import org.mifos.groupbanking.core.model.MeetingListItem
 import org.mifos.groupbanking.core.model.RescheduleMeetingRequest
 
 /**
- * Read surface for the meeting-calendar screen — the single-key merge of `get_center_meetings` +
+ * Read surface for the meeting-calendar screen — the single-key merge of `get_meeting_schedule` +
  * `get_meeting_records_datatable`.
  *
  * Wraps the single-key NETWORK_WITH_CACHE `MeetingCalendarStore` and exposes exactly one read
  * path — [meetingsStream], an offline-first [ScreenDataStream] of `List<MeetingListItem>` keyed by
- * `centerId`. There is no DAO-bypass read and no write path: the list is read-only
+ * `groupId`. There is no DAO-bypass read and no write path: the list is read-only
  * (`data-flow.yaml#sync_queue: []`, RULE-IMPLEMENT-STORE5-001 S5-1 / S5-2). No `try-catch`, no
  * `Result<T>` envelope — the stream surfaces `ScreenState` (Loading / Content / NoNetwork / Error /
  * Empty) directly.
@@ -31,7 +31,7 @@ import org.mifos.groupbanking.core.model.RescheduleMeetingRequest
 interface MeetingRepository {
 
     /**
-     * Offline-first stream of the merged scheduled-meetings list for [centerId].
+     * Offline-first stream of the merged scheduled-meetings list for [groupId].
      *
      * The store fires the two reads in parallel and merges them into one `List<MeetingListItem>`; a
      * cached list is served immediately then background-revalidated per the store's
@@ -40,13 +40,13 @@ interface MeetingRepository {
      * `ScreenState.Empty`. Call [ScreenDataStream.retry] to re-drive a failed fetch (the Retry CTA);
      * pull-to-refresh maps to a fresh network re-collection.
      *
-     * @param centerId The group center whose meetings to stream (nav param).
+     * @param groupId The group center whose meetings to stream (nav param).
      * @param scope CoroutineScope (typically `viewModelScope`) for the auto-refresh coroutine.
      * @param fetchPolicy Read policy. Defaults to [FetchPolicy.CACHE_FIRST_SWR] —
      *   stale-while-revalidate, matching the declared cache strategy.
      */
     fun meetingsStream(
-        centerId: Int,
+        groupId: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
     ): ScreenDataStream<List<MeetingListItem>>
@@ -57,7 +57,7 @@ interface MeetingRepository {
      * and returns the generated queue row id.
      *
      * **Server-gated — the live network PUT is pending-device-verify.** The mapped companion tool
-     * `companion_update_calendar` (`PUT /centers/{centerId}/calendars/{calendarId}?command=updateCalendar`,
+     * `companion_update_calendar` (`PUT /groups/{groupId}/calendars/{calendarId}?command=updateCalendar`,
      * mirrored to `dt_group_config`) is not deployed, so this method does NOT attempt a network call.
      * It offline-queues the payload (operation `UPDATE_MEETING_CALENDAR`, table `dt_group_config`) so the
      * write is durable and replays when the companion API + connectivity are available. Offline-first by

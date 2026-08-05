@@ -34,7 +34,7 @@ data class GroupDto(
     @SerialName("healthIndicator") val healthIndicator: HealthIndicatorDto = HealthIndicatorDto.UNKNOWN,
     @SerialName("overdueRate") val overdueRate: Double,
     @SerialName("status") val status: String,
-    @SerialName("fineractCenterId") val fineractCenterId: Long,
+    @SerialName("fineractGroupId") val fineractGroupId: Long,
 ) {
     companion object {
         /** Bumped when this DTO shape changes (registry `version:` driven). See EC30. */

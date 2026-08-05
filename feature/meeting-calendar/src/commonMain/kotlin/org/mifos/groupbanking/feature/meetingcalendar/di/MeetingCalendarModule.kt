@@ -17,7 +17,7 @@ import org.mifos.groupbanking.feature.meetingcalendar.MeetingCalendarViewModel
  * Koin module for the `meeting-calendar` feature. `MeetingRepository` is resolved from `DataModule`,
  * `SessionManager` from `core-base/security`, `CrashReporter` from `core-base/observability`, and
  * `KptAnalyticsTracker` from `core/analytics` — all already included via `KoinModules.allModules`.
- * The `centerId` nav-param is supplied at call-site via Koin `parametersOf(centerId)` (mirrors
+ * The `groupId` nav-param is supplied at call-site via Koin `parametersOf(groupId)` (mirrors
  * `LoanListModule`'s / `GroupDashboardModule`'s parameter-forwarding convention). See API.md#di.
  */
 val MeetingCalendarModule = module {
@@ -27,7 +27,7 @@ val MeetingCalendarModule = module {
             sessionManager = get(),
             crashReporter = get(),
             analytics = get(),
-            centerId = parameters.get(),
+            groupId = parameters.get(),
         )
     }
 }

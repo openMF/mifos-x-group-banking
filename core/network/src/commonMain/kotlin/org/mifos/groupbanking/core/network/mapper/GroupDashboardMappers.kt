@@ -56,7 +56,7 @@ fun GroupDashboardResponseDto.toDomainModel(): GroupDashboard = GroupDashboard(
 
 fun GroupDetailDto.toDomainModel(): GroupDetail = GroupDetail(
     id = id,
-    fineractCenterId = fineractCenterId,
+    fineractGroupId = fineractGroupId,
     name = name,
     cycleNumber = cycleNumber,
     cycleLengthMonths = cycleLengthMonths,

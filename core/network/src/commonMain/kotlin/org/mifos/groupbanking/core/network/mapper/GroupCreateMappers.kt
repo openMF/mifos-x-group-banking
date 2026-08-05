@@ -75,7 +75,7 @@ fun CreateGroupRequestDto.toDomainModel(): CreateGroupRequest = CreateGroupReque
 
 fun CreateGroupResponseDto.toDomainModel(): GroupCreationResult = GroupCreationResult(
     groupId = groupId,
-    fineractCenterId = fineractCenterId,
+    fineractGroupId = fineractGroupId,
     inviteCode = inviteCode,
 )
 

@@ -145,8 +145,7 @@ object MifosParamKeys {
     const val MEETING_DATE = "meeting_date"
     const val ATTENDANCE_COUNT = "attendance_count"
 
-    // Center-specific parameters
-    const val CENTER_ID = "center_id"
+    // Center-specific parameters (center == group in the group-banking model; GROUP_ID above is reused)
     const val CENTER_NAME = "center_name"
     const val COLLECTION_AMOUNT = "collection_amount"
     const val COLLECTION_METHOD = "collection_method"

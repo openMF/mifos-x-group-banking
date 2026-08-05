@@ -30,7 +30,7 @@ data class Group(
     val healthIndicator: HealthIndicator,
     val overdueRate: Double,
     val status: String,
-    val fineractCenterId: Long,
+    val fineractGroupId: Long,
 )
 
 /**

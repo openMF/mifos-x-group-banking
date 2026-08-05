@@ -9,9 +9,11 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the meeting-summary feature's
- * `GET /datatables/dt_meeting_record/{centerId}` endpoint. Follows the same default-param
+ * `GET /datatables/dt_meeting_record/{groupId}` endpoint. Follows the same default-param
  * config-class pattern as [LoanDetailApiConfig].
  *
  * The shared `HttpClient` singleton in `kpt.core.network.di.NetworkModule` is already bound to the
@@ -23,5 +25,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MeetingRecordApi base URL.
  */
 data class MeetingRecordApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

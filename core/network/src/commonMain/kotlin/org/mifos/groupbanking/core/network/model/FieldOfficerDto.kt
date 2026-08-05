@@ -13,31 +13,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Wire envelope for the paginated `GET /fineract-provider/api/v1/centers?staffId=…` response
- * (field-officer-dashboard `get_centers_for_staff`, FR-009). See API.md#dtos — PagedCentersResponse.
- */
-@Serializable
-data class PagedCentersResponseDto(
-    @SerialName("totalFilteredRecords") val totalFilteredRecords: Int = 0,
-    @SerialName("pageItems") val pageItems: List<CenterItemDto> = emptyList(),
-) {
-    companion object {
-        const val SCHEMA_VERSION = 1
-    }
-}
-
-/** Wire DTO for a single center row (`get_centers_for_staff`). See API.md#dtos — CenterItem. */
-@Serializable
-data class CenterItemDto(
-    @SerialName("id") val id: Long,
-    @SerialName("name") val name: String = "",
-    @SerialName("status") val status: StatusInfoDto = StatusInfoDto(),
-    @SerialName("staffId") val staffId: Long = 0L,
-    @SerialName("officeId") val officeId: Long = 0L,
-    @SerialName("officeName") val officeName: String = "",
-)
-
-/**
  * Wire envelope for the paginated `GET /fineract-provider/api/v1/groups?staffId=…` response
  * (field-officer-dashboard `get_groups_for_staff`, FR-009). See API.md#dtos — PagedGroupsResponse.
  */

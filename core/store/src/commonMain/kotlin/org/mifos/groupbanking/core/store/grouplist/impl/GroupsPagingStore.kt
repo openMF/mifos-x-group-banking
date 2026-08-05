@@ -123,7 +123,7 @@ private fun GroupListEntity.toDomain(): Group = Group(
     healthIndicator = HealthIndicator.fromOverdueRate(overdueRate),
     overdueRate = overdueRate,
     status = status,
-    fineractCenterId = fineractCenterId,
+    fineractGroupId = fineractGroupId,
 )
 
 private fun List<Group>.toEntities(pageIndex: Int): List<GroupListEntity> {
@@ -143,7 +143,7 @@ private fun Group.toEntity(pageIndex: Int, rowOrder: Int, fetchedAt: Long): Grou
     lastMeetingDate = lastMeetingDate.toString(),
     overdueRate = overdueRate,
     status = status,
-    fineractCenterId = fineractCenterId,
+    fineractGroupId = fineractGroupId,
     fetchedAt = fetchedAt,
 )
 

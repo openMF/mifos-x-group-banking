@@ -19,23 +19,23 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 /**
  * `/meetings/{meetingId}/summary` — the meeting-summary route (`ui.yaml#route`,
  * `ui.yaml#nav_params: { meeting_id, meeting_number, center_id }`). All three params are carried;
- * [centerId] + [meetingNumber] scope the single-key Store5 read, [meetingId] is used for
+ * [groupId] + [meetingNumber] scope the single-key Store5 read, [meetingId] is used for
  * display/analytics. See API.md#route.
  */
 @Serializable
 data class MeetingSummaryRoute(
     val meetingId: String,
     val meetingNumber: Int,
-    val centerId: Int,
+    val groupId: Int,
 )
 
 fun NavController.navigateToMeetingSummary(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
+    groupId: Int,
     navOptions: NavOptions? = null,
 ) = navigate(
-    MeetingSummaryRoute(meetingId = meetingId, meetingNumber = meetingNumber, centerId = centerId),
+    MeetingSummaryRoute(meetingId = meetingId, meetingNumber = meetingNumber, groupId = groupId),
     navOptions,
 )
 
@@ -52,7 +52,7 @@ fun NavGraphBuilder.meetingSummaryScreen(
         MeetingSummaryScreen(
             meetingId = route.meetingId,
             meetingNumber = route.meetingNumber,
-            centerId = route.centerId,
+            groupId = route.groupId,
             onNavigateDone = onNavigateDone,
         )
     }

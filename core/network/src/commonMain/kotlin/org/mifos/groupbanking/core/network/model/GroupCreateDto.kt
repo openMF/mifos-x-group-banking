@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
  * `POST /companion/groups` (COMP-GRP-001). One call orchestrates: (1) createCenter in Fineract,
  * (2) activate group, (3) associateClients, (4) assignRole (organizer for the creator), (5)
  * provision the `group_type_config` datatable row from [typeConfig]. Replaces the previous raw
- * Fineract `/centers` + `/datatables/dt_group_config` two-step. Top-level fields are camelCase
+ * Fineract `/groups` + `/datatables/dt_group_config` two-step. Top-level fields are camelCase
  * (companion-bridge convention, like `GroupDto`/`AuthResponseDto`) — [typeConfig] itself is the
  * raw `group_type_config` datatable payload and uses snake_case `@SerialName`s (see
  * [CreateGroupTypeConfigDto]).
@@ -50,7 +50,7 @@ data class CreateGroupRequestDto(
 @Serializable
 data class CreateGroupResponseDto(
     @SerialName("groupId") val groupId: String,
-    @SerialName("fineractCenterId") val fineractCenterId: Long,
+    @SerialName("fineractGroupId") val fineractGroupId: Long,
     @SerialName("inviteCode") val inviteCode: String,
 ) {
     companion object {

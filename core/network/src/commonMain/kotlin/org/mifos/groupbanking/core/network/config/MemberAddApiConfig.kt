@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the member-add create-chain's client stack —
  * `POST /clients` (`create_client`), `POST /datatables/dt_member_role/{clientId}`
@@ -27,5 +29,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MemberAddApi base URL.
  */
 data class MemberAddApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

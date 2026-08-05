@@ -19,7 +19,7 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 /**
  * `/meetings/{previousMeetingId}/review` — the previous-meeting-review route (`ui.yaml#route`,
  * `ui.yaml#nav_params: { meeting_id, meeting_number, center_id, launched_from }`). All four params
- * are carried; [centerId] + [meetingNumber] scope the reused record read, [meetingId] scopes the
+ * are carried; [groupId] + [meetingNumber] scope the reused record read, [meetingId] scopes the
  * attendance read + display/analytics, [launchedFrom] toggles the context banner + Start-Meeting CTA
  * (`conduct` vs `calendar`). See API.md#route.
  */
@@ -27,21 +27,21 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 data class PreviousMeetingReviewRoute(
     val meetingId: String,
     val meetingNumber: Int,
-    val centerId: Int,
+    val groupId: Int,
     val launchedFrom: String,
 )
 
 fun NavController.navigateToPreviousMeetingReview(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
+    groupId: Int,
     launchedFrom: String,
     navOptions: NavOptions? = null,
 ) = navigate(
     PreviousMeetingReviewRoute(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
-        centerId = centerId,
+        groupId = groupId,
         launchedFrom = launchedFrom,
     ),
     navOptions,
@@ -55,14 +55,14 @@ fun NavController.navigateToPreviousMeetingReview(
  */
 fun NavGraphBuilder.previousMeetingReviewScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToConduct: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
+    onNavigateToConduct: (meetingId: String, meetingNumber: Int, groupId: Int) -> Unit,
 ) {
     composableWithRootPushTransitions<PreviousMeetingReviewRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<PreviousMeetingReviewRoute>()
         PreviousMeetingReviewScreen(
             meetingId = route.meetingId,
             meetingNumber = route.meetingNumber,
-            centerId = route.centerId,
+            groupId = route.groupId,
             launchedFrom = route.launchedFrom,
             onNavigateBack = onNavigateBack,
             onNavigateToConduct = onNavigateToConduct,

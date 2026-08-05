@@ -255,7 +255,7 @@ val DataModule = module {
         )
     }
 
-    // meeting-summary (GET /datatables/dt_meeting_record/{centerId}?meetingNumber=N) — wraps the
+    // meeting-summary (GET /datatables/dt_meeting_record/{groupId}?meetingNumber=N) — wraps the
     // single-key composite NETWORK_WITH_CACHE MeetingSummaryStore (bound via
     // AppStoreRegistry.MeetingSummary in appStoreModule) and surfaces the offline-first
     // .asScreenStream() read (per-meeting ScreenState<MeetingSummaryData> = totals + savings
@@ -419,10 +419,10 @@ val DataModule = module {
         MeetingConductRepositoryImpl(api = get(), syncQueueRepository = get())
     }
 
-    // meeting-calendar (GET /centers/{centerId}/meetings + get_meeting_records_datatable) — wraps
+    // meeting-calendar (GET /datatables/dt_meeting_schedule/{groupId} + get_meeting_records_datatable) — wraps
     // the single-key NETWORK_WITH_CACHE MeetingCalendarStore (bound via AppStoreRegistry.MeetingCalendar
     // in appStoreModule) and surfaces the offline-first .asScreenStream() read (per-center
-    // ScreenState<List<MeetingListItem>>, the 2-way parallel merge of get_center_meetings +
+    // ScreenState<List<MeetingListItem>>, the 2-way parallel merge of get_meeting_schedule +
     // get_meeting_records_datatable). Read-only — no write path (data-flow.yaml#sync_queue: []).
     single<MeetingRepository> {
         MeetingRepositoryImpl(

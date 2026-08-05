@@ -33,16 +33,16 @@ import kotlin.time.Clock
 /**
  * Builds the **single-key** read-only NETWORK_WITH_CACHE [Store] for the meeting-calendar screen —
  * the client-side merge of the TWO reads the screen fires in parallel on mount/refresh
- * ([MeetingApi.getCenterMeetings] + [MeetingApi.getMeetingRecords]).
+ * ([MeetingApi.getMeetingSchedule] + [MeetingApi.getMeetingRecords]).
  *
- * The key is the `Int` `centerId` and the value is the merged `List<MeetingListItem>`; Store5 caches
+ * The key is the `Int` `groupId` and the value is the merged `List<MeetingListItem>`; Store5 caches
  * each center independently (one Room row per center). The read side is exposed to the UI
  * exclusively through `MeetingRepository.meetingsStream(...)` → `.asScreenStream(...)` — there is no
  * DAO-bypass read path (RULE-IMPLEMENT-STORE5-001 S5-2), and the list is read-only
  * (`data-flow.yaml#sync_queue: []`) so there is no write path (S5-1).
  *
  * - **Fetcher** — a PARALLEL-COMBINE: inside a [coroutineScope] the two reads fire as concurrent
- *   [async] coroutines. `get_center_meetings` is the critical read (its failure aborts the fetch to
+ *   [async] coroutines. `get_meeting_schedule` is the critical read (its failure aborts the fetch to
  *   Store5's error channel via [MeetingCalendarFetchException]); `get_meeting_records_datatable` is
  *   BEST-EFFORT (`404 -> no records yet` degrades to the bare meetings list per `data-flow.yaml`) so
  *   a failed records read is folded in as `null` and the mapper simply leaves the past-meeting
@@ -66,12 +66,12 @@ fun provideMeetingCalendarStore(
         AppStoreRegistry.Ttl.MEETING_CALENDAR,
     )
     return StoreFactory.createStore(
-        fetcher = Fetcher.of { centerId: Int ->
+        fetcher = Fetcher.of { groupId: Int ->
             coroutineScope {
-                val meetingsDeferred = async { api.getCenterMeetings(centerId) }
-                val recordsDeferred = async { api.getMeetingRecords(centerId) }
+                val meetingsDeferred = async { api.getMeetingSchedule(groupId) }
+                val recordsDeferred = async { api.getMeetingRecords(groupId) }
 
-                // get_center_meetings is critical — abort the whole fetch on failure.
+                // get_meeting_schedule is critical — abort the whole fetch on failure.
                 val meetings = meetingsDeferred.await().dataOrThrow()
                 // get_meeting_records is best-effort — a failure (e.g. 404 "no records yet") folds
                 // in as null and the merge leaves past-meeting figures un-enriched.
@@ -81,14 +81,14 @@ fun provideMeetingCalendarStore(
             }
         },
         sourceOfTruth = SourceOfTruth.of(
-            reader = { centerId: Int ->
-                dao.observeByKey(centerId).map { row -> row?.toDomain() }
+            reader = { groupId: Int ->
+                dao.observeByKey(groupId).map { row -> row?.toDomain() }
             },
-            writer = { centerId: Int, meetings: List<MeetingListItem> ->
-                dao.replaceForKey(meetings.toEntity(centerId))
+            writer = { groupId: Int, meetings: List<MeetingListItem> ->
+                dao.replaceForKey(meetings.toEntity(groupId))
                 validator.markFresh()
             },
-            delete = { centerId: Int -> dao.deleteByKey(centerId) },
+            delete = { groupId: Int -> dao.deleteByKey(groupId) },
             deleteAll = { dao.deleteAll() },
         ),
         validator = validator,
@@ -97,7 +97,7 @@ fun provideMeetingCalendarStore(
 
 /**
  * Signals a failed meeting-calendar fetch to Store5's error channel. Carries the sealed
- * [NetworkError] of the critical `get_center_meetings` read so downstream error mapping can branch
+ * [NetworkError] of the critical `get_meeting_schedule` read so downstream error mapping can branch
  * on the exact cause (401 -> login, 404 -> empty, offline -> cache fallback per `data-flow.yaml`).
  */
 class MeetingCalendarFetchException(
@@ -123,10 +123,10 @@ private fun <T> NetworkResult<T, NetworkError>.dataOrNull(): T? = when (this) {
 // kotlinx-serialization; core/store does not).
 // ---------------------------------------------------------------------------
 
-private fun List<MeetingListItem>.toEntity(centerId: Int): MeetingCalendarCacheEntity {
+private fun List<MeetingListItem>.toEntity(groupId: Int): MeetingCalendarCacheEntity {
     val now = Clock.System.now().toEpochMilliseconds()
     return MeetingCalendarCacheEntity(
-        centerId = centerId,
+        groupId = groupId,
         meetingsJson = MeetingCalendarCacheCodec.encode(map { it.toPayload() }),
         fetchedAt = now,
     )

@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the loan-mark-defaulted-dialog feature's
  * `POST /loans/{loanId}/transactions?command=writeoff` endpoint. Follows the same default-param
@@ -24,5 +26,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — LoanWriteoffApi base URL.
  */
 data class LoanWriteoffApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

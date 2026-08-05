@@ -136,7 +136,7 @@ sealed interface OrganizerDashboardEvent {
     /**
      * G7 — Today's-Schedule row tap ([OrganizerDashboardAction.OnMeetingGroupClick]) and the
      * Meetings-Today KPI card ([OrganizerDashboardAction.OnViewMeetingsToday]) open the tapped
-     * group's meeting calendar (`ui.yaml#events.NavigateToMeetingCalendar` params `centerId: Int`).
+     * group's meeting calendar (`ui.yaml#events.NavigateToMeetingCalendar` params `groupId: Int`).
      * [groupId] is the domain-side identifier as it exists on [ScheduledMeeting.groupId] (a String);
      * the NavHost seam bridges it to meeting-calendar's `center_id: Int` nav-param
      * (`groupId.toIntOrNull() ?: 0`), matching the group-dashboard → meeting-calendar precedent.

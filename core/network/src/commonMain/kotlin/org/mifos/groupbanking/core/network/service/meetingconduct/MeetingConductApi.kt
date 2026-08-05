@@ -11,7 +11,7 @@ package org.mifos.groupbanking.core.network.service.meetingconduct
 
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import org.mifos.groupbanking.core.network.model.CenterDetailDto
+import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.CorpusRecordDto
 import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
@@ -35,14 +35,14 @@ import org.mifos.groupbanking.core.network.model.UpdateCorpusRequestDto
  */
 interface MeetingConductApi {
 
-    /** `GET /datatables/dt_meeting_record/{centerId}` (`get_previous_meeting_record`). 404 → first meeting. */
-    suspend fun getPreviousMeetingRecord(centerId: Int): NetworkResult<MeetingRecordDetailDto, NetworkError>
+    /** `GET /datatables/dt_meeting_record/{groupId}` (`get_previous_meeting_record`). 404 → first meeting. */
+    suspend fun getPreviousMeetingRecord(groupId: Int): NetworkResult<MeetingRecordDetailDto, NetworkError>
 
-    /** `GET /centers/{centerId}` (`get_group_members`). 404 → members required (blocks advance). */
-    suspend fun getGroupMembers(centerId: Int): NetworkResult<CenterDetailDto, NetworkError>
+    /** `GET /groups/{groupId}?associations=clientMembers,groupRoles` (`get_group_members`). 404 → members required (blocks advance). */
+    suspend fun getGroupMembers(groupId: Int): NetworkResult<GroupMembersDetailDto, NetworkError>
 
-    /** `GET /datatables/dt_group_corpus/{centerId}` (`get_group_corpus`). 404 → default to 0. */
-    suspend fun getGroupCorpus(centerId: Int): NetworkResult<CorpusRecordDto, NetworkError>
+    /** `GET /datatables/dt_group_corpus/{groupId}` (`get_group_corpus`). 404 → default to 0. */
+    suspend fun getGroupCorpus(groupId: Int): NetworkResult<CorpusRecordDto, NetworkError>
 
     /** `GET /loans?groupId={groupId}&loanStatus=active` (`get_active_loans`). 404 → empty step 4. */
     suspend fun getActiveLoans(groupId: Int): NetworkResult<LoanListResponseDto, NetworkError>
@@ -87,9 +87,9 @@ interface MeetingConductApi {
         request: LoanDisbursalRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError>
 
-    /** `PUT /datatables/dt_group_corpus/{centerId}` (`patch_corpus`, priority 6). */
+    /** `PUT /datatables/dt_group_corpus/{groupId}` (`patch_corpus`, priority 6). */
     suspend fun updateCorpus(
-        centerId: Int,
+        groupId: Int,
         request: UpdateCorpusRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError>
 }

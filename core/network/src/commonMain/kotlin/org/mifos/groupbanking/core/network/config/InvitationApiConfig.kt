@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the join-with-code companion bridge (COMP-DT-004 +
  * COMP-GRP-003), served by the same mcp-mifosx Go companion server as the login-signup bridge,
@@ -26,5 +28,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — InvitationApi base URL.
  */
 data class InvitationApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

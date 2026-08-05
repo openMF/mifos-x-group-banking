@@ -21,10 +21,10 @@ import org.mifos.groupbanking.feature.previousmeetingreview.PreviousMeetingRevie
  * API.md#di.
  *
  * `PreviousMeetingReviewViewModel` is registered with the `viewModel { parameters -> ... }` builder
- * because its `centerId` / `meetingNumber` / `meetingId` / `launchedFrom` constructor parameters are
+ * because its `groupId` / `meetingNumber` / `meetingId` / `launchedFrom` constructor parameters are
  * the `ui.yaml#nav_params` values forwarded from the entry point — same convention as
  * `MeetingSummaryModule`. `PreviousMeetingReviewRoute.kt`'s composable supplies them via
- * `koinViewModel { parametersOf(centerId, meetingNumber, meetingId, launchedFrom) }`.
+ * `koinViewModel { parametersOf(groupId, meetingNumber, meetingId, launchedFrom) }`.
  */
 val PreviousMeetingReviewModule = module {
     viewModel { parameters ->
@@ -33,7 +33,7 @@ val PreviousMeetingReviewModule = module {
             sessionManager = get(),
             crashReporter = get(),
             analytics = get(),
-            centerId = parameters.get<Int>(),
+            groupId = parameters.get<Int>(),
             meetingNumber = parameters.get<Int>(),
             meetingId = parameters.get<String>(),
             launchedFrom = parameters.get<String>(),

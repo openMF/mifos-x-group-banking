@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the loan-apply feature's client stack — `GET
  * /groups/{groupId}?associations=clientMembers` (`get_group_members`), `GET /loanproducts`
@@ -29,5 +31,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — LoanApplyApi base URL.
  */
 data class LoanApplyApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

@@ -18,7 +18,7 @@ import org.mifos.groupbanking.core.network.model.MeetingRecordListDto
  * Ktor client for the meeting-calendar read path — the TWO independent Fineract reads the
  * meeting-calendar screen fires in parallel on mount/refresh
  * (`idea-layer/screens/meeting-calendar/api.yaml#api` + `data-flow.yaml#entries`):
- * the scheduled meetings list for the group center ([getCenterMeetings]) and the completed-meeting
+ * the scheduled meetings list for the group center ([getMeetingSchedule]) and the completed-meeting
  * financial records datatable ([getMeetingRecords]) that enriches past-meeting rows.
  *
  * Every method returns [NetworkResult] — never a raw [Result] envelope, never a thrown exception
@@ -30,18 +30,18 @@ import org.mifos.groupbanking.core.network.model.MeetingRecordListDto
 interface MeetingApi {
 
     /**
-     * `GET /fineract-provider/api/v1/centers/{centerId}/meetings`. Fetches the scheduled meetings
+     * `GET /fineract-provider/api/v1/datatables/dt_meeting_schedule/{groupId}`. Fetches the scheduled meetings
      * (upcoming + past) for the group center. 404 -> [NetworkError.NOT_FOUND] (surfaced as an empty
      * state by the store), 401 -> [NetworkError.UNAUTHORIZED], 5xx -> [NetworkError.SERVER]
      * (cache-fallback in the store).
      */
-    suspend fun getCenterMeetings(centerId: Int): NetworkResult<List<MeetingListItemDto>, NetworkError>
+    suspend fun getMeetingSchedule(groupId: Int): NetworkResult<List<MeetingListItemDto>, NetworkError>
 
     /**
-     * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{centerId}`. Fetches the
+     * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{groupId}`. Fetches the
      * completed-meeting financial records (attendance + collected amounts) that enrich the
      * past-meeting rows. 404 -> [NetworkError.NOT_FOUND] ("no records yet" — the store degrades to
      * the bare meetings list).
      */
-    suspend fun getMeetingRecords(centerId: Int): NetworkResult<MeetingRecordListDto, NetworkError>
+    suspend fun getMeetingRecords(groupId: Int): NetworkResult<MeetingRecordListDto, NetworkError>
 }

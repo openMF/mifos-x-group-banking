@@ -21,7 +21,7 @@ import org.mifos.groupbanking.core.database.meetingsummary.entity.MeetingRecordC
  * [org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore]).
  *
  * The store keys each meeting-summary snapshot by [MeetingRecordCacheEntity.cacheKey]
- * (`"$centerId:$meetingNumber"`), so [observeByKey] is the reactive per-meeting read the store's
+ * (`"$groupId:$meetingNumber"`), so [observeByKey] is the reactive per-meeting read the store's
  * SourceOfTruth reader subscribes to and [replaceForKey] is the store's SourceOfTruth writer.
  * Because a meeting's whole summary is exactly ONE row, a keyed `@Upsert` is inherently atomic — no
  * reader ever observes a half-written snapshot (guards RULE-IMPLEMENT-STORE5-001 S5-3, the

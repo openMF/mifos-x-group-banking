@@ -22,11 +22,11 @@ import org.mobilenativefoundation.store.store5.Store
 /**
  * Store5-backed implementation of [MeetingSummaryRepository].
  *
- * The single-key read maps the (`centerId`, `meetingNumber`) pair to the composite store key
- * `"$centerId:$meetingNumber"` and goes exclusively through [Store.asScreenStream] so the whole
+ * The single-key read maps the (`groupId`, `meetingNumber`) pair to the composite store key
+ * `"$groupId:$meetingNumber"` and goes exclusively through [Store.asScreenStream] so the whole
  * offline-first pipeline (cached emit → background revalidate → DecisionEngine → ScreenState) is
  * inherited from `core-base`. The freshness [FetchedAtRepository] cacheKey is per-meeting
- * (`meetingsummary:record:{centerId}:{meetingNumber}`) so each meeting's TTL window is tracked
+ * (`meetingsummary:record:{groupId}:{meetingNumber}`) so each meeting's TTL window is tracked
  * independently. No DAO-bypass read, no `try-catch`, no `Result` envelope (RULE-IMPLEMENT-STORE5-001
  * S5-2).
  *
@@ -39,12 +39,12 @@ class MeetingSummaryRepositoryImpl(
 ) : MeetingSummaryRepository {
 
     override fun meetingSummaryStream(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MeetingSummaryData> {
-        val key = "$centerId:$meetingNumber"
+        val key = "$groupId:$meetingNumber"
         return meetingSummaryStore.asScreenStream(
             key = key,
             networkMonitor = networkMonitor,
@@ -59,7 +59,7 @@ class MeetingSummaryRepositoryImpl(
     }
 
     private companion object {
-        /** FetchedAtRepository key prefix — one freshness timestamp per (centerId, meetingNumber). */
+        /** FetchedAtRepository key prefix — one freshness timestamp per (groupId, meetingNumber). */
         const val CACHE_KEY_PREFIX = "meetingsummary:record:"
     }
 }

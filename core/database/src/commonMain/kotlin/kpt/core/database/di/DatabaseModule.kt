@@ -72,10 +72,10 @@ val DatabaseModule = module {
     // sync-status read; NOT a Store5 SourceOfTruth)
     single { get<AppDatabase>().syncQueueDao }
 
-    // group-banking domain — meeting-summary single-key composite cache (SourceOfTruth DAO, GET /datatables/dt_meeting_record/{centerId})
+    // group-banking domain — meeting-summary single-key composite cache (SourceOfTruth DAO, GET /datatables/dt_meeting_record/{groupId})
     single { get<AppDatabase>().meetingRecordDao }
 
-    // group-banking domain — meeting-calendar single-key cache (SourceOfTruth DAO, GET /centers/{centerId}/meetings + dt_meeting_record)
+    // group-banking domain — meeting-calendar single-key cache (SourceOfTruth DAO, GET /datatables/dt_meeting_schedule/{groupId} + dt_meeting_record)
     single { get<AppDatabase>().meetingCalendarDao }
 
     // group-banking domain — previous-meeting-review per-member attendance cache (SourceOfTruth DAO, GET /datatables/dt_meeting_attendance/{meetingId})

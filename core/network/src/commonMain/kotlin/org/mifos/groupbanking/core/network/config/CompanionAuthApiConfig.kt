@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the companion auth bridge (COMP-AUTH-001/002/003),
  * served by the mcp-mifosx Go companion server (see
@@ -25,5 +27,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — CompanionAuthApi base URL.
  */
 data class CompanionAuthApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

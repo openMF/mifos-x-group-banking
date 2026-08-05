@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the `meeting-conduct` feature's client stack — the 11 Fineract
  * collection-sheet endpoints (`idea-layer/screens/meeting-conduct/api.yaml`). Follows the same
@@ -22,5 +24,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MeetingConductApi base URL.
  */
 data class MeetingConductApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

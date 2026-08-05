@@ -20,10 +20,10 @@ import org.mifos.groupbanking.feature.meetingsummary.MeetingSummaryViewModel
  * process-wide binding — all already included via `KoinModules.allModules`. See API.md#di.
  *
  * `MeetingSummaryViewModel` is registered with the `viewModel { parameters -> ... }` builder because
- * its `centerId` / `meetingNumber` / `meetingId` constructor parameters are the `ui.yaml#nav_params`
+ * its `groupId` / `meetingNumber` / `meetingId` constructor parameters are the `ui.yaml#nav_params`
  * values forwarded from the entry point, not DI-graph types — same convention as `LoanDetailModule`'s
  * `loanId`. `MeetingSummaryRoute.kt`'s composable supplies them via
- * `koinViewModel { parametersOf(centerId, meetingNumber, meetingId) }`.
+ * `koinViewModel { parametersOf(groupId, meetingNumber, meetingId) }`.
  */
 val MeetingSummaryModule = module {
     viewModel { parameters ->
@@ -32,7 +32,7 @@ val MeetingSummaryModule = module {
             sessionManager = get(),
             crashReporter = get(),
             analytics = get(),
-            centerId = parameters.get<Int>(),
+            groupId = parameters.get<Int>(),
             meetingNumber = parameters.get<Int>(),
             meetingId = parameters.get<String>(),
         )

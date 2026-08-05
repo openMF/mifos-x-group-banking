@@ -14,11 +14,11 @@ import androidx.room3.PrimaryKey
 
 /**
  * Room persisted representation of ONE group center's scheduled-meetings list (the merge of
- * `get_center_meetings` + `get_meeting_records_datatable`).
+ * `get_meeting_schedule` + `get_meeting_records_datatable`).
  *
  * Backs the offline cache (SourceOfTruth) for the single-key NETWORK_WITH_CACHE store
  * ([org.mifos.groupbanking.core.store.meetingcalendar.impl.provideMeetingCalendarStore]), a
- * **dynamic-key** read: one row per [centerId] so a cold start with no network still renders the
+ * **dynamic-key** read: one row per [groupId] so a cold start with no network still renders the
  * last-seen meetings for that center (`data-flow.yaml#cache.offline: fallback_cache`, SC2 — never
  * memory-only).
  *
@@ -37,7 +37,7 @@ import androidx.room3.PrimaryKey
 @Entity(tableName = "meeting_calendar_cache")
 data class MeetingCalendarCacheEntity(
     @PrimaryKey
-    val centerId: Int,
+    val groupId: Int,
     val meetingsJson: String,
     val fetchedAt: Long,
 )

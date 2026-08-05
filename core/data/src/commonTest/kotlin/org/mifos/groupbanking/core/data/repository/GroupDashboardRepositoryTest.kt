@@ -169,7 +169,7 @@ private class FakeGroupDashboardDao : GroupDashboardDao {
 
 private fun groupDetailDto(name: String = "Umoja VSLA") = GroupDetailDto(
     id = "group-7",
-    fineractCenterId = 100L,
+    fineractGroupId = 100L,
     name = name,
     cycleNumber = 2,
     cycleLengthMonths = 12,
@@ -217,7 +217,7 @@ private fun cacheEntity(groupId: String, name: String): GroupDashboardCacheEntit
     val payload = CachedGroupDashboard(
         group = CachedGroupDetail(
             id = groupId,
-            fineractCenterId = 100L,
+            fineractGroupId = 100L,
             name = name,
             cycleNumber = 2,
             cycleLengthMonths = 12,

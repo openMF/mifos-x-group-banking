@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the loan-request feature's client stack —
  * `POST /datatables/dt_loan_request` (`submit_loan_request`), a raw Fineract datatable passthrough
@@ -25,5 +27,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — LoanRequestApi base URL.
  */
 data class LoanRequestApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

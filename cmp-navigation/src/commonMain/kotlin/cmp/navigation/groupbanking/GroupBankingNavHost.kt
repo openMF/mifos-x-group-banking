@@ -329,7 +329,7 @@ fun GroupBankingNavHost(
                     // nav_param is `center_id: Int` — same toIntOrNull drift bridge as the
                     // group-dashboard → meeting-calendar seam below.
                     onNavigateToMeetingCalendar = { groupId ->
-                        navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
+                        navController.navigateToMeetingCalendar(groupId = groupId.toIntOrNull() ?: 0)
                     },
                     // Top-bar overflow menu → shared settings + sync-status (both param-less,
                     // already registered) — gives the organizer a Settings entry on their landing.
@@ -341,12 +341,12 @@ fun GroupBankingNavHost(
                 groupDashboardScreen(
                     // group-dashboard `Start/View Meetings` → meeting-calendar. group-dashboard
                     // forwards a `groupId: String` but meeting-calendar's nav_param is `center_id: Int`
-                    // (a flagged idea-layer nav-param drift — group-dashboard has no centerId at this
+                    // (a flagged idea-layer nav-param drift — group-dashboard has no groupId at this
                     // seam); bridge by parsing groupId, mirroring the loan-list `toLongOrNull` drift
                     // precedent above. Reported to the caller for an idea-layer follow-up (forward
-                    // fineractCenterId from group-dashboard, or key meeting-calendar by groupId).
+                    // fineractGroupId from group-dashboard, or key meeting-calendar by groupId).
                     onNavigateToMeetingCalendar = { groupId ->
-                        navController.navigateToMeetingCalendar(centerId = groupId.toIntOrNull() ?: 0)
+                        navController.navigateToMeetingCalendar(groupId = groupId.toIntOrNull() ?: 0)
                     },
                     onNavigateToMemberList = { groupId -> navController.navigateToMemberList(groupId = groupId) },
                     // viewerRole is forwarded from group-dashboard (server-reconciled role) so
@@ -465,24 +465,24 @@ fun GroupBankingNavHost(
                 //     (mirrors loan-apply's not-yet-generated-target convention) — never a dead click.
                 meetingCalendarScreen(
                     // meeting-calendar `Start Meeting` → the real meeting-conduct wizard.
-                    // `centerId` is now forwarded by `meetingCalendarScreen` (from its own
-                    // `MeetingCalendarRoute.centerId`), so meeting-conduct gets its full nav-arg
+                    // `groupId` is now forwarded by `meetingCalendarScreen` (from its own
+                    // `MeetingCalendarRoute.groupId`), so meeting-conduct gets its full nav-arg
                     // set. `meetingNumber` comes from the tapped meeting card's event payload.
-                    onNavigateToConduct = { meetingId, meetingNumber, centerId ->
+                    onNavigateToConduct = { meetingId, meetingNumber, groupId ->
                         navController.navigateToMeetingConduct(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
-                            centerId = centerId,
+                            groupId = groupId,
                         )
                     },
                     // G5 → previous-meeting-review (past-meeting drill-down, calendar-launched).
-                    // `centerId` + `launchedFrom` ("calendar") are forwarded from the calendar screen's
-                    // event (was previously the `centerId = 0` drift bridge + a hardcoded launchedFrom).
-                    onNavigateToReview = { meetingId, meetingNumber, centerId, launchedFrom ->
+                    // `groupId` + `launchedFrom` ("calendar") are forwarded from the calendar screen's
+                    // event (was previously the `groupId = 0` drift bridge + a hardcoded launchedFrom).
+                    onNavigateToReview = { meetingId, meetingNumber, groupId, launchedFrom ->
                         navController.navigateToPreviousMeetingReview(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
-                            centerId = centerId,
+                            groupId = groupId,
                             launchedFrom = launchedFrom,
                         )
                     },
@@ -491,26 +491,26 @@ fun GroupBankingNavHost(
 
                 // 9d. meeting-conduct (7-step wizard) → meeting-summary (submit success) /
                 //     previous-meeting-review (step-0 drill-down) / back. Reached via
-                //     `navController.navigateToMeetingConduct(meetingId, meetingNumber, centerId)`
-                //     (from meeting-calendar's Start-Meeting card once that callback forwards centerId).
+                //     `navController.navigateToMeetingConduct(meetingId, meetingNumber, groupId)`
+                //     (from meeting-calendar's Start-Meeting card once that callback forwards groupId).
                 //     Submit success routes to the REAL meeting-summary screen; the not-yet-built
                 //     previous-meeting-review target falls back to PlaceholderRoute (never a dead click).
                 meetingConductScreen(
-                    onNavigateToMeetingSummary = { meetingId, meetingNumber, centerId ->
+                    onNavigateToMeetingSummary = { meetingId, meetingNumber, groupId ->
                         navController.navigateToMeetingSummary(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
-                            centerId = centerId,
+                            groupId = groupId,
                         )
                     },
                     // G6 → previous-meeting-review (step-0 drill-down, conduct-launched). The callback
                     // now forwards the real meetingId (String) + meetingNumber (Int, no longer dropped)
-                    // + centerId + launchedFrom ("conduct") — resolves the prior meeting_number=0 drift.
-                    onNavigateToPreviousMeetingReview = { meetingId, meetingNumber, centerId, launchedFrom ->
+                    // + groupId + launchedFrom ("conduct") — resolves the prior meeting_number=0 drift.
+                    onNavigateToPreviousMeetingReview = { meetingId, meetingNumber, groupId, launchedFrom ->
                         navController.navigateToPreviousMeetingReview(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
-                            centerId = centerId,
+                            groupId = groupId,
                             launchedFrom = launchedFrom,
                         )
                     },
@@ -526,12 +526,12 @@ fun GroupBankingNavHost(
                     onNavigateBack = { navController.popBackStack() },
                     // previous-meeting-review `Start Meeting` (conduct-launched drill-down) → the
                     // real meeting-conduct wizard; its callback already forwards the full
-                    // (meetingId, meetingNumber, centerId) nav-arg set.
-                    onNavigateToConduct = { meetingId, meetingNumber, centerId ->
+                    // (meetingId, meetingNumber, groupId) nav-arg set.
+                    onNavigateToConduct = { meetingId, meetingNumber, groupId ->
                         navController.navigateToMeetingConduct(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
-                            centerId = centerId,
+                            groupId = groupId,
                         )
                     },
                 )
@@ -601,17 +601,17 @@ fun GroupBankingNavHost(
                 //     / back to loan-list. Reached from loan-list's "Apply for Loan" FAB.
                 loanApplyScreen(
                     // loan-apply's `NavigateToMeetingConduct(loanId)` forwards a loanId, but
-                    // meeting-conduct is keyed by (meetingId, meetingNumber, centerId) — a flagged
+                    // meeting-conduct is keyed by (meetingId, meetingNumber, groupId) — a flagged
                     // idea-layer nav-param drift (the loan-to-meeting linkage isn't resolved at this
                     // seam). Bridge with the loanId as the meetingId and 0 for the meeting/center
                     // ids, mirroring this NavHost's other documented drift bridges (e.g. the
-                    // group-dashboard→meeting-calendar `toIntOrNull ?: 0` centerId bridge).
-                    // TODO(nav): resolve the real meetingId/centerId once loan-apply forwards them.
+                    // group-dashboard→meeting-calendar `toIntOrNull ?: 0` groupId bridge).
+                    // TODO(nav): resolve the real meetingId/groupId once loan-apply forwards them.
                     onNavigateToMeetingConduct = { loanId ->
                         navController.navigateToMeetingConduct(
                             meetingId = loanId.toString(),
                             meetingNumber = 0,
-                            centerId = 0,
+                            groupId = 0,
                         )
                     },
                     onNavigateBack = { navController.popBackStack() },

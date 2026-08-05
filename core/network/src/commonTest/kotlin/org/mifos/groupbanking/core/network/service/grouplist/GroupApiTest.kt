@@ -73,7 +73,7 @@ class GroupApiTest {
               "id": "g-1", "name": "Sunrise VSLA", "groupType": "VSLA", "viewerRole": "MEMBER",
               "cycleNumber": 2, "memberCount": 18, "lastMeetingDate": "2026-07-01",
               "healthIndicator": "GREEN", "overdueRate": 0.02, "status": "ACTIVE",
-              "fineractCenterId": 100
+              "fineractGroupId": 100
             }
           ]
         }

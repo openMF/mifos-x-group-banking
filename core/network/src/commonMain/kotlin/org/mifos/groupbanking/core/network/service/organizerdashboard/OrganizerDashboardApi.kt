@@ -16,7 +16,7 @@ import org.mifos.groupbanking.core.network.model.OrganizerDashboardSummaryDto
 /**
  * Ktor client for the organizer-dashboard companion bridge — unified-identity dashboard data
  * resolved server-side from the caller's `dt_member_role` (no `staffId` param, replacing the legacy
- * raw Fineract `/staff/{id}/summary` + `/centers` + `/journal-entries` triad). See
+ * raw Fineract `/staff/{id}/summary` + `/groups` + `/journal-entries` triad). See
  * `idea-layer/screens/organizer-dashboard/api.yaml#api[0]` + API.md#services.
  *
  * Returns [NetworkResult] — never a raw [Result] envelope, never a thrown exception. The downstream

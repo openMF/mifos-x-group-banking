@@ -76,15 +76,15 @@ object AppStoreRegistry : StoreRegistry() {
     val ShareOutPreview = store("shareOutPreview")
 
     // REGISTRY:MeetingSummary — meeting-summary single-key composite store (NETWORK_WITH_CACHE,
-    // GET /datatables/dt_meeting_record/{centerId}, keyed by "$centerId:$meetingNumber")
+    // GET /datatables/dt_meeting_record/{groupId}, keyed by "$groupId:$meetingNumber")
     val MeetingSummary = store("meetingSummary")
 
     // REGISTRY:MeetingCalendar — meeting-calendar single-key store (NETWORK_WITH_CACHE,
-    // GET /centers/{centerId}/meetings merged with dt_meeting_record)
+    // GET /datatables/dt_meeting_schedule/{groupId} merged with dt_meeting_record)
     val MeetingCalendar = store("meetingCalendar")
 
     // REGISTRY:FieldOfficerDashboard — field-officer-dashboard aggregate store (composite dynamic-key
-    // NETWORK_WITH_CACHE, FR-009 — parallel GET /centers + GET /groups fanned into KPIs + health list)
+    // NETWORK_WITH_CACHE, FR-009 — parallel GET /groups fanned into KPIs + health list)
     val FieldOfficerDashboard = store("fieldOfficerDashboard")
 
     // REGISTRY:OrganizerDashboard — organizer-dashboard hub store (single-key NETWORK_WITH_CACHE,

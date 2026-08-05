@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
 
 /**
  * DTO -> domain mappers for the meeting-record wire contract
- * (`GET /datatables/dt_meeting_record/{centerId}`). Every field on `MeetingRecordDetailDto` /
+ * (`GET /datatables/dt_meeting_record/{groupId}`). Every field on `MeetingRecordDetailDto` /
  * `SavingsBreakdownItemDto` / `LoanSummaryItemDto` is mapped — no field left unmapped.
  */
 
@@ -47,7 +47,7 @@ fun LoanSummaryItemDto.toDomainModel(): LoanSummaryItem = LoanSummaryItem(
 fun List<LoanSummaryItemDto>.toDomainModels(): List<LoanSummaryItem> = map { it.toDomainModel() }
 
 /**
- * Composite converter for the single `GET /datatables/dt_meeting_record/{centerId}` payload — maps
+ * Composite converter for the single `GET /datatables/dt_meeting_record/{groupId}` payload — maps
  * the scalar meeting totals plus both nested per-member collections.
  */
 fun MeetingSummaryRecordDto.toDomainModel(): MeetingSummaryData = MeetingSummaryData(

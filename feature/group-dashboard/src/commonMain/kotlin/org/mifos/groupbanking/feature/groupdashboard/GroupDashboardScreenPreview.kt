@@ -39,13 +39,13 @@ import org.mifos.groupbanking.feature.groupdashboard.components.RotationMetricCa
  * `idea-layer/screens/group-dashboard/demo-data.yaml#entries` (Mwangaza Women's Group / VSLA /
  * ACCUMULATING and Jiunge ROSCA Circle / ROSCA / ROTATING_PAYOUT) — `demo_data_resolved = true`,
  * so every field below is the actual seeded value, never a generic placeholder literal
- * (RULE-PREVIEW-7). [GroupDetail.fineractCenterId] has no matching demo-data field (companion-API
+ * (RULE-PREVIEW-7). [GroupDetail.fineractGroupId] has no matching demo-data field (companion-API
  * concern, not surfaced to the dashboard canvas) — a plausible non-zero placeholder is used since
  * the field is required but never rendered.
  */
 private val accumulatingGroup = GroupDetail(
     id = "GRP-20260509-001",
-    fineractCenterId = 501L,
+    fineractGroupId = 501L,
     name = "Mwangaza Women's Group",
     cycleNumber = 1,
     cycleLengthMonths = 12,
@@ -71,7 +71,7 @@ private val accumulatingGroup = GroupDetail(
 
 private val rotatingGroup = GroupDetail(
     id = "GRP-20260610-002",
-    fineractCenterId = 610L,
+    fineractGroupId = 610L,
     name = "Jiunge ROSCA Circle",
     cycleNumber = 3,
     cycleLengthMonths = 10,

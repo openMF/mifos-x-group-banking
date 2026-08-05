@@ -9,9 +9,11 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the field-officer-dashboard Fineract reads (FR-009 —
- * `GET /centers`, `GET /groups`, `GET /runreports/FieldOfficerGroupReport`). Follows the same
+ * `GET /groups`, `GET /runreports/FieldOfficerGroupReport`). Follows the same
  * default-param config-class pattern as [CompanionAuthApiConfig] / [GroupApiConfig].
  *
  * The shared `HttpClient` singleton in `kpt.core.network.di.NetworkModule` dispatches these
@@ -21,5 +23,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — FieldOfficerApi base URL.
  */
 data class FieldOfficerApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

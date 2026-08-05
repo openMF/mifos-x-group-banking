@@ -105,7 +105,7 @@ data class MeetingSummaryState(
     val isSharing: Boolean = false,
     val meetingId: String = "",
     val meetingNumber: Int = 0,
-    val centerId: Int = 0,
+    val groupId: Int = 0,
 )
 
 /** Derived, single-source-of-truth screen state — see [MeetingSummaryScreenState] KDoc. */
@@ -157,9 +157,9 @@ sealed interface MeetingSummaryAction {
  * `NetworkMonitor` is not re-injected here — it is already composed inside the store's
  * `asScreenStream(...)` wiring (via `MeetingSummaryRepositoryImpl`).
  *
- * [centerId] + [meetingNumber] are the `ui.yaml#nav_params` values forwarded from the entry point
+ * [groupId] + [meetingNumber] are the `ui.yaml#nav_params` values forwarded from the entry point
  * (meeting-conduct wizard post-submit, or a meeting-calendar completed-meeting deep-link) via Koin
- * `parametersOf(centerId, meetingNumber, meetingId)`; they scope the single-key
+ * `parametersOf(groupId, meetingNumber, meetingId)`; they scope the single-key
  * [MeetingSummaryRepository.meetingSummaryStream] read. [meetingId] is carried for display/analytics.
  *
  * **In-memory hand-off gap (flagged, not invented around):** `data-flow.yaml` declares a preferred
@@ -177,28 +177,28 @@ internal class MeetingSummaryViewModel(
     private val sessionManager: SessionManager,
     private val crashReporter: CrashReporter,
     private val analytics: KptAnalyticsTracker,
-    private val centerId: Int,
+    private val groupId: Int,
     private val meetingNumber: Int,
     private val meetingId: String,
 ) : BaseViewModel<MeetingSummaryState, MeetingSummaryEvent, MeetingSummaryAction>(
     initialState = MeetingSummaryState(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
-        centerId = centerId,
+        groupId = groupId,
     ),
 ) {
 
-    /** Fixed-key offline-first stream for (centerId, meetingNumber) — see class KDoc. */
+    /** Fixed-key offline-first stream for (groupId, meetingNumber) — see class KDoc. */
     private val summaryStream: ScreenDataStream<MeetingSummaryData> =
         repository.meetingSummaryStream(
-            centerId = centerId,
+            groupId = groupId,
             meetingNumber = meetingNumber,
             scope = viewModelScope,
         )
 
     init {
         crashReporter.recordMessage(
-            message = "feature=meeting-summary screen=meeting-summary-screen centerId=$centerId meetingNumber=$meetingNumber",
+            message = "feature=meeting-summary screen=meeting-summary-screen groupId=$groupId meetingNumber=$meetingNumber",
             level = CrashSeverity.Debug,
         )
         analytics.trackSync(syncType = "meeting_summary_view")

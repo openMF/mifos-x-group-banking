@@ -53,7 +53,7 @@ data class CachedGroupDashboard(
 @Serializable
 data class CachedGroupDetail(
     val id: String,
-    val fineractCenterId: Long,
+    val fineractGroupId: Long,
     val name: String,
     val cycleNumber: Int,
     val cycleLengthMonths: Int,

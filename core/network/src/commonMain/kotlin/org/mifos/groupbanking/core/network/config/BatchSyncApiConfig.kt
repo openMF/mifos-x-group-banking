@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the sync-status feature's batch-drain client stack —
  * `POST /fineract-provider/api/v1/batches` (`batch_sync`), the Fineract Batch API endpoint
@@ -24,5 +26,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — BatchSyncApi base URL.
  */
 data class BatchSyncApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

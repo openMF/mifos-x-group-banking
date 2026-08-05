@@ -21,10 +21,10 @@ import org.mifos.groupbanking.feature.meetingconduct.MeetingConductViewModel
  * so this module does NOT re-declare those bindings).
  *
  * `MeetingConductViewModel` is registered with the `viewModel { parameters -> ... }` builder because
- * its `meetingId`/`meetingNumber`/`centerId` constructor parameters are the `ui.yaml#nav_params`
+ * its `meetingId`/`meetingNumber`/`groupId` constructor parameters are the `ui.yaml#nav_params`
  * forwarded from `meeting-calendar`, not DI-graph types — same convention as `LoanApplyModule`'s
  * `groupId` wiring. `MeetingConductScreen` supplies them via
- * `koinViewModel { parametersOf(meetingId, meetingNumber, centerId) }`.
+ * `koinViewModel { parametersOf(meetingId, meetingNumber, groupId) }`.
  */
 val MeetingConductModule = module {
     viewModel { parameters ->
@@ -35,7 +35,7 @@ val MeetingConductModule = module {
             crashReporter = get(),
             meetingId = parameters.get<String>(),
             meetingNumber = parameters.get<Int>(),
-            centerId = parameters.get<Int>(),
+            groupId = parameters.get<Int>(),
         )
     }
 }

@@ -44,16 +44,16 @@ class MeetingApiImpl(
     private val httpClient: HttpClient,
 ) : MeetingApi {
 
-    override suspend fun getCenterMeetings(centerId: Int): NetworkResult<List<MeetingListItemDto>, NetworkError> {
-        val path = "$FINERACT_BASE/centers/$centerId/meetings"
-        Logger.d(TAG) { "getCenterMeetings: GET $path" }
-        return requestAsNetworkResult(op = "getCenterMeetings") {
+    override suspend fun getMeetingSchedule(groupId: Int): NetworkResult<List<MeetingListItemDto>, NetworkError> {
+        val path = "$FINERACT_BASE/datatables/dt_meeting_schedule/$groupId"
+        Logger.d(TAG) { "getMeetingSchedule: GET $path" }
+        return requestAsNetworkResult(op = "getMeetingSchedule") {
             httpClient.get(path)
         }
     }
 
-    override suspend fun getMeetingRecords(centerId: Int): NetworkResult<MeetingRecordListDto, NetworkError> {
-        val path = "$FINERACT_BASE/datatables/dt_meeting_record/$centerId"
+    override suspend fun getMeetingRecords(groupId: Int): NetworkResult<MeetingRecordListDto, NetworkError> {
+        val path = "$FINERACT_BASE/datatables/dt_meeting_record/$groupId"
         Logger.d(TAG) { "getMeetingRecords: GET $path" }
         return requestAsNetworkResult(op = "getMeetingRecords") {
             httpClient.get(path)

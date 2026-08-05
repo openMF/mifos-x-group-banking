@@ -23,7 +23,7 @@ enum class MeetingFrequency { WEEKLY, BIWEEKLY, MONTHLY }
  * The organizer's recurring-schedule adjustment payload emitted by the meeting-calendar
  * schedule-editor sheet's Save CTA (`ui.yaml#schedule_confirm_btn`, action `RescheduleMeeting`).
  *
- * Maps to the server-gated companion `PUT /centers/{centerId}/calendars/{calendarId}?command=updateCalendar`
+ * Maps to the server-gated companion `PUT /groups/{groupId}/calendars/{calendarId}?command=updateCalendar`
  * (mirrored to `dt_group_config`). The live network write is **pending-device-verify** — the companion
  * `companion_update_calendar` tool is not deployed yet — so [org.mifos.groupbanking.core.data.repository.MeetingRepository.rescheduleMeeting]
  * offline-queues this payload to the shared `sync_queue` for later drain rather than calling the network.
@@ -34,7 +34,7 @@ enum class MeetingFrequency { WEEKLY, BIWEEKLY, MONTHLY }
  */
 @Serializable
 data class RescheduleMeetingRequest(
-    val centerId: Int,
+    val groupId: Int,
     val calendarId: String? = null,
     val day: String,
     val time: String,
@@ -52,7 +52,7 @@ enum class MeetingStatus { UPCOMING, COMPLETED, MISSED }
 
 /**
  * One meeting row for the meeting-calendar screen — the domain projection of
- * `api.yaml#dtos.MeetingListItem` (the `get_center_meetings` response row enriched with the
+ * `api.yaml#dtos.MeetingListItem` (the `get_meeting_schedule` response row enriched with the
  * `get_meeting_records_datatable` financial record for COMPLETED meetings).
  *
  * [attendanceCount] / [totalCollectedKES] are nullable: UPCOMING (and MISSED) meetings carry no

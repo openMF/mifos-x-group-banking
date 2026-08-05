@@ -58,7 +58,7 @@ class GroupCreateDtoTest {
 
     private val responseDto = CreateGroupResponseDto(
         groupId = "grp-9001",
-        fineractCenterId = 501L,
+        fineractGroupId = 501L,
         inviteCode = "AB12CD",
     )
 
@@ -166,7 +166,7 @@ class GroupCreateDtoTest {
     @Test
     fun createGroupResponseDto_constructsWithAllFields() {
         assertEquals("grp-9001", responseDto.groupId)
-        assertEquals(501L, responseDto.fineractCenterId)
+        assertEquals(501L, responseDto.fineractGroupId)
         assertEquals("AB12CD", responseDto.inviteCode)
     }
 
@@ -174,7 +174,7 @@ class GroupCreateDtoTest {
     fun createGroupResponseDto_serializationRoundTrips() {
         val encoded = json.encodeToString(CreateGroupResponseDto.serializer(), responseDto)
         assertTrue(encoded.contains("\"groupId\""))
-        assertTrue(encoded.contains("\"fineractCenterId\""))
+        assertTrue(encoded.contains("\"fineractGroupId\""))
         assertTrue(encoded.contains("\"inviteCode\""))
 
         val decoded = json.decodeFromString(CreateGroupResponseDto.serializer(), encoded)

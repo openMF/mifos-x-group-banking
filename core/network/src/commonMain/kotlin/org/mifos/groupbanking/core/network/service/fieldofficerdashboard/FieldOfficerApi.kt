@@ -11,7 +11,6 @@ package org.mifos.groupbanking.core.network.service.fieldofficerdashboard
 
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import org.mifos.groupbanking.core.network.model.PagedCentersResponseDto
 import org.mifos.groupbanking.core.network.model.PagedGroupsResponseDto
 
 /**
@@ -26,17 +25,6 @@ import org.mifos.groupbanking.core.network.model.PagedGroupsResponseDto
  * SERVICE-ONLY.
  */
 interface FieldOfficerApi {
-
-    /**
-     * `GET /fineract-provider/api/v1/centers?staffId=…` (`get_centers_for_staff`). Fetches all
-     * centers (top-level group containers) assigned to [staffId]. Offset-paginated.
-     */
-    suspend fun getCentersForStaff(
-        staffId: Long,
-        paged: Boolean = true,
-        limit: Int = 100,
-        offset: Int = 0,
-    ): NetworkResult<PagedCentersResponseDto, NetworkError>
 
     /**
      * `GET /fineract-provider/api/v1/groups?staffId=…` (`get_groups_for_staff`). Fetches all groups

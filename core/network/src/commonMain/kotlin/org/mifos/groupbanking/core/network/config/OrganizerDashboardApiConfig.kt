@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the organizer-dashboard companion bridge, served by the same
  * companion server as the login-signup bridge, the group-type catalogue, and the personal-dashboard.
@@ -25,5 +27,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — OrganizerDashboardApi base URL.
  */
 data class OrganizerDashboardApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

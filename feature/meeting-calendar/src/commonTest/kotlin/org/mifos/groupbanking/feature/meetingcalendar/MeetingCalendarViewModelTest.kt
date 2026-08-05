@@ -75,7 +75,7 @@ class MeetingCalendarViewModelTest {
         meetings: List<MeetingListItem> = emptyList(),
         failWith: Throwable? = null,
         online: Boolean = true,
-        centerId: Int = CENTER_ID,
+        groupId: Int = GROUP_ID,
         sessionManager: SessionManager = SessionManager(policy = SecurityPolicy()),
     ): Triple<FakeMeetingRepository, SessionManager, MeetingCalendarViewModel> {
         val repository = FakeMeetingRepository(meetings = meetings, failWith = failWith, online = online)
@@ -84,7 +84,7 @@ class MeetingCalendarViewModelTest {
             sessionManager = sessionManager,
             crashReporter = ConsoleCrashReporter(),
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
-            centerId = centerId,
+            groupId = groupId,
         )
         createdViewModels += viewModel
         return Triple(repository, sessionManager, viewModel)
@@ -100,14 +100,14 @@ class MeetingCalendarViewModelTest {
     // ─── initial state + stream mapping ─────────────────────────────────────
 
     @Test
-    fun `initial state is loading, seeds centerId and LIST view mode`() = runTest(testDispatcher) {
-        val (_, _, viewModel) = buildViewModel(centerId = CENTER_ID)
+    fun `initial state is loading, seeds groupId and LIST view mode`() = runTest(testDispatcher) {
+        val (_, _, viewModel) = buildViewModel(groupId = GROUP_ID)
 
         val state = viewModel.stateFlow.value
         assertTrue(state.isLoading)
         assertNull(state.error)
         assertTrue(state.meetings.isEmpty())
-        assertEquals(CENTER_ID, state.centerId)
+        assertEquals(GROUP_ID, state.groupId)
         assertEquals(ViewMode.LIST, state.viewMode)
     }
 
@@ -193,7 +193,7 @@ class MeetingCalendarViewModelTest {
 
         viewModel.eventFlow.test {
             viewModel.trySendAction(MeetingCalendarAction.OpenPastMeeting("MTG-2", 2))
-            assertEquals(MeetingCalendarEvent.NavigateToReview("MTG-2", 2, CENTER_ID), awaitItem())
+            assertEquals(MeetingCalendarEvent.NavigateToReview("MTG-2", 2, GROUP_ID), awaitItem())
         }
     }
 
@@ -226,7 +226,7 @@ class MeetingCalendarViewModelTest {
 
     @Test
     fun `RescheduleMeeting offline-queues the payload, closes the sheet and emits ShowScheduleUpdated`() = runTest(testDispatcher) {
-        val (repository, _, viewModel) = buildViewModel(centerId = CENTER_ID)
+        val (repository, _, viewModel) = buildViewModel(groupId = GROUP_ID)
         viewModel.trySendAction(MeetingCalendarAction.OpenScheduleEditor)
         viewModel.awaitState { it.showScheduleEditor }
 
@@ -238,7 +238,7 @@ class MeetingCalendarViewModelTest {
         }
 
         val queued = repository.lastReschedule
-        assertEquals(CENTER_ID, queued?.centerId)
+        assertEquals(GROUP_ID, queued?.groupId)
         assertEquals("MONDAY", queued?.day)
         assertEquals("10:00", queued?.time)
         assertEquals(MeetingFrequency.WEEKLY, queued?.frequency)
@@ -296,7 +296,7 @@ class MeetingCalendarViewModelTest {
 // Fixtures
 // ---------------------------------------------------------------------------
 
-private const val CENTER_ID = 1
+private const val GROUP_ID = 1
 
 private fun meeting(
     number: Int,
@@ -346,7 +346,7 @@ private class FakeMeetingRepository(
     }
 
     override fun meetingsStream(
-        centerId: Int,
+        groupId: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<List<MeetingListItem>> {

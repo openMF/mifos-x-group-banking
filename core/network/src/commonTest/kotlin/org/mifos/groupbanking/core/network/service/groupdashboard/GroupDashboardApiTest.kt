@@ -70,7 +70,7 @@ class GroupDashboardApiTest {
     private val groupBody = """
         {
           "id": "g-1",
-          "fineractCenterId": 42,
+          "fineractGroupId": 42,
           "name": "Sunrise VSLA",
           "cycleNumber": 3,
           "cycleLengthMonths": 12,

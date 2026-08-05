@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * Wire DTO for the organizer-dashboard companion call (`GET /companion/organizer/dashboard`) —
  * `idea-layer/screens/organizer-dashboard/api.yaml#api[0]` (unified-identity companion API; resolves
  * the caller's organizer groups via `dt_member_role`, no `staffId` param — replaces the raw Fineract
- * `/staff/{id}/summary` + `/centers` + `/journal-entries` triad). Returns KPIs scoped to "my groups"
+ * `/staff/{id}/summary` + `/groups` + `/journal-entries` triad). Returns KPIs scoped to "my groups"
  * plus the inline [todaySchedule] + [recentActivity] collections.
  *
  * See API.md#dtos — OrganizerDashboardSummary.

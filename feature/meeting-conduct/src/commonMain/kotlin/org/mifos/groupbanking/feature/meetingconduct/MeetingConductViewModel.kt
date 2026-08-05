@@ -95,7 +95,7 @@ data class MeetingConductState(
     val totalSteps: Int = 7,
     val meetingId: String = "",
     val meetingNumber: Int = 0,
-    val centerId: Int = 0,
+    val groupId: Int = 0,
     @Transient val previousMeetingSummary: PreviousMeetingSummary? = null,
     @Transient val groupMembers: List<GroupMember> = emptyList(),
     val attendanceMap: Map<String, AttendanceStatus> = emptyMap(),
@@ -143,19 +143,19 @@ fun MeetingConductState.deriveScreenState(): MeetingConductScreenState = when {
  * `ui.yaml#state_model.MeetingConductViewModel.events.members` (6 members). See API.md#events.
  */
 sealed interface MeetingConductEvent {
-    data class NavigateToMeetingSummary(val meetingId: String, val meetingNumber: Int, val centerId: Int) : MeetingConductEvent
+    data class NavigateToMeetingSummary(val meetingId: String, val meetingNumber: Int, val groupId: Int) : MeetingConductEvent
 
     /**
      * G6 fix (`ui.yaml#view_full_previous_btn.on_click`): carries the REAL prior meeting's
      * [meetingId] (String, from `previousMeetingSummary.meetingId` — NOT the meeting number) plus
-     * [meetingNumber] (the prior meeting's number, passed separately, no longer dropped), [centerId],
+     * [meetingNumber] (the prior meeting's number, passed separately, no longer dropped), [groupId],
      * and [launchedFrom]="conduct" so the review renders in conduct-context (shows the
      * "Start Meeting #N" CTA).
      */
     data class NavigateToPreviousMeetingReview(
         val meetingId: String,
         val meetingNumber: Int,
-        val centerId: Int,
+        val groupId: Int,
         val launchedFrom: String,
     ) : MeetingConductEvent
     data object NavigateBack : MeetingConductEvent
@@ -205,7 +205,7 @@ sealed interface MeetingConductAction {
  * RULE-IDEA-IMPL-INTELLIGENCE-001.
  *
  * **`groupId` gap (flagged, CFF1):** `ui.yaml#nav_params` names only `{meetingId, meetingNumber,
- * centerId}` — no `groupId`, which `get_active_loans` requires. [centerId] is threaded as the
+ * groupId}` — no `groupId`, which `get_active_loans` requires. [groupId] is threaded as the
  * `groupId` argument (center↔group are 1:1 in this group-banking domain); flagged for the idea-layer
  * to add an explicit `groupId` nav param.
  *
@@ -218,12 +218,12 @@ internal class MeetingConductViewModel(
     private val crashReporter: CrashReporter,
     private val meetingId: String,
     private val meetingNumber: Int,
-    private val centerId: Int,
+    private val groupId: Int,
 ) : BaseViewModel<MeetingConductState, MeetingConductEvent, MeetingConductAction>(
     initialState = MeetingConductState(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
-        centerId = centerId,
+        groupId = groupId,
     ),
 ) {
 
@@ -232,7 +232,7 @@ internal class MeetingConductViewModel(
 
     init {
         crashReporter.recordMessage(
-            message = "feature=meeting-conduct screen=meeting-conduct-screen meetingId=$meetingId centerId=$centerId",
+            message = "feature=meeting-conduct screen=meeting-conduct-screen meetingId=$meetingId groupId=$groupId",
             level = CrashSeverity.Debug,
         )
         updateState { copy(isOffline = !networkMonitor.isOnline.value) }
@@ -269,7 +269,7 @@ internal class MeetingConductViewModel(
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             updateState { copy(isLoading = true, loadError = null) }
-            val result = repository.loadMeetingData(centerId = centerId, groupId = centerId, meetingNumber = meetingNumber)
+            val result = repository.loadMeetingData(groupId = groupId, meetingNumber = meetingNumber)
             trySendAction(MeetingConductAction.Internal.MeetingDataLoaded(result))
         }
     }
@@ -295,7 +295,7 @@ internal class MeetingConductViewModel(
             }
             is NetworkResult.Error -> {
                 crashReporter.recordMessage(
-                    message = "meeting-conduct: loadMeetingData failed centerId=$centerId networkError=${result.error}",
+                    message = "meeting-conduct: loadMeetingData failed groupId=$groupId networkError=${result.error}",
                     level = CrashSeverity.Warning,
                 )
                 updateState { copy(isLoading = false, loadError = result.error.toMessageKey()) }
@@ -449,7 +449,7 @@ internal class MeetingConductViewModel(
         analytics.trackSync(syncType = if (isOffline) "meeting_submitted_offline" else "meeting_submitted", success = true)
         updateState { copy(isSubmitting = false, submitSuccess = true, isOffline = isOffline, submitError = null) }
         sendEvent(MeetingConductEvent.ShowSubmitSuccess)
-        sendEvent(MeetingConductEvent.NavigateToMeetingSummary(meetingId = meetingId, meetingNumber = meetingNumber, centerId = centerId))
+        sendEvent(MeetingConductEvent.NavigateToMeetingSummary(meetingId = meetingId, meetingNumber = meetingNumber, groupId = groupId))
     }
 
     // -- Navigation ---------------------------------------------------------------------------------
@@ -458,14 +458,14 @@ internal class MeetingConductViewModel(
         // G6: bind the PRIOR meeting's real id + number (previousMeetingSummary) — not the wizard's
         // current meeting id, and never the meeting NUMBER bound to meeting_id. When the server has not
         // supplied a prior meeting id yet (companion API pending), `meetingId` is blank; the
-        // previous-meeting-review keys primarily off (centerId, meetingNumber) so the review still
+        // previous-meeting-review keys primarily off (groupId, meetingNumber) so the review still
         // resolves. launched_from="conduct" makes the review show the "Start Meeting #N" CTA.
         val summary = state.previousMeetingSummary ?: return
         sendEvent(
             MeetingConductEvent.NavigateToPreviousMeetingReview(
                 meetingId = summary.meetingId,
                 meetingNumber = summary.meetingNumber,
-                centerId = centerId,
+                groupId = groupId,
                 launchedFrom = "conduct",
             ),
         )
@@ -556,7 +556,7 @@ internal fun MeetingConductState.toSubmissionRequest(): MeetingSubmissionRequest
     return MeetingSubmissionRequest(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
-        centerId = centerId,
+        groupId = groupId,
         actualDate = previousMeetingSummary?.date.orEmpty().ifBlank { "" },
         openingCorpus = openingCorpus,
         closingCorpus = closingCorpus,

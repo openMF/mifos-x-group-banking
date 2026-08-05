@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the loan-detail feature's
  * `GET /loans/{loanId}` endpoint. Follows the same default-param config-class pattern as
@@ -24,5 +26,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — LoanDetailApi base URL.
  */
 data class LoanDetailApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

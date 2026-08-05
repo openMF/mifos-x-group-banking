@@ -32,20 +32,20 @@ import org.mifos.groupbanking.core.model.PreviousMeetingDetail
 interface PreviousMeetingReviewRepository {
 
     /**
-     * Offline-first combined stream of the previous-meeting recap for (`centerId`, `meetingNumber`,
-     * `meetingId`). The reused record read is scoped by (`centerId`, `meetingNumber`); the attendance
+     * Offline-first combined stream of the previous-meeting recap for (`groupId`, `meetingNumber`,
+     * `meetingId`). The reused record read is scoped by (`groupId`, `meetingNumber`); the attendance
      * read is scoped by `meetingId`. Both serve their per-key cache immediately then
      * background-revalidate per each store's stale-while-revalidate policy. The returned
      * [PreviousMeetingReviewStream] exposes the merged [state] the ViewModel collects plus a [retry]
      * that re-drives BOTH underlying reads (the error-state Retry CTA).
      *
-     * @param centerId The center the completed meeting belongs to (record store key part 1).
+     * @param groupId The center the completed meeting belongs to (record store key part 1).
      * @param meetingNumber The completed meeting's sequence number (record store key part 2).
      * @param meetingId The completed meeting id (attendance store key + display/analytics).
      * @param scope CoroutineScope (typically `viewModelScope`) for the auto-refresh coroutines.
      */
     fun previousMeetingStream(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
         meetingId: String,
         scope: CoroutineScope,

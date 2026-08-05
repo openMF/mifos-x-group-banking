@@ -9,9 +9,11 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the meeting-calendar read path — the two Fineract reads
- * (`get_center_meetings` + `get_meeting_records_datatable`) the meeting-calendar screen fires on
+ * (`get_meeting_schedule` + `get_meeting_records_datatable`) the meeting-calendar screen fires on
  * mount/refresh. Follows the same default-param config-class pattern as [GroupDashboardApiConfig] /
  * [GroupApiConfig] / [CompanionAuthApiConfig].
  *
@@ -24,5 +26,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MeetingApi base URL.
  */
 data class MeetingApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

@@ -40,7 +40,7 @@ data class GroupDashboardResponseDto(
  * Wire DTO for `get_group` — `GET /companion/groups/{groupId}` (COMP-GRP-001 read path).
  * **Deliberately NOT the same type as the group-list `GroupDto`** — see `GroupDetail.kt` kdoc
  * (domain layer) for the full field-shape divergence rationale; this endpoint returns
- * [fineractCenterId]/[cycleLengthMonths]/[meetingFrequency]/[overdueLoansCount]/[typeConfig] and
+ * [fineractGroupId]/[cycleLengthMonths]/[meetingFrequency]/[overdueLoansCount]/[typeConfig] and
  * does NOT return `groupType`/`viewerRole`/`lastMeetingDate`/`healthIndicator`/`overdueRate`.
  *
  * See API.md#dtos — GroupDetail.
@@ -48,7 +48,7 @@ data class GroupDashboardResponseDto(
 @Serializable
 data class GroupDetailDto(
     @SerialName("id") val id: String,
-    @SerialName("fineractCenterId") val fineractCenterId: Long,
+    @SerialName("fineractGroupId") val fineractGroupId: Long,
     @SerialName("name") val name: String,
     @SerialName("cycleNumber") val cycleNumber: Int,
     @SerialName("cycleLengthMonths") val cycleLengthMonths: Int,

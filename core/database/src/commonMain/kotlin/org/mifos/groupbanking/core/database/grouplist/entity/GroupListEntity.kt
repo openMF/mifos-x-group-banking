@@ -53,6 +53,6 @@ data class GroupListEntity(
     val lastMeetingDate: String,
     val overdueRate: Double,
     val status: String,
-    val fineractCenterId: Long,
+    val fineractGroupId: Long,
     val fetchedAt: Long,
 )

@@ -26,7 +26,7 @@ import io.ktor.serialization.ContentConvertException
 import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import org.mifos.groupbanking.core.network.model.CenterDetailDto
+import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.CorpusRecordDto
 import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
@@ -45,7 +45,7 @@ private const val MEETING_RECORD_DATATABLE = "/datatables/dt_meeting_record"
 private const val ATTENDANCE_DATATABLE = "/datatables/dt_meeting_attendance"
 private const val GROUP_CORPUS_DATATABLE = "/datatables/dt_group_corpus"
 private const val LOAN_VOTE_DATATABLE = "/datatables/dt_loan_vote"
-private const val CENTERS_PATH = "/centers"
+private const val GROUPS_PATH = "/groups"
 private const val LOANS_PATH = "/loans"
 private const val SAVINGS_ACCOUNTS_PATH = "/savingsaccounts"
 private const val GROUP_LOAN_REQUESTS_PATH = "/companion/groups"
@@ -66,22 +66,22 @@ class MeetingConductApiImpl(
     private val httpClient: HttpClient,
 ) : MeetingConductApi {
 
-    override suspend fun getPreviousMeetingRecord(centerId: Int): NetworkResult<MeetingRecordDetailDto, NetworkError> {
-        val path = "$MEETING_RECORD_DATATABLE/$centerId"
+    override suspend fun getPreviousMeetingRecord(groupId: Int): NetworkResult<MeetingRecordDetailDto, NetworkError> {
+        val path = "$MEETING_RECORD_DATATABLE/$groupId"
         Logger.d(TAG) { "getPreviousMeetingRecord: GET $path" }
         return requestAsNetworkResult(op = "getPreviousMeetingRecord") { httpClient.get(path) }
     }
 
-    override suspend fun getGroupMembers(centerId: Int): NetworkResult<CenterDetailDto, NetworkError> {
-        val path = "$CENTERS_PATH/$centerId"
-        Logger.d(TAG) { "getGroupMembers: GET $path (associations=clientMembers)" }
+    override suspend fun getGroupMembers(groupId: Int): NetworkResult<GroupMembersDetailDto, NetworkError> {
+        val path = "$GROUPS_PATH/$groupId"
+        Logger.d(TAG) { "getGroupMembers: GET $path (associations=clientMembers,groupRoles)" }
         return requestAsNetworkResult(op = "getGroupMembers") {
-            httpClient.get(path) { parameter("associations", "clientMembers") }
+            httpClient.get(path) { parameter("associations", "clientMembers,groupRoles") }
         }
     }
 
-    override suspend fun getGroupCorpus(centerId: Int): NetworkResult<CorpusRecordDto, NetworkError> {
-        val path = "$GROUP_CORPUS_DATATABLE/$centerId"
+    override suspend fun getGroupCorpus(groupId: Int): NetworkResult<CorpusRecordDto, NetworkError> {
+        val path = "$GROUP_CORPUS_DATATABLE/$groupId"
         Logger.d(TAG) { "getGroupCorpus: GET $path" }
         return requestAsNetworkResult(op = "getGroupCorpus") { httpClient.get(path) }
     }
@@ -113,7 +113,7 @@ class MeetingConductApiImpl(
     override suspend fun postMeetingRecord(
         request: CreateMeetingRecordRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
-        Logger.d(TAG) { "postMeetingRecord: POST $MEETING_RECORD_DATATABLE (centerId=${request.centerId})" }
+        Logger.d(TAG) { "postMeetingRecord: POST $MEETING_RECORD_DATATABLE (groupId=${request.groupId})" }
         return requestAsNetworkResult(op = "postMeetingRecord") {
             httpClient.post(MEETING_RECORD_DATATABLE) {
                 contentType(ContentType.Application.Json)
@@ -182,10 +182,10 @@ class MeetingConductApiImpl(
     }
 
     override suspend fun updateCorpus(
-        centerId: Int,
+        groupId: Int,
         request: UpdateCorpusRequestDto,
     ): NetworkResult<DataTableEntryResponseDto, NetworkError> {
-        val path = "$GROUP_CORPUS_DATATABLE/$centerId"
+        val path = "$GROUP_CORPUS_DATATABLE/$groupId"
         Logger.d(TAG) { "updateCorpus: PUT $path (closingCorpus=${request.corpusBalance})" }
         return requestAsNetworkResult(op = "updateCorpus") {
             httpClient.put(path) {

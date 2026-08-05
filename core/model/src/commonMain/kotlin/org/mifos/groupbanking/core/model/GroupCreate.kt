@@ -76,7 +76,7 @@ data class CreateGroupTypeConfig(
  */
 data class GroupCreationResult(
     val groupId: String,
-    val fineractCenterId: Long,
+    val fineractGroupId: Long,
     val inviteCode: String,
 )
 

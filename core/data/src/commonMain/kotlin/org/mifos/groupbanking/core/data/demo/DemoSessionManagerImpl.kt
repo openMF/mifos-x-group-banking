@@ -208,7 +208,7 @@ class DemoSessionManagerImpl(
             lastMeetingDate = "2026-01-20",
             overdueRate = 0.0,
             status = "active",
-            fineractCenterId = DEMO_FINERACT_CENTER_ID,
+            fineractGroupId = DEMO_FINERACT_GROUP_ID,
             fetchedAt = Clock.System.now().toEpochMilliseconds(),
         ),
     )
@@ -223,7 +223,7 @@ class DemoSessionManagerImpl(
         val payload = CachedGroupDashboard(
             group = CachedGroupDetail(
                 id = DEMO_GROUP_ID,
-                fineractCenterId = DEMO_FINERACT_CENTER_ID,
+                fineractGroupId = DEMO_FINERACT_GROUP_ID,
                 name = DEMO_GROUP_NAME,
                 cycleNumber = 1,
                 cycleLengthMonths = 12,
@@ -374,7 +374,7 @@ class DemoSessionManagerImpl(
         const val DEMO_ORGANIZER_CLIENT_ID = 301L
 
         /** `groups[0].fineract_center_id`. */
-        const val DEMO_FINERACT_CENTER_ID = 101L
+        const val DEMO_FINERACT_GROUP_ID = 101L
 
         /** Single seeded page for every paginated cache (group-list / member-list / loan-list). */
         const val DEMO_PAGE_INDEX = 0

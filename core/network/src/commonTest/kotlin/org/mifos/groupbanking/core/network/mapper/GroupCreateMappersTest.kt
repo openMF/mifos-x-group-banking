@@ -146,13 +146,13 @@ class GroupCreateMappersTest {
     fun createGroupResponseDto_toDomainModel_mapsAllFields() {
         val responseDto = CreateGroupResponseDto(
             groupId = "grp-9001",
-            fineractCenterId = 501L,
+            fineractGroupId = 501L,
             inviteCode = "AB12CD",
         )
         val domain = responseDto.toDomainModel()
 
         assertEquals("grp-9001", domain.groupId)
-        assertEquals(501L, domain.fineractCenterId)
+        assertEquals(501L, domain.fineractGroupId)
         assertEquals("AB12CD", domain.inviteCode)
     }
 

@@ -150,7 +150,7 @@ val appStoreModule: Module = module {
     }
 
     // MODULE:MeetingSummary — meeting-summary single-key COMPOSITE store (NETWORK_WITH_CACHE,
-    // GET /datatables/dt_meeting_record/{centerId}). Internal to the store seam — exposed to UI
+    // GET /datatables/dt_meeting_record/{groupId}). Internal to the store seam — exposed to UI
     // only through MeetingSummaryRepository.asScreenStream().
     single(AppStoreRegistry.MeetingSummary) {
         provideMeetingSummaryStore(api = get(), dao = get())
@@ -163,7 +163,7 @@ val appStoreModule: Module = module {
     }
 
     // MODULE:MeetingCalendar — meeting-calendar single-key store (NETWORK_WITH_CACHE,
-    // GET /centers/{centerId}/meetings merged with dt_meeting_record). Internal to the store seam —
+    // GET /datatables/dt_meeting_schedule/{groupId} merged with dt_meeting_record). Internal to the store seam —
     // exposed to UI only through MeetingRepository.asScreenStream().
     single(AppStoreRegistry.MeetingCalendar) {
         provideMeetingCalendarStore(api = get(), dao = get())
@@ -176,7 +176,7 @@ val appStoreModule: Module = module {
     }
 
     // MODULE:FieldOfficerDashboard — field-officer-dashboard AGGREGATE store (composite dynamic-key
-    // NETWORK_WITH_CACHE, FR-009 — parallel GET /centers + GET /groups). Internal to the store seam
+    // NETWORK_WITH_CACHE, FR-009 — parallel GET /groups). Internal to the store seam
     // — exposed to UI only through FieldOfficerDashboardRepository.asScreenStream().
     single(AppStoreRegistry.FieldOfficerDashboard) {
         provideFieldOfficerDashboardStore(api = get(), dao = get())

@@ -35,7 +35,7 @@ data class MemberPayout(
 /**
  * Domain model for the strategy-aware share-out distribution preview computed by the companion
  * API (`GET /companion/groups/{groupId}/shareout/preview`, COMP-DIST-001). Replaces the raw
- * `/centers/{centerId}/accounts` + `dt_share_out` datatable calls.
+ * `/groups/{groupId}/accounts` + `dt_share_out` datatable calls.
  *
  * The [poolModel] discriminator (`ACCUMULATING` | `ROTATING_PAYOUT`) selects which strategy-
  * specific payload is meaningful: [memberPayouts] (per-member payout table) for ACCUMULATING

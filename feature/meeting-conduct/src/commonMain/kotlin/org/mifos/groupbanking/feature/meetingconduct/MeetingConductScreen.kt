@@ -169,7 +169,7 @@ import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens
 /**
  * Container for `meeting-conduct-screen` (`ui.yaml#route`: `/meetings/{meetingId}/conduct`). Collects
  * [MeetingConductViewModel] state via [collectAsStateWithLifecycle], forwards the required nav-args to
- * Koin via `parametersOf(meetingId, meetingNumber, centerId)`, consumes one-shot
+ * Koin via `parametersOf(meetingId, meetingNumber, groupId)`, consumes one-shot
  * [MeetingConductEvent]s (navigation + snackbar) through [EventsEffect], and delegates rendering to
  * the stateless [MeetingConductContent]. See API.md#screen.
  */
@@ -177,13 +177,13 @@ import org.mifos.groupbanking.feature.meetingconduct.generated.resources.screens
 internal fun MeetingConductScreen(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
-    onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
-    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, centerId: Int, launchedFrom: String) -> Unit,
+    groupId: Int,
+    onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, groupId: Int) -> Unit,
+    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, groupId: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingConductViewModel = koinViewModel(
-        parameters = { parametersOf(meetingId, meetingNumber, centerId) },
+        parameters = { parametersOf(meetingId, meetingNumber, groupId) },
     ),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -206,9 +206,9 @@ internal fun MeetingConductScreen(
     EventsEffect(viewModel) { event ->
         when (event) {
             is MeetingConductEvent.NavigateToMeetingSummary ->
-                onNavigateToMeetingSummary(event.meetingId, event.meetingNumber, event.centerId)
+                onNavigateToMeetingSummary(event.meetingId, event.meetingNumber, event.groupId)
             is MeetingConductEvent.NavigateToPreviousMeetingReview ->
-                onNavigateToPreviousMeetingReview(event.meetingId, event.meetingNumber, event.centerId, event.launchedFrom)
+                onNavigateToPreviousMeetingReview(event.meetingId, event.meetingNumber, event.groupId, event.launchedFrom)
             MeetingConductEvent.NavigateBack -> onNavigateBack()
             is MeetingConductEvent.ShowStepError -> snackbarHostState.showSnackbar(resolve(event.message))
             MeetingConductEvent.ShowSubmitSuccess -> Unit // navigation follows immediately

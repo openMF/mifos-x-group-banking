@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the previous-meeting-review feature's
  * `GET /datatables/dt_meeting_attendance/{meetingId}` endpoint. Follows the same default-param
@@ -22,5 +24,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MeetingAttendanceApi base URL.
  */
 data class MeetingAttendanceApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

@@ -244,7 +244,7 @@ class GroupCreateViewModelTest {
     @Test
     fun `OnSubmit success navigates to group dashboard and stores the invite code`() = runTest(testDispatcher) {
         groupCreateRepository.createGroupResult = NetworkResult.Success(
-            GroupCreationResult(groupId = "grp-42", fineractCenterId = 900L, inviteCode = "MWANGA1"),
+            GroupCreationResult(groupId = "grp-42", fineractGroupId = 900L, inviteCode = "MWANGA1"),
         )
         val viewModel = buildViewModel(vslaTypeConfig())
         testDispatcher.scheduler.advanceUntilIdle()
@@ -400,7 +400,7 @@ private fun sampleSession(userId: String = "42"): AuthSession = AuthSession(
 private class FakeGroupCreateRepository : GroupCreateRepository {
     var officesResult: NetworkResult<List<Office>, NetworkError> = NetworkResult.Success(emptyList())
     var createGroupResult: NetworkResult<GroupCreationResult, NetworkError> = NetworkResult.Success(
-        GroupCreationResult(groupId = "grp-1", fineractCenterId = 100L, inviteCode = "ABC123"),
+        GroupCreationResult(groupId = "grp-1", fineractGroupId = 100L, inviteCode = "ABC123"),
     )
 
     var createGroupCallCount: Int = 0

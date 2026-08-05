@@ -386,7 +386,7 @@ private fun group(id: String, name: String): Group = Group(
     healthIndicator = HealthIndicator.GREEN,
     overdueRate = 0.01,
     status = "ACTIVE",
-    fineractCenterId = 1L,
+    fineractGroupId = 1L,
 )
 
 /** Exception whose simple class name deliberately matches `categorize()`'s network-keyword scan. */

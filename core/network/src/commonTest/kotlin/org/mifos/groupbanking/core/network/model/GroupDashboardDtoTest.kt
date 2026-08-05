@@ -46,7 +46,7 @@ class GroupDashboardDtoTest {
 
     private val groupDetailDto = GroupDetailDto(
         id = "grp-1",
-        fineractCenterId = 500L,
+        fineractGroupId = 500L,
         name = "Mwangaza Women's Group",
         cycleNumber = 1,
         cycleLengthMonths = 12,
@@ -141,7 +141,7 @@ class GroupDashboardDtoTest {
     @Test
     fun groupDetailDto_constructsWithAllFields() {
         assertEquals("grp-1", groupDetailDto.id)
-        assertEquals(500L, groupDetailDto.fineractCenterId)
+        assertEquals(500L, groupDetailDto.fineractGroupId)
         assertEquals("Mwangaza Women's Group", groupDetailDto.name)
         assertEquals(1, groupDetailDto.cycleNumber)
         assertEquals(12, groupDetailDto.cycleLengthMonths)
@@ -155,7 +155,7 @@ class GroupDashboardDtoTest {
     @Test
     fun groupDetailDto_serializationRoundTrips_wireFieldNamesAreCamelCase() {
         val encoded = json.encodeToString(GroupDetailDto.serializer(), groupDetailDto)
-        assertTrue(encoded.contains("\"fineractCenterId\""))
+        assertTrue(encoded.contains("\"fineractGroupId\""))
         assertTrue(encoded.contains("\"cycleLengthMonths\""))
         assertTrue(encoded.contains("\"meetingFrequency\""))
         assertTrue(encoded.contains("\"overdueLoansCount\""))
@@ -509,7 +509,7 @@ class GroupDashboardDtoTest {
         val serverPayload = """
             {
               "group": {
-                "id":"grp-2","fineractCenterId":9,"name":"Jiunge ROSCA Circle","cycleNumber":3,
+                "id":"grp-2","fineractGroupId":9,"name":"Jiunge ROSCA Circle","cycleNumber":3,
                 "cycleLengthMonths":10,"meetingFrequency":"Monthly","memberCount":10,
                 "overdueLoansCount":0,"status":"ACTIVE",
                 "typeConfig": {

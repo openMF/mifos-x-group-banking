@@ -158,7 +158,7 @@ private fun GroupDashboard.toEntity(groupId: String): GroupDashboardCacheEntity 
 private fun GroupDashboard.toPayload(): CachedGroupDashboard = CachedGroupDashboard(
     group = CachedGroupDetail(
         id = group.id,
-        fineractCenterId = group.fineractCenterId,
+        fineractGroupId = group.fineractGroupId,
         name = group.name,
         cycleNumber = group.cycleNumber,
         cycleLengthMonths = group.cycleLengthMonths,
@@ -219,7 +219,7 @@ private fun GroupDashboardCacheEntity.toDomain(): GroupDashboard {
     return GroupDashboard(
         group = GroupDetail(
             id = payload.group.id,
-            fineractCenterId = payload.group.fineractCenterId,
+            fineractGroupId = payload.group.fineractGroupId,
             name = payload.group.name,
             cycleNumber = payload.group.cycleNumber,
             cycleLengthMonths = payload.group.cycleLengthMonths,

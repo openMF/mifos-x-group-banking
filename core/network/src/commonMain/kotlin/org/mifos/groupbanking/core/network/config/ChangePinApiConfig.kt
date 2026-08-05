@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the settings screen's change-PIN client stack —
  * `PUT /fineract-provider/api/v1/self/user/updatePassword` (`change_pin`), a raw Fineract
@@ -26,5 +28,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — ChangePinApi base URL.
  */
 data class ChangePinApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

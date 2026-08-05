@@ -29,14 +29,14 @@ import org.mifos.groupbanking.core.network.model.MeetingSummaryRecordDto
 interface MeetingRecordApi {
 
     /**
-     * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{centerId}?meetingNumber=N`
+     * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{groupId}?meetingNumber=N`
      * (`api.yaml#api[get_meeting_record]`). Fetches the completed meeting record for [meetingNumber]
-     * in center [centerId]. 401 -> [NetworkError.UNAUTHORIZED]; 404 -> [NetworkError.NOT_FOUND]
+     * in center [groupId]. 401 -> [NetworkError.UNAUTHORIZED]; 404 -> [NetworkError.NOT_FOUND]
      * ("meeting record not found" — the screen falls back to cached data); 5xx ->
      * [NetworkError.SERVER].
      */
     suspend fun getMeetingRecord(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
     ): NetworkResult<MeetingSummaryRecordDto, NetworkError>
 }

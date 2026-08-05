@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "d53d8f5f6a6eedc8534b872e3c972d68",
+    "identityHash": "9b323005a54f6f03c7f2d70d9e5fafb0",
     "entities": [
       {
         "tableName": "store_bookkeeper",
@@ -220,7 +220,7 @@
       },
       {
         "tableName": "group_list_cache",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `rowOrder` INTEGER NOT NULL, `name` TEXT NOT NULL, `groupType` TEXT NOT NULL, `viewerRole` TEXT NOT NULL, `cycleNumber` INTEGER NOT NULL, `memberCount` INTEGER NOT NULL, `lastMeetingDate` TEXT NOT NULL, `overdueRate` REAL NOT NULL, `status` TEXT NOT NULL, `fineractCenterId` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`groupId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` TEXT NOT NULL, `pageIndex` INTEGER NOT NULL, `rowOrder` INTEGER NOT NULL, `name` TEXT NOT NULL, `groupType` TEXT NOT NULL, `viewerRole` TEXT NOT NULL, `cycleNumber` INTEGER NOT NULL, `memberCount` INTEGER NOT NULL, `lastMeetingDate` TEXT NOT NULL, `overdueRate` REAL NOT NULL, `status` TEXT NOT NULL, `fineractGroupId` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`groupId`))",
         "fields": [
           {
             "fieldPath": "groupId",
@@ -289,8 +289,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "fineractCenterId",
-            "columnName": "fineractCenterId",
+            "fieldPath": "fineractGroupId",
+            "columnName": "fineractGroupId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -871,7 +871,7 @@
       },
       {
         "tableName": "meeting_record_cache",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cacheKey` TEXT NOT NULL, `centerId` INTEGER NOT NULL, `meetingId` TEXT NOT NULL, `meetingNumber` INTEGER NOT NULL, `actualDate` TEXT NOT NULL, `attendanceCount` INTEGER NOT NULL, `totalMemberCount` INTEGER NOT NULL, `groupSavingsCollected` INTEGER NOT NULL, `individualSavingsCollected` INTEGER NOT NULL, `totalSavingsCollected` INTEGER NOT NULL, `loansDisbursed` INTEGER NOT NULL, `loansRepaid` INTEGER NOT NULL, `finesCollected` INTEGER NOT NULL, `openingCorpus` INTEGER NOT NULL, `closingCorpus` INTEGER NOT NULL, `savingsBreakdownJson` TEXT NOT NULL, `loanItemsJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cacheKey` TEXT NOT NULL, `groupId` INTEGER NOT NULL, `meetingId` TEXT NOT NULL, `meetingNumber` INTEGER NOT NULL, `actualDate` TEXT NOT NULL, `attendanceCount` INTEGER NOT NULL, `totalMemberCount` INTEGER NOT NULL, `groupSavingsCollected` INTEGER NOT NULL, `individualSavingsCollected` INTEGER NOT NULL, `totalSavingsCollected` INTEGER NOT NULL, `loansDisbursed` INTEGER NOT NULL, `loansRepaid` INTEGER NOT NULL, `finesCollected` INTEGER NOT NULL, `openingCorpus` INTEGER NOT NULL, `closingCorpus` INTEGER NOT NULL, `savingsBreakdownJson` TEXT NOT NULL, `loanItemsJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))",
         "fields": [
           {
             "fieldPath": "cacheKey",
@@ -880,8 +880,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "centerId",
-            "columnName": "centerId",
+            "fieldPath": "groupId",
+            "columnName": "groupId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -991,11 +991,11 @@
       },
       {
         "tableName": "meeting_calendar_cache",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`centerId` INTEGER NOT NULL, `meetingsJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`centerId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` INTEGER NOT NULL, `meetingsJson` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`groupId`))",
         "fields": [
           {
-            "fieldPath": "centerId",
-            "columnName": "centerId",
+            "fieldPath": "groupId",
+            "columnName": "groupId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -1015,7 +1015,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "centerId"
+            "groupId"
           ]
         }
       },
@@ -1112,7 +1112,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd53d8f5f6a6eedc8534b872e3c972d68')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b323005a54f6f03c7f2d70d9e5fafb0')"
     ]
   }
 }

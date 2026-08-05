@@ -94,7 +94,7 @@ import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens
 /**
  * Container for `meeting-summary-screen`. Collects [MeetingSummaryViewModel] state via
  * [collectAsStateWithLifecycle], consumes one-shot [MeetingSummaryEvent]s through [EventsEffect], and
- * delegates all rendering to the stateless [MeetingSummaryContent]. [centerId] / [meetingNumber] /
+ * delegates all rendering to the stateless [MeetingSummaryContent]. [groupId] / [meetingNumber] /
  * [meetingId] are the `ui.yaml#nav_params` values — supplied to [MeetingSummaryViewModel] via Koin
  * `parametersOf(...)` (matching `MeetingSummaryModule`).
  *
@@ -106,11 +106,11 @@ import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens
 internal fun MeetingSummaryScreen(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
+    groupId: Int,
     onNavigateDone: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingSummaryViewModel = koinViewModel(
-        parameters = { parametersOf(centerId, meetingNumber, meetingId) },
+        parameters = { parametersOf(groupId, meetingNumber, meetingId) },
     ),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()

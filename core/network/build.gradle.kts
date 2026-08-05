@@ -33,6 +33,20 @@ buildkonfig {
             STRING, "FRED_API_KEY",
             System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
         )
+        // Single-instance SoT (server-layer/migrations/instances.json#active) cascaded into
+        // local.properties by core/scripts/instance-sync.sh. The app READS these — never
+        // hardcodes the active instance. Every *ApiConfig#baseUrl default reads FINERACT_BASE_URL;
+        // the shared HttpClient attaches FINERACT_TENANT as the Fineract-Platform-TenantId header.
+        buildConfigField(
+            STRING, "FINERACT_BASE_URL",
+            System.getenv("FINERACT_BASE_URL")
+                ?: localProps.getProperty("fineract.base.url", "https://mifos-bank-2.mifos.community"),
+        )
+        buildConfigField(
+            STRING, "FINERACT_TENANT",
+            System.getenv("FINERACT_TENANT")
+                ?: localProps.getProperty("fineract.tenant", "mifos-bank-2"),
+        )
     }
 }
 

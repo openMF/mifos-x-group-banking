@@ -45,7 +45,7 @@ private val previewGroups: List<Group> = listOf(
         healthIndicator = HealthIndicator.GREEN,
         overdueRate = 0.0,
         status = "active",
-        fineractCenterId = 101L,
+        fineractGroupId = 101L,
     ),
     Group(
         id = "grp-002",
@@ -58,7 +58,7 @@ private val previewGroups: List<Group> = listOf(
         healthIndicator = HealthIndicator.AMBER,
         overdueRate = 0.08,
         status = "active",
-        fineractCenterId = 102L,
+        fineractGroupId = 102L,
     ),
 )
 

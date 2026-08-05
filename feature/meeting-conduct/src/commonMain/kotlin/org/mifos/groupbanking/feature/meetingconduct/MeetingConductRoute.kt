@@ -18,24 +18,24 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 
 /**
  * `/meetings/{meetingId}/conduct` — the meeting-conduct wizard route (`ui.yaml#route`,
- * `ui.yaml#nav_params: { meetingId, meetingNumber, centerId }`). Forwarded from `meeting-calendar`'s
+ * `ui.yaml#nav_params: { meetingId, meetingNumber, groupId }`). Forwarded from `meeting-calendar`'s
  * "Start Meeting" entry point (`flow.yaml#entry_points[0]`) and seeds [MeetingConductViewModel] via
- * Koin `parametersOf(meetingId, meetingNumber, centerId)`. See API.md#route.
+ * Koin `parametersOf(meetingId, meetingNumber, groupId)`. See API.md#route.
  */
 @Serializable
 data class MeetingConductRoute(
     val meetingId: String,
     val meetingNumber: Int,
-    val centerId: Int,
+    val groupId: Int,
 )
 
 fun NavController.navigateToMeetingConduct(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
+    groupId: Int,
     navOptions: NavOptions? = null,
 ) = navigate(
-    MeetingConductRoute(meetingId = meetingId, meetingNumber = meetingNumber, centerId = centerId),
+    MeetingConductRoute(meetingId = meetingId, meetingNumber = meetingNumber, groupId = groupId),
     navOptions,
 )
 
@@ -46,8 +46,8 @@ fun NavController.navigateToMeetingConduct(
  * `meeting-calendar`). No callback carries a `= {}` default. See API.md#route.
  */
 fun NavGraphBuilder.meetingConductScreen(
-    onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
-    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, centerId: Int, launchedFrom: String) -> Unit,
+    onNavigateToMeetingSummary: (meetingId: String, meetingNumber: Int, groupId: Int) -> Unit,
+    onNavigateToPreviousMeetingReview: (meetingId: String, meetingNumber: Int, groupId: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composableWithRootPushTransitions<MeetingConductRoute> { backStackEntry ->
@@ -55,7 +55,7 @@ fun NavGraphBuilder.meetingConductScreen(
         MeetingConductScreen(
             meetingId = route.meetingId,
             meetingNumber = route.meetingNumber,
-            centerId = route.centerId,
+            groupId = route.groupId,
             onNavigateToMeetingSummary = onNavigateToMeetingSummary,
             onNavigateToPreviousMeetingReview = onNavigateToPreviousMeetingReview,
             onNavigateBack = onNavigateBack,

@@ -42,10 +42,10 @@ class MeetingRecordApiImpl(
 ) : MeetingRecordApi {
 
     override suspend fun getMeetingRecord(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
     ): NetworkResult<MeetingSummaryRecordDto, NetworkError> {
-        val path = "$MEETING_RECORD_PATH/$centerId"
+        val path = "$MEETING_RECORD_PATH/$groupId"
         Logger.d(TAG) { "getMeetingRecord: GET $path (meetingNumber=$meetingNumber)" }
         return requestAsNetworkResult(op = "getMeetingRecord") {
             httpClient.get(path) {

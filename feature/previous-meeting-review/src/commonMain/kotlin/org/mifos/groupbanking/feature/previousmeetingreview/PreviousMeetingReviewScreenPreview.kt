@@ -90,7 +90,7 @@ private val calendarContentState = PreviousMeetingReviewState(
     launchedFrom = "calendar",
     meetingId = summary.meetingId,
     meetingNumber = summary.meetingNumber,
-    centerId = 7,
+    groupId = 7,
 )
 
 private val conductContentState = PreviousMeetingReviewState(
@@ -100,7 +100,7 @@ private val conductContentState = PreviousMeetingReviewState(
     launchedFrom = "conduct",
     meetingId = summary.meetingId,
     meetingNumber = summary.meetingNumber,
-    centerId = 7,
+    groupId = 7,
     nextMeetingId = "meeting_016",
     nextMeetingNumber = 16,
 )

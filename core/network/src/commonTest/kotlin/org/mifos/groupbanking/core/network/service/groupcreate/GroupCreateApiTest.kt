@@ -176,7 +176,7 @@ class GroupCreateApiTest {
     )
 
     private val createResponseBody = """
-        { "groupId": "grp-100", "fineractCenterId": 55, "inviteCode": "ABC123" }
+        { "groupId": "grp-100", "fineractGroupId": 55, "inviteCode": "ABC123" }
     """.trimIndent()
 
     @Test
@@ -196,7 +196,7 @@ class GroupCreateApiTest {
 
         check(result is NetworkResult.Success)
         assertEquals("grp-100", result.data.groupId)
-        assertEquals(55L, result.data.fineractCenterId)
+        assertEquals(55L, result.data.fineractGroupId)
         assertEquals("ABC123", result.data.inviteCode)
         assertEquals("/companion/groups", capturedUrl?.encodedPath)
         assertEquals(HttpMethod.Post, capturedMethod)

@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the member-profile feature's raw-Fineract passthrough
  * endpoints (`/clients/{clientId}`, `/clients/{clientId}/accounts`,
@@ -27,5 +29,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — MemberProfileApi base URL.
  */
 data class MemberProfileApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

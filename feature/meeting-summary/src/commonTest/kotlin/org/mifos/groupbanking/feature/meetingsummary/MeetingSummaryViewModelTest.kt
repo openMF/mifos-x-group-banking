@@ -62,7 +62,7 @@ class MeetingSummaryViewModelTest {
             sessionManager = sessionManager,
             crashReporter = ConsoleCrashReporter(),
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
-            centerId = CENTER_ID,
+            groupId = GROUP_ID,
             meetingNumber = MEETING_NUMBER,
             meetingId = MEETING_ID,
         )
@@ -88,7 +88,7 @@ class MeetingSummaryViewModelTest {
         assertNull(state.meetingSummary)
         assertNull(state.error)
         assertFalse(state.isSharing)
-        assertEquals(CENTER_ID, state.centerId)
+        assertEquals(GROUP_ID, state.groupId)
         assertEquals(MEETING_NUMBER, state.meetingNumber)
         assertEquals(MEETING_ID, state.meetingId)
     }
@@ -96,7 +96,7 @@ class MeetingSummaryViewModelTest {
     @Test
     fun `init requests the stream for the nav-arg center and meeting`() = runTest(testDispatcher) {
         testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(listOf(CENTER_ID to MEETING_NUMBER), repository.requestedKeys)
+        assertEquals(listOf(GROUP_ID to MEETING_NUMBER), repository.requestedKeys)
     }
 
     @Test
@@ -196,7 +196,7 @@ class MeetingSummaryViewModelTest {
     }
 
     private companion object {
-        const val CENTER_ID = 42
+        const val GROUP_ID = 42
         const val MEETING_NUMBER = 5
         const val MEETING_ID = "MTG-2026-05-12"
     }
@@ -230,7 +230,7 @@ private fun meetingSummary(): MeetingSummaryData = MeetingSummaryData(
 
 /**
  * In-memory [MeetingSummaryRepository] fake — `meetingSummaryStream` is called exactly once per
- * [MeetingSummaryViewModel] instance (fixed centerId/meetingNumber constructor nav-args), so a
+ * [MeetingSummaryViewModel] instance (fixed groupId/meetingNumber constructor nav-args), so a
  * single buffered [MutableStateFlow] + a single shared `refreshTrigger` is sufficient — mirrors
  * `FakeLoanDetailRepository`'s identical single-key convention.
  */
@@ -247,12 +247,12 @@ private class FakeMeetingSummaryRepository : MeetingSummaryRepository {
     }
 
     override fun meetingSummaryStream(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MeetingSummaryData> {
-        requestedKeys += centerId to meetingNumber
+        requestedKeys += groupId to meetingNumber
         scope.launch {
             refreshTrigger.collect { refreshTriggerCount++ }
         }

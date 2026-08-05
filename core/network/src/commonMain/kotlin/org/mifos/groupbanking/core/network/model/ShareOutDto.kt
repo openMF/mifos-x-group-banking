@@ -40,7 +40,7 @@ data class MemberPayoutDto(
  * [rotationPosition]/[nextRecipientName]/[nextRecipientAmount] for ROTATING_PAYOUT types
  * (ROSCA/chit). [memberPayouts] defaults to `null` (absent for ROTATING_PAYOUT); the rotation
  * fields default to `null` (absent for ACCUMULATING). Replaces the raw
- * `/centers/{centerId}/accounts` + `dt_share_out` datatable calls.
+ * `/groups/{groupId}/accounts` + `dt_share_out` datatable calls.
  *
  * See API.md#dtos — ShareOutPreview.
  */
@@ -82,7 +82,7 @@ data class MemberPayoutRequestDto(
 /**
  * Wire DTO for the `POST /companion/groups/{groupId}/shareout/execute` request body
  * (`share-out-execute/api.yaml#api.post_shareout_execute.body`, COMP-DIST-001). Replaces the legacy
- * `POST /datatables/dt_share_out/{centerId}` + N sequential `POST /savingsaccounts/{id}/transactions`
+ * `POST /datatables/dt_share_out/{groupId}` + N sequential `POST /savingsaccounts/{id}/transactions`
  * calls with a single companion transaction. [shareoutFormula] is echoed for the server-side audit;
  * [executedAt] is the ISO-8601 client execution timestamp.
  *

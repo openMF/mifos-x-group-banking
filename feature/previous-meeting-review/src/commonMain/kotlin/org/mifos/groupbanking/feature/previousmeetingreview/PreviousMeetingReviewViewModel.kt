@@ -105,7 +105,7 @@ data class PreviousMeetingReviewState(
     val launchedFrom: String = "calendar",
     val meetingId: String = "",
     val meetingNumber: Int = 0,
-    val centerId: Int = 0,
+    val groupId: Int = 0,
     val nextMeetingId: String? = null,
     val nextMeetingNumber: Int? = null,
     @Transient
@@ -132,7 +132,7 @@ sealed interface PreviousMeetingReviewEvent {
     data class NavigateToConduct(
         val meetingId: String,
         val meetingNumber: Int,
-        val centerId: Int,
+        val groupId: Int,
     ) : PreviousMeetingReviewEvent
 }
 
@@ -161,7 +161,7 @@ sealed interface PreviousMeetingReviewAction {
  * [analytics] are wired for real feature-level observability; [sessionManager] handles the
  * `ScreenState.Unauthenticated -> endSession()` branch (mirrors `MeetingSummaryViewModel`).
  *
- * [centerId] / [meetingNumber] / [meetingId] / [launchedFrom] are the `ui.yaml#nav_params` forwarded
+ * [groupId] / [meetingNumber] / [meetingId] / [launchedFrom] are the `ui.yaml#nav_params` forwarded
  * from the entry point (meeting-conduct step-0 drill-down, or meeting-calendar completed-meeting card)
  * via Koin `parametersOf(...)`. When [launchedFrom] == `conduct`, the "next meeting" the Start-Meeting
  * CTA opens is derived as [meetingNumber] + 1 (the review of meeting N precedes conducting N+1).
@@ -178,7 +178,7 @@ internal class PreviousMeetingReviewViewModel(
     private val sessionManager: SessionManager,
     private val crashReporter: CrashReporter,
     private val analytics: KptAnalyticsTracker,
-    private val centerId: Int,
+    private val groupId: Int,
     private val meetingNumber: Int,
     private val meetingId: String,
     private val launchedFrom: String,
@@ -186,7 +186,7 @@ internal class PreviousMeetingReviewViewModel(
     initialState = PreviousMeetingReviewState(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
-        centerId = centerId,
+        groupId = groupId,
         launchedFrom = launchedFrom,
         nextMeetingId = if (launchedFrom == LAUNCHED_FROM_CONDUCT) meetingId else null,
         nextMeetingNumber = if (launchedFrom == LAUNCHED_FROM_CONDUCT) meetingNumber + 1 else null,
@@ -195,7 +195,7 @@ internal class PreviousMeetingReviewViewModel(
 
     /** Combined offline-first stream (reused record read + attendance read) — see class KDoc. */
     private val stream = repository.previousMeetingStream(
-        centerId = centerId,
+        groupId = groupId,
         meetingNumber = meetingNumber,
         meetingId = meetingId,
         scope = viewModelScope,
@@ -204,7 +204,7 @@ internal class PreviousMeetingReviewViewModel(
     init {
         crashReporter.recordMessage(
             message = "feature=previous-meeting-review screen=previous-meeting-review-screen " +
-                "centerId=$centerId meetingNumber=$meetingNumber launchedFrom=$launchedFrom",
+                "groupId=$groupId meetingNumber=$meetingNumber launchedFrom=$launchedFrom",
             level = CrashSeverity.Debug,
         )
         analytics.trackSync(syncType = "previous_meeting_review_view")
@@ -246,7 +246,7 @@ internal class PreviousMeetingReviewViewModel(
             PreviousMeetingReviewEvent.NavigateToConduct(
                 meetingId = nextId,
                 meetingNumber = nextNumber,
-                centerId = centerId,
+                groupId = groupId,
             ),
         )
     }

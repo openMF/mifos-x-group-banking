@@ -103,20 +103,20 @@ import org.mifos.groupbanking.feature.previousmeetingreview.generated.resources.
  * Container for `previous-meeting-review-screen` (FR-019). Collects
  * [PreviousMeetingReviewViewModel] state via [collectAsStateWithLifecycle], consumes one-shot
  * [PreviousMeetingReviewEvent]s through [EventsEffect], and delegates all rendering to the stateless
- * [PreviousMeetingReviewContent]. [centerId] / [meetingNumber] / [meetingId] / [launchedFrom] are the
+ * [PreviousMeetingReviewContent]. [groupId] / [meetingNumber] / [meetingId] / [launchedFrom] are the
  * `ui.yaml#nav_params` supplied to the ViewModel via Koin `parametersOf(...)`. See API.md#screen.
  */
 @Composable
 internal fun PreviousMeetingReviewScreen(
     meetingId: String,
     meetingNumber: Int,
-    centerId: Int,
+    groupId: Int,
     launchedFrom: String,
     onNavigateBack: () -> Unit,
-    onNavigateToConduct: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
+    onNavigateToConduct: (meetingId: String, meetingNumber: Int, groupId: Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PreviousMeetingReviewViewModel = koinViewModel(
-        parameters = { parametersOf(centerId, meetingNumber, meetingId, launchedFrom) },
+        parameters = { parametersOf(groupId, meetingNumber, meetingId, launchedFrom) },
     ),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -125,7 +125,7 @@ internal fun PreviousMeetingReviewScreen(
         when (event) {
             PreviousMeetingReviewEvent.NavigateBack -> onNavigateBack()
             is PreviousMeetingReviewEvent.NavigateToConduct ->
-                onNavigateToConduct(event.meetingId, event.meetingNumber, event.centerId)
+                onNavigateToConduct(event.meetingId, event.meetingNumber, event.groupId)
         }
     }
 

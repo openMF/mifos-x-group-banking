@@ -16,20 +16,19 @@ import kotlinx.coroutines.flow.first
 import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
 
 /**
- * Attaches `Authorization: Bearer <sessionToken>` to every companion request from the shared
- * companion [io.ktor.client.HttpClient], reading the current token from [CompanionSessionStore].
+ * Attaches `Authorization: Basic <key>` to every request from the shared Fineract
+ * [io.ktor.client.HttpClient], reading the current base64-encoded authentication key from
+ * [CompanionSessionStore] (persisted as `sessionToken` on login — see `CompanionAuthApiImpl`).
  *
- * WHY: the companion server resolves the caller's identity server-side from the bearer token
- * (COMP-AUTH-003 pattern) — e.g. the organizer dashboard greets the real user by name, and any
- * per-user-scoped endpoint can key off the authenticated caller. Before this plugin only the
- * explicit `/companion/auth/me` call sent the token, so every other companion read arrived
- * anonymous and the server fell back to a generic identity ("Organizer").
+ * WHY: Fineract authenticates every call with the basic-auth key returned by
+ * `POST /authentication` (`base64EncodedAuthenticationKey`). Sending it on every request lets
+ * Fineract resolve the authenticated caller for per-user-scoped reads (dashboards, group scope).
  *
  * Contract:
- *  - Skips when no session is persisted (pre-login calls: login / self-register need no token) so
- *    it never sends an empty `Bearer `.
- *  - Never overwrites an Authorization header a caller already set (e.g. the explicit `/me` call),
- *    so existing behaviour is preserved.
+ *  - Skips when no session is persisted (pre-login calls: the login POST itself needs no key) so
+ *    it never sends an empty `Basic `.
+ *  - Never overwrites an Authorization header a caller already set (e.g. the explicit `/userdetails`
+ *    call), so existing behaviour is preserved.
  *  - Lives in core/network (fork-owned), NOT core-base (template-shared): it uses a uniquely-named
  *    custom plugin so it cannot collide with the Auth/DefaultRequest plugins core-base installs.
  */
@@ -37,9 +36,9 @@ fun companionAuthHeaderPlugin(sessionStore: CompanionSessionStore) =
     createClientPlugin("CompanionAuthHeader") {
         onRequest { request, _ ->
             if (request.headers[HttpHeaders.Authorization] != null) return@onRequest
-            val token = sessionStore.session.first()?.sessionToken
-            if (!token.isNullOrBlank()) {
-                request.header(HttpHeaders.Authorization, "Bearer $token")
+            val key = sessionStore.session.first()?.sessionToken
+            if (!key.isNullOrBlank()) {
+                request.header(HttpHeaders.Authorization, "Basic $key")
             }
         }
     }

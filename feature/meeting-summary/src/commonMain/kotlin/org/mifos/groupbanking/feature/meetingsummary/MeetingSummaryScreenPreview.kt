@@ -60,7 +60,7 @@ private val contentState = MeetingSummaryState(
     meetingSummary = meetingSummary,
     meetingId = meetingSummary.meetingId,
     meetingNumber = meetingSummary.meetingNumber,
-    centerId = 42,
+    groupId = 42,
 )
 
 private val networkErrorState = MeetingSummaryState(isLoading = false, error = MeetingSummaryError.Network)

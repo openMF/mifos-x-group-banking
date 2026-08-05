@@ -26,7 +26,6 @@ import org.mifos.groupbanking.core.model.FieldOfficerDashboard
 import org.mifos.groupbanking.core.model.GroupHealthSummary
 import org.mifos.groupbanking.core.model.HealthIndicator
 import org.mifos.groupbanking.core.network.mapper.aggregateFieldOfficerDashboard
-import org.mifos.groupbanking.core.network.model.PagedCentersResponseDto
 import org.mifos.groupbanking.core.network.service.fieldofficerdashboard.FieldOfficerApi
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
@@ -38,9 +37,8 @@ private const val KEY_SEPARATOR = "|"
 
 /**
  * Builds the composite dynamic-key read-only NETWORK_WITH_CACHE [Store] for the
- * field-officer-dashboard screen (FR-009) — the client-side fan-in of the TWO independent Fineract
- * reads the screen fires in parallel on mount/refresh/retry ([FieldOfficerApi.getGroupsForStaff],
- * [FieldOfficerApi.getCentersForStaff]).
+ * field-officer-dashboard screen (FR-009) — the client-side aggregation of the single Fineract
+ * staff-portfolio read the screen fires on mount/refresh/retry ([FieldOfficerApi.getGroupsForStaff]).
  *
  * The key is a `String` encoding `"$staffId|$userRole"` and the value is one aggregated
  * [FieldOfficerDashboard] snapshot; Store5 caches each staff member independently (one Room row per
@@ -80,16 +78,13 @@ fun provideFieldOfficerDashboardStore(
             val userRole = key.substringAfter(KEY_SEPARATOR, missingDelimiterValue = FieldOfficerDashboard.ROLE_FIELD_OFFICER)
             coroutineScope {
                 val groupsDeferred = async { api.getGroupsForStaff(staffId) }
-                val centersDeferred = async { api.getCentersForStaff(staffId) }
 
                 val groups = groupsDeferred.await().dataOrThrow().pageItems
-                val centers = centersDeferred.await().dataOrEmpty().pageItems
 
                 aggregateFieldOfficerDashboard(
                     staffId = staffId,
                     userRole = userRole,
                     groups = groups,
-                    centers = centers,
                 )
             }
         },
@@ -128,12 +123,6 @@ class FieldOfficerDashboardFetchException(
 private fun <T> NetworkResult<T, NetworkError>.dataOrThrow(): T = when (this) {
     is NetworkResult.Success -> data
     is NetworkResult.Error -> throw FieldOfficerDashboardFetchException(error)
-}
-
-/** Unwraps a best-effort read: returns data on success, or an empty envelope on failure. */
-private fun NetworkResult<PagedCentersResponseDto, NetworkError>.dataOrEmpty(): PagedCentersResponseDto = when (this) {
-    is NetworkResult.Success -> data
-    is NetworkResult.Error -> PagedCentersResponseDto()
 }
 
 // ---------------------------------------------------------------------------

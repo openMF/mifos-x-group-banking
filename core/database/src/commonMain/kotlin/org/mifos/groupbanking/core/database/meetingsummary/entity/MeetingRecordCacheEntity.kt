@@ -13,8 +13,8 @@ import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
 /**
- * Room persisted representation of ONE completed meeting record per (centerId, meetingNumber)
- * (`GET /datatables/dt_meeting_record/{centerId}?meetingNumber=N`).
+ * Room persisted representation of ONE completed meeting record per (groupId, meetingNumber)
+ * (`GET /datatables/dt_meeting_record/{groupId}?meetingNumber=N`).
  *
  * Backs the offline cache (SourceOfTruth) for the single-key NETWORK_WITH_CACHE meeting-summary
  * store ([org.mifos.groupbanking.core.store.meetingsummary.impl.provideMeetingSummaryStore]): one
@@ -22,8 +22,8 @@ import androidx.room3.PrimaryKey
  * (`data-flow.yaml#cache.strategy: stale_while_revalidate`, `error_paths[network.offline]:
  * fallback_cache` — never memory-only).
  *
- * Keyed by [cacheKey] = `"$centerId:$meetingNumber"` (the composite store key flattened to a stable
- * String primary key); [centerId] / [meetingNumber] are kept as scalar columns for auditability.
+ * Keyed by [cacheKey] = `"$groupId:$meetingNumber"` (the composite store key flattened to a stable
+ * String primary key); [groupId] / [meetingNumber] are kept as scalar columns for auditability.
  * The two nested collections `savingsBreakdown` + `loanItems` are folded into
  * [savingsBreakdownJson] / [loanItemsJson] JSON columns via
  * [org.mifos.groupbanking.core.database.meetingsummary.entity.MeetingRecordCacheCodec]. A single-row
@@ -39,7 +39,7 @@ import androidx.room3.PrimaryKey
 data class MeetingRecordCacheEntity(
     @PrimaryKey
     val cacheKey: String,
-    val centerId: Int,
+    val groupId: Int,
     val meetingId: String,
     val meetingNumber: Int,
     val actualDate: String,

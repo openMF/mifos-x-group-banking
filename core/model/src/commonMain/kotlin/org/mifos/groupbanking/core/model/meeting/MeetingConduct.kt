@@ -108,7 +108,7 @@ data class LoanVoteRecord(
 /** `api.yaml#dtos.CorpusRecord` — the group's opening corpus + cash-on-hand balance (step 2, corpus gate). */
 @Serializable
 data class CorpusRecord(
-    val centerId: Int,
+    val groupId: Int,
     val corpusBalance: Long,
     val cashOnHand: Long,
     val lastUpdatedMeeting: Int,
@@ -172,7 +172,7 @@ data class DisbursalSubmission(
 data class MeetingSubmissionRequest(
     val meetingId: String,
     val meetingNumber: Int,
-    val centerId: Int,
+    val groupId: Int,
     val actualDate: String,
     val openingCorpus: Long,
     val closingCorpus: Long,

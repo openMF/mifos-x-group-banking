@@ -80,7 +80,7 @@ class MeetingConductViewModelTest {
         crashReporter = ConsoleCrashReporter(),
         meetingId = "M4",
         meetingNumber = 4,
-        centerId = 7,
+        groupId = 7,
     )
 
     // -- On-mount load ------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ class MeetingConductViewModelTest {
             vm.trySendAction(MeetingConductAction.SubmitMeeting)
             assertEquals(MeetingConductEvent.ShowSubmitSuccess, awaitItem())
             assertEquals(
-                MeetingConductEvent.NavigateToMeetingSummary(meetingId = "M4", meetingNumber = 4, centerId = 7),
+                MeetingConductEvent.NavigateToMeetingSummary(meetingId = "M4", meetingNumber = 4, groupId = 7),
                 awaitItem(),
             )
         }
@@ -387,7 +387,7 @@ class MeetingConductReducerTest {
         val request = stateWith(members = members, applications = listOf(app)).copy(
             meetingId = "M4",
             meetingNumber = 4,
-            centerId = 7,
+            groupId = 7,
             attendanceMap = mapOf("m1" to AttendanceStatus.PRESENT, "m2" to AttendanceStatus.ABSENT),
             savingsMap = mapOf("m1" to org.mifos.groupbanking.core.model.meeting.SavingsEntry("m1", groupAmount = 300L)),
             loanRepayments = mapOf("L1" to 200L),
@@ -430,7 +430,7 @@ private class FakeMeetingConductRepository : MeetingConductRepository {
     var enqueueCallCount: Int = 0
         private set
 
-    override suspend fun loadMeetingData(centerId: Int, groupId: Int, meetingNumber: Int): NetworkResult<MeetingConductData, NetworkError> {
+    override suspend fun loadMeetingData(groupId: Int, meetingNumber: Int): NetworkResult<MeetingConductData, NetworkError> {
         loadCallCount++
         return loadResult
     }

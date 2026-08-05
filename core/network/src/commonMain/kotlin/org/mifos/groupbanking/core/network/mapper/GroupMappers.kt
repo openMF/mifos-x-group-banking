@@ -38,7 +38,7 @@ fun GroupDto.toDomainModel(): Group = Group(
     healthIndicator = healthIndicator.toDomainModel(),
     overdueRate = overdueRate,
     status = status,
-    fineractCenterId = fineractCenterId,
+    fineractGroupId = fineractGroupId,
 )
 
 /** Batch converter — maps every group row in declaration order. */

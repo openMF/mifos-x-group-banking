@@ -175,7 +175,7 @@ class GroupCreateRepositoryTest {
     fun createGroup_success_mapsRequestToDtoAndReturnsMappedResult() = runTest {
         val api = FakeGroupCreateApi(
             createGroupResult = NetworkResult.Success(
-                CreateGroupResponseDto(groupId = "grp-100", fineractCenterId = 55, inviteCode = "ABC123"),
+                CreateGroupResponseDto(groupId = "grp-100", fineractGroupId = 55, inviteCode = "ABC123"),
             ),
         )
         val repo = GroupCreateRepositoryImpl(api, NoOpSyncQueueRepository())
@@ -184,7 +184,7 @@ class GroupCreateRepositoryTest {
 
         check(result is NetworkResult.Success)
         assertEquals("grp-100", result.data.groupId)
-        assertEquals(55L, result.data.fineractCenterId)
+        assertEquals(55L, result.data.fineractGroupId)
         assertEquals("ABC123", result.data.inviteCode)
         assertEquals(typeConfigDto, api.lastCreateRequest?.typeConfig)
         assertEquals("Sunrise VSLA", api.lastCreateRequest?.name)

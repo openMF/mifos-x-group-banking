@@ -118,7 +118,7 @@ class KptAnalyticsTracker(
     fun trackCenterOperation(
         // "create", "view", "meeting", "collection"
         operation: String,
-        centerId: String? = null,
+        groupId: String? = null,
         meetingDate: String? = null,
         attendance: Int? = null,
         success: Boolean = true,
@@ -127,7 +127,7 @@ class KptAnalyticsTracker(
             Param("center_operation", operation),
             Param(ParamKeys.SUCCESS, success.toString()),
         )
-        centerId?.let { params.add(Param("center_id", it)) }
+        groupId?.let { params.add(Param("center_id", it)) }
         meetingDate?.let { params.add(Param("meeting_date", it)) }
         attendance?.let { params.add(Param("attendance_count", it.toString())) }
 

@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the group-type catalogue endpoint (COMP-DT-003), served
  * by the same mcp-mifosx Go companion server as the login-signup bridge (see
@@ -24,5 +26,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — GroupTypeConfigApi base URL.
  */
 data class GroupTypeConfigApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

@@ -32,10 +32,10 @@ import kotlin.time.Clock
 
 /**
  * Builds the **single-key** read-only NETWORK_WITH_CACHE [Store] for the meeting-summary screen
- * (`GET /datatables/dt_meeting_record/{centerId}?meetingNumber=N`) that backs the read-only
+ * (`GET /datatables/dt_meeting_record/{groupId}?meetingNumber=N`) that backs the read-only
  * post-meeting summary.
  *
- * The store key is the composite `"$centerId:$meetingNumber"` String and the value is one
+ * The store key is the composite `"$groupId:$meetingNumber"` String and the value is one
  * [MeetingSummaryData] snapshot (persisted totals + per-member savings breakdown + per-member loan
  * activity) resolved by the single endpoint in one round trip; Store5 caches each meeting
  * independently, so re-opening a completed meeting re-uses that meeting's per-key cache or re-fetches
@@ -44,7 +44,7 @@ import kotlin.time.Clock
  * DAO-bypass read path (RULE-IMPLEMENT-STORE5-001 S5-2), and the meeting-summary screen is read-only
  * (`data-flow.yaml` declares no write) so there is no write path (S5-1).
  *
- * - **Fetcher** — [MeetingRecordApi.getMeetingRecord] with `centerId` + `meetingNumber` decoded from
+ * - **Fetcher** — [MeetingRecordApi.getMeetingRecord] with `groupId` + `meetingNumber` decoded from
  *   the composite store key. The service returns a sealed [NetworkResult]; on
  *   [NetworkResult.Success] the DTO is mapped to domain via [toDomainModel], on [NetworkResult.Error]
  *   the fetcher throws so Store5 routes it to an error response (no try-catch, no `Result` envelope).
@@ -68,8 +68,8 @@ fun provideMeetingSummaryStore(
     )
     return StoreFactory.createStore(
         fetcher = Fetcher.of { key: String ->
-            val (centerId, meetingNumber) = key.decodeMeetingKey()
-            when (val result = api.getMeetingRecord(centerId = centerId, meetingNumber = meetingNumber)) {
+            val (groupId, meetingNumber) = key.decodeMeetingKey()
+            when (val result = api.getMeetingRecord(groupId = groupId, meetingNumber = meetingNumber)) {
                 is NetworkResult.Success -> result.data.toDomainModel()
                 // 404 = this meeting has NO record because it was never conducted (a scheduled/past
                 // slot with no dt_meeting_record — e.g. a synthesized VSLA calendar date). Surface an
@@ -79,7 +79,7 @@ fun provideMeetingSummaryStore(
                 // getPreviousMeetingRecord 404 → null). Every OTHER error still throws.
                 is NetworkResult.Error ->
                     if (result.error == NetworkError.NOT_FOUND) {
-                        emptyNotConductedSummary(centerId, meetingNumber)
+                        emptyNotConductedSummary(groupId, meetingNumber)
                     } else {
                         throw MeetingRecordFetchException(result.error)
                     }
@@ -102,16 +102,16 @@ fun provideMeetingSummaryStore(
 
 /**
  * Builds the composite store key from its parts. Kept next to [decodeMeetingKey] so the encode /
- * decode pair is the single source of truth for the `"$centerId:$meetingNumber"` key shape.
+ * decode pair is the single source of truth for the `"$groupId:$meetingNumber"` key shape.
  */
-fun encodeMeetingKey(centerId: Int, meetingNumber: Int): String = "$centerId:$meetingNumber"
+fun encodeMeetingKey(groupId: Int, meetingNumber: Int): String = "$groupId:$meetingNumber"
 
-/** Splits the composite `"$centerId:$meetingNumber"` store key back into its parts. */
+/** Splits the composite `"$groupId:$meetingNumber"` store key back into its parts. */
 private fun String.decodeMeetingKey(): Pair<Int, Int> {
     val parts = split(":")
-    val centerId = parts.getOrNull(0)?.toIntOrNull() ?: 0
+    val groupId = parts.getOrNull(0)?.toIntOrNull() ?: 0
     val meetingNumber = parts.getOrNull(1)?.toIntOrNull() ?: 0
-    return centerId to meetingNumber
+    return groupId to meetingNumber
 }
 
 /**
@@ -128,11 +128,11 @@ class MeetingRecordFetchException(
  * scheduled/past slot that was never conducted — a 404 from the record read). [actualDate] is blank
  * (the signal a consumer can branch on to render a "not conducted yet" note); every total is 0 and
  * both breakdown lists are empty. Carries the [meetingNumber] so the review header still reads
- * "Meeting #N". [meetingId] uses the `"{centerId}-{meetingNumber}"` calendar-key shape.
+ * "Meeting #N". [meetingId] uses the `"{groupId}-{meetingNumber}"` calendar-key shape.
  */
-internal fun emptyNotConductedSummary(centerId: Int, meetingNumber: Int): MeetingSummaryData =
+internal fun emptyNotConductedSummary(groupId: Int, meetingNumber: Int): MeetingSummaryData =
     MeetingSummaryData(
-        meetingId = "$centerId-$meetingNumber",
+        meetingId = "$groupId-$meetingNumber",
         meetingNumber = meetingNumber,
         actualDate = "",
         attendanceCount = 0,
@@ -160,7 +160,7 @@ private fun MeetingSummaryData.toEntity(cacheKey: String): MeetingRecordCacheEnt
     val now = Clock.System.now().toEpochMilliseconds()
     return MeetingRecordCacheEntity(
         cacheKey = cacheKey,
-        centerId = cacheKey.substringBefore(":").toIntOrNull() ?: 0,
+        groupId = cacheKey.substringBefore(":").toIntOrNull() ?: 0,
         meetingId = meetingId,
         meetingNumber = meetingNumber,
         actualDate = actualDate,

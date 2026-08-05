@@ -50,7 +50,7 @@ class PreviousMeetingReviewRepositoryImpl(
 ) : PreviousMeetingReviewRepository {
 
     override fun previousMeetingStream(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
         meetingId: String,
         scope: CoroutineScope,
@@ -58,7 +58,7 @@ class PreviousMeetingReviewRepositoryImpl(
         // Reused record read (offline-first) — totals + savings + loans.
         val recordStream: ScreenDataStream<MeetingSummaryData> =
             meetingSummaryRepository.meetingSummaryStream(
-                centerId = centerId,
+                groupId = groupId,
                 meetingNumber = meetingNumber,
                 scope = scope,
             )

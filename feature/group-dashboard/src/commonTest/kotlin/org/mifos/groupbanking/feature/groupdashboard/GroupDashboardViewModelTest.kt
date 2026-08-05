@@ -397,7 +397,7 @@ private fun testConfig(minimumDisbursementThreshold: Double?) = GroupConfig(
 private fun accumulatingDashboard(role: ViewerRole = ViewerRole.ORGANIZER): GroupDashboard = GroupDashboard(
     group = GroupDetail(
         id = "grp-100",
-        fineractCenterId = 1L,
+        fineractGroupId = 1L,
         name = "Mwangaza Women's Group",
         cycleNumber = 1,
         cycleLengthMonths = 12,
@@ -453,7 +453,7 @@ private fun accumulatingDashboard(role: ViewerRole = ViewerRole.ORGANIZER): Grou
 private fun rotatingDashboard(): GroupDashboard = GroupDashboard(
     group = GroupDetail(
         id = "grp-100",
-        fineractCenterId = 1L,
+        fineractGroupId = 1L,
         name = "Jiunge ROSCA Circle",
         cycleNumber = 3,
         cycleLengthMonths = 10,

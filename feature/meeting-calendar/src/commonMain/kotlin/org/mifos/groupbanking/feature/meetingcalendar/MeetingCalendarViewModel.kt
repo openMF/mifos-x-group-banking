@@ -112,7 +112,7 @@ data class MeetingCalendarState(
     val viewMode: ViewMode = ViewMode.LIST,
     @Transient
     val error: MeetingCalendarError? = null,
-    val centerId: Int = 0,
+    val groupId: Int = 0,
     // G3 / F6 — schedule editor (mirror of `ui.yaml#state_model` schedule fields). The recurrence
     // Calendar id is unresolved at this read seam (the meetings list carries none) until the companion
     // calendar API lands; kept nullable so the RescheduleMeetingRequest payload carries it when available.
@@ -158,14 +158,14 @@ sealed interface MeetingCalendarEvent {
     data class NavigateToConduct(val meetingId: String, val meetingNumber: Int) : MeetingCalendarEvent
 
     /**
-     * G5 — open a past meeting in previous-meeting-review. Carries [centerId] and
+     * G5 — open a past meeting in previous-meeting-review. Carries [groupId] and
      * `launchedFrom = "calendar"` so the review renders in calendar-context (hides the
      * conduct-only "Start Meeting #N" CTA); previous-meeting-review requires all four nav_params.
      */
     data class NavigateToReview(
         val meetingId: String,
         val meetingNumber: Int,
-        val centerId: Int,
+        val groupId: Int,
         val launchedFrom: String = "calendar",
     ) : MeetingCalendarEvent
     data class ShowError(val message: String) : MeetingCalendarEvent
@@ -234,8 +234,8 @@ sealed interface MeetingCalendarAction {
  * `ui.yaml#state_model.di`) is not re-injected here — it is already composed inside
  * `MeetingRepositoryImpl.meetingsStream` (`Store.asScreenStream(networkMonitor = ...)`).
  *
- * [centerId] is the `ui.yaml#nav_params` value forwarded from `group-dashboard` (or `bottom_nav`)
- * via Koin `parametersOf(centerId)` — it seeds [MeetingCalendarState.centerId] and scopes the
+ * [groupId] is the `ui.yaml#nav_params` value forwarded from `group-dashboard` (or `bottom_nav`)
+ * via Koin `parametersOf(groupId)` — it seeds [MeetingCalendarState.groupId] and scopes the
  * [MeetingRepository.meetingsStream] read. See API.md#viewmodel.
  */
 internal class MeetingCalendarViewModel(
@@ -243,18 +243,18 @@ internal class MeetingCalendarViewModel(
     private val sessionManager: SessionManager,
     private val crashReporter: CrashReporter,
     private val analytics: KptAnalyticsTracker,
-    private val centerId: Int,
+    private val groupId: Int,
 ) : BaseViewModel<MeetingCalendarState, MeetingCalendarEvent, MeetingCalendarAction>(
-    initialState = MeetingCalendarState(centerId = centerId),
+    initialState = MeetingCalendarState(groupId = groupId),
 ) {
 
-    /** Fixed-key offline-first stream for [centerId] — see class KDoc. */
+    /** Fixed-key offline-first stream for [groupId] — see class KDoc. */
     private val meetingsStream: ScreenDataStream<List<MeetingListItem>> =
-        repository.meetingsStream(centerId = centerId, scope = viewModelScope)
+        repository.meetingsStream(groupId = groupId, scope = viewModelScope)
 
     init {
         crashReporter.recordMessage(
-            message = "feature=meeting-calendar screen=meeting-calendar-screen centerId=$centerId",
+            message = "feature=meeting-calendar screen=meeting-calendar-screen groupId=$groupId",
             level = CrashSeverity.Debug,
         )
         analytics.trackSync(syncType = "view_meetings")
@@ -289,7 +289,7 @@ internal class MeetingCalendarViewModel(
 
     private fun handleStartMeeting(meetingId: String, meetingNumber: Int) {
         analytics.trackSync(syncType = "start_meeting")
-        Logger.i(TAG) { "start meeting tapped meetingId=$meetingId #$meetingNumber centerId=$centerId" }
+        Logger.i(TAG) { "start meeting tapped meetingId=$meetingId #$meetingNumber groupId=$groupId" }
         sendEvent(MeetingCalendarEvent.NavigateToConduct(meetingId, meetingNumber))
     }
 
@@ -297,8 +297,8 @@ internal class MeetingCalendarViewModel(
 
     private fun handleOpenPastMeeting(meetingId: String, meetingNumber: Int) {
         analytics.trackSync(syncType = "open_past_meeting")
-        Logger.i(TAG) { "past meeting tapped meetingId=$meetingId #$meetingNumber centerId=$centerId" }
-        sendEvent(MeetingCalendarEvent.NavigateToReview(meetingId, meetingNumber, centerId, launchedFrom = "calendar"))
+        Logger.i(TAG) { "past meeting tapped meetingId=$meetingId #$meetingNumber groupId=$groupId" }
+        sendEvent(MeetingCalendarEvent.NavigateToReview(meetingId, meetingNumber, groupId, launchedFrom = "calendar"))
     }
 
     // -- Toggle view mode (ui.yaml effect: transform_state, pure in-memory viewMode flip) ----------
@@ -306,7 +306,7 @@ internal class MeetingCalendarViewModel(
     private fun handleToggleViewMode() {
         updateState {
             val next = if (viewMode == ViewMode.LIST) ViewMode.CALENDAR else ViewMode.LIST
-            Logger.d(TAG) { "view mode toggled -> $next centerId=$centerId" }
+            Logger.d(TAG) { "view mode toggled -> $next groupId=$groupId" }
             copy(viewMode = next)
         }
     }
@@ -315,13 +315,13 @@ internal class MeetingCalendarViewModel(
 
     private fun handleRefresh() {
         analytics.trackSync(syncType = "refresh_meetings")
-        Logger.i(TAG) { "refresh meetings triggered centerId=$centerId" }
+        Logger.i(TAG) { "refresh meetings triggered groupId=$groupId" }
         updateState { copy(isRefreshing = true) }
         meetingsStream.refreshFresh()
     }
 
     private fun handleRetry() {
-        Logger.i(TAG) { "retry tapped — re-dispatching meetings fetch centerId=$centerId" }
+        Logger.i(TAG) { "retry tapped — re-dispatching meetings fetch groupId=$groupId" }
         updateState { copy(error = null, isLoading = true) }
         meetingsStream.retry()
     }
@@ -330,7 +330,7 @@ internal class MeetingCalendarViewModel(
 
     /** Opens the schedule-editor sheet (pure state flip) — see `ui.yaml#OpenScheduleEditor`. */
     private fun handleOpenScheduleEditor() {
-        Logger.d(TAG) { "schedule editor opened centerId=$centerId hasUpcoming=${state.hasUpcoming}" }
+        Logger.d(TAG) { "schedule editor opened groupId=$groupId hasUpcoming=${state.hasUpcoming}" }
         updateState { copy(showScheduleEditor = true) }
     }
 
@@ -358,16 +358,16 @@ internal class MeetingCalendarViewModel(
      */
     private fun handleReschedule(day: String, time: String, frequency: MeetingFrequency) {
         if (state.isRescheduling) {
-            Logger.w(TAG) { "reschedule ignored — already in flight centerId=$centerId" }
+            Logger.w(TAG) { "reschedule ignored — already in flight groupId=$groupId" }
             return
         }
         analytics.trackSync(syncType = "reschedule_meeting")
-        Logger.i(TAG) { "reschedule confirmed centerId=$centerId day=$day time=$time frequency=$frequency (server-gated → offline queue)" }
+        Logger.i(TAG) { "reschedule confirmed groupId=$groupId day=$day time=$time frequency=$frequency (server-gated → offline queue)" }
         updateState { copy(isRescheduling = true) }
         viewModelScope.launch {
             val queuedId = repository.rescheduleMeeting(
                 RescheduleMeetingRequest(
-                    centerId = centerId,
+                    groupId = groupId,
                     calendarId = state.calendarId,
                     day = day,
                     time = time,
@@ -379,7 +379,7 @@ internal class MeetingCalendarViewModel(
     }
 
     private fun handleRescheduleQueued(queuedId: Long) {
-        Logger.i(TAG) { "reschedule queued id=$queuedId centerId=$centerId — refreshing meetings" }
+        Logger.i(TAG) { "reschedule queued id=$queuedId groupId=$groupId — refreshing meetings" }
         updateState { copy(isRescheduling = false, showScheduleEditor = false) }
         sendEvent(MeetingCalendarEvent.ShowScheduleUpdated(message = SCHEDULE_UPDATED_MESSAGE_KEY))
         meetingsStream.refreshFresh()
@@ -407,7 +407,7 @@ internal class MeetingCalendarViewModel(
 
             is ScreenState.Unauthenticated -> {
                 crashReporter.recordMessage(
-                    message = "meeting-calendar: session expired (401) centerId=$centerId — clearing session",
+                    message = "meeting-calendar: session expired (401) groupId=$groupId — clearing session",
                     level = CrashSeverity.Warning,
                 )
                 sessionManager.endSession()
@@ -418,7 +418,7 @@ internal class MeetingCalendarViewModel(
             is ScreenState.Error -> {
                 crashReporter.recordException(
                     throwable = screenState.error,
-                    message = "meeting-calendar: stream error centerId=$centerId isNetworkError=${screenState.isNetworkError}",
+                    message = "meeting-calendar: stream error groupId=$groupId isNetworkError=${screenState.isNetworkError}",
                 )
                 val mapped = if (screenState.isNetworkError) {
                     MeetingCalendarError.Network

@@ -20,7 +20,7 @@ import org.mifos.groupbanking.core.database.meetingcalendar.entity.MeetingCalend
  * Room DAO for the meeting-calendar cache (SourceOfTruth for the single-key NETWORK_WITH_CACHE
  * [org.mifos.groupbanking.core.store.meetingcalendar.impl.provideMeetingCalendarStore]).
  *
- * The store keys each meetings snapshot by center ([MeetingCalendarCacheEntity.centerId]), so
+ * The store keys each meetings snapshot by center ([MeetingCalendarCacheEntity.groupId]), so
  * [observeByKey] is the reactive per-center read the store's SourceOfTruth reader subscribes to and
  * [replaceForKey] is the store's SourceOfTruth writer. Because a center's whole meetings list is
  * exactly ONE row, a keyed `@Upsert` is inherently atomic — no reader ever observes a half-written
@@ -32,21 +32,21 @@ import org.mifos.groupbanking.core.database.meetingcalendar.entity.MeetingCalend
 interface MeetingCalendarDao {
 
     /** Reactive read of one cached center's meetings snapshot. Backs the store SoT reader. */
-    @Query("SELECT * FROM meeting_calendar_cache WHERE centerId = :centerId")
-    fun observeByKey(centerId: Int): Flow<MeetingCalendarCacheEntity?>
+    @Query("SELECT * FROM meeting_calendar_cache WHERE groupId = :groupId")
+    fun observeByKey(groupId: Int): Flow<MeetingCalendarCacheEntity?>
 
     @Upsert
     suspend fun upsert(entity: MeetingCalendarCacheEntity)
 
-    @Query("DELETE FROM meeting_calendar_cache WHERE centerId = :centerId")
-    suspend fun deleteByKey(centerId: Int)
+    @Query("DELETE FROM meeting_calendar_cache WHERE groupId = :groupId")
+    suspend fun deleteByKey(groupId: Int)
 
     @Query("DELETE FROM meeting_calendar_cache")
     suspend fun deleteAll()
 
     /**
      * Atomically replace ONE center's cached meetings snapshot. The store SoT writer calls this so
-     * the write for a [MeetingCalendarCacheEntity.centerId] lands in a single transaction — no
+     * the write for a [MeetingCalendarCacheEntity.groupId] lands in a single transaction — no
      * reader ever sees a partially-written row mid-refresh (S5-3).
      */
     @Transaction

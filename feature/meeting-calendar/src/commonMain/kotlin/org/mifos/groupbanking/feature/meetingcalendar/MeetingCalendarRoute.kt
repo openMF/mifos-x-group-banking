@@ -22,10 +22,10 @@ import kpt.core.base.ui.nav.composableWithPushTransitions
  * "Meetings" quick action or `bottom_nav`. See API.md#route.
  */
 @Serializable
-data class MeetingCalendarRoute(val centerId: Int)
+data class MeetingCalendarRoute(val groupId: Int)
 
-fun NavController.navigateToMeetingCalendar(centerId: Int, navOptions: NavOptions? = null) =
-    navigate(MeetingCalendarRoute(centerId = centerId), navOptions)
+fun NavController.navigateToMeetingCalendar(groupId: Int, navOptions: NavOptions? = null) =
+    navigate(MeetingCalendarRoute(groupId = groupId), navOptions)
 
 /**
  * Registers [MeetingCalendarScreen] on the host [NavGraphBuilder]. Both onward callbacks close a
@@ -37,24 +37,24 @@ fun NavController.navigateToMeetingCalendar(centerId: Int, navOptions: NavOption
  * not-yet-generated-target convention. See API.md#route.
  */
 fun NavGraphBuilder.meetingCalendarScreen(
-    onNavigateToConduct: (meetingId: String, meetingNumber: Int, centerId: Int) -> Unit,
-    onNavigateToReview: (meetingId: String, meetingNumber: Int, centerId: Int, launchedFrom: String) -> Unit,
+    onNavigateToConduct: (meetingId: String, meetingNumber: Int, groupId: Int) -> Unit,
+    onNavigateToReview: (meetingId: String, meetingNumber: Int, groupId: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composableWithPushTransitions<MeetingCalendarRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<MeetingCalendarRoute>()
         MeetingCalendarScreen(
-            centerId = route.centerId,
+            groupId = route.groupId,
             // The screen's `MeetingCalendarEvent` carries only (meetingId, meetingNumber); the
             // host targets (`meeting-conduct` / `previous-meeting-review`) are additionally keyed
-            // by `centerId`, which this destination already holds as `route.centerId`. Forward it
+            // by `groupId`, which this destination already holds as `route.groupId`. Forward it
             // here so the caller (the NavHost) gets the full nav-arg set without the screen having
-            // to re-thread a param it never had — resolves the prior `centerId = 0` drift bridge.
+            // to re-thread a param it never had — resolves the prior `groupId = 0` drift bridge.
             onNavigateToConduct = { meetingId, meetingNumber ->
-                onNavigateToConduct(meetingId, meetingNumber, route.centerId)
+                onNavigateToConduct(meetingId, meetingNumber, route.groupId)
             },
             onNavigateToReview = { meetingId, meetingNumber, launchedFrom ->
-                onNavigateToReview(meetingId, meetingNumber, route.centerId, launchedFrom)
+                onNavigateToReview(meetingId, meetingNumber, route.groupId, launchedFrom)
             },
             onNavigateBack = onNavigateBack,
         )

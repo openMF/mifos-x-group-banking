@@ -60,7 +60,7 @@ class PreviousMeetingReviewViewModelTest {
             sessionManager = sessionManager,
             crashReporter = ConsoleCrashReporter(),
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
-            centerId = CENTER_ID,
+            groupId = GROUP_ID,
             meetingNumber = MEETING_NUMBER,
             meetingId = MEETING_ID,
             launchedFrom = launchedFrom,
@@ -85,7 +85,7 @@ class PreviousMeetingReviewViewModelTest {
         assertTrue(state.isLoading)
         assertNull(state.meetingDetail)
         assertNull(state.error)
-        assertEquals(CENTER_ID, state.centerId)
+        assertEquals(GROUP_ID, state.groupId)
         assertEquals(MEETING_NUMBER, state.meetingNumber)
         assertEquals(MEETING_ID, state.meetingId)
         assertEquals("calendar", state.launchedFrom)
@@ -104,7 +104,7 @@ class PreviousMeetingReviewViewModelTest {
     fun `init requests the stream for the nav-arg keys`() = runTest(testDispatcher) {
         createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(listOf(Triple(CENTER_ID, MEETING_NUMBER, MEETING_ID)), repository.requestedKeys)
+        assertEquals(listOf(Triple(GROUP_ID, MEETING_NUMBER, MEETING_ID)), repository.requestedKeys)
     }
 
     @Test
@@ -144,7 +144,7 @@ class PreviousMeetingReviewViewModelTest {
                 assertTrue(event is PreviousMeetingReviewEvent.NavigateToConduct)
                 event as PreviousMeetingReviewEvent.NavigateToConduct
                 assertEquals(MEETING_NUMBER + 1, event.meetingNumber)
-                assertEquals(CENTER_ID, event.centerId)
+                assertEquals(GROUP_ID, event.groupId)
             }
         }
 
@@ -208,7 +208,7 @@ class PreviousMeetingReviewViewModelTest {
     }
 
     private companion object {
-        const val CENTER_ID = 7
+        const val GROUP_ID = 7
         const val MEETING_NUMBER = 15
         const val MEETING_ID = "meeting_015"
     }
@@ -266,12 +266,12 @@ private class FakePreviousMeetingReviewRepository : PreviousMeetingReviewReposit
     }
 
     override fun previousMeetingStream(
-        centerId: Int,
+        groupId: Int,
         meetingNumber: Int,
         meetingId: String,
         scope: CoroutineScope,
     ): PreviousMeetingReviewStream {
-        requestedKeys += Triple(centerId, meetingNumber, meetingId)
+        requestedKeys += Triple(groupId, meetingNumber, meetingId)
         return PreviousMeetingReviewStream(
             state = stateFlow,
             onRetry = { retryCount++ },

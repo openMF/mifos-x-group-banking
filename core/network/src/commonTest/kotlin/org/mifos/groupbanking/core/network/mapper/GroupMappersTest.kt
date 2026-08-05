@@ -38,7 +38,7 @@ class GroupMappersTest {
         healthIndicator = HealthIndicatorDto.GREEN,
         overdueRate = 0.00,
         status = "ACTIVE",
-        fineractCenterId = 1001L,
+        fineractGroupId = 1001L,
     )
 
     // ---------- GroupDto -> Group (all 11 fields) ----------
@@ -57,7 +57,7 @@ class GroupMappersTest {
         assertEquals(HealthIndicator.GREEN, domain.healthIndicator)
         assertEquals(0.00, domain.overdueRate)
         assertEquals("ACTIVE", domain.status)
-        assertEquals(1001L, domain.fineractCenterId)
+        assertEquals(1001L, domain.fineractGroupId)
     }
 
     @Test
@@ -72,7 +72,7 @@ class GroupMappersTest {
             lastMeetingDate = "2026-07-10",
             healthIndicator = HealthIndicatorDto.AMBER,
             overdueRate = 0.12,
-            fineractCenterId = 1002L,
+            fineractGroupId = 1002L,
         )
 
         val domain = roscaDto.toDomainModel()

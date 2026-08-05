@@ -18,7 +18,7 @@ import org.mifos.groupbanking.core.network.model.MeetingStatusDto
 
 /**
  * Merges the two meeting-calendar reads into the domain list. Each [MeetingListItemDto] from
- * `get_center_meetings` is enriched, WHERE its own `attendanceCount`/`totalCollectedKES` are null,
+ * `get_meeting_schedule` is enriched, WHERE its own `attendanceCount`/`totalCollectedKES` are null,
  * with the matching-by-`meetingNumber` [MeetingRecordItemDto] financial record from
  * `get_meeting_records_datatable` (`totalCollectedKES = totalSavings + totalRepayments`). MISSED /
  * UPCOMING meetings that have no record simply keep their null figures.

@@ -25,10 +25,10 @@ import org.mobilenativefoundation.store.store5.Store
 /**
  * Store5-backed implementation of [MeetingRepository].
  *
- * The single-key read maps `centerId` to the store key and goes exclusively through
+ * The single-key read maps `groupId` to the store key and goes exclusively through
  * [Store.asScreenStream] so the whole offline-first pipeline (cached emit → background revalidate →
  * DecisionEngine → ScreenState) is inherited from `core-base`. The freshness [cacheKey] is
- * per-center (`meetingcalendar:{centerId}`) so each center's TTL window is tracked independently. No
+ * per-center (`meetingcalendar:{groupId}`) so each center's TTL window is tracked independently. No
  * DAO-bypass read, no `try-catch`, no `Result` envelope (RULE-IMPLEMENT-STORE5-001 S5-2). An empty
  * meetings list surfaces as `ScreenState.Empty` via the `isEmpty` predicate. The error_state Retry
  * CTA re-drives via [ScreenDataStream.retry] — the injected [NetworkMonitor] pre-checks connectivity.
@@ -43,15 +43,15 @@ class MeetingRepositoryImpl(
 ) : MeetingRepository {
 
     override fun meetingsStream(
-        centerId: Int,
+        groupId: Int,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<List<MeetingListItem>> {
         return meetingCalendarStore.asScreenStream(
-            key = centerId,
+            key = groupId,
             networkMonitor = networkMonitor,
             fetchedAtRepository = fetchedAtRepository,
-            cacheKey = "$CACHE_KEY_PREFIX$centerId",
+            cacheKey = "$CACHE_KEY_PREFIX$groupId",
             scope = scope,
             // A fetched meetings list is "present" even when empty — `isEmpty = { false }` so an
             // empty result maps to Content, then the ViewModel's `.emptyIfContent { it.isEmpty() }`
@@ -73,7 +73,7 @@ class MeetingRepositoryImpl(
     override suspend fun rescheduleMeeting(request: RescheduleMeetingRequest): Long {
         val payloadJson = meetingJson.encodeToString(RescheduleMeetingRequest.serializer(), request)
         Logger.i(TAG) {
-            "rescheduleMeeting: queuing $RESCHEDULE_OPERATION_TYPE centerId=${request.centerId} " +
+            "rescheduleMeeting: queuing $RESCHEDULE_OPERATION_TYPE groupId=${request.groupId} " +
                 "day=${request.day} time=${request.time} frequency=${request.frequency} (server-gated → offline queue)"
         }
         return syncQueueRepository.enqueue(

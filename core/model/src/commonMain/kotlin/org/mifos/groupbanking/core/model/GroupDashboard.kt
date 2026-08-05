@@ -36,7 +36,7 @@ data class GroupDashboard(
  * (COMP-GRP-001 `/companion/groups/mine` row) even though both are conceptually "a group" and
  * `idea-layer/screens/group-dashboard/ui.yaml#state_model` pseudocodes its state field as
  * `group: Group?` — the two wire shapes genuinely diverge: this endpoint returns
- * [fineractCenterId]/[cycleLengthMonths]/[meetingFrequency]/[overdueLoansCount]/[typeConfig]
+ * [fineractGroupId]/[cycleLengthMonths]/[meetingFrequency]/[overdueLoansCount]/[typeConfig]
  * (none of which [Group] carries) and does NOT return `groupType`/`viewerRole`/`lastMeetingDate`/
  * `healthIndicator`/`overdueRate` (all non-null, required fields on [Group] with no default) —
  * forcing [Group] reuse here would require fabricating values with no wire source. **Flagged for
@@ -47,7 +47,7 @@ data class GroupDashboard(
  */
 data class GroupDetail(
     val id: String,
-    val fineractCenterId: Long,
+    val fineractGroupId: Long,
     val name: String,
     val cycleNumber: Int,
     val cycleLengthMonths: Int,

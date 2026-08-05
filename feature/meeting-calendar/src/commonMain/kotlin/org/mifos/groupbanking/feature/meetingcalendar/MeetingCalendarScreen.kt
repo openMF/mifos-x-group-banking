@@ -98,19 +98,19 @@ import org.mifos.groupbanking.feature.meetingcalendar.generated.resources.screen
  * Container for `meeting-calendar-screen`. Collects [MeetingCalendarViewModel] state via
  * [collectAsStateWithLifecycle], consumes one-shot [MeetingCalendarEvent]s (navigate to conduct /
  * review, show error) through [EventsEffect], and delegates rendering to the stateless
- * [MeetingCalendarContent]. [centerId] is the `ui.yaml#nav_params` value forwarded from
+ * [MeetingCalendarContent]. [groupId] is the `ui.yaml#nav_params` value forwarded from
  * `group-dashboard`'s "Meetings" entry point — supplied to [MeetingCalendarViewModel] via Koin
- * `parametersOf(centerId)`. [onNavigateBack] is a PLAIN nav callback (no declared `NavigateBack`
+ * `parametersOf(groupId)`. [onNavigateBack] is a PLAIN nav callback (no declared `NavigateBack`
  * event — mirrors `LoanListScreen`'s precedent). See API.md#screen.
  */
 @Composable
 internal fun MeetingCalendarScreen(
-    centerId: Int,
+    groupId: Int,
     onNavigateToConduct: (meetingId: String, meetingNumber: Int) -> Unit,
     onNavigateToReview: (meetingId: String, meetingNumber: Int, launchedFrom: String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MeetingCalendarViewModel = koinViewModel(parameters = { parametersOf(centerId) }),
+    viewModel: MeetingCalendarViewModel = koinViewModel(parameters = { parametersOf(groupId) }),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

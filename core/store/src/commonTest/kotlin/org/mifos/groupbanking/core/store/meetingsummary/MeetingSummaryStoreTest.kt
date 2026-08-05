@@ -24,7 +24,7 @@ class MeetingSummaryStoreTest {
 
     @Test
     fun emptyNotConductedSummary_hasBlankDate_zeroTotals_andEmptyBreakdowns() {
-        val summary = emptyNotConductedSummary(centerId = 24, meetingNumber = 1)
+        val summary = emptyNotConductedSummary(groupId = 24, meetingNumber = 1)
 
         // The blank actualDate is the "not conducted" signal the previous-review screen keys on.
         assertTrue(summary.actualDate.isBlank(), "actualDate must be blank for a not-conducted meeting")
@@ -47,7 +47,7 @@ class MeetingSummaryStoreTest {
 
     @Test
     fun emptyNotConductedSummary_carriesMeetingIdentityForTheReviewHeader() {
-        val summary = emptyNotConductedSummary(centerId = 100, meetingNumber = 7)
+        val summary = emptyNotConductedSummary(groupId = 100, meetingNumber = 7)
         assertEquals("100-7", summary.meetingId)
         assertEquals(7, summary.meetingNumber)
     }

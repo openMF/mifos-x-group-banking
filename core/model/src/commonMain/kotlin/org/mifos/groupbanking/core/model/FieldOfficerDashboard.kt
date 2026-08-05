@@ -26,7 +26,7 @@ package org.mifos.groupbanking.core.model
  *
  * **Idea-layer gap (flagged, not invented here):** `api.yaml` declares [GroupHealthSummary] as
  * "client-side derived from GroupItem + computed overdueRate; not a network DTO", but the two
- * source endpoints (`GET /centers`, `GET /groups`) return neither `overdueRate` nor per-group
+ * source endpoints (`GET /groups`) return neither `overdueRate` nor per-group
  * savings/loan balances — the mapper therefore defaults those to `0.0` (see `FieldOfficerMappers.kt`)
  * until a companion roll-up endpoint supplies them. Similarly [staffId]/[userRole] are declared
  * `source: session` on `ui.yaml#nav_params`, but no session-staff accessor exists in this build

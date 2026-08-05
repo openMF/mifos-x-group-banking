@@ -54,7 +54,7 @@ class GroupDashboardMappersTest {
 
     private val groupDetailDto = GroupDetailDto(
         id = "grp-1",
-        fineractCenterId = 500L,
+        fineractGroupId = 500L,
         name = "Mwangaza Women's Group",
         cycleNumber = 1,
         cycleLengthMonths = 12,
@@ -135,7 +135,7 @@ class GroupDashboardMappersTest {
         val domain = groupDetailDto.toDomainModel()
 
         assertEquals("grp-1", domain.id)
-        assertEquals(500L, domain.fineractCenterId)
+        assertEquals(500L, domain.fineractGroupId)
         assertEquals("Mwangaza Women's Group", domain.name)
         assertEquals(1, domain.cycleNumber)
         assertEquals(12, domain.cycleLengthMonths)

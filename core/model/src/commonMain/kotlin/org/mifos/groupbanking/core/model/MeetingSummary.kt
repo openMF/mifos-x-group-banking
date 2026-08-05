@@ -11,7 +11,7 @@ package org.mifos.groupbanking.core.model
 
 /**
  * Domain composite for the read-only meeting-summary screen
- * (`GET /datatables/dt_meeting_record/{centerId}?meetingNumber=N`). The single Store5 read result
+ * (`GET /datatables/dt_meeting_record/{groupId}?meetingNumber=N`). The single Store5 read result
  * bundling the meeting's persisted totals (attendance, savings, loans, fines, opening/closing
  * corpus) with the per-member savings breakdown and per-member loan activity.
  *

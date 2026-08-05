@@ -39,7 +39,7 @@ class GroupDtoTest {
         healthIndicator = HealthIndicatorDto.GREEN,
         overdueRate = 0.00,
         status = "ACTIVE",
-        fineractCenterId = 1001L,
+        fineractGroupId = 1001L,
     )
 
     // ---------- GroupDto ----------
@@ -56,7 +56,7 @@ class GroupDtoTest {
         assertEquals(HealthIndicatorDto.GREEN, mwangazaDto.healthIndicator)
         assertEquals(0.00, mwangazaDto.overdueRate)
         assertEquals("ACTIVE", mwangazaDto.status)
-        assertEquals(1001L, mwangazaDto.fineractCenterId)
+        assertEquals(1001L, mwangazaDto.fineractGroupId)
     }
 
     @Test
@@ -72,7 +72,7 @@ class GroupDtoTest {
         assertTrue(encoded.contains("\"healthIndicator\""))
         assertTrue(encoded.contains("\"overdueRate\""))
         assertTrue(encoded.contains("\"status\""))
-        assertTrue(encoded.contains("\"fineractCenterId\""))
+        assertTrue(encoded.contains("\"fineractGroupId\""))
 
         val decoded = json.decodeFromString(GroupDto.serializer(), encoded)
         assertEquals(mwangazaDto, decoded)
@@ -122,8 +122,8 @@ class GroupDtoTest {
             {
               "totalFilteredRecords": 2,
               "pageItems": [
-                {"id":"GRP-1","name":"A","groupType":"VSLA","viewerRole":"ORGANIZER","cycleNumber":1,"memberCount":20,"lastMeetingDate":"2026-07-14","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractCenterId":1001},
-                {"id":"GRP-2","name":"B","groupType":"ROSCA","viewerRole":"MEMBER","cycleNumber":3,"memberCount":10,"lastMeetingDate":"2026-07-10","healthIndicator":"AMBER","overdueRate":0.12,"status":"ACTIVE","fineractCenterId":1002}
+                {"id":"GRP-1","name":"A","groupType":"VSLA","viewerRole":"ORGANIZER","cycleNumber":1,"memberCount":20,"lastMeetingDate":"2026-07-14","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractGroupId":1001},
+                {"id":"GRP-2","name":"B","groupType":"ROSCA","viewerRole":"MEMBER","cycleNumber":3,"memberCount":10,"lastMeetingDate":"2026-07-10","healthIndicator":"AMBER","overdueRate":0.12,"status":"ACTIVE","fineractGroupId":1002}
               ]
             }
         """.trimIndent()
@@ -162,7 +162,7 @@ class GroupDtoTest {
     @Test
     fun groupTypeDto_unknownServerValueCoercesToUnknownFallback_notCrash() {
         val payload = """
-            {"id":"GRP-9","name":"New","groupType":"COOP_UNION","viewerRole":"MEMBER","cycleNumber":1,"memberCount":5,"lastMeetingDate":"2026-07-01","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractCenterId":9999}
+            {"id":"GRP-9","name":"New","groupType":"COOP_UNION","viewerRole":"MEMBER","cycleNumber":1,"memberCount":5,"lastMeetingDate":"2026-07-01","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractGroupId":9999}
         """.trimIndent()
         val decoded = json.decodeFromString(GroupDto.serializer(), payload)
         assertEquals(GroupTypeDto.UNKNOWN, decoded.groupType)
@@ -188,7 +188,7 @@ class GroupDtoTest {
     @Test
     fun viewerRoleDto_unknownServerValueCoercesToUnknownFallback_notCrash() {
         val payload = """
-            {"id":"GRP-9","name":"New","groupType":"VSLA","viewerRole":"AUDITOR","cycleNumber":1,"memberCount":5,"lastMeetingDate":"2026-07-01","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractCenterId":9999}
+            {"id":"GRP-9","name":"New","groupType":"VSLA","viewerRole":"AUDITOR","cycleNumber":1,"memberCount":5,"lastMeetingDate":"2026-07-01","healthIndicator":"GREEN","overdueRate":0.0,"status":"ACTIVE","fineractGroupId":9999}
         """.trimIndent()
         val decoded = json.decodeFromString(GroupDto.serializer(), payload)
         assertEquals(ViewerRoleDto.UNKNOWN, decoded.viewerRole)
@@ -228,7 +228,7 @@ class GroupDtoTest {
               "healthIndicator":"GREEN",
               "overdueRate":0.00,
               "status":"ACTIVE",
-              "fineractCenterId":1001,
+              "fineractGroupId":1001,
               "programCode":"KE-2026-not-in-old-schema"
             }
         """.trimIndent()

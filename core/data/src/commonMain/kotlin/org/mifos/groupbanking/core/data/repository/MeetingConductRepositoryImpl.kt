@@ -47,15 +47,14 @@ class MeetingConductRepositoryImpl(
 ) : MeetingConductRepository {
 
     override suspend fun loadMeetingData(
-        centerId: Int,
         groupId: Int,
         meetingNumber: Int,
     ): NetworkResult<MeetingConductData, NetworkError> = coroutineScope {
-        Logger.d(TAG) { "loadMeetingData: centerId=$centerId groupId=$groupId meetingNumber=$meetingNumber (4-way parallel)" }
+        Logger.d(TAG) { "loadMeetingData: groupId=$groupId meetingNumber=$meetingNumber (5-way parallel)" }
 
-        val previousDeferred = async { api.getPreviousMeetingRecord(centerId) }
-        val membersDeferred = async { api.getGroupMembers(centerId) }
-        val corpusDeferred = async { api.getGroupCorpus(centerId) }
+        val previousDeferred = async { api.getPreviousMeetingRecord(groupId) }
+        val membersDeferred = async { api.getGroupMembers(groupId) }
+        val corpusDeferred = async { api.getGroupCorpus(groupId) }
         val loansDeferred = async { api.getActiveLoans(groupId) }
         val pendingAppsDeferred = async { api.getPendingLoanApplications(groupId) }
 
@@ -92,7 +91,7 @@ class MeetingConductRepositoryImpl(
             pendingLoanApplications = pendingApplications,
         )
         Logger.i(TAG) {
-            "loadMeetingData: succeeded centerId=$centerId members=${members.size} " +
+            "loadMeetingData: succeeded groupId=$groupId members=${members.size} " +
                 "openingCorpus=${data.openingCorpus} activeLoans=${activeLoans.size} " +
                 "pendingApplications=${pendingApplications.size} hasPrevious=${previousSummary != null}"
         }
@@ -158,7 +157,7 @@ class MeetingConductRepositoryImpl(
                 }
             }
             add {
-                api.updateCorpus(request.centerId, request.toCorpusUpdateDto()).errorOrNull()
+                api.updateCorpus(request.groupId, request.toCorpusUpdateDto()).errorOrNull()
                     ?.also { Logger.e(TAG) { "submitMeeting: updateCorpus failed: $it" } }
             }
         }

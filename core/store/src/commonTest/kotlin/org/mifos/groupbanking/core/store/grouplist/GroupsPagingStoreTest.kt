@@ -159,7 +159,7 @@ private fun groupDto(n: Int): GroupDto = GroupDto(
     healthIndicator = HealthIndicatorDto.GREEN,
     overdueRate = 0.01,
     status = "ACTIVE",
-    fineractCenterId = n.toLong(),
+    fineractGroupId = n.toLong(),
 )
 
 private fun entities(pageIndex: Int, count: Int): List<GroupListEntity> = (0 until count).map { i ->
@@ -175,7 +175,7 @@ private fun entities(pageIndex: Int, count: Int): List<GroupListEntity> = (0 unt
         lastMeetingDate = "2026-07-14",
         overdueRate = 0.01,
         status = "ACTIVE",
-        fineractCenterId = i.toLong(),
+        fineractGroupId = i.toLong(),
         fetchedAt = 1L,
     )
 }

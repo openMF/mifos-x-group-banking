@@ -9,6 +9,8 @@
  */
 package org.mifos.groupbanking.core.network.config
 
+import kpt.core.network.BuildKonfig
+
 /**
  * Koin-injectable base-URL config for the group-create wizard's client stack —
  * `POST /companion/groups` (COMP-GRP-001, companion bridge) and `GET /offices` (raw Fineract
@@ -27,5 +29,5 @@ package org.mifos.groupbanking.core.network.config
  * See API.md#services — GroupCreateApi base URL.
  */
 data class GroupCreateApiConfig(
-    val baseUrl: String = "http://localhost:8080",
+    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
 )

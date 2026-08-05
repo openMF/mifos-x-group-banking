@@ -45,7 +45,6 @@ interface MeetingConductRepository {
      * `postLoanDisbursal` → companion `POST /companion/loan-applications/{clientId}/disburse`.
      */
     suspend fun loadMeetingData(
-        centerId: Int,
         groupId: Int,
         meetingNumber: Int,
     ): NetworkResult<MeetingConductData, NetworkError>

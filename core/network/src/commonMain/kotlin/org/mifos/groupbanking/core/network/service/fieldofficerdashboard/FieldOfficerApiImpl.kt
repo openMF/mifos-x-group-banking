@@ -21,11 +21,9 @@ import io.ktor.serialization.ContentConvertException
 import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import org.mifos.groupbanking.core.network.model.PagedCentersResponseDto
 import org.mifos.groupbanking.core.network.model.PagedGroupsResponseDto
 
 private const val TAG = "FieldOfficerApi"
-private const val CENTERS_PATH = "/fineract-provider/api/v1/centers"
 private const val GROUPS_PATH = "/fineract-provider/api/v1/groups"
 private const val REPORT_PATH = "/fineract-provider/api/v1/runreports/FieldOfficerGroupReport"
 
@@ -43,23 +41,6 @@ private const val REPORT_PATH = "/fineract-provider/api/v1/runreports/FieldOffic
 class FieldOfficerApiImpl(
     private val httpClient: HttpClient,
 ) : FieldOfficerApi {
-
-    override suspend fun getCentersForStaff(
-        staffId: Long,
-        paged: Boolean,
-        limit: Int,
-        offset: Int,
-    ): NetworkResult<PagedCentersResponseDto, NetworkError> {
-        Logger.d(TAG) { "getCentersForStaff: GET $CENTERS_PATH (staffId=$staffId)" }
-        return requestAsNetworkResult(op = "getCentersForStaff") {
-            httpClient.get(CENTERS_PATH) {
-                parameter("staffId", staffId)
-                parameter("paged", paged)
-                parameter("limit", limit)
-                parameter("offset", offset)
-            }
-        }
-    }
 
     override suspend fun getGroupsForStaff(
         staffId: Long,

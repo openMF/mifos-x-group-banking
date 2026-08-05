@@ -12,7 +12,6 @@ package org.mifos.groupbanking.core.network.mapper
 import org.mifos.groupbanking.core.model.FieldOfficerDashboard
 import org.mifos.groupbanking.core.model.GroupHealthSummary
 import org.mifos.groupbanking.core.model.HealthIndicator
-import org.mifos.groupbanking.core.network.model.CenterItemDto
 import org.mifos.groupbanking.core.network.model.GroupItemDto
 
 /**
@@ -56,10 +55,9 @@ fun aggregateFieldOfficerDashboard(
     staffId: Long,
     userRole: String,
     groups: List<GroupItemDto>,
-    centers: List<CenterItemDto>,
 ): FieldOfficerDashboard {
     val summaries = groups.map { it.toGroupHealthSummary() }
-    val regions = (summaries.map { it.officeName } + centers.map { it.officeName })
+    val regions = summaries.map { it.officeName }
         .filter { it.isNotBlank() }
         .distinct()
         .sorted()

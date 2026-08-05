@@ -123,12 +123,12 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // group-banking domain — offline write-queue shared infra (member-add / loan-request enqueue,
         // sync-status read); NOT a Store5 read-cache
         SyncQueueEntity::class,
-        // group-banking domain — meeting-summary single-key composite offline cache (GET /datatables/dt_meeting_record/{centerId})
+        // group-banking domain — meeting-summary single-key composite offline cache (GET /datatables/dt_meeting_record/{groupId})
         MeetingRecordCacheEntity::class,
-        // group-banking domain — meeting-calendar single-key offline cache (GET /centers/{centerId}/meetings + dt_meeting_record)
+        // group-banking domain — meeting-calendar single-key offline cache (GET /datatables/dt_meeting_schedule/{groupId} + dt_meeting_record)
         MeetingCalendarCacheEntity::class,
         // group-banking domain — field-officer-dashboard aggregate per-staff offline cache (FR-009,
-        // parallel GET /centers + GET /groups fanned into cross-group KPIs + group health list)
+        // parallel GET /groups fanned into cross-group KPIs + group health list)
         FieldOfficerDashboardCacheEntity::class,
         // group-banking domain — organizer-dashboard single-key hub offline cache
         // (GET /companion/organizer/dashboard — "my groups" KPIs + today's schedule + recent activity)
@@ -178,11 +178,11 @@ abstract class AppDatabase : RoomDatabase() {
         // v9 to v10: adds `sync_queue` (offline write-queue shared infra — member-add/loan-request
         //            enqueue, sync-status read; NOT a Store5 read-cache).
         // v10 to v11: adds `meeting_record_cache` (meeting-summary single-key composite offline
-        //            cache, GET /datatables/dt_meeting_record/{centerId}).
+        //            cache, GET /datatables/dt_meeting_record/{groupId}).
         // v11 to v12: adds `meeting_calendar_cache` (meeting-calendar single-key offline cache,
-        //            GET /centers/{centerId}/meetings merged with dt_meeting_record).
+        //            GET /datatables/dt_meeting_schedule/{groupId} merged with dt_meeting_record).
         // v12 to v13: adds `field_officer_dashboard_cache` (field-officer-dashboard aggregate
-        //            per-staff offline cache, FR-009 — parallel GET /centers + GET /groups).
+        //            per-staff offline cache, FR-009 — parallel GET /groups).
         // v13 to v14: adds `organizer_dashboard_cache` (organizer-dashboard single-key hub offline
         //            cache, GET /companion/organizer/dashboard — "my groups" KPIs + today's schedule
         //            + recent activity).

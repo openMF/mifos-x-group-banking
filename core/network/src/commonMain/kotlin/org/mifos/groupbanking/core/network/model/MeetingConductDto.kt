@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 
 // -- Read responses ---------------------------------------------------------------------------------
 
-/** `GET /datatables/dt_meeting_record/{centerId}` — previous meeting summary row (`get_previous_meeting_record`). */
+/** `GET /datatables/dt_meeting_record/{groupId}` — previous meeting summary row (`get_previous_meeting_record`). */
 @Serializable
 data class MeetingRecordDetailDto(
     @SerialName("meetingId") val meetingId: String = "",
@@ -35,9 +35,9 @@ data class MeetingRecordDetailDto(
     @SerialName("attendanceCount") val attendanceCount: Int = 0,
 )
 
-/** `GET /centers/{centerId}` — center detail incl. active client members (`get_group_members`). */
+/** `GET /groups/{groupId}?associations=clientMembers,groupRoles` — group detail incl. active client members (`get_group_members`). */
 @Serializable
-data class CenterDetailDto(
+data class GroupMembersDetailDto(
     @SerialName("id") val id: Int = 0,
     @SerialName("name") val name: String = "",
     @SerialName("activeClientMembers") val activeClientMembers: List<ClientMemberDto> = emptyList(),
@@ -51,10 +51,10 @@ data class ClientMemberDto(
     @SerialName("savingsAccountId") val savingsAccountId: String? = null,
 )
 
-/** `GET /datatables/dt_group_corpus/{centerId}` — opening corpus balance (`get_group_corpus`). */
+/** `GET /datatables/dt_group_corpus/{groupId}` — opening corpus balance (`get_group_corpus`). */
 @Serializable
 data class CorpusRecordDto(
-    @SerialName("centerId") val centerId: Int = 0,
+    @SerialName("groupId") val groupId: Int = 0,
     @SerialName("corpusBalance") val corpusBalance: Long = 0L,
     @SerialName("cashOnHand") val cashOnHand: Long = 0L,
     @SerialName("lastUpdatedMeeting") val lastUpdatedMeeting: Int = 0,
@@ -102,7 +102,7 @@ data class DataTableEntryResponseDto(
 /** `POST /datatables/dt_meeting_record` (`post_meeting_record`, priority 1). */
 @Serializable
 data class CreateMeetingRecordRequestDto(
-    val centerId: Int,
+    val groupId: Int,
     val meetingNumber: Int,
     val actualDate: String,
     val openingCorpus: Long,
@@ -179,7 +179,7 @@ data class MeetingLoanApplicationDto(
     val purpose: String = "",
 )
 
-/** `PUT /datatables/dt_group_corpus/{centerId}` (`patch_corpus`, priority 6). */
+/** `PUT /datatables/dt_group_corpus/{groupId}` (`patch_corpus`, priority 6). */
 @Serializable
 data class UpdateCorpusRequestDto(
     val corpusBalance: Long,
@@ -198,7 +198,7 @@ data class UpdateCorpusRequestDto(
 data class MeetingSubmissionPayloadDto(
     val meetingId: String,
     val meetingNumber: Int,
-    val centerId: Int,
+    val groupId: Int,
     val record: CreateMeetingRecordRequestDto,
     val attendance: List<CreateAttendanceRequestDto>,
     val savings: List<MeetingSavingsPayloadDto>,
