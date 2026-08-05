@@ -124,12 +124,14 @@ module FastlaneConfig
   # ProjectConfig — identity + service-account paths consumed by Appfile
   # --------------------------------------------------------------------------
   module ProjectConfig
-    ORGANIZATION_NAME = "Mifos Initiative".freeze
+    # E0/T5 (white-label): no template identity literal — a fork overrides via ENV['ORGANIZATION_NAME']
+    # (or fork.properties org.name, read at call sites). Neutral default, never mifos.
+    ORGANIZATION_NAME = (ENV["ORGANIZATION_NAME"] || "Your Organization").freeze
 
     ANDROID = {
       package_name:        ForkIdentity::APP_ID,
       # DRIFT FIX: was "secrets/play/service-account.json" (wrong — lanes/script use
-      # secrets/android/play/…). Resolver returns the canonical path from LAYOUT.yaml.
+      # secrets/live/android/play/…). Resolver returns the canonical path from LAYOUT.yaml.
       play_store_json_key: BuildSecrets.for.path(:play_service_account),
     }.freeze
 
@@ -149,6 +151,8 @@ module FastlaneConfig
   module IosConfig
     _s = FastlaneConfig::SECRETS_DIR
     _c = FastlaneConfig  # alias for brevity — calls FastlaneConfig._secret(...)
+    _bs = BuildSecrets.for  # canonical resolver: LAYOUT.yaml + secrets/live/ path + ENV-first
+    _nz = ->(v) { (v.nil? || v.to_s.strip.empty?) ? nil : v.to_s.strip }  # nil-if-blank
 
     BUILD_CONFIG = {
       scheme:                        "iosApp",
@@ -160,9 +164,17 @@ module FastlaneConfig
       key_id:                        BuildSecrets.for.value(:appstore_key_id),
       issuer_id:                     BuildSecrets.for.value(:appstore_issuer_id),
       key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:appstore_auth_key)),
-      # Match certificate repository — ENV (CI) → secrets/ file → fork.properties → default
-      match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/apple/match/git_url")    || _c._fork_prop("apple.match.git.url"),
-      match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/apple/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
+      # Match certificate repository — resolve via the CANONICAL BuildSecrets resolver (LAYOUT.yaml →
+      # secrets/live/apple/match/… + ENV-first), exactly like :match_ssh_key below. The old
+      # `_c._secret("…","#{_s}/apple/match/git_branch")` form dropped the `live/` flavor segment (the file is
+      # at secrets/live/apple/match/git_branch, NOT secrets/apple/…), so the lookup MISSED and silently fell
+      # through to the fork.properties default. When that default named a branch the provisioning repo does
+      # not have, Match checked out an empty orphan branch → certs/distribution/ came back empty → "No code
+      # signing identity found and cannot create a new one because you enabled readonly", even though the
+      # repo carries a valid cert+key+profile. The last-resort `|| "dev"` matches the provisioning repo's
+      # default branch so a fresh fork works with zero config; each fork overrides via its own LAYOUT/fork.properties. (fix 2026-07-31)
+      match_git_url:    _nz.call(_bs.value(:match_git_url))    || _c._fork_prop("apple.match.git.url"),
+      match_git_branch: _nz.call(_bs.value(:match_git_branch)) || _c._fork_prop("apple.match.git.branch") || "dev",
       match_type:                    "adhoc",
       match_ssh_key_path:            BuildSecrets.for.path(:match_ssh_key),
       match_password:                BuildSecrets.for.value(:match_password),
@@ -181,13 +193,13 @@ module FastlaneConfig
 
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
-        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "team@mifos.org",
+        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
         contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "Mifos",
         contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || _c._fork_prop("org.last.name")  || "Team",
-        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "+1234567890",
+        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
         demo_account_required: false,
       }.freeze,
-      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "team@mifos.org",
+      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "", # E0/T5: no mifos fallback — fork supplies org.email
       beta_app_description:              "#{ForkIdentity::APP_DISPLAY_NAME} beta build",
       demo_account_required:             false,
       distribute_external:               true,
@@ -204,6 +216,25 @@ module FastlaneConfig
       localized_app_info:                {},
     }.freeze
 
+    # BETA TESTERS — per-platform tester groups, sourced entirely from gradle/fork.properties
+    # (template documents the keys; the fork fills real values). deployment/ auto-syncs every build to
+    # these groups. The groups are pre-created on each store; iOS internal testers must be Apple-team
+    # members, everyone else is an iOS EXTERNAL tester (Apple review) — the public link lets them self-join.
+    TESTERS = {
+      ios: {
+        internal_group:       _nz.call(_c._fork_prop("apple.testers.internal.group")) || "Internal Testers",
+        external_group:       _nz.call(_c._fork_prop("apple.testers.external.group")) || _nz.call(_c._fork_prop("apple.tf.groups")) || "External Beta",
+        external_public_link: (_nz.call(_c._fork_prop("apple.testers.external.public.link")) || "true").to_s.downcase == "true",
+      },
+      play: {
+        internal_googlegroup: _nz.call(_c._fork_prop("play.testers.internal.googlegroup")),
+        closed_googlegroup:   _nz.call(_c._fork_prop("play.testers.closed.googlegroup")),
+      },
+      firebase: {
+        groups: (_nz.call(_c._fork_prop("firebase.groups")) || "").split(",").map(&:strip).reject(&:empty?),
+      },
+    }.freeze
+
     APPSTORE_CONFIG = {
       submit_for_review:                  true,
       automatic_release:                  true,
@@ -217,8 +248,8 @@ module FastlaneConfig
       app_review_information: {
         first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
         last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",
-        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "+1234567890",
-        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "review@mifos.org",
+        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
+        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
       }.freeze,
     }.freeze
   end
@@ -234,6 +265,28 @@ module FastlaneConfig
   # --------------------------------------------------------------------------
   module AndroidConfig
     METADATA_PATH = "deployment/android/metadata".freeze
+    # Primary Play Store listing locale (the metadata subdir under METADATA_PATH).
+    # Android-owned — platform-wise config, do NOT borrow IosConfig for an Android lane.
+    # Fork-configurable via gradle/fork.properties `store.primary.locale` (falls back to en-US).
+    # Replaces the broken `FastlaneConfig::SHARED[:primary_locale]` reference (SHARED was undefined).
+    # Read INLINE (not via the top-level `_fork_prop` helper): fastlane imports config.rb into its
+    # FastFile class, so top-level defs become FastFile methods, unreachable from inside this nested
+    # module at load time (NoMethodError). Self-contained read avoids that. (fix 2026-07-31)
+    PRIMARY_LOCALE = begin
+      _loc = "en-US"
+      _fp = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "fork.properties")
+      if File.exist?(_fp)
+        File.foreach(_fp) do |line|
+          k, v = line.strip.split("=", 2)
+          next unless k && v
+          if k.strip == "store.primary.locale" && !v.strip.empty?
+            _loc = v.strip
+            break
+          end
+        end
+      end
+      _loc
+    end.freeze
 
     # Per-flavor Play track destination — the mechanism that makes demo's Play
     # publication config, not a Ruby conditional (AC-12). Each flavor maps to
@@ -315,8 +368,15 @@ module FastlaneConfig
   # Reads UPLOAD keystore credentials (Play App Signing model — Play Console
   # verifies upload signature, then re-signs with the Google-held app signing key).
   def self.get_android_signing_config(options = {})
-    _s = SECRETS_DIR
-    props_path = "#{_s}/android/keystores/upload_keystore.properties"
+    # Resolve the keystore + its .properties through the LAYOUT resolver
+    # (live-wins-else-sample) — NOT the raw SECRETS_DIR base, which misses the
+    # `live/` segment after the secrets/{live,sample} split and yields a
+    # non-existent `secrets/android/keystores/…` path (breaks local signed
+    # builds). Matches the same resolver buildAndSignApp uses for its fallback
+    # (BuildSecrets.for.path). (fix 2026-07-31)
+    ks_rel     = BuildSecrets.for.path(:upload_keystore)
+    ks_dir     = File.dirname(ks_rel)
+    props_path = "#{ks_dir}/upload_keystore.properties"
     props = {}
     if File.exist?(File.join(DEPLOYMENT_REPO_ROOT, props_path))
       File.readlines(File.join(DEPLOYMENT_REPO_ROOT, props_path)).each do |line|
@@ -327,7 +387,7 @@ module FastlaneConfig
 
     # Read storeFile dynamically so forks can rename the keystore without
     # touching config.rb (storeFile key in upload_keystore.properties is canonical).
-    default_jks = "#{_s}/android/keystores/#{props.fetch("storeFile", "upload_keystore.keystore")}"
+    default_jks = "#{ks_dir}/#{props.fetch("storeFile", "upload_keystore.keystore")}"
 
     {
       keystore_path:     options[:keystore_path]     ||
@@ -360,7 +420,12 @@ end
 
 # Run Fastlane's setup_ci action when running on CI.
 def setup_ci_if_needed
-  setup_ci(force: true) if ENV["CI"]
+  # ALWAYS run fastlane's setup_ci — it creates a throwaway keychain and wires Match to it, so the
+  # shared Distribution cert imports there, NOT the developer's login keychain. Makes the
+  # ios-provisioning-profile Match repo self-sufficient headless/interactive/CI, zero per-member setup,
+  # no keychain password. Gating on ENV["CI"] left local runs on the (locked) login keychain → Match
+  # found no identity and tried to mint a new cert → Apple cert cap. (fix 2026-07-31)
+  setup_ci(force: true)
 end
 
 # Load App Store Connect API key into lane context.
@@ -406,34 +471,13 @@ def with_ios_preamble(options = {})
   end
 end
 
-# Unlock (local) or create (CI) the keychain before Match imports certificates.
-# Call this before fetch_certificates_with_match.
-# options:
-#   :keychain_password — macOS login keychain password (unlocks so Match can import)
-#   ENV["KEYCHAIN_PASSWORD"] — CI / local env override
+# Prepare the keychain for Match — delegates to fastlane's standard ephemeral `setup_ci` keychain.
+# NEVER the developer's login keychain and NO custom keychain: Match imports the shared cert from the
+# fastlane-match provisioning repo into fastlane's throwaway `fastlane_tmp_keychain`, which is
+# auto-created, isolated, and cleaned up — identical headless/interactive/CI, zero per-member setup.
+# (2026-07-31)
 def setup_ios_keychain(options = {})
-  cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
-  keychain_pass = options[:keychain_password] ||
-                  ENV["KEYCHAIN_PASSWORD"] ||
-                  cfg[:keychain_password]
-  return unless keychain_pass
-
-  if ENV["CI"].to_s != ""
-    create_keychain(
-      name:             "build.keychain-db",
-      password:         keychain_pass,
-      default_keychain: true,
-      unlock:           true,
-      timeout:          false,
-      lock_when_sleeps: false,
-    )
-  else
-    unlock_keychain(
-      path:        File.expand_path("~/Library/Keychains/login.keychain-db"),
-      password:    keychain_pass,
-      set_default: true,
-    )
-  end
+  setup_ci(force: true)
 end
 
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
@@ -442,7 +486,7 @@ def fetch_certificates_with_match(options = {})
   ssh_key = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
 
   # Match reads MATCH_PASSWORD automatically to decrypt the git-stored certs.
-  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/apple/match/).
+  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/live/apple/match/).
   match_pass = options[:match_password] || ENV["MATCH_PASSWORD"] || cfg[:match_password]
   ENV["MATCH_PASSWORD"] = match_pass.to_s if match_pass && ENV["MATCH_PASSWORD"].to_s.empty?
 
@@ -466,28 +510,23 @@ def fetch_certificates_with_match(options = {})
     return
   end
 
-  # FULLY-AUTOMATIC Match (auto readonly/force + auto-renew):
-  #   Phase 1 — readonly fetch. Installs whatever valid cert/profile already lives in the Match
-  #     repo. NO Dev Portal call → works even when the Apple PLA is pending. If it raises (repo
-  #     empty / cert revoked), fall through to renewal.
-  phase1_ok = begin
+  # SINGLE SOURCE OF TRUTH — readonly ONLY, NO fallback to minting/renewal. All signing material comes
+  # STRICTLY from the fastlane-match provisioning repo. A deploy lane NEVER creates or renews a
+  # cert/profile on the Apple Dev Portal — that fallback is what tries to mint a new Distribution cert
+  # and hits Apple's cert cap. If the repo lacks a valid, installable cert+key/profile for this app,
+  # FAIL LOUDLY: fix the provisioning repo (its cert-renewal.sh — the ONLY sanctioned place a cert is
+  # minted), not the deploy. Deliberate minting stays available via the explicit `readonly: false`
+  # override above (cert-renewal / bootstrap only), never as an automatic deploy-time fallback. (2026-07-31)
+  begin
     match(**base, readonly: true, force: false)
-    true
+    UI.success("✅ Signing pulled readonly from the fastlane-match provisioning repo (no Dev Portal, no mint).")
   rescue StandardError => e
-    UI.important("readonly match could not install a cert/profile (#{e.message.to_s.lines.first&.strip}); will renew.")
-    false
-  end
-
-  #   Phase 2 — decide force LOCALLY (no portal): renew only when the AppStore cert/profile is
-  #     missing or expiring soon. readonly:false + force:true regenerates on the Dev Portal AND
-  #     commits the fresh assets back to the Match repo (auto-renew). Renewal is the ONLY path
-  #     that needs the portal/PLA — the valid-cert steady state never touches it. (2026-06-22)
-  if !phase1_ok || match_assets_expired?(cfg, options)
-    UI.important("⚠️ AppStore cert/profile expired or missing → AUTO-RENEWING on the Dev Portal " \
-                 "(requires the Apple Program License Agreement to be current for the account holder).")
-    match(**base, readonly: false, force: true)
-  else
-    UI.message("✅ Valid AppStore cert/profile already in the Match repo — readonly, no Dev Portal / PLA needed.")
+    UI.user_error!(
+      "Match (readonly) could not install a valid signing identity for #{base[:app_identifier]} " \
+      "(#{e.message.to_s.lines.first&.strip}). The provisioning repo must carry a valid cert (with its " \
+      "private key) + profile for this app. Fix it with the provisioning repo's cert-renewal.sh — NO " \
+      "cert is minted from a deploy lane (no fallback)."
+    )
   end
 end
 
@@ -626,6 +665,94 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
   end
 end
 
+# Ensure the App Store Connect TestFlight tester GROUPS exist (from gradle/fork.properties `apple.testers.*`)
+# so an uploaded build reaches testers instead of sitting undistributed. Fully config-driven — NO tester
+# email lists live here: iOS INTERNAL testers are Apple-team members (managed in ASC → Users & Access; the
+# internal group has has_access_to_all_builds=true so they get EVERY build instantly, no review), and iOS
+# EXTERNAL testers self-join via the group's PUBLIC LINK (one Apple beta review, then every build). The
+# public link is the ASC analog of the Play/Firebase tester group. Idempotent, best-effort (rescued — a
+# hiccup NEVER blocks the upload). Requires load_api_key first. Opt out: SKIP_TESTFLIGHT_TESTER_SYNC=1.
+# Shared by iOS + macOS TestFlight lanes.
+def sync_testflight_testers(app_identifier:, config: nil)
+  return UI.important("⏭  TestFlight tester sync skipped (SKIP_TESTFLIGHT_TESTER_SYNC=1).") \
+    if ENV["SKIP_TESTFLIGHT_TESTER_SYNC"].to_s == "1"
+
+  require "spaceship"
+  cfg = config || FastlaneConfig::IosConfig::TESTERS[:ios]
+  UI.user_error!("No ASC API token — call load_api_key before sync_testflight_testers") unless Spaceship::ConnectAPI.token
+
+  app = begin
+    Spaceship::ConnectAPI::App.find(app_identifier)
+  rescue => e
+    return UI.important("⚠️  ASC app lookup flaked for tester sync: #{e.message.to_s.lines.first&.strip}")
+  end
+  return UI.important("⚠️  App '#{app_identifier}' not found on ASC — skipping tester sync.") unless app
+
+  # internal group (team-only, auto every build) + external group (self-join public link).
+  specs = []
+  specs << { name: cfg[:internal_group], internal: true,  public: false } if cfg[:internal_group].to_s != ""
+  specs << { name: cfg[:external_group], internal: false, public: cfg[:external_public_link] } if cfg[:external_group].to_s != ""
+  return UI.message("ℹ️  No apple.testers.* groups in fork.properties — skipping ASC tester sync.") if specs.empty?
+
+  specs.each do |gs|
+    begin
+      grp = (app.get_beta_groups(filter: { name: gs[:name] }) || []).first
+      grp ||= app.create_beta_group(
+        group_name:                gs[:name],
+        is_internal_group:         gs[:internal],
+        has_access_to_all_builds:  gs[:internal] ? true : nil,
+        public_link_enabled:       gs[:public] ? true : nil,
+        public_link_limit_enabled: gs[:public] ? true : nil,
+        public_link_limit:         gs[:public] ? 10_000 : nil,
+      )
+      kind = gs[:internal] ? "internal (team, every build)" : "external (public-link self-join, after review)"
+      UI.success("👥 ASC beta group ensured: '#{gs[:name]}' — #{kind}.")
+      if !gs[:internal] && gs[:public]
+        link = (grp.respond_to?(:public_link) && grp.public_link) || nil
+        UI.success("🔗 Public TestFlight join link for '#{gs[:name]}': #{link}") if link
+      end
+    rescue => e
+      UI.important("⚠️  ASC group '#{gs[:name]}' sync hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                   "Upload continues — verify in App Store Connect → TestFlight if needed.")
+    end
+  end
+end
+
+# Attach the configured Google Group (fork.properties play.testers.<track>.googlegroup) to a Play testing
+# track, so every upload to that track reaches the group's members. UNLIKE ASC, this binding PERSISTS on the
+# track — a one-time (idempotent) setup, re-asserted here so a fresh app/track is wired with zero Console
+# clicks. Manage membership in the Google Group itself. Best-effort (rescued — never blocks the AAB upload);
+# no-op when the fork leaves the group blank. `track` = internal|closed. Opt out: SKIP_PLAY_TESTER_SYNC=1.
+def sync_play_testers(package_name:, track:, json_key: nil, google_group: nil)
+  return if ENV["SKIP_PLAY_TESTER_SYNC"].to_s == "1"
+  key = track.to_s == "closed" ? :closed_googlegroup : :internal_googlegroup
+  group = google_group || FastlaneConfig::IosConfig::TESTERS[:play][key]
+  return UI.message("ℹ️  No play.testers.#{track}.googlegroup in fork.properties — skipping Play tester sync.") \
+    if group.nil? || group.to_s.strip.empty?
+  json_key ||= FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key]
+  json_key = File.join(DEPLOYMENT_REPO_ROOT, json_key) unless json_key.to_s.start_with?("/")
+  return UI.important("⚠️  Play service-account json not found (#{json_key}) — skipping Play tester sync.") \
+    unless File.exist?(json_key.to_s)
+
+  begin
+    require "google/apis/androidpublisher_v3"
+    require "googleauth"
+    svc = Google::Apis::AndroidpublisherV3::AndroidPublisherService.new
+    svc.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open(json_key),
+      scope: "https://www.googleapis.com/auth/androidpublisher",
+    )
+    edit = svc.insert_edit(package_name)
+    testers = Google::Apis::AndroidpublisherV3::Testers.new(google_groups: [group])
+    svc.update_edit_tester(package_name, edit.id, track.to_s, testers)
+    svc.commit_edit(package_name, edit.id)
+    UI.success("👥 Play '#{track}' track testers → Google Group '#{group}' (persists for every future upload).")
+  rescue => e
+    UI.important("⚠️  Play tester sync (#{track} → #{group}) hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                 "Upload continues — set the group once in Play Console → Testing → #{track} → Testers if needed.")
+  end
+end
+
 # Revoke iOS Distribution certificates from Apple Developer Portal to free slots for
 # a fresh cert. Strategy (in order):
 #   1. Revoke all truly expired certs first (safe, they're already unusable).
@@ -689,14 +816,14 @@ end
 # Distribution certificate via the ASC API.
 #
 # PERSISTENT CLONE STRATEGY
-#   The clone lives at secrets/apple/match/ios-provisioning-profile/ (gitignored).
+#   The clone lives at secrets/live/apple/match/ios-provisioning-profile/ (gitignored).
 #   • Local / colleagues: clone is reused across runs (git fetch + reset — fast).
 #   • GitHub Actions: starts clean each run, falls back to git clone --depth 1.
 #
 #   Colleague first-time setup:
-#     GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
+#     GIT_SSH_COMMAND="ssh -i secrets/live/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
 #       git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-#       secrets/apple/match/ios-provisioning-profile
+#       secrets/live/apple/match/ios-provisioning-profile
 #   Subsequent runs: the lane updates the clone automatically.
 #
 # Safe: does NOT revoke from Apple Developer Portal (expired certs are already unusable).
@@ -885,7 +1012,7 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  # DRIFT FIX: was hardcoded "secrets/android/keystores/upload_keystore.keystore"
+  # DRIFT FIX: was hardcoded "secrets/live/android/keystores/upload_keystore.keystore"
   # (flat pre-restructure path — broke after secrets/{live,sample} split). CI passes
   # keystore_path from `build-secrets path upload_keystore`; the local-run fallback
   # must resolve through the SAME LAYOUT resolver (live-wins-else-sample), never hardcode.
