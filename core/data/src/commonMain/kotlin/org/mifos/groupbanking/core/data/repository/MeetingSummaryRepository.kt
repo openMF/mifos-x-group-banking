@@ -50,4 +50,15 @@ interface MeetingSummaryRepository {
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
     ): ScreenDataStream<MeetingSummaryData>
+
+    /**
+     * Offline-first cache prime, called from the meeting-conduct SUBMIT (input) side — on a
+     * successful online post OR an offline enqueue — so the just-submitted [data] is written into
+     * the summary Store's SourceOfTruth BEFORE the summary screen opens. This is NOT a user-facing
+     * mutation of the read-only summary (there is still no domain write path, S5-1); it is the
+     * documented in-memory→cache hand-off that lets the summary render the submitted totals whether
+     * the device is online or offline, and overwrites any poisoned zero-row a pre-conduct 404 view
+     * cached. The next successful online revalidate reconciles the full server projection.
+     */
+    suspend fun primeSubmittedSummary(groupId: Int, meetingNumber: Int, data: MeetingSummaryData)
 }

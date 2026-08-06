@@ -1,0 +1,2 @@
+# generated health runs — only latest.json is tracked as a baseline
+health-*.json

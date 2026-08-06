@@ -27,7 +27,11 @@ import org.mifos.groupbanking.core.network.model.ChangePinRequestDto
 import org.mifos.groupbanking.core.network.model.ChangePinResponseDto
 
 private const val TAG = "ChangePinApi"
-private const val UPDATE_PASSWORD_PATH = "/fineract-provider/api/v1/self/user/updatePassword"
+// Companion SERVICE-cred facade (COMP-CHANGEPW). The raw `/self/user/updatePassword` 403s for members
+// who are Fineract clients but not self-service users (the seeded + companion-self-registered
+// accounts) — a self-service login cannot reach a back-office API, so the companion performs the
+// equivalent `PUT users/{id}` server-side, resolving the caller from their session.
+private const val UPDATE_PASSWORD_PATH = "/companion/self/user/updatePassword"
 
 /**
  * Plain-Ktor implementation of [ChangePinApi]. This class is the ONLY layer in the change-PIN
@@ -41,13 +45,14 @@ private const val UPDATE_PASSWORD_PATH = "/fineract-provider/api/v1/self/user/up
  * [org.mifos.groupbanking.core.network.service.memberadd.MemberAddApiImpl].
  *
  * Reuses the shared `HttpClient` singleton registered in `kpt.core.network.di.NetworkModule`
- * (bound to the companion server base URL) — no second engine constructed here, even though this
- * path is a raw Fineract self-service passthrough
- * (`/fineract-provider/api/v1/self/user/updatePassword`) rather than a `/companion/…` one; both
- * are served by the same host today, same convention as
- * [org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl]. The `BasicAuth`
- * header `api.yaml#api[change_pin].auth` declares is attached by the shared client itself
- * (`core-base/network`, non-editable — Hard Rule #8), never set here.
+ * (bound to the companion server base URL) — no second engine constructed here. The path is the
+ * companion SERVICE-credential facade `/companion/self/user/updatePassword` (COMP-CHANGEPW): the raw
+ * Fineract `/self/user/updatePassword` 403s for members who are Fineract clients but NOT self-service
+ * users (the seeded + companion-self-registered accounts) — a self-service login cannot reach a
+ * back-office API, so the companion resolves the caller from their session and performs the
+ * equivalent `PUT users/{id}` server-side. The app stays single-host and never talks to Fineract
+ * directly. The `BasicAuth` header the shared client attaches (`core-base/network`, non-editable —
+ * Hard Rule #8) identifies the caller to the companion; the companion re-auths + uses service creds.
  *
  * See API.md#services — ChangePinApi.
  */

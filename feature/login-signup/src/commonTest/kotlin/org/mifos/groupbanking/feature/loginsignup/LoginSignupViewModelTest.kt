@@ -163,6 +163,24 @@ class LoginSignupViewModelTest {
     }
 
     @Test
+    fun `OnLoginTap success with a committee role (treasurer) emits NavigateToOrganizerDashboard`() =
+        runTest(testDispatcher) {
+            // The whole management committee runs the group, not only the ORGANIZER row — a treasurer
+            // (the Amina showcase login) must reach the organizer hub too (GroupRole.isGroupLeadership).
+            repository.loginResult = NetworkResult.Success(
+                sampleSession(groups = listOf(sampleMembership(role = GroupRole.TREASURER))),
+            )
+            viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("amina@example.com"))
+            viewModel.trySendAction(LoginSignupAction.OnPasswordChange("Passw0rd!"))
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(LoginSignupAction.OnLoginTap)
+                assertEquals(LoginSignupEvent.NavigateToOrganizerDashboard, awaitItem())
+            }
+        }
+
+    @Test
     fun `OnLoginTap success with zero groups transitions to ZeroGroups screen state without nav event`() = runTest(testDispatcher) {
         repository.loginResult = NetworkResult.Success(sampleSession(groups = emptyList()))
         viewModel.trySendAction(LoginSignupAction.OnEmailPhoneChange("grace.wanjiku@example.com"))

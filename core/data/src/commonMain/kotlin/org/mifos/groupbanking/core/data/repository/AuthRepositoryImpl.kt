@@ -13,6 +13,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
+import kpt.core.data.user.UserDataRepository
 import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
 import org.mifos.groupbanking.core.model.AuthSession
 import org.mifos.groupbanking.core.model.LoginCredentials
@@ -34,7 +35,17 @@ class AuthRepositoryImpl(
     private val api: CompanionAuthApi,
     private val sessionStore: CompanionSessionStore,
     private val cacheCleaner: LocalCacheCleaner,
+    private val userDataRepository: UserDataRepository,
 ) : AuthRepository {
+
+    // Persist the resolvable auth flag alongside the session token so RootNavViewModel can route
+    // an already-signed-in user straight to the dashboard on next app open (instead of always
+    // showing login). isUnlocked=true because this app has no passcode gate by default
+    // (isPasscodeEnabled=false); the passcode flow, when enabled, still governs UserLocked.
+    private suspend fun markAuthenticated() {
+        userDataRepository.setIsAuthenticated(true)
+        userDataRepository.setIsUnlocked(true)
+    }
 
     override val currentSession: Flow<AuthSession?> = sessionStore.session
 
@@ -44,6 +55,7 @@ class AuthRepositoryImpl(
             is NetworkResult.Success -> {
                 val session = result.data.toDomainModel()
                 sessionStore.save(session.userId, session.sessionToken, session.tokenExpiresAt)
+                markAuthenticated()
                 Logger.i(TAG) { "selfRegister succeeded userId=${session.userId}" }
                 NetworkResult.Success(session)
             }
@@ -60,6 +72,7 @@ class AuthRepositoryImpl(
             is NetworkResult.Success -> {
                 val session = result.data.toDomainModel()
                 sessionStore.save(session.userId, session.sessionToken, session.tokenExpiresAt)
+                markAuthenticated()
                 Logger.i(TAG) { "login succeeded userId=${session.userId}" }
                 NetworkResult.Success(session)
             }
@@ -86,6 +99,9 @@ class AuthRepositoryImpl(
 
     override suspend fun clearSession() {
         sessionStore.clear()
+        // Clear the resolvable auth flag so the NEXT app open resolves to login (not dashboard).
+        userDataRepository.setIsAuthenticated(false)
+        userDataRepository.setIsUnlocked(false)
         // Wipe ALL locally-cached user-scoped state (per-user dashboards, loans, savings, member
         // lists, freshness stamps, AND the offline sync-queue). Room caches are keyed by domain id
         // (e.g. member_dashboard_cache by groupId), NOT by user — so without this, the NEXT user to

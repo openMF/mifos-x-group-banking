@@ -35,7 +35,9 @@ import kotlinx.serialization.Serializable
 data class GroupMemberDto(
     @SerialName("id") val id: Long,
     @SerialName("displayName") val displayName: String,
-    @SerialName("imagePresent") val imagePresent: Boolean,
+    // Fineract nulls imagePresent for a member with no photo; coerceInputValues turns the null into
+    // this default (was required non-null → loan-apply getGroupMembers deserialization failed).
+    @SerialName("imagePresent") val imagePresent: Boolean = false,
 ) {
     companion object {
         /** Bumped when this DTO shape changes (registry `version:` driven). See EC30. */
@@ -95,12 +97,14 @@ data class LoanProductDto(
  */
 @Serializable
 data class LoanApplyTemplateDto(
-    @SerialName("principal") val principal: Double,
-    @SerialName("numberOfRepayments") val numberOfRepayments: Int,
-    @SerialName("interestRatePerPeriod") val interestRatePerPeriod: Double,
-    @SerialName("interestType") val interestType: FineractStatusDto,
-    @SerialName("amortizationType") val amortizationType: FineractStatusDto,
-    @SerialName("repaymentEvery") val repaymentEvery: Int,
+    // Fineract's /loans/template returns null/absent defaults for these until a product is selected;
+    // default them so the template read never fails the loan-apply form load.
+    @SerialName("principal") val principal: Double = 0.0,
+    @SerialName("numberOfRepayments") val numberOfRepayments: Int = 0,
+    @SerialName("interestRatePerPeriod") val interestRatePerPeriod: Double = 0.0,
+    @SerialName("interestType") val interestType: FineractStatusDto = FineractStatusDto(id = 0, value = ""),
+    @SerialName("amortizationType") val amortizationType: FineractStatusDto = FineractStatusDto(id = 0, value = ""),
+    @SerialName("repaymentEvery") val repaymentEvery: Int = 0,
 ) {
     companion object {
         const val SCHEMA_VERSION = 1
@@ -176,8 +180,10 @@ data class MemberSavingsResponseDto(
  */
 @Serializable
 data class GroupCorpusRowDto(
-    @SerialName("corpus_balance") val corpusBalance: Double,
-    @SerialName("last_updated") val lastUpdated: String,
+    // The dt_group_corpus row can carry null columns (unpopulated config); coerceInputValues turns
+    // the nulls into these defaults so the loan-apply form loads (degraded) instead of hard-erroring.
+    @SerialName("corpus_balance") val corpusBalance: Double = 0.0,
+    @SerialName("last_updated") val lastUpdated: String = "",
 ) {
     companion object {
         const val SCHEMA_VERSION = 1
@@ -198,9 +204,10 @@ data class GroupCorpusRowDto(
  */
 @Serializable
 data class GroupLoanConfigDto(
-    @SerialName("loan_multiplier") val loanMultiplier: Double,
-    @SerialName("max_loan_amount") val maxLoanAmount: Double,
-    @SerialName("meeting_frequency") val meetingFrequency: String,
+    // dt_group_config columns may be null for a group without loan config yet — default so the form loads.
+    @SerialName("loan_multiplier") val loanMultiplier: Double = 0.0,
+    @SerialName("max_loan_amount") val maxLoanAmount: Double = 0.0,
+    @SerialName("meeting_frequency") val meetingFrequency: String = "",
 ) {
     companion object {
         const val SCHEMA_VERSION = 1

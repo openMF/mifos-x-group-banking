@@ -174,6 +174,8 @@ data class MeetingSubmissionRequest(
     val meetingNumber: Int,
     val groupId: Int,
     val actualDate: String,
+    /** Local wall-clock time the meeting was conducted/submitted, "HH:mm" (24h). Empty when unknown. */
+    val completedTime: String = "",
     val openingCorpus: Long,
     val closingCorpus: Long,
     val totalSavingsCollected: Long,

@@ -12,6 +12,7 @@ package org.mifos.groupbanking.feature.groupdashboard.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -88,6 +89,17 @@ fun QuickActionsSection(
                             testTag = GroupDashboardTestTags.START_MEETING_BUTTON,
                             modifier = Modifier.weight(1f),
                         )
+                        // Meetings is a CORE quick action (read-only meeting calendar/list), peer to
+                        // Members / Loans / Share-Out — mirrors the member grid's Meetings action.
+                        QuickActionButton(
+                            label = stringResource(Res.string.screens_group_dashboard_action_meetings),
+                            icon = Icons.Filled.CalendarMonth,
+                            onClick = { onAction(GroupDashboardAction.OnViewMeetings) },
+                            testTag = GroupDashboardTestTags.MEETINGS_BUTTON,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                         QuickActionButton(
                             label = stringResource(Res.string.screens_group_dashboard_action_members),
                             icon = Icons.Filled.Group,
@@ -95,8 +107,6 @@ fun QuickActionsSection(
                             testTag = GroupDashboardTestTags.VIEW_MEMBERS_BUTTON,
                             modifier = Modifier.weight(1f),
                         )
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                         QuickActionButton(
                             label = stringResource(Res.string.screens_group_dashboard_action_loans),
                             icon = Icons.Filled.AccountBalance,
@@ -104,6 +114,8 @@ fun QuickActionsSection(
                             testTag = GroupDashboardTestTags.VIEW_LOANS_BUTTON,
                             modifier = Modifier.weight(1f),
                         )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                         QuickActionButton(
                             label = stringResource(Res.string.screens_group_dashboard_action_share_out),
                             icon = Icons.Filled.Share,
@@ -112,6 +124,9 @@ fun QuickActionsSection(
                             testTag = GroupDashboardTestTags.SHARE_OUT_BUTTON,
                             modifier = Modifier.weight(1f),
                         )
+                        // Keep the 2-column grid aligned — Share-Out sits in a full row with an empty
+                        // peer slot (its disabled hint renders below).
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                     if (!shareOutEnabled) {
                         Text(

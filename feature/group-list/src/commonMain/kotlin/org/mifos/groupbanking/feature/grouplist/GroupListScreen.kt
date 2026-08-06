@@ -97,6 +97,7 @@ internal fun GroupListScreen(
     onNavigateToGroupDashboard: (groupId: String, viewerRole: String) -> Unit,
     onNavigateToCreateGroup: () -> Unit,
     onNavigateToJoinGroup: () -> Unit,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GroupListViewModel = koinViewModel(),
 ) {
@@ -126,6 +127,7 @@ internal fun GroupListScreen(
     GroupListContent(
         state = state,
         onAction = viewModel::trySendAction,
+        onNavigateBack = onNavigateBack,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -149,6 +151,7 @@ private fun messageKeyToText(key: String, network: String, server: String, auth:
 internal fun GroupListContent(
     state: GroupListState,
     onAction: (GroupListAction) -> Unit,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
@@ -160,7 +163,10 @@ internal fun GroupListContent(
     val notificationsCd = stringResource(Res.string.screens_group_list_notifications_cd)
 
     KptScaffold(
-        showNavigationIcon = false,
+        // Group-list is always PUSHED from a dashboard (All Groups) — never a root/tab destination
+        // (NavHost start = login) — so it carries a back affordance to pop to that dashboard.
+        showNavigationIcon = true,
+        onNavigationIconClick = onNavigateBack,
         title = title,
         actions = listOf(
             TopAppBarAction(

@@ -86,3 +86,11 @@ enum class GroupRole {
     SECRETARY,
     UNKNOWN,
 }
+
+/**
+ * A committee/leadership role that runs the group — the whole management committee (organizer,
+ * treasurer, secretary; the companion folds CHAIRPERSON onto ORGANIZER), NOT a plain member. Used to
+ * route a leader to the organizer dashboard on launch (see LoginSignupViewModel.routeEvent).
+ */
+val GroupRole.isGroupLeadership: Boolean
+    get() = this == GroupRole.ORGANIZER || this == GroupRole.TREASURER || this == GroupRole.SECRETARY

@@ -258,6 +258,9 @@ sealed interface GroupDashboardEvent {
  */
 sealed interface GroupDashboardAction {
     data object OnStartMeeting : GroupDashboardAction
+
+    /** Overflow-menu "Meetings" — open the meeting calendar (read-only list) with no corpus check. */
+    data object OnViewMeetings : GroupDashboardAction
     data object OnViewMembers : GroupDashboardAction
     data object OnViewLoans : GroupDashboardAction
     data object OnShareOut : GroupDashboardAction
@@ -373,6 +376,7 @@ internal class GroupDashboardViewModel(
     override fun handleAction(action: GroupDashboardAction) {
         when (action) {
             GroupDashboardAction.OnStartMeeting -> handleStartMeeting()
+            GroupDashboardAction.OnViewMeetings -> handleViewMeetings()
             GroupDashboardAction.OnViewMembers -> handleViewMembers()
             GroupDashboardAction.OnViewLoans -> handleViewLoans()
             GroupDashboardAction.OnShareOut -> handleShareOut()
@@ -474,6 +478,12 @@ internal class GroupDashboardViewModel(
         Logger.i(TAG) { "OnGroupSettings groupId=$groupId — opening settings" }
         updateState { copy(isMoreMenuExpanded = false) }
         sendEvent(GroupDashboardEvent.NavigateToSettings)
+    }
+
+    private fun handleViewMeetings() {
+        Logger.i(TAG) { "OnViewMeetings groupId=$groupId — opening meeting calendar (read-only list)" }
+        updateState { copy(isMoreMenuExpanded = false) }
+        sendEvent(GroupDashboardEvent.NavigateToMeetingCalendar(groupId))
     }
 
     private fun handleSyncStatus() {

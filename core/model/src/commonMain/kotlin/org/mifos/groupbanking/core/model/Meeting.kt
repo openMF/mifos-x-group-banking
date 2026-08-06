@@ -66,4 +66,6 @@ data class MeetingListItem(
     val status: MeetingStatus,
     val attendanceCount: Int? = null,
     val totalCollectedKES: Long? = null,
+    /** Wall-clock time the meeting was conducted, "HH:mm" — only present for COMPLETED meetings. */
+    val meetingTime: String = "",
 )

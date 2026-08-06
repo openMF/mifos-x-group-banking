@@ -27,24 +27,19 @@ import kotlinx.serialization.SerializationException
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.network.model.AuthResponseDto
-import org.mifos.groupbanking.core.network.model.FineractAuthRequestDto
-import org.mifos.groupbanking.core.network.model.FineractAuthResponseDto
-import org.mifos.groupbanking.core.network.model.FineractUserDetailsDto
 import org.mifos.groupbanking.core.network.model.LoginRequestDto
 import org.mifos.groupbanking.core.network.model.SelfRegisterRequestDto
 import org.mifos.groupbanking.core.network.model.UserProfileDto
 
 private const val TAG = "CompanionAuthApi"
 
-// Fineract-native auth endpoints (single-instance SoT: BuildKonfig.FINERACT_BASE_URL, resolved
-// via the shared HttpClient's base URL from CompanionAuthApiConfig). Replaces the retired
-// `/companion/auth/*` bridge.
-private const val AUTH_PATH = "/fineract-provider/api/v1/authentication"
-private const val USER_DETAILS_PATH = "/fineract-provider/api/v1/userdetails"
-
-// Fineract basic-auth keys do not carry an expiry; the app's AuthSession/session store still
-// require an Instant, so we synthesize a far-future stamp for the token-presence gate.
-private const val NON_EXPIRING_TOKEN_STAMP = "2099-12-31T23:59:59Z"
+// Companion auth bridge endpoints (COMP-AUTH-001/002/003), served by the deployed companion
+// (mcp-mifosx Go BFF) resolved via the shared HttpClient's base URL from CompanionAuthApiConfig
+// (BuildKonfig.COMPANION_BASE_URL). The companion holds the Fineract service credential and
+// proxies to the active instance — the app never talks to Fineract directly.
+private const val SELF_REGISTER_PATH = "/companion/auth/self-register"
+private const val LOGIN_PATH = "/companion/auth/login"
+private const val ME_PATH = "/companion/auth/me"
 
 /**
  * Plain-Ktor implementation of [CompanionAuthApi]. This class is the ONLY layer in the
@@ -63,68 +58,31 @@ class CompanionAuthApiImpl(
 ) : CompanionAuthApi {
 
     override suspend fun selfRegister(request: SelfRegisterRequestDto): NetworkResult<AuthResponseDto, NetworkError> {
-        // TODO(auth): /self/registration — Fineract self-service registration
-        // (POST /fineract-provider/api/v1/self/registration) does not map cleanly onto the
-        // companion self-register shape (it requires an authenticationMode + a separate activation
-        // step and returns no auth key). Non-blocking: signup is not a core group-banking flow.
-        Logger.d(TAG) { "selfRegister: not wired to Fineract self-service yet" }
-        return NetworkResult.Error(NetworkError.UNKNOWN)
+        Logger.d(TAG) { "selfRegister: POST $SELF_REGISTER_PATH" }
+        return requestAsNetworkResult(op = "selfRegister") {
+            httpClient.post(SELF_REGISTER_PATH) {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+        }
     }
 
     override suspend fun login(request: LoginRequestDto): NetworkResult<AuthResponseDto, NetworkError> {
-        Logger.d(TAG) { "login: POST $AUTH_PATH" }
-        val result: NetworkResult<FineractAuthResponseDto, NetworkError> = requestAsNetworkResult(op = "login") {
-            httpClient.post(AUTH_PATH) {
+        Logger.d(TAG) { "login: POST $LOGIN_PATH" }
+        return requestAsNetworkResult(op = "login") {
+            httpClient.post(LOGIN_PATH) {
                 contentType(ContentType.Application.Json)
-                setBody(FineractAuthRequestDto(username = request.emailPhone, password = request.password))
+                setBody(request)
             }
-        }
-        return when (result) {
-            is NetworkResult.Success -> {
-                val fineract = result.data
-                val key = fineract.base64EncodedAuthenticationKey
-                if (fineract.authenticated && !key.isNullOrBlank()) {
-                    NetworkResult.Success(
-                        AuthResponseDto(
-                            userId = fineract.userId?.toString() ?: (fineract.username ?: ""),
-                            // The base64 basic-auth key becomes the stored credential the
-                            // CompanionAuthHeaderPlugin attaches as `Authorization: Basic <key>`.
-                            sessionToken = key,
-                            tokenExpiresAt = NON_EXPIRING_TOKEN_STAMP,
-                            groupMemberships = emptyList(),
-                        ),
-                    )
-                } else {
-                    Logger.e(TAG) { "login: authenticated=false or missing key" }
-                    NetworkResult.Error(NetworkError.UNAUTHORIZED)
-                }
-            }
-            is NetworkResult.Error -> result
         }
     }
 
     override suspend fun me(sessionToken: String): NetworkResult<UserProfileDto, NetworkError> {
-        Logger.d(TAG) { "me: GET $USER_DETAILS_PATH" }
-        val result: NetworkResult<FineractUserDetailsDto, NetworkError> = requestAsNetworkResult(op = "me") {
-            httpClient.get(USER_DETAILS_PATH) {
-                header(HttpHeaders.Authorization, "Basic $sessionToken")
+        Logger.d(TAG) { "me: GET $ME_PATH" }
+        return requestAsNetworkResult(op = "me") {
+            httpClient.get(ME_PATH) {
+                header(HttpHeaders.Authorization, "Bearer $sessionToken")
             }
-        }
-        return when (result) {
-            is NetworkResult.Success -> {
-                val details = result.data
-                val name = details.username ?: ""
-                NetworkResult.Success(
-                    UserProfileDto(
-                        userId = details.userId?.toString() ?: name,
-                        name = name,
-                        // Fineract /userdetails exposes no email/phone — fall back to username.
-                        emailPhone = name,
-                        groupMemberships = emptyList(),
-                    ),
-                )
-            }
-            is NetworkResult.Error -> result
         }
     }
 }

@@ -43,6 +43,7 @@ data class MeetingRecordCacheEntity(
     val meetingId: String,
     val meetingNumber: Int,
     val actualDate: String,
+    val meetingTime: String,
     val attendanceCount: Int,
     val totalMemberCount: Int,
     val groupSavingsCollected: Long,

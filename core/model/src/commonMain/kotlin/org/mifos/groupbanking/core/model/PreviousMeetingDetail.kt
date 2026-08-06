@@ -101,6 +101,7 @@ data class PreviousMeetingDetail(
     val meetingId: String get() = summary.meetingId
     val meetingNumber: Int get() = summary.meetingNumber
     val actualDate: String get() = summary.actualDate
+    val meetingTime: String get() = summary.meetingTime
     val attendanceCount: Int get() = summary.attendanceCount
     val totalMemberCount: Int get() = summary.totalMemberCount
     val totalSavingsCollected: Long get() = summary.totalSavingsCollected

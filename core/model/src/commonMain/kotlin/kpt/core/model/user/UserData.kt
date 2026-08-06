@@ -41,7 +41,13 @@ data class UserData(
             darkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
             useDynamicColor = false,
             appLanguage = LanguageConfig.DEFAULT,
-            isAuthenticated = true,
+            // A fresh/logged-out user is NOT authenticated — RootNavViewModel routes them to the
+            // login screen. (The upstream Money Toolkit template defaults this true because it is a
+            // no-login toolkit; MifosSave adds real Fineract auth, so a pristine install / post-logout
+            // state must start unauthenticated or it falls through to UserUnlocked("") and shows the
+            // authenticated zero-groups screen instead of Sign In.) Login/selfRegister set this true
+            // via AuthRepositoryImpl.markAuthenticated(); logout clears it.
+            isAuthenticated = false,
             isUnlocked = true,
             isPasscodeEnabled = false,
             isBiometricsEnabled = false,

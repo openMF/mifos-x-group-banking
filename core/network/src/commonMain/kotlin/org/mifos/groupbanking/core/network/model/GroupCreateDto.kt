@@ -50,7 +50,11 @@ data class CreateGroupRequestDto(
 @Serializable
 data class CreateGroupResponseDto(
     @SerialName("groupId") val groupId: String,
-    @SerialName("fineractGroupId") val fineractGroupId: Long,
+    // Optional: the companion emits fineractGroupId (canonical) — some deployments still send only the
+    // legacy fineractCenterId mirror. groupId is the source of truth for navigation, so a missing
+    // fineractGroupId must NOT fail an otherwise-successful create. Falls back to fineractCenterId then 0.
+    @SerialName("fineractGroupId") val fineractGroupId: Long = 0,
+    @SerialName("fineractCenterId") val fineractCenterId: Long = 0,
     @SerialName("inviteCode") val inviteCode: String,
 ) {
     companion object {

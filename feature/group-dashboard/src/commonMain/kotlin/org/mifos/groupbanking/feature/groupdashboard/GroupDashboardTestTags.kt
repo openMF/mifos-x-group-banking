@@ -28,6 +28,9 @@ object GroupDashboardTestTags {
     /** G13 — top-bar overflow dropdown surface (`ui.yaml#components.top_bar.actions[0].menu`). */
     const val MORE_MENU: String = "group_dashboard_more_menu"
 
+    /** Overflow menu "Meetings" item — [GroupDashboardAction.OnViewMeetings] (→ meeting-calendar list). */
+    const val MENU_MEETINGS_ITEM: String = "group_dashboard_menu_meetings_item"
+
     /** G13 — overflow menu "Settings" item — [GroupDashboardAction.OnGroupSettings] (→ settings). */
     const val MENU_SETTINGS_ITEM: String = "group_dashboard_menu_settings_item"
 
@@ -63,6 +66,9 @@ object GroupDashboardTestTags {
 
     /** `ui.yaml#components.quick_actions_section.content.management_actions_grid.start_meeting_button` — [GroupDashboardAction.OnStartMeeting]. */
     const val START_MEETING_BUTTON: String = "group_dashboard_start_meeting_button"
+
+    /** Management grid "Meetings" core action — [GroupDashboardAction.OnViewMeetings] (→ meeting-calendar list). */
+    const val MEETINGS_BUTTON: String = "group_dashboard_meetings_button"
 
     /** `ui.yaml#components.quick_actions_section.content.management_actions_grid.view_members_button` — [GroupDashboardAction.OnViewMembers]. */
     const val VIEW_MEMBERS_BUTTON: String = "group_dashboard_view_members_button"

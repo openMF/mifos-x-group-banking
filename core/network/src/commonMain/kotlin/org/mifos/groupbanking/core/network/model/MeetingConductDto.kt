@@ -40,7 +40,10 @@ data class MeetingRecordDetailDto(
 data class GroupMembersDetailDto(
     @SerialName("id") val id: Int = 0,
     @SerialName("name") val name: String = "",
-    @SerialName("activeClientMembers") val activeClientMembers: List<ClientMemberDto> = emptyList(),
+    // Fineract's /groups/{id}?associations=clientMembers returns the roster under `clientMembers`,
+    // not `activeClientMembers` — the old name never matched, so meeting-conduct saw members=0
+    // (empty attendance list). Map the real field.
+    @SerialName("clientMembers") val activeClientMembers: List<ClientMemberDto> = emptyList(),
 )
 
 @Serializable
@@ -112,6 +115,8 @@ data class CreateMeetingRecordRequestDto(
     val totalLoansDisbursed: Long,
     val totalFinesCollected: Long,
     val attendanceCount: Int,
+    /** Wall-clock time the meeting was conducted, "HH:mm" — persisted to dt_meeting_record.completed_time. */
+    val completedTime: String = "",
     val locale: String = "en",
     val dateFormat: String = "dd MMMM yyyy",
 )

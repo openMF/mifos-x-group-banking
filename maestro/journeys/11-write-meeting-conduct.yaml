@@ -1,0 +1,20 @@
+# WRITE journey (meeting-conduct open + attendance): Meetings → Start Meeting → the conduct wizard
+# loads (members / opening corpus / active loans / pending applications / previous record), then the
+# Attendance step (1) lists the members. Reached from the ORGANIZER dashboard's Today's-Schedule row →
+# meeting calendar → Start Meeting. Guards the GroupMembersDetailDto clientMembers field-name fix (was
+# activeClientMembers → members=0 → empty attendance). Stops before submitting (no real meeting recorded).
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_content" }, timeout: 45000 }
+- scrollUntilVisible: { element: { text: "Today's Schedule" }, direction: DOWN }
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: { id: "meeting_calendar_screen" }, timeout: 40000 }
+- tapOn: { text: "Start Meeting" }
+# Step 0 — Previous Meeting Review resolves past the spinner (all 5 reads succeed).
+- extendedWaitUntil: { visible: { id: "meeting_conduct_step0_previous_review" }, timeout: 40000 }
+- tapOn: { id: "meeting_conduct_next_footer_button" }
+# Step 1 — Attendance lists the 5 members (the clientMembers fix).
+- extendedWaitUntil: { visible: { id: "meeting_conduct_step1_attendance" }, timeout: 20000 }
+- assertVisible: "Amina Otieno"
+- takeScreenshot: /tmp/meeting-attendance

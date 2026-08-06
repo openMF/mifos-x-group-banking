@@ -1,0 +1,22 @@
+# group-list -> group -> Loans -> loan detail renders (principal, status, amortization schedule).
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when: { visible: "Could not load groups" }
+          commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ]
+      - assertVisible: { id: "group_list_lazy_column" }
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: "Loans", timeout: 30000 }
+- tapOn: { text: "Loans" }
+- extendedWaitUntil: { visible: { id: "loan_list_lazy_column" }, timeout: 40000 }
+- assertNotVisible: { id: "loan_list_loading_indicator" }
+- tapOn: { text: "Grace Wanjiru" }
+- extendedWaitUntil: { visible: { id: "loan_detail_content_list" }, timeout: 30000 }
+- assertNotVisible: { id: "loan_detail_loading_section" }

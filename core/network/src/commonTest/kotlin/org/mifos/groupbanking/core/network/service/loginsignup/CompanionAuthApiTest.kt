@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.groupbanking.core.network.service.loginsignup
 
@@ -49,53 +49,70 @@ class CompanionAuthApiTest {
         }
         val client = HttpClient(engine) {
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        coerceInputValues = true
-                    },
-                )
+                json(Json { ignoreUnknownKeys = true; coerceInputValues = true })
             }
         }
         return CompanionAuthApiImpl(client)
     }
 
-    // ---------- selfRegister (Fineract self-service — not yet wired) ----------
+    // ---------- selfRegister (COMP-AUTH-001) ----------
 
     @Test
-    fun selfRegister_notWiredToFineract_returnsUnknownError() = runTest {
-        // Fineract self-service registration does not map cleanly onto the companion shape; the
-        // impl short-circuits to Error(UNKNOWN) with a TODO(auth) marker (non-blocking).
-        val api = apiWith(HttpStatusCode.OK, """{}""")
+    fun selfRegister_success_returnsMappedAuthResponse() = runTest {
+        val api = apiWith(
+            HttpStatusCode.Created,
+            """{"userId":"u-1","sessionToken":"tok-abc","tokenExpiresAt":"2026-08-01T00:00:00Z","groupMemberships":[]}""",
+        )
+
+        val result = api.selfRegister(SelfRegisterRequestDto("Amina", "amina@example.com", "hunter22"))
+
+        check(result is NetworkResult.Success)
+        assertEquals("u-1", result.data.userId)
+        assertEquals("tok-abc", result.data.sessionToken)
+    }
+
+    @Test
+    fun selfRegister_conflict409_mapsToUnknownError() = runTest {
+        // NetworkError has no CONFLICT bucket — 409 falls into the same UNKNOWN else-branch as
+        // core-base/network's ResultSuspendConverterFactory (kept consistent deliberately).
+        val api = apiWith(HttpStatusCode(409, "Conflict"), """{"error":"exists"}""")
 
         val result = api.selfRegister(SelfRegisterRequestDto("Amina", "amina@example.com", "hunter22"))
 
         assertEquals(NetworkResult.Error(NetworkError.UNKNOWN), result)
     }
 
-    // ---------- login (POST /fineract-provider/api/v1/authentication) ----------
+    @Test
+    fun selfRegister_serverError500_mapsToServerError() = runTest {
+        val api = apiWith(HttpStatusCode.InternalServerError, """{"error":"boom"}""")
+
+        val result = api.selfRegister(SelfRegisterRequestDto("Amina", "amina@example.com", "hunter22"))
+
+        assertEquals(NetworkResult.Error(NetworkError.SERVER), result)
+    }
 
     @Test
-    fun login_authenticated_mapsKeyToSessionToken() = runTest {
+    fun selfRegister_malformedJsonBody_mapsToSerializationError() = runTest {
+        val api = apiWith(HttpStatusCode.OK, """not-json""")
+
+        val result = api.selfRegister(SelfRegisterRequestDto("Amina", "amina@example.com", "hunter22"))
+
+        assertEquals(NetworkResult.Error(NetworkError.SERIALIZATION), result)
+    }
+
+    // ---------- login (COMP-AUTH-002) ----------
+
+    @Test
+    fun login_success_returnsMappedAuthResponse() = runTest {
         val api = apiWith(
             HttpStatusCode.OK,
-            """{"username":"amina","userId":42,"base64EncodedAuthenticationKey":"YW1pbmE6cHc=","authenticated":true,"officeId":1,"officeName":"Head Office"}""",
+            """{"userId":"u-1","sessionToken":"tok-abc","tokenExpiresAt":"2026-08-01T00:00:00Z","groupMemberships":[]}""",
         )
 
         val result = api.login(LoginRequestDto("amina@example.com", "hunter22"))
 
         check(result is NetworkResult.Success)
-        assertEquals("42", result.data.userId)
-        assertEquals("YW1pbmE6cHc=", result.data.sessionToken)
-    }
-
-    @Test
-    fun login_authenticatedFalse_mapsToUnauthorizedError() = runTest {
-        val api = apiWith(HttpStatusCode.OK, """{"authenticated":false}""")
-
-        val result = api.login(LoginRequestDto("amina@example.com", "wrong"))
-
-        assertEquals(NetworkResult.Error(NetworkError.UNAUTHORIZED), result)
+        assertEquals("u-1", result.data.userId)
     }
 
     @Test
@@ -108,6 +125,15 @@ class CompanionAuthApiTest {
     }
 
     @Test
+    fun login_rateLimited429_mapsToTooManyRequestsError() = runTest {
+        val api = apiWith(HttpStatusCode.TooManyRequests, """{"error":"rate limited"}""")
+
+        val result = api.login(LoginRequestDto("amina@example.com", "hunter22"))
+
+        assertEquals(NetworkResult.Error(NetworkError.TOO_MANY_REQUESTS), result)
+    }
+
+    @Test
     fun login_serverError500_mapsToServerError() = runTest {
         val api = apiWith(HttpStatusCode.InternalServerError, """{"error":"boom"}""")
 
@@ -116,22 +142,22 @@ class CompanionAuthApiTest {
         assertEquals(NetworkResult.Error(NetworkError.SERVER), result)
     }
 
-    // ---------- me (GET /fineract-provider/api/v1/userdetails) ----------
+    // ---------- me (COMP-AUTH-003) ----------
 
     @Test
-    fun me_success_returnsMappedUserProfileAndSendsBasicHeader() = runTest {
+    fun me_success_returnsMappedUserProfileAndSendsBearerHeader() = runTest {
         var capturedAuthHeader: String? = null
         val api = apiWith(
             HttpStatusCode.OK,
-            """{"username":"amina","userId":42,"officeId":1,"officeName":"Head Office"}""",
+            """{"userId":"u-1","name":"Amina","emailPhone":"amina@example.com","groupMemberships":[]}""",
             onRequestHeader = { capturedAuthHeader = it },
         )
 
-        val result = api.me("YW1pbmE6cHc=")
+        val result = api.me("tok-abc")
 
         check(result is NetworkResult.Success)
-        assertEquals("amina", result.data.name)
-        assertEquals("Basic YW1pbmE6cHc=", capturedAuthHeader)
+        assertEquals("Amina", result.data.name)
+        assertEquals("Bearer tok-abc", capturedAuthHeader)
     }
 
     @Test

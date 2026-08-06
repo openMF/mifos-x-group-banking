@@ -45,7 +45,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -53,6 +55,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
@@ -114,6 +117,20 @@ internal fun MeetingCalendarScreen(
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Re-fetch the meetings whenever the calendar RETURNS to the foreground (e.g. after conducting a
+    // meeting and popping back through the summary) so the just-completed meeting shows immediately —
+    // the calendar sits alive in the back stack, so without this its SWR stream keeps serving the
+    // pre-submit cached list. Skip the first resume: init already loads on initial composition.
+    var isInitialResume by remember { mutableStateOf(true) }
+    LifecycleResumeEffect(Unit) {
+        if (isInitialResume) {
+            isInitialResume = false
+        } else {
+            viewModel.trySendAction(MeetingCalendarAction.RefreshMeetings)
+        }
+        onPauseOrDispose { }
+    }
 
     val networkMessage = stringResource(Res.string.screens_meeting_calendar_error_network_message)
     val serverMessage = stringResource(Res.string.screens_meeting_calendar_error_server_message)
@@ -439,11 +456,17 @@ private fun PastMeetingRow(meeting: MeetingListItem, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
             val attendance = meeting.attendanceCount
+            // COMPLETED meetings carry the wall-clock conducted time — show "date · HH:mm".
+            val dateLabel = if (meeting.meetingTime.isNotBlank()) {
+                "${meeting.meetingDate} · ${meeting.meetingTime}"
+            } else {
+                meeting.meetingDate
+            }
             Text(
                 text = if (attendance != null) {
-                    stringResource(Res.string.screens_meeting_calendar_row_subtitle_attended, meeting.meetingDate, attendance)
+                    stringResource(Res.string.screens_meeting_calendar_row_subtitle_attended, dateLabel, attendance)
                 } else {
-                    meeting.meetingDate
+                    dateLabel
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -27,5 +27,5 @@ import kpt.core.network.BuildKonfig
  * See API.md#services — GroupDashboardApi base URL.
  */
 data class GroupDashboardApiConfig(
-    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
+    val baseUrl: String = BuildKonfig.COMPANION_BASE_URL,
 )

@@ -43,9 +43,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
+import kpt.core.base.ui.util.ShareUtils
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -86,7 +85,6 @@ import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_repayments_label
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_savings_breakdown_header
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_share_btn_description
-import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_share_copied
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_title
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_title_format
 import org.mifos.groupbanking.feature.meetingsummary.generated.resources.screens_meeting_summary_total_collected_label
@@ -115,15 +113,15 @@ internal fun MeetingSummaryScreen(
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val clipboardManager = LocalClipboardManager.current
-    val shareCopiedMessage = stringResource(Res.string.screens_meeting_summary_share_copied)
 
     EventsEffect(viewModel) { event ->
         when (event) {
             MeetingSummaryEvent.NavigateToCalendar -> onNavigateDone()
             is MeetingSummaryEvent.ShareSummary -> {
-                clipboardManager.setText(AnnotatedString(event.reportText))
-                snackbarHostState.showSnackbar(message = shareCopiedMessage)
+                // Open the platform OS share sheet (Android ACTION_SEND / iOS UIActivityViewController /
+                // desktop+web fallbacks) via the core-base ShareUtils — a silent clipboard copy read as
+                // "the share button does nothing". The share sheet still offers Copy as one option.
+                ShareUtils.shareText(event.reportText)
             }
         }
     }
@@ -270,7 +268,8 @@ internal fun MeetingSummaryHeroCard(summary: MeetingSummaryData, modifier: Modif
                 text = stringResource(
                     Res.string.screens_meeting_summary_meeting_date_format,
                     summary.meetingNumber,
-                    summary.actualDate,
+                    // Append the conducted wall-clock time when recorded: "date · HH:mm".
+                    if (summary.meetingTime.isNotBlank()) "${summary.actualDate} · ${summary.meetingTime}" else summary.actualDate,
                 ),
                 style = MaterialTheme.typography.bodyMedium,
             )

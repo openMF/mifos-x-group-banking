@@ -26,10 +26,11 @@ import org.mifos.groupbanking.core.network.model.GroupTypeConfigDto
 interface GroupTypeConfigApi {
 
     /**
-     * `GET /companion/datatables/group_type_config/{entityId}` (COMP-DT-003). No auth token
-     * required. [entityId] defaults to `0` — the global seeded catalogue query, not a per-group
-     * lookup. Response is cached SWR by the caller per `data-flow.yaml#cache_strategy`
-     * (`ttl=86400`, `offline=show_cached`) — this Service call itself is unconditional.
+     * `GET /companion/datatables/group_type_config/{entityId}` (COMP-DT-003) — companion read of
+     * the seeded group-type archetype catalogue. No auth token required. [entityId] defaults to
+     * `0`, the global seeded catalogue query the companion serves, not a per-group lookup. Response
+     * is cached SWR by the caller per `data-flow.yaml#cache_strategy` (`ttl=86400`,
+     * `offline=show_cached`) — this Service call itself is unconditional.
      */
     suspend fun getGroupTypeConfigs(entityId: Long = 0): NetworkResult<List<GroupTypeConfigDto>, NetworkError>
 }

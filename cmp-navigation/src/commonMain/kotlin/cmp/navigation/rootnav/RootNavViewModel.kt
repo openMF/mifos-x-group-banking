@@ -45,19 +45,20 @@ class RootNavViewModel(
     private fun handleUserStateUpdateReceive(action: UserStateUpdateReceive) {
         val userData = action.userData
 
-        // TODO:: Configure this based on the user state
+        // Resolve the startup destination from the persisted auth status: an authenticated user goes
+        // straight to the dashboard (never the login screen). The passcode lock only gates entry when
+        // the user has explicitly enabled it (isPasscodeEnabled) — this app defaults it off, so a
+        // signed-in user is never bounced to UserLocked. (Auth persistence lives in AuthRepositoryImpl:
+        // login/selfRegister set isAuthenticated+isUnlocked, logout clears them.)
         val updatedRootNavState = when {
             userData.firstTimeUser -> RootNavState.ShowOnboarding
 
             !userData.isAuthenticated -> RootNavState.Auth
 
-            userData.passcode.isEmpty() -> RootNavState.UserLocked
+            userData.isPasscodeEnabled && (userData.passcode.isEmpty() || !userData.isUnlocked) ->
+                RootNavState.UserLocked
 
-            userData.isUnlocked -> {
-                RootNavState.UserUnlocked(userData.activeUserId)
-            }
-
-            else -> RootNavState.UserLocked
+            else -> RootNavState.UserUnlocked(userData.activeUserId)
         }
 
         mutableStateFlow.update { updatedRootNavState }

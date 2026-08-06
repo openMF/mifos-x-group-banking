@@ -14,10 +14,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
+import org.mifos.groupbanking.core.model.MeetingSummaryData
 import org.mifos.groupbanking.core.model.meeting.LoanVoteRecord
 import org.mifos.groupbanking.core.model.meeting.MeetingConductData
 import org.mifos.groupbanking.core.model.meeting.MeetingSubmissionRequest
 import org.mifos.groupbanking.core.model.meeting.MeetingSubmitResult
+import org.mifos.groupbanking.core.model.meeting.SavingsType
 import org.mifos.groupbanking.core.network.mapper.toCorpusUpdateDto
 import org.mifos.groupbanking.core.network.mapper.toDisbursalDto
 import org.mifos.groupbanking.core.network.mapper.toDomainModel
@@ -44,6 +46,7 @@ private const val SUBMIT_MEETING_TARGET_TABLE = "dt_meeting_record"
 class MeetingConductRepositoryImpl(
     private val api: MeetingConductApi,
     private val syncQueueRepository: SyncQueueRepository,
+    private val meetingSummaryRepository: MeetingSummaryRepository,
 ) : MeetingConductRepository {
 
     override suspend fun loadMeetingData(
@@ -165,18 +168,78 @@ class MeetingConductRepositoryImpl(
         steps.firstNotNullOfOrNull { it() }?.let { return NetworkResult.Error(it) }
 
         Logger.i(TAG) { "submitMeeting: succeeded meetingId=${request.meetingId} (all 6 priorities posted)" }
+        // Write-through the just-submitted record into the summary Store's local cache so the summary
+        // screen is offline-first (renders the submitted totals instantly, no dependence on a fresh
+        // fetch, and overwrites any poisoned pre-conduct 404 zero-row). Best-effort: a local cache
+        // write must never turn a fully-posted submit into a failure.
+        primeSummaryCache(request)
         return NetworkResult.Success(MeetingSubmitResult(meetingId = request.meetingId, isOffline = false))
     }
 
     override suspend fun enqueueMeetingOffline(request: MeetingSubmissionRequest): Long {
         val payloadJson = request.toJsonPayload()
         Logger.i(TAG) { "enqueueMeetingOffline: queuing $SUBMIT_MEETING_OPERATION_TYPE meetingId=${request.meetingId}" }
-        return syncQueueRepository.enqueue(
+        val queuedId = syncQueueRepository.enqueue(
             operationType = SUBMIT_MEETING_OPERATION_TYPE,
             targetTable = SUBMIT_MEETING_TARGET_TABLE,
             payloadJson = payloadJson,
         )
+        // Same optimistic write-through as the online path — the summary must render the submitted
+        // totals offline while the payload waits in the sync queue.
+        primeSummaryCache(request)
+        return queuedId
     }
+
+    /**
+     * Best-effort offline-first cache prime: build the summary snapshot from the submitted request
+     * and write it into the summary Store's SourceOfTruth (keyed by `groupId:meetingNumber`). Wrapped
+     * so a local persistence hiccup never propagates out of a successful submit/enqueue.
+     */
+    private suspend fun primeSummaryCache(request: MeetingSubmissionRequest) {
+        runCatching {
+            meetingSummaryRepository.primeSubmittedSummary(
+                groupId = request.groupId,
+                meetingNumber = request.meetingNumber,
+                data = request.toSummaryData(),
+            )
+        }.onFailure { Logger.w(TAG) { "primeSummaryCache: cache prime failed meetingId=${request.meetingId}: ${it.message}" } }
+    }
+}
+
+/**
+ * Builds the offline-first [MeetingSummaryData] snapshot from the just-submitted request. Scalar
+ * totals come straight from the request; the group/individual split is summed from the per-member
+ * savings lines. The per-member `savingsBreakdown` / `loanItems` are left empty here (the request
+ * carries member ids but not display names) — they reconcile from the server on the next successful
+ * online revalidate, which is exactly the offline-first stale-while-revalidate contract.
+ */
+private fun MeetingSubmissionRequest.toSummaryData(): MeetingSummaryData {
+    // The per-member savings LINES only exist for members with a Fineract savings account, so in a
+    // group with no member savings accounts `savings` is empty even though the running
+    // `totalSavingsCollected` (all members) is non-zero. When the split is unavailable, attribute
+    // the whole running total to GROUP savings — mirroring the companion handleMeetingSummary
+    // fallback so the primed cache and the server-revalidated projection agree.
+    val groupFromLines = savings.filter { it.type == SavingsType.GROUP_LINKED }.sumOf { it.amount }
+    val individualFromLines = savings.filter { it.type == SavingsType.INDIVIDUAL }.sumOf { it.amount }
+    val hasLineSplit = groupFromLines > 0L || individualFromLines > 0L
+    return MeetingSummaryData(
+        meetingId = meetingId,
+        meetingNumber = meetingNumber,
+        actualDate = actualDate,
+        meetingTime = completedTime,
+        attendanceCount = attendanceCount,
+        totalMemberCount = attendance.size,
+        groupSavingsCollected = if (hasLineSplit) groupFromLines else totalSavingsCollected,
+        individualSavingsCollected = individualFromLines,
+        totalSavingsCollected = totalSavingsCollected,
+        loansDisbursed = totalLoansDisbursed,
+        loansRepaid = totalRepaymentsReceived,
+        finesCollected = totalFinesCollected,
+        openingCorpus = openingCorpus,
+        closingCorpus = closingCorpus,
+        savingsBreakdown = emptyList(),
+        loanItems = emptyList(),
+    )
 }
 
 /** Returns the [NetworkError] when this result is an error, or `null` on success — the ordered-sequence short-circuit helper. */

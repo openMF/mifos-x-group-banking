@@ -57,6 +57,7 @@ class GroupTypeConfigApiTest {
                     Json {
                         ignoreUnknownKeys = true
                         coerceInputValues = true
+                        isLenient = true
                     },
                 )
             }
@@ -92,6 +93,7 @@ class GroupTypeConfigApiTest {
         check(result is NetworkResult.Success)
         assertEquals(1, result.data.size)
         assertEquals(GroupTypeSlugDto.VSLA, result.data[0].typeSlug)
+        // Default entityId 0 = the global seeded catalogue the companion serves.
         assertEquals("/companion/datatables/group_type_config/0", capturedPath)
         assertEquals(HttpMethod.Get, capturedMethod)
     }

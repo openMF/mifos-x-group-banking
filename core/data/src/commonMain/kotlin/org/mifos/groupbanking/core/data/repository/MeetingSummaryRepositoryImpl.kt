@@ -16,7 +16,9 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.store.AppStoreRegistry
+import org.mifos.groupbanking.core.database.meetingsummary.dao.MeetingRecordDao
 import org.mifos.groupbanking.core.model.MeetingSummaryData
+import org.mifos.groupbanking.core.store.meetingsummary.impl.primeMeetingSummaryCache
 import org.mobilenativefoundation.store.store5.Store
 
 /**
@@ -36,6 +38,7 @@ class MeetingSummaryRepositoryImpl(
     private val meetingSummaryStore: Store<String, MeetingSummaryData>,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
+    private val meetingRecordDao: MeetingRecordDao,
 ) : MeetingSummaryRepository {
 
     override fun meetingSummaryStream(
@@ -56,6 +59,16 @@ class MeetingSummaryRepositoryImpl(
             fetchPolicy = fetchPolicy,
             ttl = AppStoreRegistry.Ttl.MEETING_SUMMARY,
         )
+    }
+
+    override suspend fun primeSubmittedSummary(
+        groupId: Int,
+        meetingNumber: Int,
+        data: MeetingSummaryData,
+    ) {
+        // Write-through the just-submitted record into the read Store's SourceOfTruth so the summary
+        // is offline-first (see interface KDoc + primeMeetingSummaryCache).
+        primeMeetingSummaryCache(meetingRecordDao, groupId, meetingNumber, data)
     }
 
     private companion object {

@@ -24,8 +24,8 @@ import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.network.model.PagedGroupsResponseDto
 
 private const val TAG = "FieldOfficerApi"
-private const val GROUPS_PATH = "/fineract-provider/api/v1/groups"
-private const val REPORT_PATH = "/fineract-provider/api/v1/runreports/FieldOfficerGroupReport"
+private const val GROUPS_PATH = "/companion/field-officer/groups"
+private const val REPORT_PATH = "/companion/field-officer/report"
 
 /**
  * Plain-Ktor implementation of [FieldOfficerApi]. This class is the ONLY layer in the

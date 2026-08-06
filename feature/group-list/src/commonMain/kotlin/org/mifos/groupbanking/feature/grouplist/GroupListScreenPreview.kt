@@ -93,7 +93,7 @@ private fun GroupListContentPreview(
     state: GroupListState,
 ) {
     KptTheme {
-        GroupListContent(state = state, onAction = {})
+        GroupListContent(state = state, onAction = {}, onNavigateBack = {})
     }
 }
 

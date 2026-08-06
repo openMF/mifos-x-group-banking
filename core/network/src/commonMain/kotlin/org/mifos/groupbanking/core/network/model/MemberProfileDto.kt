@@ -11,6 +11,7 @@ package org.mifos.groupbanking.core.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.mifos.groupbanking.core.network.serializer.FineractDateAsIsoStringSerializer
 
 /**
  * Wire DTO for `get_client` — `GET /clients/{clientId}` (raw Fineract client resource,
@@ -48,10 +49,15 @@ data class MemberProfileDto(
     @SerialName("displayName") val displayName: String,
     @SerialName("firstname") val firstName: String,
     @SerialName("lastname") val lastName: String,
-    @SerialName("mobileNo") val mobileNo: String,
-    @SerialName("imagePresent") val imagePresent: Boolean,
+    // Fineract omits/nulls these for a client with no phone / no photo; coerceInputValues (NetworkModule)
+    // turns the explicit null into the default, so they must carry one.
+    @SerialName("mobileNo") val mobileNo: String = "",
+    @SerialName("imagePresent") val imagePresent: Boolean = false,
     @SerialName("status") val status: FineractStatusDto,
-    @SerialName("activationDate") val activationDate: String,
+    // Fineract serializes activationDate as a [y,m,d] int array; normalize to an ISO string.
+    @SerialName("activationDate")
+    @Serializable(with = FineractDateAsIsoStringSerializer::class)
+    val activationDate: String,
     @SerialName("officeId") val officeId: Long,
 ) {
     companion object {
@@ -116,7 +122,10 @@ data class MemberSavingsAccountDto(
     @SerialName("id") val id: Long,
     @SerialName("productName") val productName: String,
     @SerialName("accountNo") val accountNo: String,
-    @SerialName("balance") val balance: Double,
+    // Fineract's /clients/{id}/accounts savings summary names the balance `accountBalance`, not
+    // `balance` — the old @SerialName never matched, so this required field was always missing and
+    // failed member-profile deserialization once a client had a savings account.
+    @SerialName("accountBalance") val balance: Double = 0.0,
     @SerialName("status") val status: FineractStatusDto,
 ) {
     companion object {
@@ -181,8 +190,12 @@ data class MemberLoanAccountSummaryDto(
 @Serializable
 data class MemberRoleInfoDto(
     @SerialName("role") val role: MemberRoleDto = MemberRoleDto.UNKNOWN,
-    @SerialName("groupId") val groupId: Long,
-    @SerialName("assignedDate") val assignedDate: String,
+    // The dt_member_role datatable row uses snake_case columns (group_id, joined_date) and serializes
+    // joined_date as a Fineract [y,m,d] array — the old camelCase @SerialNames never matched.
+    @SerialName("group_id") val groupId: Long,
+    @SerialName("joined_date")
+    @Serializable(with = FineractDateAsIsoStringSerializer::class)
+    val assignedDate: String,
 ) {
     companion object {
         const val SCHEMA_VERSION = 1

@@ -35,6 +35,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import androidx.navigation.toRoute
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.serialization.Serializable
@@ -66,6 +67,7 @@ import org.mifos.groupbanking.feature.loginsignup.loginSignupScreen
 import org.mifos.groupbanking.feature.loginsignup.navigateToLoginSignup
 import org.mifos.groupbanking.feature.meetingcalendar.meetingCalendarScreen
 import org.mifos.groupbanking.feature.meetingcalendar.navigateToMeetingCalendar
+import org.mifos.groupbanking.feature.meetingconduct.MeetingConductRoute
 import org.mifos.groupbanking.feature.meetingconduct.meetingConductScreen
 import org.mifos.groupbanking.feature.meetingconduct.navigateToMeetingConduct
 import org.mifos.groupbanking.feature.meetingsummary.meetingSummaryScreen
@@ -222,6 +224,7 @@ fun GroupBankingNavHost(
                     },
                     onNavigateToCreateGroup = { navController.navigateToGroupTypePicker() },
                     onNavigateToJoinGroup = { navController.navigateToJoinWithCode() },
+                    onNavigateBack = { navController.popBackStack() },
                 )
 
                 // 5. join-with-code → dashboard (joiner is a MEMBER) / re-auth
@@ -497,10 +500,17 @@ fun GroupBankingNavHost(
                 //     previous-meeting-review target falls back to PlaceholderRoute (never a dead click).
                 meetingConductScreen(
                     onNavigateToMeetingSummary = { meetingId, meetingNumber, groupId ->
+                        // Pop the conduct wizard off the back stack as we go to the summary, so the
+                        // summary sits directly on the calendar. Otherwise the wizard (frozen on its
+                        // "submitted successfully" overlay) stays underneath and the summary's Done
+                        // (popBackStack) lands back on that stuck overlay instead of the calendar.
                         navController.navigateToMeetingSummary(
                             meetingId = meetingId,
                             meetingNumber = meetingNumber,
                             groupId = groupId,
+                            navOptions = navOptions {
+                                popUpTo<MeetingConductRoute> { inclusive = true }
+                            },
                         )
                     },
                     // G6 → previous-meeting-review (step-0 drill-down, conduct-launched). The callback

@@ -1,0 +1,14 @@
+# Member (Grace) logs in and lands on the PERSONAL dashboard with their real groups.
+appId: org.mifos.groupbanking
+---
+- launchApp
+- assertVisible: { id: "login_signup_field_email_phone" }
+- tapOn: { id: "login_signup_field_email_phone" }
+- inputText: "+254700000003"
+- tapOn: { id: "login_signup_field_password" }
+- inputText: "DemoMember@2026"
+- hideKeyboard
+- tapOn: { id: "login_signup_login_button" }
+- extendedWaitUntil:
+    visible: "Mwangaza Women's Group"
+    timeout: 45000

@@ -1,0 +1,17 @@
+# "My Groups" loads real group cards (guards the fineractGroupId + lastMeetingDate deserialization
+# fixes — a missing/array field previously showed "Could not load groups" on a 200 response).
+# Assumes an authenticated session (launchApp resumes to the organizer dashboard).
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when: { visible: "Could not load groups" }   # backend flap tolerance
+          commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ]
+      - assertVisible: { id: "group_list_lazy_column" }
+- assertVisible: "Mwangaza Women's Group"

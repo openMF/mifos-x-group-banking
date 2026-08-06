@@ -32,7 +32,7 @@ import kotlin.test.assertNull
 /**
  * TDD RED-first coverage for [ChangePinApi] / [ChangePinApiImpl] — the settings screen's
  * change-PIN submission (`idea-layer/screens/settings/api.yaml#api[change_pin]`,
- * `PUT /fineract-provider/api/v1/self/user/updatePassword`). Returns [NetworkResult] — never a
+ * `PUT /companion/self/user/updatePassword`). Returns [NetworkResult] — never a
  * raw [Result] envelope, never a thrown exception (Mandatory Rule 2 / API.md#services). Mirrors
  * [org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiTest]'s (PUT
  * variant of) the shared loan-request/member-add MockEngine harness pattern, including its
@@ -90,7 +90,7 @@ class ChangePinApiTest {
         check(result is NetworkResult.Success)
         assertEquals(42L, result.data.resourceId)
         assertEquals(
-            "/fineract-provider/api/v1/self/user/updatePassword",
+            "/companion/self/user/updatePassword",
             capturedUrl?.encodedPath,
         )
         assertEquals(HttpMethod.Put, capturedMethod)
@@ -150,6 +150,6 @@ class ChangePinApiTest {
 
         check(result is NetworkResult.Success)
         assertEquals(requestDto.password, requestDto.repeatPassword)
-        assertEquals("/fineract-provider/api/v1/self/user/updatePassword", capturedUrl?.encodedPath)
+        assertEquals("/companion/self/user/updatePassword", capturedUrl?.encodedPath)
     }
 }

@@ -202,23 +202,29 @@ internal fun GroupDashboardContent(
                 GroupDashboardScreenState.Error -> GroupDashboardErrorSection(state = state, onAction = onAction)
             }
 
-            DropdownMenu(
-                expanded = state.isMoreMenuExpanded,
-                onDismissRequest = { onAction(GroupDashboardAction.OnMoreOptions) },
-                modifier = Modifier.testTag(GroupDashboardTestTags.MORE_MENU),
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(Res.string.screens_group_dashboard_menu_group_settings)) },
-                    onClick = { onAction(GroupDashboardAction.OnGroupSettings) },
-                    leadingIcon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
-                    modifier = Modifier.testTag(GroupDashboardTestTags.MENU_SETTINGS_ITEM),
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(Res.string.screens_group_dashboard_menu_sync_status)) },
-                    onClick = { onAction(GroupDashboardAction.OnSyncStatus) },
-                    leadingIcon = { Icon(imageVector = Icons.Filled.Sync, contentDescription = null) },
-                    modifier = Modifier.testTag(GroupDashboardTestTags.MENU_SYNC_STATUS_ITEM),
-                )
+            // Anchor the overflow dropdown under the top-end three-dot action. DropdownMenu's own
+            // `modifier` styles the popup CONTENT, not its anchor, so `.align()` on it is ignored and
+            // the popup pins to its call-site (top-start). Wrapping it in a TopEnd-aligned Box moves
+            // the anchor NODE to the top-right, so the menu opens directly beneath the three-dot.
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                DropdownMenu(
+                    expanded = state.isMoreMenuExpanded,
+                    onDismissRequest = { onAction(GroupDashboardAction.OnMoreOptions) },
+                    modifier = Modifier.testTag(GroupDashboardTestTags.MORE_MENU),
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.screens_group_dashboard_menu_group_settings)) },
+                        onClick = { onAction(GroupDashboardAction.OnGroupSettings) },
+                        leadingIcon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
+                        modifier = Modifier.testTag(GroupDashboardTestTags.MENU_SETTINGS_ITEM),
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.screens_group_dashboard_menu_sync_status)) },
+                        onClick = { onAction(GroupDashboardAction.OnSyncStatus) },
+                        leadingIcon = { Icon(imageVector = Icons.Filled.Sync, contentDescription = null) },
+                        modifier = Modifier.testTag(GroupDashboardTestTags.MENU_SYNC_STATUS_ITEM),
+                    )
+                }
             }
         }
     }

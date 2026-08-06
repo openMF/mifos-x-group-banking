@@ -15,6 +15,8 @@ import co.touchlab.kermit.Logger
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kpt.core.analytics.KptAnalyticsTracker
@@ -23,6 +25,7 @@ import kpt.core.base.network.NetworkResult
 import kpt.core.base.observability.CrashReporter
 import kpt.core.base.observability.CrashSeverity
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kotlin.time.Clock
 import org.mifos.groupbanking.core.data.repository.MeetingConductRepository
 import org.mifos.groupbanking.core.model.meeting.AttendanceStatus
 import org.mifos.groupbanking.core.model.meeting.AttendanceSubmission
@@ -553,11 +556,19 @@ internal fun MeetingConductState.toSubmissionRequest(): MeetingSubmissionRequest
         .filter { it.id in approvedApplicationIds }
         .map { DisbursalSubmission(loanId = it.id, amount = it.requestedAmount) }
 
+    // Capture the real meeting-completed timestamp at submit (works offline too — it is the wall-clock
+    // moment the operator conducted the meeting, not a scheduled default). actualDate is set from it
+    // as well, replacing the prior-meeting-date hack. kotlinx-datetime local time.
+    val completedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val completedDate = completedAt.date.toString() // ISO yyyy-MM-dd
+    val completedClock = "${completedAt.hour.toString().padStart(2, '0')}:${completedAt.minute.toString().padStart(2, '0')}"
+
     return MeetingSubmissionRequest(
         meetingId = meetingId,
         meetingNumber = meetingNumber,
         groupId = groupId,
-        actualDate = previousMeetingSummary?.date.orEmpty().ifBlank { "" },
+        actualDate = completedDate,
+        completedTime = completedClock,
         openingCorpus = openingCorpus,
         closingCorpus = closingCorpus,
         totalSavingsCollected = runningSavingsTotal,

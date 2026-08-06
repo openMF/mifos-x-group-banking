@@ -1,0 +1,25 @@
+# group-list -> group -> Members -> member profile renders (savings history, role chip, attendance).
+# Guards the raw-Fineract member-profile DTO fixes (activationDate array serializer, mobileNo/
+# imagePresent null-defaults, savings accountBalance, dt_member_role group_id/joined_date).
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when: { visible: "Could not load groups" }
+          commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ]
+      - assertVisible: { id: "group_list_lazy_column" }
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: "Members", timeout: 30000 }
+- tapOn: { text: "Members" }
+- extendedWaitUntil: { visible: { id: "member_list_lazy_column" }, timeout: 40000 }
+- assertNotVisible: { id: "member_list_loading_indicator" }
+- tapOn: { text: "Amina Otieno" }
+- extendedWaitUntil: { visible: { id: "member_profile_screen" }, timeout: 30000 }
+- assertNotVisible: { id: "member_profile_loading_section" }
+- assertNotVisible: { id: "member_profile_error_section" }

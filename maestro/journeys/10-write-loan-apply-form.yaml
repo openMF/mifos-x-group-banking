@@ -1,0 +1,36 @@
+# WRITE journey (loan-apply form): open Apply-for-Loan, select a member (which fires the 5-way combine
+# that loads products / template / config / corpus / savings), and confirm the form becomes fully
+# usable — real max-eligible from the seeded dt_group_config loan_multiplier, and the Loan Product
+# dropdown populated. Stops short of submitting (avoids creating a real loan every run).
+#
+# Guards: dt_group_config seeded (server-layer/migrations/seed-group-config) + companion returning it
+# as an OBJECT with derived max_loan_amount + loan-template dropping productId=0 (Fineract 500s on it).
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow: { when: { visible: "Could not load groups" }, commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ] }
+      - assertVisible: { id: "group_list_lazy_column" }
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: "Loans", timeout: 30000 }
+- tapOn: { text: "Loans" }
+- extendedWaitUntil: { visible: { id: "loan_list_lazy_column" }, timeout: 40000 }
+- tapOn: { text: "Apply for Loan" }
+- extendedWaitUntil: { visible: { id: "loan_apply_screen" }, timeout: 30000 }
+# Selecting a member fires the products/template/config/corpus/savings combine.
+- tapOn: { id: "loan_apply_dropdown_member" }
+- waitForAnimationToEnd
+- tapOn: { text: "Amina Otieno" }
+- waitForAnimationToEnd
+- assertNotVisible: { id: "loan_apply_error_section" }
+# Real eligibility surfaced from the seeded config (multiplier) + member savings.
+- assertVisible: "Max eligible: KES 4,500 (3.0× savings)"
+# Loan Product dropdown populated (was empty before the config/template fixes).
+- tapOn: { id: "loan_apply_dropdown_product" }
+- waitForAnimationToEnd
+- assertVisible: "VSLA Group Loan"

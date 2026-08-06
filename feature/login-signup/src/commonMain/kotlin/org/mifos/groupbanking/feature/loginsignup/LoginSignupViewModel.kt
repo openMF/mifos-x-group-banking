@@ -28,6 +28,7 @@ import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.model.AuthSession
 import org.mifos.groupbanking.core.model.GroupMembership
 import org.mifos.groupbanking.core.model.GroupRole
+import org.mifos.groupbanking.core.model.isGroupLeadership
 import org.mifos.groupbanking.core.model.LoginCredentials
 import org.mifos.groupbanking.core.model.SelfRegistration
 import org.mifos.groupbanking.core.model.UserProfile
@@ -700,15 +701,18 @@ internal class LoginSignupViewModel(
         if (memberships.isEmpty()) LoginSignupScreenState.ZeroGroups else LoginSignupScreenState.Content
 
     /**
-     * Routes on `groupMemberships` per SPEC.md — an organizer in ANY group lands on the
-     * organizer-per-group hub (`organizer-dashboard`, whose `ui.yaml#entry_points` declare exactly
-     * this `app_launch` trigger gated on `isOrganizerInAnyGroup`); every other member lands on
-     * `personal-dashboard`. `group-list` stays reachable from the organizer hub's All-Groups
-     * quick-nav (`organizer-dashboard#onNavigateToGroupList`) and from `personal-dashboard`.
+     * Routes on `groupMemberships` per SPEC.md — a member holding ANY committee/leadership role in ANY
+     * group lands on the organizer-per-group hub (`organizer-dashboard`, whose `ui.yaml#entry_points`
+     * declare exactly this `app_launch` trigger gated on `isOrganizerInAnyGroup`); a plain member
+     * lands on `personal-dashboard`. Leadership = ORGANIZER / TREASURER / SECRETARY (the companion
+     * folds CHAIRPERSON onto ORGANIZER) — the whole management committee runs the group, not just the
+     * ORGANIZER row, so e.g. the treasurer showcase login (Amina) reaches the organizer hub.
+     * `group-list` stays reachable from the organizer hub's All-Groups quick-nav
+     * (`organizer-dashboard#onNavigateToGroupList`) and from `personal-dashboard`.
      */
     private fun routeEvent(memberships: List<GroupMembership>): LoginSignupEvent? = when {
         memberships.isEmpty() -> null
-        memberships.any { it.role == GroupRole.ORGANIZER } -> LoginSignupEvent.NavigateToOrganizerDashboard
+        memberships.any { it.role.isGroupLeadership } -> LoginSignupEvent.NavigateToOrganizerDashboard
         else -> LoginSignupEvent.NavigateToPersonalDashboard
     }
 

@@ -1,0 +1,19 @@
+# Committee leader (Amina, TREASURER) logs in and is ROUTED to the ORGANIZER dashboard,
+# which renders real content (KPIs), not a stuck shimmer.
+appId: org.mifos.groupbanking
+---
+- launchApp
+- assertVisible: { id: "login_signup_field_email_phone" }
+- tapOn: { id: "login_signup_field_email_phone" }
+- inputText: "+254700000001"
+- tapOn: { id: "login_signup_field_password" }
+- inputText: "DemoExplore@2026"
+- hideKeyboard
+- tapOn: { id: "login_signup_login_button" }
+- extendedWaitUntil:
+    visible: { id: "organizer_dashboard_screen" }
+    timeout: 45000
+- extendedWaitUntil:
+    visible: { id: "organizer_dashboard_content" }
+    timeout: 45000
+- assertNotVisible: { id: "organizer_dashboard_loading_indicator" }

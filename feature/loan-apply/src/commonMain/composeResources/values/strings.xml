@@ -26,7 +26,7 @@
     <string name="screens_loan_apply_amount_cd">Requested loan amount</string>
     <string name="screens_loan_apply_amount_icon_cd">Currency</string>
 
-    <string name="screens_loan_apply_corpus_warning">Warning: Disbursing this amount will reduce the group corpus below 10%% buffer. Current balance: KES %1$s.</string>
+    <string name="screens_loan_apply_corpus_warning">Warning: Disbursing this amount will reduce the group corpus below 10% buffer. Current balance: KES %1$s.</string>
     <string name="screens_loan_apply_corpus_warning_cd">Corpus balance warning</string>
 
     <string name="screens_loan_apply_duration_label">Loan Duration</string>

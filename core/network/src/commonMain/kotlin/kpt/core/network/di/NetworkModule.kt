@@ -12,7 +12,6 @@ package kpt.core.network.di
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
 import kotlinx.serialization.json.Json
-import kpt.core.network.BuildKonfig
 import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
@@ -136,17 +135,20 @@ val NetworkModule = module {
     single<HttpClient> {
         val defaultConfig = setupDefaultHttpClient(
             baseUrl = get<CompanionAuthApiConfig>().baseUrl,
-            // Fineract multi-tenancy: every request against the governed base URL must carry the
-            // active tenant (single-instance SoT, cascaded into BuildKonfig.FINERACT_TENANT).
-            // Threaded through setupDefaultHttpClient's defaultHeaders so it lands on the shared
-            // client's DefaultRequest — no second plugin install.
-            defaultHeaders = mapOf("Fineract-Platform-TenantId" to BuildKonfig.FINERACT_TENANT),
+            // Talking to the companion (not Fineract directly): the companion handles tenancy, so
+            // no Fineract-Platform-TenantId header is attached here. Auth is the Bearer sessionToken
+            // added by companionAuthHeaderPlugin below.
             // EC30 client-side half: ignoreUnknownKeys + coerceInputValues so a server-added
             // field/enum value never crashes a staggered old client (pairs with the DTO
             // SCHEMA_VERSION + @SerialName("UNKNOWN") enum fallback in LoginSignupDto.kt).
             jsonConfig = Json {
                 ignoreUnknownKeys = true
                 coerceInputValues = true
+                // The companion may relay Fineract datatable columns that serialize booleans as the
+                // STRING "true"/"false" and may quote numbers; isLenient lets those relaxed JSON
+                // tokens parse into the DTO's Boolean/Double/Int fields (e.g. the group_type_config
+                // catalogue → GroupTypeConfigDto).
+                isLenient = true
             },
         )
         httpClient {

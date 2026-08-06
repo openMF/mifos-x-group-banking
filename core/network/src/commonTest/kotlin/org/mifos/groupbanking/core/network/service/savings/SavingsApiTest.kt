@@ -101,7 +101,7 @@ class SavingsApiTest {
         check(result is NetworkResult.Success)
         assertEquals(1, result.data.size)
         assertEquals(9001L, result.data[0].id)
-        assertEquals("/self/savingsaccounts/501/transactions", capturedUrl?.encodedPath)
+        assertEquals("/companion/savings/501/transactions", capturedUrl?.encodedPath)
         assertEquals(HttpMethod.Get, capturedMethod)
         assertEquals("50", capturedUrl?.parameters?.get("limit"))
         assertEquals("0", capturedUrl?.parameters?.get("offset"))
@@ -115,7 +115,7 @@ class SavingsApiTest {
         val result = api.getSavingsTransactions(savingsId = 777L, limit = 20, offset = 40)
 
         check(result is NetworkResult.Success)
-        assertEquals("/self/savingsaccounts/777/transactions", capturedUrl?.encodedPath)
+        assertEquals("/companion/savings/777/transactions", capturedUrl?.encodedPath)
         assertEquals("20", capturedUrl?.parameters?.get("limit"))
         assertEquals("40", capturedUrl?.parameters?.get("offset"))
     }
@@ -131,7 +131,7 @@ class SavingsApiTest {
         val result = api.getSavingsTransactions(savingsId = 888L)
 
         check(result is NetworkResult.Success)
-        assertEquals("/self/savingsaccounts/888/transactions", capturedUrl?.encodedPath)
+        assertEquals("/companion/savings/888/transactions", capturedUrl?.encodedPath)
     }
 
     @Test

@@ -26,5 +26,5 @@ import kpt.core.network.BuildKonfig
  * See API.md#services — LoanRepaymentApi base URL.
  */
 data class LoanRepaymentApiConfig(
-    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
+    val baseUrl: String = BuildKonfig.COMPANION_BASE_URL,
 )

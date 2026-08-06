@@ -51,6 +51,7 @@ fun List<LoanSummaryItemDto>.toDomainModels(): List<LoanSummaryItem> = map { it.
  * the scalar meeting totals plus both nested per-member collections.
  */
 fun MeetingSummaryRecordDto.toDomainModel(): MeetingSummaryData = MeetingSummaryData(
+    meetingTime = meetingTime,
     meetingId = meetingId,
     meetingNumber = meetingNumber,
     actualDate = actualDate,

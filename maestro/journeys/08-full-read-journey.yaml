@@ -1,0 +1,33 @@
+# The whole read path in one flow: group-list -> group -> Members -> member profile -> back ->
+# Loans -> loan detail. A single regression net over the core screens + their DTO deserialization.
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when: { visible: "Could not load groups" }
+          commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ]
+      - assertVisible: { id: "group_list_lazy_column" }
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: "Members", timeout: 30000 }
+
+# Members -> member profile
+- tapOn: { text: "Members" }
+- extendedWaitUntil: { visible: { id: "member_list_lazy_column" }, timeout: 40000 }
+- tapOn: { text: "Amina Otieno" }
+- extendedWaitUntil: { visible: { id: "member_profile_screen" }, timeout: 30000 }
+- assertNotVisible: { id: "member_profile_error_section" }
+- back
+- back
+
+# Loans -> loan detail
+- tapOn: { text: "Loans" }
+- extendedWaitUntil: { visible: { id: "loan_list_lazy_column" }, timeout: 40000 }
+- tapOn: { text: "Grace Wanjiru" }
+- extendedWaitUntil: { visible: { id: "loan_detail_content_list" }, timeout: 30000 }
+- assertNotVisible: { id: "loan_detail_loading_section" }

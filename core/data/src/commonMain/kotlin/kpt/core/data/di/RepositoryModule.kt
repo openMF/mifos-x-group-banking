@@ -100,7 +100,7 @@ val DataModule = module {
     // login-signup client stack (COMP-AUTH-001/002/003) — Store5-free (business_logic.kind:
     // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
     single<LocalCacheCleaner> { RoomLocalCacheCleaner(database = get<AppDatabase>()) }
-    single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get(), cacheCleaner = get()) }
+    single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get(), cacheCleaner = get(), userDataRepository = get()) }
 
     // login-signup Demo Explore offline guest session (ui.yaml#demo_confirm_dialog,
     // flow.yaml#on_demo_confirm). Seeds the offline read caches the Demo-Explore mode browses —
@@ -265,6 +265,7 @@ val DataModule = module {
             meetingSummaryStore = get(AppStoreRegistry.MeetingSummary),
             networkMonitor = get(),
             fetchedAtRepository = get(),
+            meetingRecordDao = get(),
         )
     }
 
@@ -416,7 +417,7 @@ val DataModule = module {
     // enqueue seam (flow.yaml#submit_meeting.offline, SUBMIT_MEETING). Surfaces NetworkResult, never
     // .asScreenStream()/.write() — same branch as ShareOutRepository/LoanRequestRepository above.
     single<MeetingConductRepository> {
-        MeetingConductRepositoryImpl(api = get(), syncQueueRepository = get())
+        MeetingConductRepositoryImpl(api = get(), syncQueueRepository = get(), meetingSummaryRepository = get())
     }
 
     // meeting-calendar (GET /datatables/dt_meeting_schedule/{groupId} + get_meeting_records_datatable) — wraps

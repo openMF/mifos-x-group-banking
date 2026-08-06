@@ -261,4 +261,10 @@ private class FakeMeetingSummaryRepository : MeetingSummaryRepository {
             refreshTrigger = refreshTrigger,
         )
     }
+
+    val primedSummaries = mutableListOf<Triple<Int, Int, MeetingSummaryData>>()
+
+    override suspend fun primeSubmittedSummary(groupId: Int, meetingNumber: Int, data: MeetingSummaryData) {
+        primedSummaries += Triple(groupId, meetingNumber, data)
+    }
 }

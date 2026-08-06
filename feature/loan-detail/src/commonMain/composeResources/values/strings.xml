@@ -15,7 +15,7 @@
     <string name="screens_loan_detail_amount_kes">KES %1$s</string>
     <string name="screens_loan_detail_principal_label">Principal: KES %1$s</string>
     <string name="screens_loan_detail_disbursed_label">Disbursed: %1$s</string>
-    <string name="screens_loan_detail_interest_label">Interest: %1$s%% per week</string>
+    <string name="screens_loan_detail_interest_label">Interest: %1$s% per week</string>
     <string name="screens_loan_detail_outstanding_label">Outstanding</string>
     <string name="screens_loan_detail_overdue_label">Overdue</string>
 

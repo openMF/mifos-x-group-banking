@@ -101,6 +101,29 @@ fun provideMeetingSummaryStore(
 }
 
 /**
+ * Offline-first cache prime for the meeting-summary read. Called at the meeting-conduct SUBMIT
+ * (input) level — on a successful online post OR an offline enqueue — so the [MeetingSummaryData]
+ * the operator just entered is written into the summary Store's SourceOfTruth ([MeetingRecordDao])
+ * BEFORE the summary screen opens. The summary then renders it instantly from cache whether the
+ * device is online or offline (no dependence on a fresh network read, and it overwrites any poisoned
+ * zero-row a pre-conduct 404 view may have cached). A subsequent online revalidate reconciles the
+ * full server projection (per-member breakdown / loan items) on the next successful fetch.
+ *
+ * Writes the SourceOfTruth directly (not through the read-only [Store]) using the same
+ * [MeetingSummaryData.toEntity] codec as the Store's own writer, so the row shape is identical.
+ * Intentionally does NOT touch the freshness timestamp — leaving the entry revalidatable so the
+ * background SWR fetch still runs when connectivity allows.
+ */
+suspend fun primeMeetingSummaryCache(
+    dao: MeetingRecordDao,
+    groupId: Int,
+    meetingNumber: Int,
+    data: MeetingSummaryData,
+) {
+    dao.replaceForKey(data.toEntity(encodeMeetingKey(groupId, meetingNumber)))
+}
+
+/**
  * Builds the composite store key from its parts. Kept next to [decodeMeetingKey] so the encode /
  * decode pair is the single source of truth for the `"$groupId:$meetingNumber"` key shape.
  */
@@ -135,6 +158,7 @@ internal fun emptyNotConductedSummary(groupId: Int, meetingNumber: Int): Meeting
         meetingId = "$groupId-$meetingNumber",
         meetingNumber = meetingNumber,
         actualDate = "",
+        meetingTime = "",
         attendanceCount = 0,
         totalMemberCount = 0,
         groupSavingsCollected = 0L,
@@ -164,6 +188,7 @@ private fun MeetingSummaryData.toEntity(cacheKey: String): MeetingRecordCacheEnt
         meetingId = meetingId,
         meetingNumber = meetingNumber,
         actualDate = actualDate,
+        meetingTime = meetingTime,
         attendanceCount = attendanceCount,
         totalMemberCount = totalMemberCount,
         groupSavingsCollected = groupSavingsCollected,
@@ -188,6 +213,7 @@ private fun MeetingRecordCacheEntity.toDomain(): MeetingSummaryData = MeetingSum
     meetingId = meetingId,
     meetingNumber = meetingNumber,
     actualDate = actualDate,
+    meetingTime = meetingTime,
     attendanceCount = attendanceCount,
     totalMemberCount = totalMemberCount,
     groupSavingsCollected = groupSavingsCollected,

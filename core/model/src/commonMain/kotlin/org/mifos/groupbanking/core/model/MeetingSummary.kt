@@ -27,6 +27,8 @@ data class MeetingSummaryData(
     val meetingId: String,
     val meetingNumber: Int,
     val actualDate: String,
+    /** Wall-clock time the meeting was conducted, "HH:mm" — blank when not recorded. */
+    val meetingTime: String = "",
     val attendanceCount: Int,
     val totalMemberCount: Int,
     val groupSavingsCollected: Long,

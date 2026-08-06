@@ -216,7 +216,12 @@ internal fun PreviousMeetingReviewContentSection(
         verticalArrangement = Arrangement.spacedBy(sp.md),
         contentPadding = PaddingValues(sp.lg),
     ) {
-        item { ContextBanner(state = state, actualDate = detail.actualDate) }
+        item {
+            ContextBanner(
+                state = state,
+                actualDate = if (detail.meetingTime.isNotBlank()) "${detail.actualDate} · ${detail.meetingTime}" else detail.actualDate,
+            )
+        }
         if (state.unresolvedItems.isNotEmpty()) {
             item { UnresolvedAlertCard(items = state.unresolvedItems) }
         }

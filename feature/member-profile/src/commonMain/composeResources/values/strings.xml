@@ -31,7 +31,7 @@
 
     <string name="screens_member_profile_attendance_label">Meeting Attendance</string>
     <string name="screens_member_profile_attendance_fraction">%1$d / %2$d</string>
-    <string name="screens_member_profile_attendance_rate">%1$d%% attendance rate</string>
+    <string name="screens_member_profile_attendance_rate">%1$d% attendance rate</string>
     <string name="screens_member_profile_attendance_progress_cd">%1$d percent attendance rate</string>
 
     <string name="screens_member_profile_change_role_title">Change Member Role</string>

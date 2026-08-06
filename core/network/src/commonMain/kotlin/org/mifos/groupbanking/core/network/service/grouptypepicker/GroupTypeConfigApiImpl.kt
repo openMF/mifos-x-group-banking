@@ -23,6 +23,10 @@ import kpt.core.base.network.NetworkResult
 import org.mifos.groupbanking.core.network.model.GroupTypeConfigDto
 
 private const val TAG = "GroupTypeConfigApi"
+
+// Companion datatable read: the seeded group-type archetype catalogue is served by the companion
+// at GET /companion/datatables/group_type_config/{entityId} (entityId 0 = the global catalogue),
+// returning a JSON array of rows whose keys match GroupTypeConfigDto's @SerialName keys.
 private const val GROUP_TYPE_CONFIG_PATH_PREFIX = "/companion/datatables/group_type_config"
 
 /**
@@ -44,6 +48,8 @@ class GroupTypeConfigApiImpl(
 ) : GroupTypeConfigApi {
 
     override suspend fun getGroupTypeConfigs(entityId: Long): NetworkResult<List<GroupTypeConfigDto>, NetworkError> {
+        // entityId 0 = the picker asking for the global catalogue; the companion serves the
+        // archetypes at that entityId. Any explicit non-zero entityId is threaded through unchanged.
         val path = "$GROUP_TYPE_CONFIG_PATH_PREFIX/$entityId"
         Logger.d(TAG) { "getGroupTypeConfigs: GET $path" }
         return requestAsNetworkResult(op = "getGroupTypeConfigs") {

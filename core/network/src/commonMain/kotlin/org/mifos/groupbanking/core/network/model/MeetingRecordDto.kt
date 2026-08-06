@@ -33,6 +33,7 @@ data class MeetingSummaryRecordDto(
     @SerialName("meetingId") val meetingId: String,
     @SerialName("meetingNumber") val meetingNumber: Int,
     @SerialName("actualDate") val actualDate: String,
+    @SerialName("meetingTime") val meetingTime: String = "",
     @SerialName("attendanceCount") val attendanceCount: Int,
     @SerialName("totalMemberCount") val totalMemberCount: Int,
     @SerialName("groupSavingsCollected") val groupSavingsCollected: Long,

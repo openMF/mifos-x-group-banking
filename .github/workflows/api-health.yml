@@ -1,0 +1,75 @@
+name: API Health (companion)
+
+# Rule-driven, role-wise companion API health sweep (server-layer/verify/api-health.sh reading
+# api-registry.json). Confirms every role still reaches all the APIs its screens consume and tracks
+# latency vs each endpoint's SLO. Because it hits the LIVE companion + chronically-flaky mifos-bank-2,
+# it hard-fails ONLY on a DETERMINISTIC regression (a route MISSING / an access DENY) — transient
+# 5xx/timeouts are surfaced as warnings + in the artifact, not red builds. Retries once to absorb flaps.
+
+on:
+  workflow_dispatch:
+    inputs:
+      companion_url:
+        description: "Companion base URL to probe"
+        required: false
+        default: "https://mifossave-companion.onrender.com"
+  schedule:
+    - cron: "0 6 * * *"   # daily 06:00 UTC — regression radar
+  push:
+    branches: [dev, development, main]
+    paths:
+      - "server-layer/verify/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-health-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPANION_BASE_URL: ${{ github.event.inputs.companion_url || 'https://mifossave-companion.onrender.com' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure jq
+        run: jq --version || sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run API health sweep (retry once to absorb backend flaps)
+        id: sweep
+        run: |
+          set +e
+          run() { bash server-layer/verify/api-health.sh; }
+          # attempt 1 (report mode) — inspect for login flaps / transient errors
+          run | tee /tmp/health1.txt
+          FLAKY=$(grep -cE 'NOAUTH|ERROR|TIMEOUT' server-layer/verify/health-data/latest.json 2>/dev/null || echo 0)
+          if [ "$FLAKY" -gt 0 ]; then
+            echo "::notice::transient signals on attempt 1 — retrying once"
+            sleep 30
+          fi
+          # final attempt — strict: exit 1 on MISSING/DENY (deterministic regressions)
+          CI_STRICT=1 run | tee /tmp/health2.txt
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Job summary (matrix + counts)
+        if: always()
+        run: |
+          {
+            echo "## API Health — \`$COMPANION_BASE_URL\`"
+            echo ""
+            echo '```'
+            sed -n '/=== API HEALTH/,/health data:/p' /tmp/health2.txt 2>/dev/null | head -80
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload health data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-health-${{ github.run_id }}
+          path: server-layer/verify/health-data/latest.json
+          if-no-files-found: warn

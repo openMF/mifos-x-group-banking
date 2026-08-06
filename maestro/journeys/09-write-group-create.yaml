@@ -1,0 +1,51 @@
+# WRITE journey: create a VSLA group through the 4-step wizard (Identity -> Rules -> Members ->
+# Review -> submit POST /companion/groups). The underlying mutation is verified reliably at the API
+# level (server-layer/verify — a real group is created with the creator auto-associated); this device
+# flow drives the full wizard. NOTE: Maestro automation of the multi-step Compose form (dropdowns +
+# keyboard + scroll) is timing-sensitive — if a dropdown selection does not register, step-1 validation
+# (officeId/meetingDay/meetingTime) blocks Next. Re-run, or bump waitForAnimationToEnd, if it stalls.
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_screen" }, timeout: 45000 }
+- tapOn: { text: "All Groups" }
+- extendedWaitUntil: { visible: "My Groups", timeout: 20000 }
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow: { when: { visible: "Could not load groups" }, commands: [ { tapOn: { text: "Retry" } }, waitForAnimationToEnd ] }
+      - assertVisible: { id: "group_list_lazy_column" }
+- tapOn: { text: "Create Group" }
+- extendedWaitUntil: { visible: { id: "group_type_picker_screen" }, timeout: 30000 }
+- tapOn: { id: "group_type_picker_card_vsla" }
+- extendedWaitUntil: { visible: { id: "group_create_screen" }, timeout: 30000 }
+- tapOn: { id: "group_create_field_group_name" }
+- inputText: "Maestro VSLA Demo"
+- hideKeyboard
+- tapOn: { id: "group_create_dropdown_office" }
+- waitForAnimationToEnd
+- tapOn: { text: "MORELOS" }
+- waitForAnimationToEnd
+- tapOn: { id: "group_create_dropdown_meeting_day" }
+- waitForAnimationToEnd
+- tapOn: { text: "Monday" }
+- waitForAnimationToEnd
+- tapOn: { id: "group_create_field_meeting_time" }
+- waitForAnimationToEnd
+- hideKeyboard
+- waitForAnimationToEnd
+# Step 1 -> 2 -> 3 -> 4: each step scroll Next into view + tap, until Submit appears
+- repeat:
+    times: 4
+    commands:
+      - runFlow:
+          when: { notVisible: { id: "group_create_submit_button" } }
+          commands:
+            - scrollUntilVisible: { element: { id: "group_create_next_button" }, direction: DOWN, timeout: 10000 }
+            - tapOn: { id: "group_create_next_button" }
+            - waitForAnimationToEnd
+- scrollUntilVisible: { element: { id: "group_create_submit_button" }, direction: DOWN, timeout: 10000 }
+- takeScreenshot: /tmp/gc5-review
+- tapOn: { id: "group_create_submit_button" }
+- extendedWaitUntil: { visible: "Maestro VSLA Demo", timeout: 45000 }
+- takeScreenshot: /tmp/gc5-created

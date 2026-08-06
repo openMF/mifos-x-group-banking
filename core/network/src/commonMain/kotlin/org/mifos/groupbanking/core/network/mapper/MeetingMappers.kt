@@ -41,6 +41,7 @@ fun toMeetingListItems(
             attendanceCount = dto.attendanceCount ?: record?.attendanceCount,
             totalCollectedKES = dto.totalCollectedKES
                 ?: record?.let { it.totalSavings + it.totalRepayments },
+            meetingTime = dto.meetingTime,
         )
     }
 }

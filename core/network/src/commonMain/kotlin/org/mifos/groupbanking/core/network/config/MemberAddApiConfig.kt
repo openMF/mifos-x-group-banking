@@ -29,5 +29,5 @@ import kpt.core.network.BuildKonfig
  * See API.md#services — MemberAddApi base URL.
  */
 data class MemberAddApiConfig(
-    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
+    val baseUrl: String = BuildKonfig.COMPANION_BASE_URL,
 )

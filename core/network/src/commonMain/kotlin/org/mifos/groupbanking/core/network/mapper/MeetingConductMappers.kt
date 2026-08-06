@@ -113,6 +113,7 @@ fun MeetingSubmissionRequest.toRecordDto(): CreateMeetingRecordRequestDto = Crea
     totalLoansDisbursed = totalLoansDisbursed,
     totalFinesCollected = totalFinesCollected,
     attendanceCount = attendanceCount,
+    completedTime = completedTime,
 )
 
 fun AttendanceSubmission.toDto(meetingId: String): CreateAttendanceRequestDto = CreateAttendanceRequestDto(

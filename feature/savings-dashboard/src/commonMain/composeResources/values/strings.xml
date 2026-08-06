@@ -25,7 +25,7 @@
     <string name="screens_savings_dashboard_cycle_progress_label">Cycle Progress</string>
     <string name="screens_savings_dashboard_cycle_progress_shares_format">%1$s shares of %2$s target</string>
     <string name="screens_savings_dashboard_cycle_progress_amount_format">KES %1$s of KES %2$s</string>
-    <string name="screens_savings_dashboard_cycle_progress_percent_format">%1$s%% of cycle target</string>
+    <string name="screens_savings_dashboard_cycle_progress_percent_format">%1$s% of cycle target</string>
     <string name="screens_savings_dashboard_cycle_progress_cd">Cycle progress %1$s percent</string>
 
     <string name="screens_savings_dashboard_group_total_chip_format">Group total: KES %1$s</string>

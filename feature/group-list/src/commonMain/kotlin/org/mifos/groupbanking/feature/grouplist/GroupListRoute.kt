@@ -38,12 +38,14 @@ fun NavGraphBuilder.groupListScreen(
     onNavigateToGroupDashboard: (groupId: String, viewerRole: String) -> Unit,
     onNavigateToCreateGroup: () -> Unit,
     onNavigateToJoinGroup: () -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     composableWithRootPushTransitions<GroupListRoute> {
         GroupListScreen(
             onNavigateToGroupDashboard = onNavigateToGroupDashboard,
             onNavigateToCreateGroup = onNavigateToCreateGroup,
             onNavigateToJoinGroup = onNavigateToJoinGroup,
+            onNavigateBack = onNavigateBack,
         )
     }
 }

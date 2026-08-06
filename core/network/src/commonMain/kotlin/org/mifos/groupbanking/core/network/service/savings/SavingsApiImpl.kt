@@ -27,7 +27,7 @@ import org.mifos.groupbanking.core.network.model.MemberSavingsDetailDto
 import org.mifos.groupbanking.core.network.model.SavingsLedgerEntryDto
 
 private const val TAG = "SavingsApi"
-private const val SELF_SAVINGS_ACCOUNTS_PATH = "/self/savingsaccounts"
+private const val COMPANION_SAVINGS_PATH = "/companion/savings"
 private const val COMPANION_GROUPS_PATH = "/companion/groups"
 
 /**
@@ -40,9 +40,10 @@ private const val COMPANION_GROUPS_PATH = "/companion/groups"
  * [org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl].
  *
  * Reuses the shared `HttpClient` singleton registered in `kpt.core.network.di.NetworkModule` — no
- * second engine constructed here, even though [getSavingsTransactions] is a raw Fineract
- * self-service passthrough (`/self/savingsaccounts/…`) rather than a `/companion/…` one — same
- * convention as [org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl].
+ * second engine constructed here. Every endpoint is a `/companion/…` facade read with the service
+ * credential — including [getSavingsTransactions] (`/companion/savings/{id}/transactions`), which
+ * replaced the raw `/self/savingsaccounts/{id}/transactions` call that 403s for members who are
+ * Fineract clients but not self-service users (the seeded + companion-self-registered accounts).
  * Auth-required requests are threaded through the shared client's optional
  * `bearerTokensProvider` plugin (see `core-base/network`'s `setupDefaultHttpClient`) rather than a
  * per-call header.
@@ -58,7 +59,11 @@ class SavingsApiImpl(
         limit: Int,
         offset: Int,
     ): NetworkResult<List<SavingsLedgerEntryDto>, NetworkError> {
-        val path = "$SELF_SAVINGS_ACCOUNTS_PATH/$savingsId/transactions"
+        // Reads via the companion SERVICE-cred facade (COMP-SAVINGS-TXN) rather than the raw Fineract
+        // `/self/savingsaccounts/{id}/transactions`, which 403s for members who are Fineract clients
+        // but not self-service users (the seeded + companion-self-registered accounts). The companion
+        // enforces the same ownership contract server-side.
+        val path = "$COMPANION_SAVINGS_PATH/$savingsId/transactions"
         Logger.d(TAG) { "getSavingsTransactions: GET $path (limit=$limit, offset=$offset)" }
         return requestAsNetworkResult(op = "getSavingsTransactions") {
             httpClient.get(path) {

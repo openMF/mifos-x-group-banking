@@ -16,18 +16,18 @@ import kotlinx.coroutines.flow.first
 import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
 
 /**
- * Attaches `Authorization: Basic <key>` to every request from the shared Fineract
- * [io.ktor.client.HttpClient], reading the current base64-encoded authentication key from
- * [CompanionSessionStore] (persisted as `sessionToken` on login — see `CompanionAuthApiImpl`).
+ * Attaches `Authorization: Bearer <sessionToken>` to every request from the shared companion
+ * [io.ktor.client.HttpClient], reading the current session token from [CompanionSessionStore]
+ * (persisted as `sessionToken` on login — see `CompanionAuthApiImpl`).
  *
- * WHY: Fineract authenticates every call with the basic-auth key returned by
- * `POST /authentication` (`base64EncodedAuthenticationKey`). Sending it on every request lets
- * Fineract resolve the authenticated caller for per-user-scoped reads (dashboards, group scope).
+ * WHY: the companion server issues a `sessionToken` on `POST /companion/auth/login` and expects
+ * it back as a Bearer token on every subsequent call, so it can resolve the authenticated caller
+ * for per-user-scoped reads (dashboards, group scope, my-role).
  *
  * Contract:
- *  - Skips when no session is persisted (pre-login calls: the login POST itself needs no key) so
- *    it never sends an empty `Basic `.
- *  - Never overwrites an Authorization header a caller already set (e.g. the explicit `/userdetails`
+ *  - Skips when no session is persisted (pre-login calls: the login POST itself needs no token) so
+ *    it never sends an empty `Bearer `.
+ *  - Never overwrites an Authorization header a caller already set (e.g. the explicit `/me`
  *    call), so existing behaviour is preserved.
  *  - Lives in core/network (fork-owned), NOT core-base (template-shared): it uses a uniquely-named
  *    custom plugin so it cannot collide with the Auth/DefaultRequest plugins core-base installs.
@@ -36,9 +36,9 @@ fun companionAuthHeaderPlugin(sessionStore: CompanionSessionStore) =
     createClientPlugin("CompanionAuthHeader") {
         onRequest { request, _ ->
             if (request.headers[HttpHeaders.Authorization] != null) return@onRequest
-            val key = sessionStore.session.first()?.sessionToken
-            if (!key.isNullOrBlank()) {
-                request.header(HttpHeaders.Authorization, "Basic $key")
+            val token = sessionStore.session.first()?.sessionToken
+            if (!token.isNullOrBlank()) {
+                request.header(HttpHeaders.Authorization, "Bearer $token")
             }
         }
     }

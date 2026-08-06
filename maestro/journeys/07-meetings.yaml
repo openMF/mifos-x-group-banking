@@ -1,0 +1,13 @@
+# Meeting calendar renders (upcoming meeting + past meetings with attendance/totals).
+# Reached from the ORGANIZER dashboard's Today's-Schedule row (NavigateToMeetingCalendar), NOT a
+# group-dashboard quick action.
+appId: org.mifos.groupbanking
+---
+- launchApp
+- extendedWaitUntil: { visible: { id: "organizer_dashboard_content" }, timeout: 45000 }
+- scrollUntilVisible:
+    element: { text: "Today's Schedule" }
+    direction: DOWN
+- tapOn: { text: "Mwangaza Women's Group" }
+- extendedWaitUntil: { visible: { id: "meeting_calendar_screen" }, timeout: 40000 }
+- assertNotVisible: { id: "meeting_calendar_loading_indicator" }

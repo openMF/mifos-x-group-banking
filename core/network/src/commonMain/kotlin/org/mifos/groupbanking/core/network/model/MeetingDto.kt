@@ -28,6 +28,7 @@ data class MeetingListItemDto(
     @SerialName("status") val status: MeetingStatusDto = MeetingStatusDto.UNKNOWN,
     @SerialName("attendanceCount") val attendanceCount: Int? = null,
     @SerialName("totalCollectedKES") val totalCollectedKES: Long? = null,
+    @SerialName("meetingTime") val meetingTime: String = "",
 ) {
     companion object {
         const val SCHEMA_VERSION = 1

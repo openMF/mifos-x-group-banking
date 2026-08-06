@@ -27,5 +27,5 @@ import kpt.core.network.BuildKonfig
  * See API.md#services — OrganizerDashboardApi base URL.
  */
 data class OrganizerDashboardApiConfig(
-    val baseUrl: String = BuildKonfig.FINERACT_BASE_URL,
+    val baseUrl: String = BuildKonfig.COMPANION_BASE_URL,
 )

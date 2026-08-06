@@ -101,13 +101,13 @@
     <string name="screens_group_create_row_loan_multiplier">Loan Multiplier</string>
     <string name="screens_group_create_row_loan_multiplier_value">%1$s× savings</string>
     <string name="screens_group_create_row_interest_rate">Interest Rate</string>
-    <string name="screens_group_create_row_interest_rate_value">%1$s%% flat</string>
+    <string name="screens_group_create_row_interest_rate_value">%1$s% flat</string>
     <string name="screens_group_create_row_cycle_length">Cycle Length</string>
     <string name="screens_group_create_row_cycle_length_value">%1$s months</string>
     <string name="screens_group_create_row_late_fine">Late Fine</string>
     <string name="screens_group_create_row_late_fine_value">%1$s %2$s</string>
     <string name="screens_group_create_row_social_fund">Social Fund</string>
-    <string name="screens_group_create_row_social_fund_value">%1$s%% of corpus</string>
+    <string name="screens_group_create_row_social_fund_value">%1$s% of corpus</string>
     <string name="screens_group_create_row_max_members">Max Members</string>
 
     <string name="screens_group_create_action_next">Next</string>

@@ -9,16 +9,20 @@
  */
 package org.mifos.groupbanking.feature.personaldashboard.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
 import org.mifos.groupbanking.core.model.GroupSummary
 import org.mifos.groupbanking.feature.personaldashboard.PersonalDashboardTestTags
@@ -42,10 +46,27 @@ fun GroupSelectorChipRow(
         horizontalArrangement = Arrangement.spacedBy(sp.xs),
     ) {
         items(items = groups, key = { it.groupId }) { group ->
+            val isSelected = group.groupId == selectedGroupId
             FilterChip(
-                selected = group.groupId == selectedGroupId,
+                selected = isSelected,
                 onClick = { onGroupSelected(group.groupId) },
                 label = { Text(text = group.name, style = MaterialTheme.typography.labelLarge) },
+                // This chip row sits ON the primary (dark-green) header, so the default M3
+                // unselected label color (onSurfaceVariant, dark) is nearly invisible. Render the
+                // unselected label + a subtle outline in onPrimary (light) for contrast; keep the
+                // selected chip's cream secondaryContainer + dark onSecondaryContainer label.
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = Color.Transparent,
+                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (isSelected) {
+                        Color.Transparent
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+                    },
+                ),
                 modifier = Modifier
                     .heightIn(min = sp.touchTargetMin)
                     .testTag(PersonalDashboardTestTags.groupChipTag(group.groupId)),
