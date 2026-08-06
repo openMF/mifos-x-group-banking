@@ -146,9 +146,15 @@ val MeetingCalendarState.upcomingMeeting: MeetingListItem?
 val MeetingCalendarState.hasUpcoming: Boolean
     get() = upcomingMeeting != null
 
-/** The past (COMPLETED / MISSED) meetings, newest-first order preserved from the stream. */
+/**
+ * The past (COMPLETED / MISSED) meetings, newest-first (descending by meeting number, which tracks
+ * chronological order) so the most recent meeting is at the top of the list. The companion emits the
+ * schedule oldest-first (recurrence order), so sort here rather than rely on stream order.
+ */
 val MeetingCalendarState.pastMeetings: List<MeetingListItem>
-    get() = meetings.filter { it.status != org.mifos.groupbanking.core.model.MeetingStatus.UPCOMING }
+    get() = meetings
+        .filter { it.status != org.mifos.groupbanking.core.model.MeetingStatus.UPCOMING }
+        .sortedByDescending { it.meetingNumber }
 
 /**
  * One-shot side effects emitted by `MeetingCalendarViewModel` — verbatim mirror of
