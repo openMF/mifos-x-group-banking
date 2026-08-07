@@ -97,7 +97,7 @@ class MemberProfileApiTest {
 
     private val roleArrayBody = """
         [
-          { "role": "TREASURER", "groupId": 42, "assignedDate": "2026-01-15" }
+          { "role": "TREASURER", "group_id": 42, "joined_date": "2026-01-15" }
         ]
     """.trimIndent()
 

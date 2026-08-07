@@ -258,8 +258,8 @@ class MemberProfileDtoTest {
     fun memberRoleInfoDtoList_decodesTheDatatableArrayResponseShape() {
         val payload = """
             [
-              {"role": "CHAIRPERSON", "groupId": 42, "assignedDate": "2025-01-05"},
-              {"role": "TREASURER", "groupId": 42, "assignedDate": "2025-02-11"}
+              {"role": "CHAIRPERSON", "group_id": 42, "joined_date": "2025-01-05"},
+              {"role": "TREASURER", "group_id": 42, "joined_date": "2025-02-11"}
             ]
         """.trimIndent()
         val decoded = json.decodeFromString(
@@ -272,7 +272,7 @@ class MemberProfileDtoTest {
 
     @Test
     fun memberRoleInfoDto_unknownServerRoleCoercesToUnknownFallback_notCrash() {
-        val payload = """{"role": "AUDITOR", "groupId": 42, "assignedDate": "2025-01-05"}"""
+        val payload = """{"role": "AUDITOR", "group_id": 42, "joined_date": "2025-01-05"}"""
         val decoded = json.decodeFromString(MemberRoleInfoDto.serializer(), payload)
         assertEquals(MemberRoleDto.UNKNOWN, decoded.role)
     }
