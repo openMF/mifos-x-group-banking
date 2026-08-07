@@ -27,11 +27,10 @@ import org.mifos.groupbanking.core.data.demo.DemoSessionManager
 import org.mifos.groupbanking.core.data.repository.AuthRepository
 import org.mifos.groupbanking.core.model.AuthSession
 import org.mifos.groupbanking.core.model.GroupMembership
-import org.mifos.groupbanking.core.model.GroupRole
-import org.mifos.groupbanking.core.model.isGroupLeadership
 import org.mifos.groupbanking.core.model.LoginCredentials
 import org.mifos.groupbanking.core.model.SelfRegistration
 import org.mifos.groupbanking.core.model.UserProfile
+import org.mifos.groupbanking.core.model.isGroupLeadership
 
 private const val TAG = "LoginSignupViewModel"
 

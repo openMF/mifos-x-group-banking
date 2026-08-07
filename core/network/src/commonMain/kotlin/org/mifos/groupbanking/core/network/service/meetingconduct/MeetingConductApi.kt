@@ -11,11 +11,11 @@ package org.mifos.groupbanking.core.network.service.meetingconduct
 
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
-import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.CorpusRecordDto
 import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
 import org.mifos.groupbanking.core.network.model.DataTableEntryResponseDto
+import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
 import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto

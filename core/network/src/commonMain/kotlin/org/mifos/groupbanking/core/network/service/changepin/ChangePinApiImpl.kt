@@ -27,6 +27,7 @@ import org.mifos.groupbanking.core.network.model.ChangePinRequestDto
 import org.mifos.groupbanking.core.network.model.ChangePinResponseDto
 
 private const val TAG = "ChangePinApi"
+
 // Companion SERVICE-cred facade (COMP-CHANGEPW). The raw `/self/user/updatePassword` 403s for members
 // who are Fineract clients but not self-service users (the seeded + companion-self-registered
 // accounts) — a self-service login cannot reach a back-office API, so the companion performs the

@@ -21,10 +21,10 @@ import org.mifos.groupbanking.core.model.meeting.MeetingSubmissionRequest
 import org.mifos.groupbanking.core.model.meeting.PreviousMeetingSummary
 import org.mifos.groupbanking.core.model.meeting.RepaymentSubmission
 import org.mifos.groupbanking.core.model.meeting.SavingsSubmission
-import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.CorpusRecordDto
 import org.mifos.groupbanking.core.network.model.CreateAttendanceRequestDto
 import org.mifos.groupbanking.core.network.model.CreateMeetingRecordRequestDto
+import org.mifos.groupbanking.core.network.model.GroupMembersDetailDto
 import org.mifos.groupbanking.core.network.model.LoanDisbursalRequestDto
 import org.mifos.groupbanking.core.network.model.LoanListResponseDto
 import org.mifos.groupbanking.core.network.model.LoanRepaymentRequestDto
