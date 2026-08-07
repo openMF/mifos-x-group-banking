@@ -48,11 +48,11 @@ class AppDatabaseTest {
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 16 in the v15→v16 migration that added the
-        // clientId / groupLinkedSavingsId / individualSavingsId columns to
-        // `member_dashboard_cache`. Update this constant when bumping
-        // AppDatabase.VERSION so the guardrail stays meaningful.
-        assertEquals(16, AppDatabase.VERSION)
+        // Bumped to 17 in the v16→v17 migration that added the `meetingTime`
+        // column to `meeting_record_cache` (meeting completed-time feature).
+        // Update this constant when bumping AppDatabase.VERSION so the
+        // guardrail stays meaningful.
+        assertEquals(17, AppDatabase.VERSION)
     }
 
     @Test
