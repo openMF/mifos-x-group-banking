@@ -1,0 +1,19 @@
+# app-profile/app.yaml — fork-owned white-label SoT (read FIRST by deployment/_shared/config.rb).
+# Seeded from the mifos-x org SoT (workspaces/mifos-x/_org/company.yaml#org_identity + deploy_contact).
+# In the full flow /idea-deploy folds company.yaml → here; this file makes the group names + review
+# contact available to the TestFlight lane at deploy time (config.rb resolves app-profile before fork.properties).
+
+# iOS TestFlight tester groups — org SoT: {org}-team (internal) + {org}-mobile-apps (external).
+# sync_testflight_testers CREATES any missing group on deploy; the beta lane distributes the build to both.
+apple:
+  testers:
+    internal_group: "mifos-mobile-apps"
+    external_group: "mifos-mobile-apps"
+    external_public_link: true
+
+# Review + beta-review contact (Apple external beta review requires a valid phone).
+org:
+  email: "team@mifos.org"
+  first_name: "Mifos"
+  last_name: "Team"
+  phone: "+919015090523"   # E.164, +91 India — Apple external beta review contactPhone

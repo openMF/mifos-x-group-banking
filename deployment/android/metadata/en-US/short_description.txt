@@ -1,1 +1,1 @@
-Loan tracker, EMI calculator, bill reminders & interest rates. Offline.
+Run your VSLA, SACCO or chama: savings, group loans & share-out, offline.

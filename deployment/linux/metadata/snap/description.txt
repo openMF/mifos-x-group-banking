@@ -1,0 +1,15 @@
+MifosSave digitizes the full life of a community savings group — from the first meeting to the final share-out — and works fully offline, syncing to a Mifos / Apache Fineract core banking backend the moment you reconnect.
+
+Built for VSLAs, ROSCAs, ASCAs, SILC groups, SHGs, SACCOs, village banks, welfare and burial societies, and joint-liability groups, MifosSave replaces error-prone paper ledgers with transparent records every member can trust.
+
+Features:
+
+* Offline-first — run a whole meeting with no signal, then sync automatically.
+* Create or join a group with an invite code; 9 group types with the right rules built in.
+* Run meetings — attendance, group-linked and individual savings, fines, guided agenda.
+* Real-time group corpus with excess-outflow blocking.
+* Group loans — request, vote-approve, disburse, repay, with ceilings and repayment health.
+* End-of-cycle share-out — pro-rata, rotation payout or auction.
+* Personal dashboard, notifications, and English/Swahili/French/Hindi support.
+
+MifosSave is open-source community banking software from the Mifos Initiative — keeping every shilling accounted for, online or off.

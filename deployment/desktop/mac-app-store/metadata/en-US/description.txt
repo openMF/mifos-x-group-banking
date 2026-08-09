@@ -1,0 +1,34 @@
+Your savings group, on your Mac — and it works even when the network doesn't.
+
+MifosSave brings the full life of a community savings group to your desktop: meetings, savings, loans and share-out, all backed by proven open-source Mifos / Apache Fineract core banking and all working offline first.
+
+Whether you run a VSLA, ROSCA, ASCA, SILC, SHG, SACCO, village bank, welfare society or joint-liability group, MifosSave replaces paper ledgers with records every member can see and trust.
+
+GET STARTED IN MINUTES
+• Sign up and create your first group, or join one with an invite code.
+• Pick your group type — the right rules are built in.
+• Invite members and assign roles: organizer, treasurer, chairperson, secretary or member.
+
+RUN YOUR MEETINGS
+• Take attendance, follow a guided agenda, and review the previous meeting first.
+• Record group-linked and individual savings.
+• Collect fines and track late attendance.
+
+MANAGE THE GROUP FUND
+• Watch the group corpus update in real time.
+• Excess-outflow blocking means you never disburse more than you hold.
+
+LEND AND REPAY
+• Members request loans; the group approves by vote.
+• Disburse, schedule repayments and track repayment health.
+• Set loan ceilings and per-member limits.
+
+SHARE OUT
+• Calculate and distribute the end-of-cycle share-out — pro-rata, rotation payout or auction.
+
+STAY TRANSPARENT
+• Every member gets a personal dashboard of their savings, loans and requests.
+• Notifications for meetings, approvals and payouts.
+• Available in English, Swahili, French and Hindi.
+
+MifosSave is open-source community banking from the Mifos Initiative — keeping every shilling accounted for, online or off.

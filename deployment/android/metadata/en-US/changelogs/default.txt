@@ -1,5 +1,9 @@
-First release of Money Toolkit.
-
-Track loans, calculate EMIs, set bill reminders, compare loan offers, view live interest rates and currency exchange rates.
-
-100% offline — no login, no account, no ads.
+MifosSave 1.0 — offline-first community group banking.
+• Create or join a group with an invite code
+• 9 group types: VSLA, ROSCA, ASCA, SILC, SHG, SACCO, village bank, welfare, JLG
+• Meetings: attendance, savings, fines, guided agenda
+• Loans: request, vote-approve, disburse, repay
+• Real-time group fund with excess-outflow blocking
+• Share-out: pro-rata, rotation or auction
+• Works offline, syncs to Mifos Fineract
+• English, Swahili, French, Hindi
