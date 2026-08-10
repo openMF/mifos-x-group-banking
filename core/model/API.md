@@ -16,7 +16,7 @@
 | `GroupTypeSlug` | enum: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO_VILLAGE_BANK`, `BURIAL_WELFARE`, `JLG`, `UNKNOWN` | mirrors wire `GroupTypeSlugDto` 1:1 |
 | `SavingsMechanism` | enum: `ACCUMULATING`, `ROTATING_PAYOUT`, `NONE`, `UNKNOWN` | mirrors wire `SavingsMechanismDto` 1:1 |
 | `ContributionMode` | enum: `SHARE_BASED_VARIABLE`, `FIXED`, `MINIMAL`, `UNKNOWN` | mirrors wire `ContributionModeDto` 1:1 |
-| `Group` | `id: String`, `name: String`, `groupType: GroupTypeSlug`, `viewerRole: ViewerRole`, `cycleNumber: Int`, `memberCount: Int`, `lastMeetingDate: LocalDate`, `healthIndicator: HealthIndicator`, `overdueRate: Double`, `status: String`, `fineractCenterId: Long` | COMP-GRP-001 canonical group shape; reuses `GroupTypeSlug` (see `GroupTypeConfig.kt`), read-only |
+| `Group` | `id: String`, `name: String`, `groupType: GroupTypeSlug`, `viewerRole: ViewerRole`, `cycleNumber: Int`, `memberCount: Int`, `lastMeetingDate: LocalDate`, `healthIndicator: HealthIndicator`, `overdueRate: Double`, `status: String`, `fineractGroupId: Long` | COMP-GRP-001 canonical group shape; reuses `GroupTypeSlug` (see `GroupTypeConfig.kt`), read-only |
 | `GroupPage` | `totalFilteredRecords: Int`, `groups: List<Group>` | offset-paginated envelope of COMP-GRP-001 |
 | `ViewerRole` | enum: `ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN` | mirrors wire `ViewerRoleDto` 1:1; NOT unified with `GroupRole` (missing `CHAIRPERSON`) — see `Group.kt` kdoc |
 | `HealthIndicator` | enum: `GREEN`, `AMBER`, `RED`, `UNKNOWN` | mirrors wire `HealthIndicatorDto` 1:1; `fromOverdueRate(rate: Double)` factory independently re-derives GREEN(<0.05)/AMBER(0.05–0.20)/RED(>=0.20) |
@@ -32,13 +32,13 @@
 | `TransactionType` | enum: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | mirrors wire `TransactionTypeDto` 1:1 |
 | `CreateGroupRequest` | `name: String`, `officeId: Long`, `userId: Long`, `currency: String`, `meetingDay: String`, `meetingTime: String`, `typeConfig: CreateGroupTypeConfig` | group-create wizard submission (COMP-GRP-001); assembled across the wizard's 4 steps |
 | `CreateGroupTypeConfig` | `groupType: GroupTypeSlug`, `poolModel: SavingsMechanism`, `contributionModel: ContributionModel`, `shareoutFormula: ShareoutFormula`, `payoutOrderMethod: PayoutOrderMethod`, `shareValue: Double`, `contributionAmount: Double`, `socialFundEnabled: Boolean`, `socialFundPercent: Double`, `cycleLengthMonths: Int`, `loanMultiplier: Double`, `interestRate: Double`, `fineAmount: Double`, `maxMembers: Int` | type-adaptive rule set forwarded to provision the `group_type_config` datatable row; reuses `GroupTypeSlug` + `SavingsMechanism` (no duplicate enums for those 2 axes) |
-| `GroupCreationResult` | `groupId: String`, `fineractCenterId: Long`, `inviteCode: String` | group-create success result |
+| `GroupCreationResult` | `groupId: String`, `fineractGroupId: Long`, `inviteCode: String` | group-create success result |
 | `ContributionModel` | enum: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | mirrors wire `ContributionModelDto` 1:1; distinct from `ContributionMode` (different value-set) |
 | `ShareoutFormula` | enum: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | mirrors wire `ShareoutFormulaDto` 1:1 |
 | `PayoutOrderMethod` | enum: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | mirrors wire `PayoutOrderMethodDto` 1:1 |
 | `Office` | `id: Long`, `name: String`, `nameDecorated: String`, `externalId: String?` | office dropdown row; `externalId` nullable (registry gap, see `core/network/model/API.md`) |
 | `GroupDashboard` | `group: GroupDetail`, `viewerRole: ViewerRoleInfo`, `corpus: GroupCorpus`, `accounts: GroupAccounts` | group-dashboard composite (COMP-GRP-001 4-way parallel fan-in); NOT returned by a single endpoint; `GroupConfig` deliberately excluded — see notes below |
-| `GroupDetail` | `id: String`, `fineractCenterId: Long`, `name: String`, `cycleNumber: Int`, `cycleLengthMonths: Int`, `meetingFrequency: String`, `memberCount: Int`, `overdueLoansCount: Int`, `status: String`, `typeConfig: GroupInstanceConfig` | `get_group` identity/header shape; deliberately NOT `Group` — see field-shape-divergence note below |
+| `GroupDetail` | `id: String`, `fineractGroupId: Long`, `name: String`, `cycleNumber: Int`, `cycleLengthMonths: Int`, `meetingFrequency: String`, `memberCount: Int`, `overdueLoansCount: Int`, `status: String`, `typeConfig: GroupInstanceConfig` | `get_group` identity/header shape; deliberately NOT `Group` — see field-shape-divergence note below |
 | `GroupInstanceConfig` | `groupType: GroupTypeSlug`, `poolModel: SavingsMechanism`, `contributionModel: GroupContributionModel`, `shareoutFormula: String`, `payoutOrderMethod: String`, `shareValue: Double`, `contributionAmount: Double`, `socialFundEnabled: Boolean`, `cycleLengthMonths: Int`, `loanMultiplier: Double`, `interestRate: Double`, `fineAmount: Double` | THIS group's configured instance (embedded on `GroupDetail.typeConfig`); reuses `GroupTypeSlug` + `SavingsMechanism`; naming-collision with catalogue `GroupTypeConfig` — see note below |
 | `GroupContributionModel` | enum: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | mirrors wire `GroupContributionModelDto` 1:1; distinct from both `ContributionMode` and `ContributionModel` (see note below) |
 | `ViewerRoleInfo` | `role: ViewerRole`, `memberId: Long` | `get_viewer_role` result; reuses `ViewerRole` (no new enum) |
@@ -301,7 +301,7 @@ exists (confirmed gap, same class as `GroupConfig.shareMin`).
 cross-feature repair station):** `idea-layer/screens/group-dashboard/ui.yaml#state_model`
 pseudocodes its state field as `group: Group?`, and this feature's generation
 brief explicitly instructed reusing `Group` "do NOT duplicate" — but
-`get_group`'s actual `api.yaml` response (`id`, `fineractCenterId`, `name`,
+`get_group`'s actual `api.yaml` response (`id`, `fineractGroupId`, `name`,
 `cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`,
 `overdueLoansCount`, `status`, `typeConfig`) genuinely diverges from `Group`'s
 wire shape (`GroupDto`, from `group-list`'s COMP-GRP-001): it does NOT return

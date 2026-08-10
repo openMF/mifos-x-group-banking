@@ -20,7 +20,7 @@ import org.mifos.groupbanking.core.network.model.GroupItemDto
  * [aggregateFieldOfficerDashboard] is the client-side fan-in described by
  * `idea-layer/screens/field-officer-dashboard/data-flow.yaml`: it maps each [GroupItemDto] to a
  * [GroupHealthSummary], sums the per-group counts/balances into the four KPI totals, and derives
- * [FieldOfficerDashboard.availableRegions] from the distinct union of group + center `officeName`
+ * [FieldOfficerDashboard.availableRegions] from the distinct set of group `officeName`
  * values.
  *
  * **Idea-layer gap (flagged):** the `GET /groups` contract returns no `overdueRate` and no per-group

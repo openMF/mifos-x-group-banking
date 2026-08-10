@@ -115,24 +115,6 @@ class KptAnalyticsTracker(
     }
 
     /** Track center operations (Mifos-specific) */
-    fun trackCenterOperation(
-        // "create", "view", "meeting", "collection"
-        operation: String,
-        groupId: String? = null,
-        meetingDate: String? = null,
-        attendance: Int? = null,
-        success: Boolean = true,
-    ) {
-        val params = mutableListOf(
-            Param("center_operation", operation),
-            Param(ParamKeys.SUCCESS, success.toString()),
-        )
-        groupId?.let { params.add(Param("center_id", it)) }
-        meetingDate?.let { params.add(Param("meeting_date", it)) }
-        attendance?.let { params.add(Param("attendance_count", it.toString())) }
-
-        analyticsHelper.logEvent(AnalyticsEvent("center_operation", params))
-    }
 
     /** Track survey operations */
     fun trackSurveyOperation(

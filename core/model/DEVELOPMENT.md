@@ -249,7 +249,7 @@ mappers in `core/network/mapper`.
 | `Group` | `healthIndicator` | `HealthIndicator` | non-null |
 | `Group` | `overdueRate` | `Double` | non-null |
 | `Group` | `status` | `String` | non-null |
-| `Group` | `fineractCenterId` | `Long` | non-null |
+| `Group` | `fineractGroupId` | `Long` | non-null |
 | `GroupPage` | `totalFilteredRecords` | `Int` | non-null |
 | `GroupPage` | `groups` | `List<Group>` | non-null (may be empty) |
 | `Invitation` | `token` | `String` | non-null |
@@ -313,7 +313,7 @@ mappers in `core/network/mapper`.
 | `CreateGroupTypeConfig` | `fineAmount` | `Double` | non-null |
 | `CreateGroupTypeConfig` | `maxMembers` | `Int` | non-null |
 | `GroupCreationResult` | `groupId` | `String` | non-null |
-| `GroupCreationResult` | `fineractCenterId` | `Long` | non-null |
+| `GroupCreationResult` | `fineractGroupId` | `Long` | non-null |
 | `GroupCreationResult` | `inviteCode` | `String` | non-null |
 | `Office` | `id` | `Long` | non-null |
 | `Office` | `name` | `String` | non-null |
@@ -324,7 +324,7 @@ mappers in `core/network/mapper`.
 | `GroupDashboard` | `corpus` | `GroupCorpus` | non-null |
 | `GroupDashboard` | `accounts` | `GroupAccounts` | non-null |
 | `GroupDetail` | `id` | `String` | non-null |
-| `GroupDetail` | `fineractCenterId` | `Long` | non-null |
+| `GroupDetail` | `fineractGroupId` | `Long` | non-null |
 | `GroupDetail` | `name` | `String` | non-null |
 | `GroupDetail` | `cycleNumber` | `Int` | non-null |
 | `GroupDetail` | `cycleLengthMonths` | `Int` | non-null |

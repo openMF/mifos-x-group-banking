@@ -15,8 +15,7 @@ import kotlinx.serialization.Serializable
 /**
  * Wire DTO for a single row of the group-list contract (COMP-GRP-001 —
  * `GET /companion/groups/mine`). Lists every group the authenticated user belongs to across any
- * role, with [groupType] and [viewerRole] resolved server-side from `dt_member_role` (no
- * `staffId` param — replaces the old staff-only `/centers?staffId=` Fineract endpoint). This
+ * role, with [groupType] and [viewerRole] resolved server-side from `dt_member_role`. This
  * shape is the CANONICAL wire `Group` for group-list, reused by group-dashboard + member
  * features per `idea-layer/screens/group-list/api.yaml#dtos.Group`.
  *

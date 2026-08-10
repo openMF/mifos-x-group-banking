@@ -41,7 +41,7 @@ interface GroupCreateApi {
 
     /**
      * `POST /companion/groups` (COMP-GRP-001). Single companion-API call that orchestrates:
-     * (1) createCenter in Fineract, (2) activate the group, (3) associateClients (creator becomes
+     * (1) createGroup in Fineract, (2) activate the group, (3) associateClients (creator becomes
      * a member), (4) assignRole ORGANIZER to the creator, and (5) provision the
      * `group_type_config` datatable row from [request]'s `typeConfig`. No auth-required header is
      * threaded explicitly — the shared client's `bearerTokensProvider` plugin handles it, same

@@ -17,8 +17,8 @@ import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 
 /**
- * `/meetings` — the calendar/list of a group center's scheduled + past meetings
- * (`ui.yaml#route`, `ui.yaml#nav_params: { center_id }`), entered from `group-dashboard`'s
+ * `/meetings` — the calendar/list of a group's scheduled + past meetings
+ * (`ui.yaml#route`, `ui.yaml#nav_params: { group_id }`), entered from `group-dashboard`'s
  * "Meetings" quick action or `bottom_nav`. See API.md#route.
  */
 @Serializable

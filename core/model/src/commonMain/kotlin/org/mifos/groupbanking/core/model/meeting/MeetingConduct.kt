@@ -33,7 +33,7 @@ enum class SavingsType { GROUP_LINKED, INDIVIDUAL }
 enum class LoanVote { FOR, AGAINST, ABSTAIN }
 
 /**
- * `api.yaml#dtos.GroupMember` — the attendance/savings repeater-row projection of one center member.
+ * `api.yaml#dtos.GroupMember` — the attendance/savings repeater-row projection of one group member.
  * [savingsAccountId] is the Fineract savings account the step-3 deposits post against
  * (`api.yaml#api[post_savings_transaction].params.savingsId`); nullable because a member without a
  * linked savings account cannot receive a group deposit (that member's row disables the input).

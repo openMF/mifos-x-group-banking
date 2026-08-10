@@ -52,7 +52,7 @@
     { "id": "client-accounts",      "method": "GET", "path": "/clients/{clientId}/accounts",                    "access": "fineract-service",  "screen": "member-profile",    "roles": "all",        "slo": "medium", "probe": "safe" },
     { "id": "group-clients",        "method": "GET", "path": "/groups/{groupId}/clients",                       "access": "companion-service", "screen": "member-list",       "roles": "all",        "slo": "medium", "probe": "safe", "note": "companion aggregates group detail + savings + roster, not a plain client list" },
     { "id": "offices",              "method": "GET", "path": "/offices",                                        "access": "fineract-service",  "screen": "group-create",      "roles": "leadership", "slo": "fast",   "probe": "safe" },
-    { "id": "center-detail",        "method": "GET", "path": "/centers/{groupId}",                              "access": "fineract-service",  "screen": "meeting",           "roles": "leadership", "slo": "fast",   "probe": "safe" },
+    { "id": "group-detail",        "method": "GET", "path": "/groups/{groupId}",                              "access": "fineract-service",  "screen": "meeting",           "roles": "leadership", "slo": "fast",   "probe": "safe" },
 
     { "id": "fo-groups",            "method": "GET", "path": "/companion/field-officer/groups",                 "access": "companion-service", "screen": "field-officer",     "roles": "fieldoff",   "slo": "fast",   "probe": "safe" },
     { "id": "fo-report",            "method": "GET", "path": "/companion/field-officer/report?R_staffId={clientId}&output-type=CSV", "access": "companion-service", "screen": "field-officer", "roles": "fieldoff", "slo": "medium", "probe": "safe", "note": "CSV export; needs FieldOfficerGroupReport registered via server-layer/migrations/register-reports (companion translates R_staffId->R_loanOfficerId). Returns empty until groups have staff_id assigned." },
@@ -79,6 +79,6 @@
     { "id": "client-create",        "method": "POST",   "path": "/clients",                                         "access": "fineract-service",  "screen": "member-add",     "roles": "leadership", "slo": "medium","probe": "write" },
     { "id": "client-image",         "method": "POST",   "path": "/clients/{clientId}/images",                       "access": "fineract-service",  "screen": "member-profile", "roles": "all",        "slo": "medium","probe": "write" },
     { "id": "batch-sync",           "method": "POST",   "path": "/fineract-provider/api/v1/batches",                "access": "fineract-service",  "screen": "offline-sync",   "roles": "all",        "slo": "medium","probe": "write" },
-    { "id": "meeting-reschedule",   "method": "PUT",    "path": "/centers/{groupId}/calendars/1",                   "access": "fineract-service",  "screen": "meeting",        "roles": "leadership", "slo": "medium","probe": "write" }
+    { "id": "meeting-reschedule",   "method": "PUT",    "path": "/groups/{groupId}/calendars/1",                   "access": "fineract-service",  "screen": "meeting",        "roles": "leadership", "slo": "medium","probe": "write" }
   ]
 }

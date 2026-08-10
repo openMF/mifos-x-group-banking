@@ -52,7 +52,7 @@ private const val KEY_SEPARATOR = "|"
  * - **Fetcher** — a PARALLEL-COMBINE: inside a [coroutineScope] the two reads fire as concurrent
  *   [async] coroutines. `get_groups_for_staff` is the CRITICAL read (its failure throws
  *   [FieldOfficerDashboardFetchException] so Store5 routes it to an error response — no try-catch,
- *   no `Result` envelope); `get_centers_for_staff` is best-effort (its office names only enrich
+ *   no `Result` envelope); (group-only — no center aggregation).__DROP__
  *   [FieldOfficerDashboard.availableRegions]), so an error there degrades to an empty center list
  *   rather than failing the whole load. The two are fanned into the aggregate by
  *   [aggregateFieldOfficerDashboard].

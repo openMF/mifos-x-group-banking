@@ -17,11 +17,11 @@ import kpt.core.base.store.screen.ScreenDataStream
 import org.mifos.groupbanking.core.model.FieldOfficerDashboard
 
 /**
- * Read surface for the field-officer-dashboard screen (FR-009) — the composite fan-in of
- * `get_centers_for_staff` + `get_groups_for_staff` aggregated client-side into cross-group KPIs +
- * a per-group health list, plus the one-shot CSV export.
+ * Read surface for the field-officer-dashboard screen (FR-009) — `get_groups_for_staff`
+ * aggregated client-side into cross-group KPIs + a per-group health list, plus the one-shot CSV
+ * export.
  *
- * The two-way parallel read is exposed through [fieldOfficerDashboardStream] — an offline-first
+ * The read is exposed through [fieldOfficerDashboardStream] — an offline-first
  * [ScreenDataStream] of `FieldOfficerDashboard` keyed by the field officer's staffId (+ session
  * role). There is no Store5 write path: the dashboard is read-only (RULE-IMPLEMENT-STORE5-001 S5-1
  * / S5-2). The export ([exportReport]) is a Store5-FREE direct read of the Fineract
@@ -35,8 +35,8 @@ interface FieldOfficerDashboardRepository {
     /**
      * Offline-first stream of the aggregated field-officer dashboard for [staffId].
      *
-     * The store fires `get_groups_for_staff` (critical) + `get_centers_for_staff` (best-effort) in
-     * parallel and fans them into one [FieldOfficerDashboard]; a cached aggregate is served
+     * The store fires `get_groups_for_staff` and projects it into one [FieldOfficerDashboard]; a
+     * cached aggregate is served
      * immediately then background-revalidated per the store's stale-while-revalidate policy
      * (`data-flow.yaml`: `stale_while_revalidate`, `ttl=300`, `offline: show_cached_with_banner`).
      * Call [ScreenDataStream.retry] to re-drive a failed fetch (the Retry CTA); pull-to-refresh

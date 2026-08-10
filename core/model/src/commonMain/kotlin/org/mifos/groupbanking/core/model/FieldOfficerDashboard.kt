@@ -10,10 +10,9 @@
 package org.mifos.groupbanking.core.model
 
 /**
- * Domain composite for the field-officer-dashboard screen (FR-009) — the client-side fan-in of
- * `get_centers_for_staff` + `get_groups_for_staff` (fired in parallel on mount, keyed by the
- * session-derived staffId) aggregated into cross-group KPIs plus a per-group health list. Pure
- * business shape, no wire concerns.
+ * Domain composite for the field-officer-dashboard screen (FR-009) — the client-side projection of
+ * `get_groups_for_staff` (fired on mount, keyed by the session-derived staffId) aggregated into
+ * cross-group KPIs plus a per-group health list. Pure business shape, no wire concerns.
  *
  * Read-only monitoring surface: there is no mutation path. Per
  * `idea-layer/screens/field-officer-dashboard/data-flow.yaml`, the ViewModel/store aggregate the
@@ -22,7 +21,7 @@ package org.mifos.groupbanking.core.model
  * sum(totalLoansOutstanding)`), derive each group's [GroupHealthSummary.healthIndicator] from its
  * `overdueRate` (GREEN < 0.05, AMBER 0.05–0.20, RED >= 0.20 — reusing the shared
  * [HealthIndicator.fromOverdueRate] rule already used by group-list), and extract [availableRegions]
- * from the distinct set of group + center `officeName` values.
+ * from the distinct set of group `officeName` values.
  *
  * **Idea-layer gap (flagged, not invented here):** `api.yaml` declares [GroupHealthSummary] as
  * "client-side derived from GroupItem + computed overdueRate; not a network DTO", but the two

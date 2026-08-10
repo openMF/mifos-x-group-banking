@@ -44,8 +44,8 @@ data class GroupItemDto(
 )
 
 /**
- * Wire DTO for the nested Fineract `status` object (`{ id, value }`) carried by both center and
- * group rows. [value] is the human status string (e.g. `"active"`, `"pending"`, `"closed"`).
+ * Wire DTO for the nested Fineract `status` object (`{ id, value }`) carried by group rows.
+ * [value] is the human status string (e.g. `"active"`, `"pending"`, `"closed"`).
  * See API.md#dtos — StatusInfo.
  */
 @Serializable

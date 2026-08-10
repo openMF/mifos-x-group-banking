@@ -14,7 +14,7 @@ import androidx.room3.PrimaryKey
 
 /**
  * Room persisted representation of ONE field-officer-dashboard composite snapshot per staff member
- * (FR-009 — the parallel fan-in of `get_centers_for_staff` + `get_groups_for_staff` aggregated into
+ * (FR-009 — the parallel fan-in of `get_groups_for_staff` aggregated into
  * cross-group KPIs + a per-group health list).
  *
  * Backs the offline cache (SourceOfTruth) for the composite NETWORK_WITH_CACHE store

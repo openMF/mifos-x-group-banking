@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 
 /**
  * Wire request DTO for the group-create wizard's single companion-API orchestration call —
- * `POST /companion/groups` (COMP-GRP-001). One call orchestrates: (1) createCenter in Fineract,
+ * `POST /companion/groups` (COMP-GRP-001). One call orchestrates: (1) createGroup in Fineract,
  * (2) activate group, (3) associateClients, (4) assignRole (organizer for the creator), (5)
  * provision the `group_type_config` datatable row from [typeConfig]. Replaces the previous raw
  * Fineract `/groups` + `/datatables/dt_group_config` two-step. Top-level fields are camelCase
@@ -50,11 +50,9 @@ data class CreateGroupRequestDto(
 @Serializable
 data class CreateGroupResponseDto(
     @SerialName("groupId") val groupId: String,
-    // Optional: the companion emits fineractGroupId (canonical) — some deployments still send only the
-    // legacy fineractCenterId mirror. groupId is the source of truth for navigation, so a missing
-    // fineractGroupId must NOT fail an otherwise-successful create. Falls back to fineractCenterId then 0.
+    // groupId is the source of truth for navigation, so a missing fineractGroupId must NOT fail an
+    // otherwise-successful create — it defaults to 0.
     @SerialName("fineractGroupId") val fineractGroupId: Long = 0,
-    @SerialName("fineractCenterId") val fineractCenterId: Long = 0,
     @SerialName("inviteCode") val inviteCode: String,
 ) {
     companion object {

@@ -164,7 +164,7 @@ sealed interface MeetingSummaryAction {
  *
  * **In-memory hand-off gap (flagged, not invented around):** `data-flow.yaml` declares a preferred
  * "render from the in-memory meeting-conduct wizard state" path, but `ui.yaml#nav_params` only
- * carries the scalar `meeting_id`/`meeting_number`/`center_id` — NOT a full `MeetingRecordDetail`,
+ * carries the scalar `meeting_id`/`meeting_number`/`group_id` — NOT a full `MeetingRecordDetail`,
  * which type-safe Compose navigation cannot pass. So this ViewModel always resolves the record
  * through the offline-first Store5 read (which serves the just-written cache instantly when the
  * wizard has persisted it, achieving the same "no visible spinner" effect). Reported to the caller

@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 /**
  * Wire DTO for one row of `get_meeting_schedule` — `GET /fineract-provider/api/v1/datatables/dt_meeting_schedule/{groupId}`
  * (`idea-layer/screens/meeting-calendar/api.yaml#dtos.MeetingListResponse`). A single scheduled
- * meeting for the group center. [attendanceCount] / [totalCollectedKES] are populated only for
+ * meeting for the group. [attendanceCount] / [totalCollectedKES] are populated only for
  * COMPLETED meetings, null for UPCOMING/MISSED.
  *
  * See API.md#dtos — MeetingListItem.
@@ -57,7 +57,7 @@ enum class MeetingStatusDto {
 /**
  * Wire DTO for `get_meeting_records_datatable` —
  * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{groupId}`
- * (`api.yaml#dtos.MeetingRecordList`). The completed-meeting financial records for the center that
+ * (`api.yaml#dtos.MeetingRecordList`). The completed-meeting financial records for the group that
  * enrich the past-meeting rows with attendance + collected amounts.
  *
  * See API.md#dtos — MeetingRecordList.

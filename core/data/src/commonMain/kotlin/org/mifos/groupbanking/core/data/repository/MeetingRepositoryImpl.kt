@@ -28,7 +28,7 @@ import org.mobilenativefoundation.store.store5.Store
  * The single-key read maps `groupId` to the store key and goes exclusively through
  * [Store.asScreenStream] so the whole offline-first pipeline (cached emit → background revalidate →
  * DecisionEngine → ScreenState) is inherited from `core-base`. The freshness [cacheKey] is
- * per-center (`meetingcalendar:{groupId}`) so each center's TTL window is tracked independently. No
+ * per-group (`meetingcalendar:{groupId}`) so each group's TTL window is tracked independently. No
  * DAO-bypass read, no `try-catch`, no `Result` envelope (RULE-IMPLEMENT-STORE5-001 S5-2). An empty
  * meetings list surfaces as `ScreenState.Empty` via the `isEmpty` predicate. The error_state Retry
  * CTA re-drives via [ScreenDataStream.retry] — the injected [NetworkMonitor] pre-checks connectivity.
@@ -84,7 +84,7 @@ class MeetingRepositoryImpl(
     }
 
     private companion object {
-        /** FetchedAtRepository key prefix — one freshness timestamp per center. */
+        /** FetchedAtRepository key prefix — one freshness timestamp per group. */
         const val CACHE_KEY_PREFIX = "meetingcalendar:"
         const val TAG = "MeetingRepository"
 

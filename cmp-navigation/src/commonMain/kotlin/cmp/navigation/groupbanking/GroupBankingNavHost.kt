@@ -329,7 +329,7 @@ fun GroupBankingNavHost(
                     onNavigateToFieldOfficerDashboard = { navController.navigateToFieldOfficerDashboard() },
                     // G7 — Today's-Schedule row + Meetings-Today KPI open the tapped group's meeting
                     // calendar. group-dashboard forwards a `groupId: String`; meeting-calendar's
-                    // nav_param is `center_id: Int` — same toIntOrNull drift bridge as the
+                    // takes a `groupId: Int` — same toIntOrNull drift bridge as the
                     // group-dashboard → meeting-calendar seam below.
                     onNavigateToMeetingCalendar = { groupId ->
                         navController.navigateToMeetingCalendar(groupId = groupId.toIntOrNull() ?: 0)
@@ -343,7 +343,7 @@ fun GroupBankingNavHost(
                 // 7. group-dashboard → not-yet-built onward targets (placeholders) + loan-list
                 groupDashboardScreen(
                     // group-dashboard `Start/View Meetings` → meeting-calendar. group-dashboard
-                    // forwards a `groupId: String` but meeting-calendar's nav_param is `center_id: Int`
+                    // forwards a `groupId: String` but meeting-calendar takes `group_id: Int`
                     // (a flagged idea-layer nav-param drift — group-dashboard has no groupId at this
                     // seam); bridge by parsing groupId, mirroring the loan-list `toLongOrNull` drift
                     // precedent above. Reported to the caller for an idea-layer follow-up (forward
@@ -613,7 +613,7 @@ fun GroupBankingNavHost(
                     // loan-apply's `NavigateToMeetingConduct(loanId)` forwards a loanId, but
                     // meeting-conduct is keyed by (meetingId, meetingNumber, groupId) — a flagged
                     // idea-layer nav-param drift (the loan-to-meeting linkage isn't resolved at this
-                    // seam). Bridge with the loanId as the meetingId and 0 for the meeting/center
+                    // seam). Bridge with the loanId as the meetingId and 0 for the meeting/group
                     // ids, mirroring this NavHost's other documented drift bridges (e.g. the
                     // group-dashboard→meeting-calendar `toIntOrNull ?: 0` groupId bridge).
                     // TODO(nav): resolve the real meetingId/groupId once loan-apply forwards them.

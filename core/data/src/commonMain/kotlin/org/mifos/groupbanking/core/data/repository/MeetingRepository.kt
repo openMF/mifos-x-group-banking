@@ -40,7 +40,7 @@ interface MeetingRepository {
      * `ScreenState.Empty`. Call [ScreenDataStream.retry] to re-drive a failed fetch (the Retry CTA);
      * pull-to-refresh maps to a fresh network re-collection.
      *
-     * @param groupId The group center whose meetings to stream (nav param).
+     * @param groupId The group whose meetings to stream (nav param).
      * @param scope CoroutineScope (typically `viewModelScope`) for the auto-refresh coroutine.
      * @param fetchPolicy Read policy. Defaults to [FetchPolicy.CACHE_FIRST_SWR] —
      *   stale-while-revalidate, matching the declared cache strategy.

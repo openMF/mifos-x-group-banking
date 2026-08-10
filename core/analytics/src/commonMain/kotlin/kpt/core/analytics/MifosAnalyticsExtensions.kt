@@ -175,7 +175,7 @@ fun AnalyticsHelper.trackBiometricAuth(
  * Extension for tracking geolocation usage
  */
 fun AnalyticsHelper.trackLocationUsage(
-    // "client_visit", "center_meeting", "field_collection"
+    // "client_visit", "group_meeting", "field_collection"
     feature: String,
     accuracy: Float? = null,
     permissionGranted: Boolean = true,

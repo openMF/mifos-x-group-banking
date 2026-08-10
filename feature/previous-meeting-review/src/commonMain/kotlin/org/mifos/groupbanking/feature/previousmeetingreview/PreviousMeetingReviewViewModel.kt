@@ -167,7 +167,7 @@ sealed interface PreviousMeetingReviewAction {
  * CTA opens is derived as [meetingNumber] + 1 (the review of meeting N precedes conducting N+1).
  *
  * **Nav-param gap (flagged, not invented around):** `ui.yaml#nav_params` carries no explicit
- * `next_meeting_id`; the CTA forwards the same [meetingId] center context with the incremented number
+ * `next_meeting_id`; the CTA forwards the same [meetingId] group context with the incremented number
  * so meeting-conduct can resolve/assign the concrete id when the meeting starts. Reported to the
  * caller as an idea-layer follow-up (add `next_meeting_id` to the review nav args).
  *

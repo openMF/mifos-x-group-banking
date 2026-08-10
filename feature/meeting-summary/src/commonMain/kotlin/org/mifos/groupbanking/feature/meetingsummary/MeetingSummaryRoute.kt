@@ -18,7 +18,7 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 
 /**
  * `/meetings/{meetingId}/summary` — the meeting-summary route (`ui.yaml#route`,
- * `ui.yaml#nav_params: { meeting_id, meeting_number, center_id }`). All three params are carried;
+ * `ui.yaml#nav_params: { meeting_id, meeting_number, group_id }`). All three params are carried;
  * [groupId] + [meetingNumber] scope the single-key Store5 read, [meetingId] is used for
  * display/analytics. See API.md#route.
  */

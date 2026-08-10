@@ -151,7 +151,7 @@ fastlane/        — iOS deployment automation
 
 | Entity | Fineract Mapping |
 |--------|------------------|
-| Group | `m_center` + `dt_group_config` |
+| Group | `m_group` + `dt_group_config` |
 | Member | `m_client` + `dt_member_role` |
 | Meeting | `dt_meeting_record` + `dt_meeting_attendance` |
 | Savings Transaction | `m_savings_account_transaction` |

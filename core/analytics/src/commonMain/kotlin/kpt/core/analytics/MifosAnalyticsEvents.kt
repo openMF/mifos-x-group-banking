@@ -48,12 +48,6 @@ object MifosEventTypes {
     const val GROUP_LOAN_DISBURSED = "group_loan_disbursed"
     const val GROUP_COLLECTION_MADE = "group_collection_made"
 
-    // Center Management Events
-    const val CENTER_CREATED = "center_created"
-    const val CENTER_MEETING_CONDUCTED = "center_meeting_conducted"
-    const val CENTER_COLLECTION_SHEET_GENERATED = "center_collection_sheet_generated"
-    const val CENTER_ATTENDANCE_RECORDED = "center_attendance_recorded"
-
     // Survey and Data Collection Events
     const val SURVEY_STARTED = "survey_started"
     const val SURVEY_QUESTION_ANSWERED = "survey_question_answered"
@@ -145,8 +139,7 @@ object MifosParamKeys {
     const val MEETING_DATE = "meeting_date"
     const val ATTENDANCE_COUNT = "attendance_count"
 
-    // Center-specific parameters (center == group in the group-banking model; GROUP_ID above is reused)
-    const val CENTER_NAME = "center_name"
+    // Collection-specific parameters
     const val COLLECTION_AMOUNT = "collection_amount"
     const val COLLECTION_METHOD = "collection_method"
 

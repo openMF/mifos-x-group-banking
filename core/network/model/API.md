@@ -16,7 +16,7 @@
 | `GroupTypeSlugDto` | enum `@SerialName`: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO_VILLAGE_BANK`, `BURIAL_WELFARE`, `JLG`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback for any future server-added group type | field of `GroupTypeConfigDto.typeSlug` |
 | `SavingsMechanismDto` | enum `@SerialName`: `ACCUMULATING`, `ROTATING_PAYOUT`, `NONE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupTypeConfigDto.savingsMechanism` |
 | `ContributionModeDto` | enum `@SerialName`: `SHARE_BASED_VARIABLE`, `FIXED`, `MINIMAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupTypeConfigDto.contributionMode` |
-| `GroupDto` | `id`, `name`, `groupType` (default `UNKNOWN`), `viewerRole` (default `UNKNOWN`), `cycleNumber`, `memberCount`, `lastMeetingDate`, `healthIndicator` (default `UNKNOWN`), `overdueRate`, `status`, `fineractCenterId` | 3 enum fields default `UNKNOWN`; remaining 8 non-null required | `GET /companion/groups/mine` (COMP-GRP-001) — CANONICAL `Group`, reused by group-dashboard + member features |
+| `GroupDto` | `id`, `name`, `groupType` (default `UNKNOWN`), `viewerRole` (default `UNKNOWN`), `cycleNumber`, `memberCount`, `lastMeetingDate`, `healthIndicator` (default `UNKNOWN`), `overdueRate`, `status`, `fineractGroupId` | 3 enum fields default `UNKNOWN`; remaining 8 non-null required | `GET /companion/groups/mine` (COMP-GRP-001) — CANONICAL `Group`, reused by group-dashboard + member features |
 | `GroupPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope of COMP-GRP-001 (`page_size=20`) |
 | `GroupTypeDto` | enum `@SerialName`: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO`, `BURIAL`, `JLG`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOTE short-form `CBO`/`BURIAL` (distinct wire values from `GroupTypeSlugDto`'s `CBO_VILLAGE_BANK`/`BURIAL_WELFARE` — see `## 4. Boundaries`) | field of `GroupDto.groupType` |
 | `ViewerRoleDto` | enum `@SerialName`: `ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupDto.viewerRole` |
@@ -34,13 +34,13 @@
 | `TransactionTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback (also absorbs richer wire values like `INTEREST_POSTING`/`FEE_DEDUCTION` that this compact contract does not model) | field of `SavingsTransactionDto.type` |
 | `CreateGroupRequestDto` | `name`, `officeId`, `userId`, `currency`, `meetingDay`, `meetingTime`, `typeConfig` | all required, camelCase | `POST /companion/groups` (COMP-GRP-001) request |
 | `CreateGroupTypeConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula` (default `UNKNOWN`), `payout_order_method` (default `UNKNOWN`), `share_value`, `contribution_amount`, `social_fund_enabled`, `social_fund_percent`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount`, `max_members` | 5 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable columns (Hard Rule 5), NOT the companion camelCase convention | field of `CreateGroupRequestDto.typeConfig`; provisioned as a `group_type_config` datatable row (COMP-GRP-001 step 5) |
-| `CreateGroupResponseDto` | `groupId`, `fineractCenterId`, `inviteCode` | all required, camelCase | response of COMP-GRP-001 |
+| `CreateGroupResponseDto` | `groupId`, `fineractGroupId`, `inviteCode` | all required, camelCase | response of COMP-GRP-001 |
 | `OfficeDto` | `id`, `name`, `nameDecorated`, `externalId` (nullable, default `null`) | `externalId` nullable/optional (registry-vs-operation-schema gap, see note below); rest required | `GET /offices` (`orderBy=name` default), cached SWR (`ttl=3600`) |
 | `ContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; DISTINCT value-set from `ContributionModeDto` — see reuse note below | field of `CreateGroupTypeConfigDto.contributionModel` |
 | `ShareoutFormulaDto` | enum `@SerialName`: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `CreateGroupTypeConfigDto.shareoutFormula` |
 | `PayoutOrderMethodDto` | enum `@SerialName`: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; api.yaml declares 5 known values (task prose narrowed to 3 — api.yaml wins per PP-1) | field of `CreateGroupTypeConfigDto.payoutOrderMethod` |
 | `GroupDashboardResponseDto` | `group`, `viewerRole`, `corpus`, `accounts` | all required, camelCase | client-side composite (COMP-GRP-001 4-way parallel fan-in); NOT returned by a single endpoint, assembled by `GroupRepository` |
-| `GroupDetailDto` | `id`, `fineractCenterId`, `name`, `cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`, `overdueLoansCount`, `status`, `typeConfig` | all required, camelCase | `GET /companion/groups/{groupId}` (`get_group`, COMP-GRP-001 read path); NOT the same shape as `GroupDto` — see field-shape-divergence note below |
+| `GroupDetailDto` | `id`, `fineractGroupId`, `name`, `cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`, `overdueLoansCount`, `status`, `typeConfig` | all required, camelCase | `GET /companion/groups/{groupId}` (`get_group`, COMP-GRP-001 read path); NOT the same shape as `GroupDto` — see field-shape-divergence note below |
 | `GroupInstanceConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeSlugDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula`, `payout_order_method`, `share_value`, `contribution_amount`, `social_fund_enabled`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount` | 3 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable row for THIS group (Hard Rule 5) | field of `GroupDetailDto.typeConfig`; naming-collision with `GroupTypeConfigDto` — see note below |
 | `GroupContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; identical value-set to `ContributionModelDto` (group-create) but declared independently — see note below | field of `GroupInstanceConfigDto.contribution_model` |
 | `ViewerRoleInfoDto` | `role` (default `UNKNOWN`, reuses `ViewerRoleDto`), `memberId` | `role` defaults `UNKNOWN`; `memberId` required | `GET /companion/groups/{groupId}/my-role` (`get_viewer_role`) |
@@ -453,7 +453,7 @@ class as `GroupConfigDto.shareMin`).
 
 **`GroupDetailDto` vs `GroupDto` field-shape divergence (flagged for the
 cross-feature repair station):** `get_group`'s response
-(`id`/`fineractCenterId`/`name`/`cycleNumber`/`cycleLengthMonths`/
+(`id`/`fineractGroupId`/`name`/`cycleNumber`/`cycleLengthMonths`/
 `meetingFrequency`/`memberCount`/`overdueLoansCount`/`status`/`typeConfig`)
 genuinely diverges from the group-list `GroupDto` (COMP-GRP-001 `/mine`):
 missing `groupType`/`viewerRole`/`lastMeetingDate`/`healthIndicator`/
@@ -657,13 +657,13 @@ first-class columns and retire the classifier.
 station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a
 DIFFERENT `Group` shape (`id: Long`, `groupTypeSlug`, `poolModel`,
 `contributionModel`, `corpusBalance`, `officeId`, `nextMeetingDate`,
-`staffId`) sourced from `GET /centers/{centerId}` / `GET
-/centers?staffId={staffId}` and claims `used_by: group-list`. That reference
+`staffId`) sourced from `GET /groups/{groupId}` / `GET
+/groups?staffId={staffId}` and claims `used_by: group-list`. That reference
 is STALE: `idea-layer/screens/group-list/docs.yaml` states COMP-GRP-001 (`GET
-/companion/groups/mine`) explicitly REPLACES the staff-only `/centers?staffId=`
-path, and the screen's own approved `api.yaml#dtos.Group` (the shape emitted
+/companion/groups/mine`) is the current group-read path, and the screen's own
+approved `api.yaml#dtos.Group` (the shape emitted
 here — `id: String`, `viewerRole`, `healthIndicator`, `overdueRate`,
-`fineractCenterId`, etc.) is the current contract (`status: approved`,
+`fineractGroupId`, etc.) is the current contract (`status: approved`,
 approved 2026-07-17). `GroupDto` in this file was generated from the
 group-list screen's own `api.yaml`/`docs.yaml`/`data-flow.yaml`, NOT from the
 stale registry entry. The registry's `list_endpoint` + field set should be

@@ -207,10 +207,9 @@ sealed interface MeetingConductAction {
  * [crashReporter] are mandatory here (financial mutation, outside `{crud, nav_only}`) per
  * RULE-IDEA-IMPL-INTELLIGENCE-001.
  *
- * **`groupId` gap (flagged, CFF1):** `ui.yaml#nav_params` names only `{meetingId, meetingNumber,
- * groupId}` — no `groupId`, which `get_active_loans` requires. [groupId] is threaded as the
- * `groupId` argument (center↔group are 1:1 in this group-banking domain); flagged for the idea-layer
- * to add an explicit `groupId` nav param.
+ * **`groupId` gap (flagged, CFF1):** `ui.yaml#nav_params` names only `{meetingId, meetingNumber}`
+ * — no `groupId`, which `get_active_loans` requires. [groupId] is threaded as the `groupId`
+ * argument; flagged for the idea-layer to add an explicit `groupId` nav param.
  *
  * See API.md#viewmodel.
  */

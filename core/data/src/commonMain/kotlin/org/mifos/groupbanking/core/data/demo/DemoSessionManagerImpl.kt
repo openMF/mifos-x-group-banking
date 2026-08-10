@@ -373,7 +373,7 @@ class DemoSessionManagerImpl(
         /** Amina's Fineract client id (`members[0].fineract_client_id`) — the ORGANIZER viewer's memberId. */
         const val DEMO_ORGANIZER_CLIENT_ID = 301L
 
-        /** `groups[0].fineract_center_id`. */
+        /** `groups[0].fineract_group_id`. */
         const val DEMO_FINERACT_GROUP_ID = 101L
 
         /** Single seeded page for every paginated cache (group-list / member-list / loan-list). */

@@ -405,7 +405,7 @@ logic, no domain field names.
 | `GroupDto` | `healthIndicator` | `healthIndicator` | `HealthIndicatorDto` | `HealthIndicatorDto.UNKNOWN` |
 | `GroupDto` | `overdueRate` | `overdueRate` | `Double` | — |
 | `GroupDto` | `status` | `status` | `String` | — |
-| `GroupDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `GroupDto` | `fineractGroupId` | `fineractGroupId` | `Long` | — |
 | `GroupPageDto` | `totalFilteredRecords` | `totalFilteredRecords` | `Int` | — |
 | `GroupPageDto` | `pageItems` | `pageItems` | `List<GroupDto>` | `emptyList()` |
 | `InvitationRowDto` | `token` | `token` | `String` | — |
@@ -470,7 +470,7 @@ logic, no domain field names.
 | `CreateGroupTypeConfigDto` | `fineAmount` | `fine_amount` | `Double` | — |
 | `CreateGroupTypeConfigDto` | `maxMembers` | `max_members` | `Int` | — |
 | `CreateGroupResponseDto` | `groupId` | `groupId` | `String` | — |
-| `CreateGroupResponseDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `CreateGroupResponseDto` | `fineractGroupId` | `fineractGroupId` | `Long` | — |
 | `CreateGroupResponseDto` | `inviteCode` | `inviteCode` | `String` | — |
 | `OfficeDto` | `id` | `id` | `Long` | — |
 | `OfficeDto` | `name` | `name` | `String` | — |
@@ -481,7 +481,7 @@ logic, no domain field names.
 | `GroupDashboardResponseDto` | `corpus` | `corpus` | `GroupCorpusDto` | — |
 | `GroupDashboardResponseDto` | `accounts` | `accounts` | `GroupAccountsDto` | — |
 | `GroupDetailDto` | `id` | `id` | `String` | — |
-| `GroupDetailDto` | `fineractCenterId` | `fineractCenterId` | `Long` | — |
+| `GroupDetailDto` | `fineractGroupId` | `fineractGroupId` | `Long` | — |
 | `GroupDetailDto` | `name` | `name` | `String` | — |
 | `GroupDetailDto` | `cycleNumber` | `cycleNumber` | `Int` | — |
 | `GroupDetailDto` | `cycleLengthMonths` | `cycleLengthMonths` | `Int` | — |

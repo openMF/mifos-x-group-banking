@@ -29,7 +29,7 @@ actually define. Exposed as an explicit caller-supplied param; see
 `InvitationRepository.joinGroup` KDoc.
 
 Contract refs (GroupCreateRepository): COMP-GRP-001 (`createGroup`, group-create orchestration:
-createCenter + activate + associateClients + assignRole + provision `group_type_config`) + raw
+createGroup + activate + associateClients + assignRole + provision `group_type_config`) + raw
 Fineract `list_all_offices` (`getOffices`) — see `idea-layer/screens/group-create/api.yaml`.
 **KNOWN SC2 GAP**: `data-flow.yaml`'s `on_mount` entry declares a genuine
 `stale_while_revalidate` (`ttl_seconds=3600`) cache strategy for `getOffices` with an

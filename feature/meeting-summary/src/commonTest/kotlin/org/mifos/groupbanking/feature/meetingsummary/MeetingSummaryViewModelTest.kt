@@ -94,7 +94,7 @@ class MeetingSummaryViewModelTest {
     }
 
     @Test
-    fun `init requests the stream for the nav-arg center and meeting`() = runTest(testDispatcher) {
+    fun `init requests the stream for the nav-arg group and meeting`() = runTest(testDispatcher) {
         testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(listOf(GROUP_ID to MEETING_NUMBER), repository.requestedKeys)
     }

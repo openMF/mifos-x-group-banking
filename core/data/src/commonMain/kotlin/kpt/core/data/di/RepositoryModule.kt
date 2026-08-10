@@ -171,7 +171,7 @@ val DataModule = module {
     // field-officer-dashboard (FR-009) — wraps the composite dynamic-key NETWORK_WITH_CACHE
     // FieldOfficerDashboardStore (bound via AppStoreRegistry.FieldOfficerDashboard in appStoreModule)
     // and surfaces the offline-first .asScreenStream() read (per-staff ScreenState<FieldOfficerDashboard>,
-    // the parallel fan-in of get_centers_for_staff + get_groups_for_staff). The Store5-free CSV export
+    // projected from get_groups_for_staff). The Store5-free CSV export
     // (runReport) takes FieldOfficerApi directly (get()) — no read-stream to cache.
     single<FieldOfficerDashboardRepository> {
         FieldOfficerDashboardRepositoryImpl(
@@ -422,7 +422,7 @@ val DataModule = module {
 
     // meeting-calendar (GET /datatables/dt_meeting_schedule/{groupId} + get_meeting_records_datatable) — wraps
     // the single-key NETWORK_WITH_CACHE MeetingCalendarStore (bound via AppStoreRegistry.MeetingCalendar
-    // in appStoreModule) and surfaces the offline-first .asScreenStream() read (per-center
+    // in appStoreModule) and surfaces the offline-first .asScreenStream() read (per-group
     // ScreenState<List<MeetingListItem>>, the 2-way parallel merge of get_meeting_schedule +
     // get_meeting_records_datatable). Read-only — no write path (data-flow.yaml#sync_queue: []).
     single<MeetingRepository> {

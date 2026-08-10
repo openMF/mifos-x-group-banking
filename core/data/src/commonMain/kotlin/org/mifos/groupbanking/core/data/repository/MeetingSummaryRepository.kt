@@ -38,7 +38,7 @@ interface MeetingSummaryRepository {
      * policy (`data-flow.yaml#cache.strategy`: `stale_while_revalidate`, `ttl_seconds=600`, offline
      * fallback_cache). Call [ScreenDataStream.retry] to re-drive a failed fetch.
      *
-     * @param groupId The center the completed meeting belongs to (store key part 1).
+     * @param groupId The group the completed meeting belongs to (store key part 1).
      * @param meetingNumber The completed meeting's sequence number (store key part 2).
      * @param scope CoroutineScope (typically `viewModelScope`) for the auto-refresh coroutine.
      * @param fetchPolicy Read policy. Defaults to [FetchPolicy.CACHE_FIRST_SWR] —

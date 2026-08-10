@@ -32,7 +32,7 @@ fun NavController.navigateToOrganizerDashboard(navOptions: NavOptions? = null) =
  * group-list); [onNavigateToFieldOfficerDashboard] closes the optional-tier field-officer quick-nav
  * tap; [onNavigateToMeetingCalendar] (G7) closes the Today's-Schedule row + Meetings-Today KPI taps
  * (both open the tapped group's meeting calendar). The `groupId` String is bridged to
- * meeting-calendar's `center_id: Int` nav-param at the NavHost seam. [onNavigateToSettings] /
+ * meeting-calendar's `groupId: Int` nav-param at the NavHost seam. [onNavigateToSettings] /
  * [onNavigateToSyncStatus] (G13) close the top-bar overflow menu items — matching the
  * group-dashboard / personal-dashboard overflow-menu precedent. See API.md#route.
  */

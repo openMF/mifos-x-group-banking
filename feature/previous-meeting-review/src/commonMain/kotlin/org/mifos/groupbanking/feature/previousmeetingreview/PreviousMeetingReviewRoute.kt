@@ -18,7 +18,7 @@ import kpt.core.base.ui.nav.composableWithRootPushTransitions
 
 /**
  * `/meetings/{previousMeetingId}/review` — the previous-meeting-review route (`ui.yaml#route`,
- * `ui.yaml#nav_params: { meeting_id, meeting_number, center_id, launched_from }`). All four params
+ * `ui.yaml#nav_params: { meeting_id, meeting_number, group_id, launched_from }`). All four params
  * are carried; [groupId] + [meetingNumber] scope the reused record read, [meetingId] scopes the
  * attendance read + display/analytics, [launchedFrom] toggles the context banner + Start-Meeting CTA
  * (`conduct` vs `calendar`). See API.md#route.

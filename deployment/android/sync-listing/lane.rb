@@ -8,7 +8,7 @@ platform :android do
   lane :syncListing do |options|
     options = sanitize_options(options)
 
-    locale = FastlaneConfig::SHARED[:primary_locale] || "en-US"
+    locale = FastlaneConfig::AndroidConfig::PRIMARY_LOCALE   # was the broken `FastlaneConfig::SHARED[:primary_locale]` (SHARED undefined) — Android-owned locale const (config.rb#AndroidConfig)
     metadata_root = File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata")
 
     UI.message("📋 Syncing Play Store listing for locale: #{locale}")

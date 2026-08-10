@@ -16,7 +16,7 @@ import org.mifos.groupbanking.core.network.model.MeetingSummaryRecordDto
 /**
  * Ktor client for the meeting-summary feature — the single composite read that resolves one
  * completed meeting record (persisted totals + per-member savings breakdown + per-member loan
- * activity) for a center/meeting pair in one round trip. See
+ * activity) for a group/meeting pair in one round trip. See
  * `idea-layer/screens/meeting-summary/api.yaml#api[get_meeting_record]` +
  * `data-flow.yaml#cache.strategy` (`stale_while_revalidate`, ttl=600) + API.md#services for the
  * endpoint contract.
@@ -31,7 +31,7 @@ interface MeetingRecordApi {
     /**
      * `GET /fineract-provider/api/v1/datatables/dt_meeting_record/{groupId}?meetingNumber=N`
      * (`api.yaml#api[get_meeting_record]`). Fetches the completed meeting record for [meetingNumber]
-     * in center [groupId]. 401 -> [NetworkError.UNAUTHORIZED]; 404 -> [NetworkError.NOT_FOUND]
+     * in group [groupId]. 401 -> [NetworkError.UNAUTHORIZED]; 404 -> [NetworkError.NOT_FOUND]
      * ("meeting record not found" — the screen falls back to cached data); 5xx ->
      * [NetworkError.SERVER].
      */

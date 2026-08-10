@@ -39,7 +39,7 @@ interface PreviousMeetingReviewRepository {
      * [PreviousMeetingReviewStream] exposes the merged [state] the ViewModel collects plus a [retry]
      * that re-drives BOTH underlying reads (the error-state Retry CTA).
      *
-     * @param groupId The center the completed meeting belongs to (record store key part 1).
+     * @param groupId The group the completed meeting belongs to (record store key part 1).
      * @param meetingNumber The completed meeting's sequence number (record store key part 2).
      * @param meetingId The completed meeting id (attendance store key + display/analytics).
      * @param scope CoroutineScope (typically `viewModelScope`) for the auto-refresh coroutines.
