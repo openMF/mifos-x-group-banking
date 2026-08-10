@@ -144,7 +144,11 @@ data class MemberLoanAccountDto(
     @SerialName("productName") val productName: String,
     @SerialName("accountNo") val accountNo: String,
     @SerialName("status") val status: FineractStatusDto,
-    @SerialName("summary") val summary: MemberLoanAccountSummaryDto,
+    // Fineract OMITS `summary` for loans not yet disbursed (submitted/approved/pending) — a required
+    // non-null field made those members' `/clients/{id}/accounts` un-parseable ("Field 'summary' is
+    // required … but it was missing"), so their profile failed to load. Nullable + default so the
+    // profile parses; the mapper null-defaults the derived outstanding/arrears.
+    @SerialName("summary") val summary: MemberLoanAccountSummaryDto? = null,
 ) {
     companion object {
         const val SCHEMA_VERSION = 1

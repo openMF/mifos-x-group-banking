@@ -77,8 +77,8 @@ fun MemberAccountsDto.toDomainModel(): MemberAccounts = MemberAccounts(
 fun MemberLoanAccountDto.toActiveLoanSummary(): ActiveLoanSummary = ActiveLoanSummary(
     id = id,
     productName = productName,
-    outstandingBalance = summary.principalOutstanding,
-    inArrears = summary.totalOverdue > 0.0,
+    outstandingBalance = summary?.principalOutstanding ?: 0.0,
+    inArrears = (summary?.totalOverdue ?: 0.0) > 0.0,
     dueDate = null,
 )
 
