@@ -216,9 +216,9 @@ class MemberProfileDtoTest {
         assertEquals("Group Loan", loanAccountDto.productName)
         assertEquals("LA-7001", loanAccountDto.accountNo)
         assertEquals(activeStatusDto, loanAccountDto.status)
-        assertEquals(500.0, loanAccountDto.summary.principalDisbursed)
-        assertEquals(320.0, loanAccountDto.summary.principalOutstanding)
-        assertEquals(40.0, loanAccountDto.summary.totalOverdue)
+        assertEquals(500.0, loanAccountDto.summary!!.principalDisbursed)
+        assertEquals(320.0, loanAccountDto.summary!!.principalOutstanding)
+        assertEquals(40.0, loanAccountDto.summary!!.totalOverdue)
     }
 
     // ---------- MemberRoleInfoDto (get_member_role — datatable array item, reuses MemberRoleDto) ----------
