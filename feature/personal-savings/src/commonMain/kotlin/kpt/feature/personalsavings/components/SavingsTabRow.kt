@@ -21,13 +21,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsTab
 import kpt.feature.personalsavings.PersonalSavingsTestTags
 import kpt.feature.personalsavings.generated.resources.Res
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_tab_group_linked
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_tab_individual
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_tab_row_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.savings_tab_row` — GROUP_LINKED / INDIVIDUAL account switcher, rendered

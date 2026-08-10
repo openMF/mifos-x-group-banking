@@ -16,7 +16,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.meetingcalendar.dao.MeetingCalendarDao
 import kpt.core.database.meetingcalendar.entity.CachedMeetingItem
 import kpt.core.database.meetingcalendar.entity.MeetingCalendarCacheCodec
@@ -25,6 +24,7 @@ import kpt.core.model.MeetingListItem
 import kpt.core.model.MeetingStatus
 import kpt.core.network.mapper.toMeetingListItems
 import kpt.core.network.service.meetingcalendar.MeetingApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

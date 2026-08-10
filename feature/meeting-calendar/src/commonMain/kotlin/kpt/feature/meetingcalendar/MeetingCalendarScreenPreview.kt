@@ -11,11 +11,11 @@ package kpt.feature.meetingcalendar
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
+import kpt.core.model.MeetingListItem
+import kpt.core.model.MeetingStatus
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-import kpt.core.model.MeetingListItem
-import kpt.core.model.MeetingStatus
 
 /**
  * `@Preview` gallery for `MeetingCalendarScreen.kt`. Data source: `demo-data.yaml` (Mwangaza

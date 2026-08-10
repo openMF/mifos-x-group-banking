@@ -60,13 +60,9 @@ import kpt.core.base.designsystem.component.KptTopAppBar
 import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.MemberRole
 import kpt.core.model.PendingInvite
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.memberinvite.generated.resources.Res
 import kpt.feature.memberinvite.generated.resources.screens_member_invite_action_copy_code
 import kpt.feature.memberinvite.generated.resources.screens_member_invite_action_copy_code_cd
@@ -111,6 +107,10 @@ import kpt.feature.memberinvite.generated.resources.screens_member_invite_snack_
 import kpt.feature.memberinvite.generated.resources.screens_member_invite_snack_queued_offline
 import kpt.feature.memberinvite.generated.resources.screens_member_invite_snack_revoked
 import kpt.feature.memberinvite.generated.resources.screens_member_invite_topbar_title
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `member-invite-screen` (`ui.yaml#route`: `/groups/{groupId}/invite`). Collects

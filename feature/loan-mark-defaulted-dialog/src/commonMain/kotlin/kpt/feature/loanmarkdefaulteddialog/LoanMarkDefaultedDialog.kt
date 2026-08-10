@@ -38,9 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.Res
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark_defaulted_dialog_cancel
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark_defaulted_dialog_confirm
@@ -53,6 +50,9 @@ import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark_defaulted_dialog_title
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark_defaulted_dialog_warning_body
 import kpt.feature.loanmarkdefaulteddialog.generated.resources.screens_loan_mark_defaulted_dialog_warning_icon_cd
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for the `loan-mark-defaulted-dialog` modal (`ui.yaml#archetype: dialog`,

@@ -12,9 +12,6 @@ package kpt.feature.personaldashboard
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.LocalDate
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.GroupSummary
 import kpt.core.model.SavingsMechanism
 import kpt.core.model.SavingsTransaction
@@ -23,6 +20,9 @@ import kpt.feature.personaldashboard.components.GroupSelectorChipRow
 import kpt.feature.personaldashboard.components.RecentActivityRow
 import kpt.feature.personaldashboard.components.SavingsSummaryCard
 import kpt.feature.personaldashboard.components.ShareoutProjectionCard
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `PersonalDashboardScreen.kt`. See API.md#preview. Data source:

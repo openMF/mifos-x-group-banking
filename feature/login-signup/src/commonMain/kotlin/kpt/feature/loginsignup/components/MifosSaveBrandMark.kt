@@ -19,9 +19,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_brand_mark_cd
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

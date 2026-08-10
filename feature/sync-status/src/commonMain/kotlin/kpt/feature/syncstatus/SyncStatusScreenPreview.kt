@@ -13,13 +13,13 @@ package kpt.feature.syncstatus
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.EntityType
 import kpt.core.model.SyncOverallStatus
 import kpt.core.model.SyncQueueItem
 import kpt.core.model.SyncStatus
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

@@ -15,8 +15,8 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.OrganizerDashboardSummary
+import kpt.core.store.AppStoreRegistry
 import kpt.core.store.organizerdashboard.impl.ORGANIZER_DASHBOARD_KEY
 import org.mobilenativefoundation.store.store5.Store
 

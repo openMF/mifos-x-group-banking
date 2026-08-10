@@ -15,8 +15,8 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.GroupTypeConfig
+import kpt.core.store.AppStoreRegistry
 import kpt.core.store.grouptypepicker.impl.GROUP_TYPE_CONFIG_CATALOGUE_KEY
 import org.mobilenativefoundation.store.store5.Store
 

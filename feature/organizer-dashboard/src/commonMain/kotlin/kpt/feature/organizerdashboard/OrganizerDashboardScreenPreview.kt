@@ -11,12 +11,12 @@ package kpt.feature.organizerdashboard
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.OrganizerActivityItem
 import kpt.core.model.OrganizerActivityType
 import kpt.core.model.ScheduledMeeting
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `OrganizerDashboardScreen.kt`. Data source: `demo-data.yaml` /

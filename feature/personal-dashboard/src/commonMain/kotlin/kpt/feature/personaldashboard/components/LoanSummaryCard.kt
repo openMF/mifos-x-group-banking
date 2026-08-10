@@ -30,12 +30,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.personaldashboard.PersonalDashboardTestTags
 import kpt.feature.personaldashboard.generated.resources.Res
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_loan_card_cd
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_my_loans_label
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_my_loans_sublabel
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Elevated, tappable loan entry card — `ui.yaml#components.loan_card` (un-deferred loan tile). A

@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsLedgerEntry
 import kpt.core.model.SavingsLedgerTransactionType
 import kpt.feature.personalsavings.generated.resources.Res
@@ -46,6 +45,7 @@ import kpt.feature.personalsavings.generated.resources.screens_personal_savings_
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_txn_deposit_icon_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_txn_row_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_txn_withdrawal_icon_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.transaction_list_item` — one row of the active tab's savings ledger. Leading

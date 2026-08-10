@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.feature.settingslogoutdialog.generated.resources.Res
 import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_logout_dialog_a11y_cancel
 import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_logout_dialog_a11y_logout
@@ -43,6 +41,8 @@ import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_log
 import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_logout_dialog_logout
 import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_logout_dialog_logout_progress_cd
 import kpt.feature.settingslogoutdialog.generated.resources.screens_settings_logout_dialog_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for the `settings-logout-dialog` modal (`ui.yaml#screens[0].type: dialog`,

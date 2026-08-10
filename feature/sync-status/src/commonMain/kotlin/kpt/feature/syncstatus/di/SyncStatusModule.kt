@@ -9,9 +9,9 @@
  */
 package kpt.feature.syncstatus.di
 
+import kpt.feature.syncstatus.SyncStatusViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.syncstatus.SyncStatusViewModel
 
 /**
  * Koin module for the `sync-status` feature. `SyncQueueRepository`/`SyncManager` resolve from

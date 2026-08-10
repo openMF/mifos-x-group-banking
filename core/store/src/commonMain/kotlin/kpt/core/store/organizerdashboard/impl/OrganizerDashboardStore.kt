@@ -14,7 +14,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.organizerdashboard.dao.OrganizerDashboardDao
 import kpt.core.database.organizerdashboard.entity.CachedOrganizerActivityItem
 import kpt.core.database.organizerdashboard.entity.CachedOrganizerDashboard
@@ -27,6 +26,7 @@ import kpt.core.model.OrganizerDashboardSummary
 import kpt.core.model.ScheduledMeeting
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.organizerdashboard.OrganizerDashboardApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

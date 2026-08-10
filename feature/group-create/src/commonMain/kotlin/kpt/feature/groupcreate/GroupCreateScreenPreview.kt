@@ -11,14 +11,14 @@ package kpt.feature.groupcreate
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.ContributionMode
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.GroupTypeSlug
 import kpt.core.model.Office
 import kpt.core.model.SavingsMechanism
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 // -- demo-data.yaml#entries fixtures (Office / GroupTypeConfig) -------------------------------
 

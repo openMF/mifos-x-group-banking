@@ -9,9 +9,9 @@
  */
 package kpt.feature.meetingsummary.di
 
+import kpt.feature.meetingsummary.MeetingSummaryViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.meetingsummary.MeetingSummaryViewModel
 
 /**
  * Koin module for the `meeting-summary` feature. `MeetingSummaryRepository` is resolved from

@@ -15,7 +15,6 @@ import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.base.store.paging.PageKey
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.memberlist.dao.MemberListDao
 import kpt.core.database.memberlist.entity.MemberListEntity
 import kpt.core.model.LoanStatus
@@ -23,6 +22,7 @@ import kpt.core.model.Member
 import kpt.core.model.MemberRole
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.memberlist.MemberApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.KptButton
 import kpt.core.base.designsystem.component.KptOutlinedButton
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.LoginSignupTestTags
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_action_create_group
@@ -41,6 +40,7 @@ import kpt.feature.loginsignup.generated.resources.screens_login_signup_join_wit
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_zero_groups_illustration_cd
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_zero_groups_message
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_zero_groups_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Post-auth empty state rendered when `groupMemberships.isEmpty()` — illustration, copy, and

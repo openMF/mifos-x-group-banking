@@ -33,7 +33,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsDataPoint
 import kpt.feature.memberprofile.MemberProfileTestTags
 import kpt.feature.memberprofile.generated.resources.Res
@@ -41,6 +40,7 @@ import kpt.feature.memberprofile.generated.resources.screens_member_profile_savi
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_savings_label
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_sparkline_cd
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_view_full_history
+import org.jetbrains.compose.resources.stringResource
 
 private val SPARKLINE_HEIGHT = 80.dp
 private val BAR_GAP = 6.dp

@@ -26,12 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.grouplist.GroupListTestTags
 import kpt.feature.grouplist.generated.resources.Res
 import kpt.feature.grouplist.generated.resources.screens_group_list_search_clear_cd
 import kpt.feature.grouplist.generated.resources.screens_group_list_search_hint
 import kpt.feature.grouplist.generated.resources.screens_group_list_search_icon_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Search field — `ui.yaml#components.search_bar` (mirrors `SPEC.md`'s 48dp-height,

@@ -22,12 +22,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.joinwithcode.JoinWithCodeTestTags
 import kpt.feature.joinwithcode.generated.resources.Res
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_field_invite_code_cd
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_field_invite_code_label
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_field_invite_code_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * 6-character invite-code entry field — `ui.yaml#components.invite_code_field` /

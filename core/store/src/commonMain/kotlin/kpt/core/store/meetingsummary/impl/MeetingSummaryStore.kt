@@ -14,7 +14,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.meetingsummary.dao.MeetingRecordDao
 import kpt.core.database.meetingsummary.entity.CachedLoanSummaryItem
 import kpt.core.database.meetingsummary.entity.CachedSavingsBreakdownItem
@@ -25,6 +24,7 @@ import kpt.core.model.MeetingSummaryData
 import kpt.core.model.SavingsBreakdownItem
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.meetingsummary.MeetingRecordApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

@@ -10,9 +10,9 @@
 package kpt.feature.groupcreate.di
 
 import kpt.core.analytics.KptAnalyticsTracker
+import kpt.feature.groupcreate.GroupCreateViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.groupcreate.GroupCreateViewModel
 
 /**
  * Koin module for the `group-create` feature. `GroupCreateRepository`/`AuthRepository` resolve

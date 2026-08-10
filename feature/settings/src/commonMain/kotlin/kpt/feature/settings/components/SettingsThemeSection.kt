@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.model.user.DarkThemeConfig
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.settings.generated.resources.Res
 import kpt.feature.settings.generated.resources.screens_settings_a11y_theme_dark
 import kpt.feature.settings.generated.resources.screens_settings_a11y_theme_light
@@ -26,6 +25,7 @@ import kpt.feature.settings.generated.resources.screens_settings_a11y_theme_syst
 import kpt.feature.settings.generated.resources.screens_settings_theme_dark
 import kpt.feature.settings.generated.resources.screens_settings_theme_light
 import kpt.feature.settings.generated.resources.screens_settings_theme_system
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * The 3 theme rows backing `ui.yaml#components.theme_selector_group` — Light / Dark / System

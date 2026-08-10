@@ -9,9 +9,9 @@
  */
 package kpt.feature.loanapply.di
 
+import kpt.feature.loanapply.LoanApplyViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.loanapply.LoanApplyViewModel
 
 /**
  * Koin module for the `loan-apply` feature. `LoanApplyRepository` resolves from `DataModule`,

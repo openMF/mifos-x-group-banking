@@ -23,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_trust_footer
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_trust_footer_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Small centered trust row shown below the auth card — a `primary` lock icon plus a muted

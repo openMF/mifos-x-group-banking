@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.RepaymentRowStatus
 import kpt.core.model.RepaymentScheduleRow
 import kpt.feature.loandetail.generated.resources.Res
@@ -37,6 +36,7 @@ import kpt.feature.loandetail.generated.resources.screens_loan_detail_status_ove
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_status_paid
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_status_partial
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_status_upcoming
+import org.jetbrains.compose.resources.stringResource
 
 /** Column weights for [RepaymentScheduleHeaderRow] / [RepaymentScheduleRowItem] — Wk / Due Date / Due / Paid / Balance / Status. */
 private val CELL_WEIGHTS = floatArrayOf(0.6f, 1.4f, 1f, 1f, 1f, 1f)

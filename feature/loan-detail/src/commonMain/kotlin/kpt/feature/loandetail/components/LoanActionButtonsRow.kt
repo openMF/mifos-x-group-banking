@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanDetail
 import kpt.feature.loandetail.LoanDetailAction
@@ -29,6 +28,7 @@ import kpt.feature.loandetail.LoanDetailTestTags
 import kpt.feature.loandetail.generated.resources.Res
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_action_mark_defaulted
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_action_record_repayment
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Role-gated action row — `ui.yaml#components.action_buttons_row`. Record Repayment renders only

@@ -47,13 +47,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.paging.rememberLoadMoreTrigger
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.LoanStatusFilter
 import kpt.core.ui.scaffold.FloatingActionButtonContent
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import kpt.core.model.LoanStatusFilter
 import kpt.feature.loanlist.components.LoanListCard
 import kpt.feature.loanlist.components.LoanListCardSkeleton
 import kpt.feature.loanlist.components.LoanListFilterChips
@@ -71,6 +68,9 @@ import kpt.feature.loanlist.generated.resources.screens_loan_list_error_title
 import kpt.feature.loanlist.generated.resources.screens_loan_list_fab_cd
 import kpt.feature.loanlist.generated.resources.screens_loan_list_loading_message
 import kpt.feature.loanlist.generated.resources.screens_loan_list_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `loan-list-screen`. Collects [LoanListViewModel] state via

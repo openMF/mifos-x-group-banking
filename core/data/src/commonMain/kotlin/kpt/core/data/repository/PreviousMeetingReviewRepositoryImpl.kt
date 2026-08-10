@@ -19,12 +19,12 @@ import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.base.store.screen.combineContent
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.AttendanceRecord
 import kpt.core.model.MeetingSummaryData
 import kpt.core.model.PreviousMeetingDetail
 import kpt.core.model.UnresolvedItem
 import kpt.core.model.UnresolvedType
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Store
 
 /**

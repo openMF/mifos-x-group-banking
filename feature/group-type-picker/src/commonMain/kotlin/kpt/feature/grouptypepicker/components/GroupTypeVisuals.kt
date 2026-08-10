@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupTypeSlug
 import kpt.feature.grouptypepicker.generated.resources.Res
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_asca_feature_1
@@ -49,6 +48,7 @@ import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_vsla_feature_1
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_vsla_feature_2
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_vsla_feature_3
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Per-[GroupTypeSlug] leading icon for the type card avatar — mirrors `ui.yaml#components.*.icon`

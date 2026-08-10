@@ -16,7 +16,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.groupdashboard.dao.GroupDashboardDao
 import kpt.core.database.groupdashboard.entity.CachedActivityItem
 import kpt.core.database.groupdashboard.entity.CachedGroupAccounts
@@ -42,6 +41,7 @@ import kpt.core.model.ViewerRoleInfo
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.model.GroupDashboardResponseDto
 import kpt.core.network.service.groupdashboard.GroupDashboardApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

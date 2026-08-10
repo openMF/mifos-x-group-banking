@@ -49,14 +49,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.core.model.GroupHealthSummary
 import kpt.core.model.GroupStatusFilter
 import kpt.core.model.HealthIndicator
 import kpt.core.model.OverdueRateFilter
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.fieldofficerdashboard.components.ClearFilterIcon
 import kpt.feature.fieldofficerdashboard.components.FieldOfficerFilterChip
 import kpt.feature.fieldofficerdashboard.components.GroupHealthCard
@@ -111,6 +109,8 @@ import kpt.feature.fieldofficerdashboard.generated.resources.screens_field_offic
 import kpt.feature.fieldofficerdashboard.generated.resources.screens_field_officer_dashboard_picker_status_title
 import kpt.feature.fieldofficerdashboard.generated.resources.screens_field_officer_dashboard_subtitle
 import kpt.feature.fieldofficerdashboard.generated.resources.screens_field_officer_dashboard_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `field-officer-dashboard-screen`. Collects [FieldOfficerDashboardViewModel] state,

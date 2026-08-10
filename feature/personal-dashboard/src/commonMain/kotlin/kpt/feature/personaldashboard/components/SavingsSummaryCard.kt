@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.personaldashboard.PersonalDashboardTestTags
 import kpt.feature.personaldashboard.generated.resources.Res
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_amount_kes
@@ -39,6 +38,7 @@ import kpt.feature.personaldashboard.generated.resources.screens_personal_dashbo
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_group_linked_amount
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_individual_amount
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_total_savings_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Elevated, tappable savings summary card — `ui.yaml#components.savings_summary_card`. Shows the

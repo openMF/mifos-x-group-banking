@@ -37,9 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.PaymentMethod
 import kpt.feature.loanrepaymentdialog.generated.resources.Res
 import kpt.feature.loanrepaymentdialog.generated.resources.screens_loan_repayment_dialog_amount_label
@@ -61,6 +58,9 @@ import kpt.feature.loanrepaymentdialog.generated.resources.screens_loan_repaymen
 import kpt.feature.loanrepaymentdialog.generated.resources.screens_loan_repayment_dialog_submit
 import kpt.feature.loanrepaymentdialog.generated.resources.screens_loan_repayment_dialog_submit_cd
 import kpt.feature.loanrepaymentdialog.generated.resources.screens_loan_repayment_dialog_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for the `loan-repayment-dialog` modal (`ui.yaml#archetype: dialog`,

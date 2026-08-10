@@ -9,9 +9,9 @@
  */
 package kpt.feature.loandetail.di
 
+import kpt.feature.loandetail.LoanDetailViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.loandetail.LoanDetailViewModel
 
 /**
  * Koin module for the `loan-detail` feature. `LoanDetailRepository` is resolved from

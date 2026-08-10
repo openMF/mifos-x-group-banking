@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.LoginSignupTestTags
 import kpt.feature.loginsignup.PasswordRequirements
 import kpt.feature.loginsignup.generated.resources.Res
@@ -34,6 +33,7 @@ import kpt.feature.loginsignup.generated.resources.screens_login_signup_password
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_password_rule_len
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_password_rule_norepeat
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_password_rule_symbol
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Live Fineract password-policy feedback — a wrap-row of small pill chips, one per rule, each

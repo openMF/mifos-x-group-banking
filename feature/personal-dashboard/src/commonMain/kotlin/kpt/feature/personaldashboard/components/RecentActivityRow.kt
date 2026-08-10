@@ -26,13 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsTransaction
 import kpt.core.model.TransactionType
 import kpt.feature.personaldashboard.PersonalDashboardTestTags
 import kpt.feature.personaldashboard.generated.resources.Res
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_transaction_deposit_amount
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_transaction_withdrawal_amount
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * One recent-activity row — `ui.yaml#components.recent_activity_list`. Leading icon + amount

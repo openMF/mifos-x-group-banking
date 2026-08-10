@@ -9,9 +9,9 @@
  */
 package kpt.feature.grouplist.di
 
+import kpt.feature.grouplist.GroupListViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.grouplist.GroupListViewModel
 
 /**
  * Koin module for the `group-list` feature. `GroupRepository` is resolved from `DataModule`

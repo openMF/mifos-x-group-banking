@@ -29,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.joinwithcode.JoinError
 import kpt.feature.joinwithcode.JoinWithCodeTestTags
 import kpt.feature.joinwithcode.generated.resources.Res
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_action_retry
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_error_icon_cd
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_hint_expired_message
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Inline error banner — `ui.yaml#components.error_card`. [message] is resolved by the caller

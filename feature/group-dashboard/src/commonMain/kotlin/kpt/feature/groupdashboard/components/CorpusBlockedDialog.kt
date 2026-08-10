@@ -21,12 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.groupdashboard.GroupDashboardTestTags
 import kpt.feature.groupdashboard.generated.resources.Res
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_corpus_blocked
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_corpus_dialog_title
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_dialog_ok
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `GroupDashboardEvent.ShowCorpusBlockedDialog` modal — surfaced by

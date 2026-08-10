@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.testTag
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupCorpus
 import kpt.feature.groupdashboard.GroupDashboardTestTags
 import kpt.feature.groupdashboard.generated.resources.Res
@@ -34,6 +33,7 @@ import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_ne
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_pool_balance
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_rotation_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_viewer_position
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * ROTATING_PAYOUT-type metric card — `ui.yaml#components.rotation_card` (visible when

@@ -29,7 +29,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.ContributionMode
 import kpt.core.model.SavingsMember
 import kpt.feature.membersavingsdetail.MemberSavingsDetailTestTags
@@ -41,6 +40,7 @@ import kpt.feature.membersavingsdetail.generated.resources.screens_member_saving
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_balance_label_shares
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_shares_at_format
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_shares_total_format
+import org.jetbrains.compose.resources.stringResource
 
 private val AVATAR_SIZE = 48.dp
 

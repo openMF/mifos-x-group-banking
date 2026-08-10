@@ -36,11 +36,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.Member
 import kpt.feature.memberlist.generated.resources.Res
 import kpt.feature.memberlist.generated.resources.screens_member_list_row_cd
 import kpt.feature.memberlist.generated.resources.screens_member_list_savings_label
+import org.jetbrains.compose.resources.stringResource
 
 private const val ROW_MIN_HEIGHT_DP = 72
 

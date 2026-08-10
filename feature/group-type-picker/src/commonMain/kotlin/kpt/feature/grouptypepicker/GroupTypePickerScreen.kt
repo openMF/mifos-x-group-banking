@@ -30,10 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.core.model.GroupTypeConfig
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.grouptypepicker.components.GroupTypeCard
 import kpt.feature.grouptypepicker.components.GroupTypeCardSkeleton
 import kpt.feature.grouptypepicker.components.GroupTypeErrorSection
@@ -45,6 +43,8 @@ import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_error_server_message
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_loading_message
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `group-type-picker-screen`. Collects [GroupTypePickerViewModel] state via

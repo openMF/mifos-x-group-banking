@@ -31,11 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.grouptypepicker.GroupTypePickerTestTags
 import kpt.feature.grouptypepicker.generated.resources.Res
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_action_retry
 import kpt.feature.grouptypepicker.generated.resources.screens_group_type_picker_error_icon_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Full-screen error surface — `GroupTypePickerScreenState.Error`. Mirrors

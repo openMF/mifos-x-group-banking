@@ -57,11 +57,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.GroupSummary
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import kpt.core.model.GroupSummary
 import kpt.feature.personaldashboard.components.GroupSelectorChipRow
 import kpt.feature.personaldashboard.components.LoanSummaryCard
 import kpt.feature.personaldashboard.components.RecentActivityRow
@@ -86,6 +84,8 @@ import kpt.feature.personaldashboard.generated.resources.screens_personal_dashbo
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_overflow_menu_cd
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_recent_activity_title
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_retry_action
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 

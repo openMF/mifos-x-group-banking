@@ -45,13 +45,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.LoanDetailTab
 import kpt.core.model.RepaymentRowStatus
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.loandetail.components.LoanActionButtonsRow
 import kpt.feature.loandetail.components.LoanDetailTabs
 import kpt.feature.loandetail.components.LoanHeaderCard
@@ -70,6 +67,9 @@ import kpt.feature.loandetail.generated.resources.screens_loan_detail_error_serv
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_error_state_title
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_refresh_cd
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `loan-detail-screen`. Collects [LoanDetailViewModel] state via

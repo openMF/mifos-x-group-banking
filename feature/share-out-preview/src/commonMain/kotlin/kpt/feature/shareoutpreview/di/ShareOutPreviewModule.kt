@@ -9,9 +9,9 @@
  */
 package kpt.feature.shareoutpreview.di
 
+import kpt.feature.shareoutpreview.ShareOutPreviewViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.shareoutpreview.ShareOutPreviewViewModel
 
 /**
  * Koin module for the `share-out-preview` feature. `ShareOutRepository` resolves from `DataModule`,

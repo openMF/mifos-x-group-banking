@@ -30,13 +30,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.personalsavings.PersonalSavingsTestTags
 import kpt.feature.personalsavings.generated.resources.Res
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_contribution_progress_icon_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_contribution_progress_label
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_meetings_progress_format
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_this_cycle_format
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.contribution_progress_card` — visible only when `selectedTab ==

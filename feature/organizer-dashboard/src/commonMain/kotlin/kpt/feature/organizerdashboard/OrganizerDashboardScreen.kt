@@ -50,12 +50,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.core.model.OrganizerActivityItem
 import kpt.core.model.ScheduledMeeting
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.organizerdashboard.components.ActivityRow
 import kpt.feature.organizerdashboard.components.KpiGroupsIcon
 import kpt.feature.organizerdashboard.components.KpiMeetingsIcon
@@ -102,6 +100,8 @@ import kpt.feature.organizerdashboard.generated.resources.screens_organizer_dash
 import kpt.feature.organizerdashboard.generated.resources.screens_organizer_dashboard_top_bar_title
 import kpt.feature.organizerdashboard.generated.resources.screens_organizer_dashboard_welcome_greeting
 import kpt.feature.organizerdashboard.generated.resources.screens_organizer_dashboard_welcome_subtitle
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `organizer-dashboard-screen`. Collects [OrganizerDashboardViewModel] state, consumes

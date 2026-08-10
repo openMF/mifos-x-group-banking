@@ -33,8 +33,6 @@ import kpt.core.common.formatTimeAgo
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.feature.syncstatus.components.SyncNowButton
 import kpt.feature.syncstatus.components.SyncStatusConflictChip
 import kpt.feature.syncstatus.components.SyncStatusEmptyState
@@ -67,6 +65,8 @@ import kpt.feature.syncstatus.generated.resources.screens_sync_status_sync_now_c
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_sync_now_offline
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_title
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_top_bar_cd
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `sync-status-screen` (`ui.yaml#route`: `/sync-status`, `ui.yaml#nav_params: {}`).

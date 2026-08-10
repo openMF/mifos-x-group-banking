@@ -9,9 +9,9 @@
  */
 package kpt.feature.personaldashboard.di
 
+import kpt.feature.personaldashboard.PersonalDashboardViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.personaldashboard.PersonalDashboardViewModel
 
 /**
  * Koin module for the `personal-dashboard` feature. `MemberDashboardRepository` is resolved from

@@ -11,13 +11,13 @@ package kpt.feature.grouptypepicker
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.ContributionMode
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.GroupTypeSlug
 import kpt.core.model.SavingsMechanism
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `GroupTypePickerScreen.kt`. See API.md#preview. Data source:

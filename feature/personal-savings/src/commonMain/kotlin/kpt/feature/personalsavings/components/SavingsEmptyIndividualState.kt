@@ -27,12 +27,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.personalsavings.PersonalSavingsTestTags
 import kpt.feature.personalsavings.generated.resources.Res
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_empty_individual_body
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_empty_individual_icon_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_empty_individual_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.empty_individual_promo` — rendered when `selectedTab == INDIVIDUAL &&

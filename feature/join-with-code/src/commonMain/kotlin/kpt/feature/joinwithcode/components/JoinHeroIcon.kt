@@ -22,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.joinwithcode.generated.resources.Res
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_hero_icon_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Circular hero illustration for the invite-entry screen — `ui.yaml#components.hero_icon`

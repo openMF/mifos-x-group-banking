@@ -9,9 +9,9 @@
  */
 package kpt.feature.personalloans.di
 
+import kpt.feature.personalloans.PersonalLoansViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.personalloans.PersonalLoansViewModel
 
 /**
  * Koin module for the `personal-loans` feature. `LoanRepository` is resolved from `DataModule`,

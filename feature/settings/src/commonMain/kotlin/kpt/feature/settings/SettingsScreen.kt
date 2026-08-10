@@ -32,8 +32,6 @@ import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.feature.settings.components.SettingsChangePinDialog
 import kpt.feature.settings.components.SettingsLanguageSection
 import kpt.feature.settings.components.SettingsLogoutButton
@@ -80,6 +78,8 @@ import kpt.feature.settings.generated.resources.screens_settings_section_notific
 import kpt.feature.settings.generated.resources.screens_settings_section_security
 import kpt.feature.settings.generated.resources.screens_settings_title
 import kpt.feature.settings.generated.resources.screens_settings_version_label
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `settings-screen` (`ui.yaml#route`: `/settings`). Collects

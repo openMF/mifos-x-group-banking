@@ -11,9 +11,6 @@ package kpt.feature.previousmeetingreview
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.AttendanceRecord
 import kpt.core.model.AttendanceStatus
 import kpt.core.model.LoanSummaryItem
@@ -22,6 +19,9 @@ import kpt.core.model.PreviousMeetingDetail
 import kpt.core.model.SavingsBreakdownItem
 import kpt.core.model.UnresolvedItem
 import kpt.core.model.UnresolvedType
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `PreviousMeetingReviewScreen.kt`. See API.md#preview. Data source:

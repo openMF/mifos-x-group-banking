@@ -26,10 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.LoginSignupTestTags
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_error_icon_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Inline banner surfaced when `LoginSignupState.error != null`. Mirrors

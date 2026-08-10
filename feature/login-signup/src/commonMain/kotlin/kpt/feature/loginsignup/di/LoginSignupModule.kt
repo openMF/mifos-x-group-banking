@@ -10,9 +10,9 @@
 package kpt.feature.loginsignup.di
 
 import kpt.core.analytics.KptAnalyticsTracker
+import kpt.feature.loginsignup.LoginSignupViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.loginsignup.LoginSignupViewModel
 
 /**
  * Koin module for the `login-signup` feature. `AuthRepository` is resolved from `DataModule`

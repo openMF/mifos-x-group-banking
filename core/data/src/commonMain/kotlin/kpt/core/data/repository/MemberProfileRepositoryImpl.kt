@@ -17,13 +17,13 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.MemberProfileDetail
 import kpt.core.model.UpdateMemberRoleRequest
 import kpt.core.model.UpdateMemberRoleResult
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.mapper.toDto
 import kpt.core.network.service.memberprofile.MemberProfileApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Store
 
 /**

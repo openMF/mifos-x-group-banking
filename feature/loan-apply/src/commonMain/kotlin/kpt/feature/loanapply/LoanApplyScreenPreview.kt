@@ -11,12 +11,12 @@ package kpt.feature.loanapply
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.GroupMember
 import kpt.core.model.LoanProduct
 import kpt.core.model.LoanPurpose
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 // -- ui.yaml#states.content.demo_data fixtures -------------------------------------------------
 

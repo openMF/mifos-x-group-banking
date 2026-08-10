@@ -11,12 +11,12 @@ package kpt.feature.fieldofficerdashboard
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.FieldOfficerDashboard
 import kpt.core.model.GroupHealthSummary
 import kpt.core.model.HealthIndicator
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `FieldOfficerDashboardScreen.kt`. Data source: `demo-data.yaml` /

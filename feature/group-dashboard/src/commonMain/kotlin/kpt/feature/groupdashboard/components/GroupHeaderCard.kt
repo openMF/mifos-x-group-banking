@@ -29,13 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupDetail
 import kpt.feature.groupdashboard.GroupDashboardTestTags
 import kpt.feature.groupdashboard.generated.resources.Res
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_cycle_info
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_member_count_chip
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_overdue_loans_chip
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Primary-container header — `ui.yaml#components.group_header_card`. Renders [group].name (i18n:

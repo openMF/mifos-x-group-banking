@@ -9,9 +9,9 @@
  */
 package kpt.feature.groupdashboard.di
 
+import kpt.feature.groupdashboard.GroupDashboardViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.groupdashboard.GroupDashboardViewModel
 
 /**
  * Koin module for the `group-dashboard` feature. `GroupDashboardRepository` resolves from

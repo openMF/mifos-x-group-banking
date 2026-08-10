@@ -40,13 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.LoanStatusFilter
 import kpt.core.ui.scaffold.FloatingActionButtonContent
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import kpt.core.model.LoanStatusFilter
 import kpt.feature.personalloans.components.PersonalLoansCard
 import kpt.feature.personalloans.components.PersonalLoansCardSkeleton
 import kpt.feature.personalloans.components.PersonalLoansFilterChips
@@ -65,6 +62,9 @@ import kpt.feature.personalloans.generated.resources.screens_personal_loans_fab_
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_fab_label
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_shimmer_cd
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `personal-loans-screen`. Collects [PersonalLoansViewModel] state via

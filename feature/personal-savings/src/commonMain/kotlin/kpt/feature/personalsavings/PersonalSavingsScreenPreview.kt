@@ -12,9 +12,6 @@ package kpt.feature.personalsavings
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.LocalDate
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.SavingsLedgerEntry
 import kpt.core.model.SavingsLedgerTransactionType
 import kpt.core.model.SavingsTab
@@ -24,6 +21,9 @@ import kpt.feature.personalsavings.components.SavingsEmptyIndividualState
 import kpt.feature.personalsavings.components.SavingsTabRow
 import kpt.feature.personalsavings.components.SavingsTransactionRow
 import kpt.feature.personalsavings.components.SavingsTransactionSkeletonRow
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `PersonalSavingsScreen.kt`. See API.md#preview. Data source:

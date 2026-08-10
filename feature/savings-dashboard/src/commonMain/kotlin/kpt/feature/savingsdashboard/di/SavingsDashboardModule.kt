@@ -9,9 +9,9 @@
  */
 package kpt.feature.savingsdashboard.di
 
+import kpt.feature.savingsdashboard.SavingsDashboardViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.savingsdashboard.SavingsDashboardViewModel
 
 /**
  * Koin module for the `savings-dashboard` feature. `SavingsRepository` resolves from

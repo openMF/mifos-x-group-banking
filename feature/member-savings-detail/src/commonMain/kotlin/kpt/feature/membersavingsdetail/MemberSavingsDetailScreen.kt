@@ -52,12 +52,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.paging.rememberLoadMoreTrigger
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.GroupTypeConfig
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import kpt.core.model.GroupTypeConfig
 import kpt.feature.membersavingsdetail.components.MemberSavingsHeaderCard
 import kpt.feature.membersavingsdetail.components.SavingsFilterChips
 import kpt.feature.membersavingsdetail.components.SavingsSparklineCard
@@ -75,6 +72,9 @@ import kpt.feature.membersavingsdetail.generated.resources.screens_member_saving
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_error_title
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_load_more_cd
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_screen_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `member-savings-detail-screen`. Collects [MemberSavingsDetailViewModel] state via

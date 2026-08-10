@@ -15,8 +15,8 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.MemberDashboard
+import kpt.core.store.AppStoreRegistry
 import kpt.core.store.personaldashboard.impl.MEMBER_DASHBOARD_DEFAULT_KEY
 import org.mobilenativefoundation.store.store5.Store
 

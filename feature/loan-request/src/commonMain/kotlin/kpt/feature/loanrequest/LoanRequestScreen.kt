@@ -39,11 +39,8 @@ import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.LoanPurpose
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.loanrequest.components.LoanRequestAmountField
 import kpt.feature.loanrequest.components.LoanRequestDropdownField
 import kpt.feature.loanrequest.components.LoanRequestDurationSelector
@@ -101,6 +98,9 @@ import kpt.feature.loanrequest.generated.resources.screens_loan_request_success_
 import kpt.feature.loanrequest.generated.resources.screens_loan_request_success_online_title
 import kpt.feature.loanrequest.generated.resources.screens_loan_request_topbar_title
 import kpt.feature.loanrequest.generated.resources.screens_loan_request_total_repayment_label
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `loan-request-screen` (`ui.yaml#route`: `/loan-request`). Collects

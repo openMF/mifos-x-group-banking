@@ -9,9 +9,9 @@
  */
 package kpt.feature.memberadd.di
 
+import kpt.feature.memberadd.MemberAddViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.memberadd.MemberAddViewModel
 
 /**
  * Koin module for the `member-add` feature. `MemberAddRepository` resolves from `DataModule`,

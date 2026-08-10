@@ -51,12 +51,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.SavingsMechanism
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import kpt.core.model.SavingsMechanism
 import kpt.feature.groupdashboard.components.ActivityFeedSection
 import kpt.feature.groupdashboard.components.CorpusBlockedDialog
 import kpt.feature.groupdashboard.components.CorpusMetricCard
@@ -76,6 +73,9 @@ import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_me
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_menu_sync_status
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_more_options_cd
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_share_out_not_available
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `group-dashboard-screen`. Collects [GroupDashboardViewModel] state via

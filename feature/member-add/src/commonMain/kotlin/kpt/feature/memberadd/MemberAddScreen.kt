@@ -50,11 +50,8 @@ import kpt.core.base.designsystem.component.KptTopAppBar
 import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.MemberRole
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.memberadd.components.MemberAddDropdownField
 import kpt.feature.memberadd.components.MemberAddErrorBanner
 import kpt.feature.memberadd.components.MemberAddOfflineBanner
@@ -109,6 +106,9 @@ import kpt.feature.memberadd.generated.resources.screens_member_add_role_treasur
 import kpt.feature.memberadd.generated.resources.screens_member_add_success_icon_cd
 import kpt.feature.memberadd.generated.resources.screens_member_add_success_message
 import kpt.feature.memberadd.generated.resources.screens_member_add_topbar_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Placeholder camera-capture URI dispatched by [PhotoSourceBottomSheet]'s "Take Photo" option.

@@ -32,13 +32,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.AuthMode
 import kpt.feature.loginsignup.LoginSignupTestTags
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_mode_toggle_cd
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_tab_login
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_tab_signup
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * LOGIN / SIGNUP pill segmented control. A rounded `surfaceVariant` track holds two segments; the

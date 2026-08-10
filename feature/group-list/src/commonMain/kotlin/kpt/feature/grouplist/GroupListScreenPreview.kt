@@ -12,10 +12,6 @@ package kpt.feature.grouplist
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.LocalDate
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.Group
 import kpt.core.model.GroupTypeSlug
 import kpt.core.model.HealthIndicator
@@ -25,6 +21,10 @@ import kpt.feature.grouplist.components.GroupListCardSkeleton
 import kpt.feature.grouplist.components.GroupListSearchBar
 import kpt.feature.grouplist.generated.resources.Res
 import kpt.feature.grouplist.generated.resources.screens_group_list_error_network_message
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `GroupListScreen.kt`. See API.md#preview. Data source:

@@ -24,13 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanDetail
 import kpt.feature.loandetail.LoanDetailTestTags
 import kpt.feature.loandetail.generated.resources.Res
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_amount_kes
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_outstanding_label
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_overdue_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Outstanding / overdue info-chip row — `ui.yaml#components.outstanding_summary_row`. The overdue

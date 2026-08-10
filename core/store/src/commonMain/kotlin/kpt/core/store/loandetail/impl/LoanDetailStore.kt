@@ -14,7 +14,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.loandetail.dao.LoanDetailDao
 import kpt.core.database.loandetail.entity.CachedRepaymentScheduleRow
 import kpt.core.database.loandetail.entity.CachedRepaymentTransaction
@@ -28,6 +27,7 @@ import kpt.core.model.RepaymentScheduleRow
 import kpt.core.model.RepaymentTransaction
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.loandetail.LoanDetailApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

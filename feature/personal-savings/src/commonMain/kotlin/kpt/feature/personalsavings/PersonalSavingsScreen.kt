@@ -36,13 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.SavingsLedgerEntry
 import kpt.core.model.SavingsTab
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.personalsavings.components.SavingsBalanceHeroCard
 import kpt.feature.personalsavings.components.SavingsContributionProgressCard
 import kpt.feature.personalsavings.components.SavingsEmptyIndividualState
@@ -59,6 +56,9 @@ import kpt.feature.personalsavings.generated.resources.screens_personal_savings_
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_shimmer_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_title
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_transaction_history_label
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `personal-savings-screen`. Collects [PersonalSavingsViewModel] state via

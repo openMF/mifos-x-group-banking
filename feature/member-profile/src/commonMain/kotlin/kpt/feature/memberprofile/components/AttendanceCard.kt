@@ -27,13 +27,13 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.memberprofile.MemberProfileTestTags
 import kpt.feature.memberprofile.generated.resources.Res
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_attendance_fraction
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_attendance_label
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_attendance_progress_cd
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_attendance_rate
+import org.jetbrains.compose.resources.stringResource
 
 private const val RATE_HIGH_THRESHOLD = 0.80
 private const val RATE_MID_THRESHOLD = 0.60

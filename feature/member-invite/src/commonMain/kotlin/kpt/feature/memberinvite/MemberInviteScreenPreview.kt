@@ -11,11 +11,11 @@ package kpt.feature.memberinvite
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
+import kpt.core.model.MemberRole
+import kpt.core.model.PendingInvite
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-import kpt.core.model.MemberRole
-import kpt.core.model.PendingInvite
 
 // -- ui.yaml#states.*.demo_data fixtures -------------------------------------------------------
 

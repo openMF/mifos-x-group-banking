@@ -21,15 +21,12 @@ import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
-import kpt.feature.home.di.HomeModule
-import kpt.sync.di.SyncModule
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
 import kpt.feature.fieldofficerdashboard.di.FieldOfficerDashboardModule
 import kpt.feature.groupcreate.di.GroupCreateModule
 import kpt.feature.groupdashboard.di.GroupDashboardModule
 import kpt.feature.grouplist.di.GroupListModule
 import kpt.feature.grouptypepicker.di.GroupTypePickerModule
+import kpt.feature.home.di.HomeModule
 import kpt.feature.joinwithcode.di.JoinWithCodeModule
 import kpt.feature.loanapply.di.LoanApplyModule
 import kpt.feature.loandetail.di.LoanDetailModule
@@ -56,6 +53,9 @@ import kpt.feature.settingslogoutdialog.di.SettingsLogoutDialogModule
 import kpt.feature.shareoutexecute.di.ShareOutExecuteModule
 import kpt.feature.shareoutpreview.di.ShareOutPreviewModule
 import kpt.feature.syncstatus.di.SyncStatusModule
+import kpt.sync.di.SyncModule
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 import kpt.feature.settings.di.SettingsModule as GroupBankingSettingsModule
 
 object KoinModules {

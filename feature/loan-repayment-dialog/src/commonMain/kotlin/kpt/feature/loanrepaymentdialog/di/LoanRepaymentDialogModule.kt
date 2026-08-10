@@ -9,9 +9,9 @@
  */
 package kpt.feature.loanrepaymentdialog.di
 
+import kpt.feature.loanrepaymentdialog.LoanRepaymentDialogViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.loanrepaymentdialog.LoanRepaymentDialogViewModel
 
 /**
  * Koin module for the `loan-repayment-dialog` feature. `LoanRepaymentRepository` resolves from

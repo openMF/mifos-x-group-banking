@@ -9,9 +9,9 @@
  */
 package kpt.feature.loanrequest.di
 
+import kpt.feature.loanrequest.LoanRequestViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.loanrequest.LoanRequestViewModel
 
 /**
  * Koin module for the `loan-request` feature. `LoanRequestRepository` resolves from `DataModule`,

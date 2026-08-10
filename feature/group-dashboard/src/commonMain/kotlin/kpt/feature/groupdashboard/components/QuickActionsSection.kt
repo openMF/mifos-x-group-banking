@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.groupdashboard.GroupDashboardAction
 import kpt.feature.groupdashboard.GroupDashboardTestTags
 import kpt.feature.groupdashboard.generated.resources.Res
@@ -49,6 +48,7 @@ import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_ac
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_action_start_meeting
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_quick_actions_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_share_out_disabled_hint
+import org.jetbrains.compose.resources.stringResource
 
 /** ORGANIZER / CHAIRPERSON / TREASURER — mirrors `ui.yaml#management_actions_grid.visible`. */
 private val MANAGEMENT_ROLES = setOf("ORGANIZER", "CHAIRPERSON", "TREASURER")

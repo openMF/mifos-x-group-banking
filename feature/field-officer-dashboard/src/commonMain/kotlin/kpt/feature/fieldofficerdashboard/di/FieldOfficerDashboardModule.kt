@@ -9,9 +9,9 @@
  */
 package kpt.feature.fieldofficerdashboard.di
 
+import kpt.feature.fieldofficerdashboard.FieldOfficerDashboardViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.fieldofficerdashboard.FieldOfficerDashboardViewModel
 
 /**
  * Koin module for the `field-officer-dashboard` feature. `FieldOfficerDashboardRepository` is

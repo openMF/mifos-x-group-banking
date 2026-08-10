@@ -13,9 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.ActiveLoanSummary
 import kpt.core.model.MemberAccounts
 import kpt.core.model.MemberProfile
@@ -27,6 +24,9 @@ import kpt.feature.memberprofile.components.AttendanceCard
 import kpt.feature.memberprofile.components.MemberHeaderCard
 import kpt.feature.memberprofile.components.RoleEditBottomSheet
 import kpt.feature.memberprofile.components.SavingsHistoryCard
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `MemberProfileScreen.kt`. See API.md#preview. Data source:

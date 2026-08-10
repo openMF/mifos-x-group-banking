@@ -9,9 +9,9 @@
  */
 package kpt.feature.personalsavings.di
 
+import kpt.feature.personalsavings.PersonalSavingsViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.personalsavings.PersonalSavingsViewModel
 
 /**
  * Koin module for the `personal-savings` feature. `SavingsRepository` is resolved from

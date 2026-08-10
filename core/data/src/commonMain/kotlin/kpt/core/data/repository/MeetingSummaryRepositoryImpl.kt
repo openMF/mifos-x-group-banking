@@ -15,9 +15,9 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.meetingsummary.dao.MeetingRecordDao
 import kpt.core.model.MeetingSummaryData
+import kpt.core.store.AppStoreRegistry
 import kpt.core.store.meetingsummary.impl.primeMeetingSummaryCache
 import org.mobilenativefoundation.store.store5.Store
 

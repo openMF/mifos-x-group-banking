@@ -17,9 +17,9 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
-import kpt.core.store.AppStoreRegistry
 import kpt.core.model.FieldOfficerDashboard
 import kpt.core.network.service.fieldofficerdashboard.FieldOfficerApi
+import kpt.core.store.AppStoreRegistry
 import kpt.core.store.fieldofficerdashboard.impl.fieldOfficerDashboardStoreKey
 import org.mobilenativefoundation.store.store5.Store
 

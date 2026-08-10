@@ -9,9 +9,9 @@
  */
 package kpt.feature.previousmeetingreview.di
 
+import kpt.feature.previousmeetingreview.PreviousMeetingReviewViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.previousmeetingreview.PreviousMeetingReviewViewModel
 
 /**
  * Koin module for the `previous-meeting-review` feature. `PreviousMeetingReviewRepository` is

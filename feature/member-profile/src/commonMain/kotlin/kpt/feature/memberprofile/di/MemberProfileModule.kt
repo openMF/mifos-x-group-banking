@@ -9,9 +9,9 @@
  */
 package kpt.feature.memberprofile.di
 
+import kpt.feature.memberprofile.MemberProfileViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.memberprofile.MemberProfileViewModel
 
 /**
  * Koin module for the `member-profile` feature. `MemberProfileRepository` resolves from

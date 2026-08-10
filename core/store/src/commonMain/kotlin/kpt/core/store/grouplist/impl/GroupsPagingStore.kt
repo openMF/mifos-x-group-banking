@@ -16,7 +16,6 @@ import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.base.store.paging.PageKey
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.grouplist.dao.GroupListDao
 import kpt.core.database.grouplist.entity.GroupListEntity
 import kpt.core.model.Group
@@ -25,6 +24,7 @@ import kpt.core.model.HealthIndicator
 import kpt.core.model.ViewerRole
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.grouplist.GroupApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

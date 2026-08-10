@@ -12,7 +12,6 @@ package kpt.feature.memberlist.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanStatus
 import kpt.core.model.MemberRole
 import kpt.feature.memberlist.generated.resources.Res
@@ -22,6 +21,7 @@ import kpt.feature.memberlist.generated.resources.screens_member_list_role_chair
 import kpt.feature.memberlist.generated.resources.screens_member_list_role_member
 import kpt.feature.memberlist.generated.resources.screens_member_list_role_secretary
 import kpt.feature.memberlist.generated.resources.screens_member_list_role_treasurer
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Role-chip label + colors — verbatim mirror of `ui.yaml#components.member_list_item.content

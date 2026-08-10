@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanSummary
 import kpt.feature.loanlist.generated.resources.Res
@@ -52,6 +51,7 @@ import kpt.feature.loanlist.generated.resources.screens_loan_list_card_cd
 import kpt.feature.loanlist.generated.resources.screens_loan_list_next_repayment_label
 import kpt.feature.loanlist.generated.resources.screens_loan_list_outstanding_label
 import kpt.feature.loanlist.generated.resources.screens_loan_list_overdue_label
+import org.jetbrains.compose.resources.stringResource
 
 private const val CARD_MIN_HEIGHT_DP = 72
 

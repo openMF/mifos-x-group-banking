@@ -15,13 +15,13 @@ import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.base.store.paging.PageKey
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.loanlist.dao.LoanListDao
 import kpt.core.database.loanlist.entity.LoanListEntity
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanSummary
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.loanlist.LoanApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

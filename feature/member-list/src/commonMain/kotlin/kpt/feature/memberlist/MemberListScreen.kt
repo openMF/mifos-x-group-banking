@@ -54,9 +54,6 @@ import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.FloatingActionButtonContent
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.feature.memberlist.components.MemberListItemRow
 import kpt.feature.memberlist.components.MemberListItemSkeleton
 import kpt.feature.memberlist.generated.resources.Res
@@ -76,6 +73,9 @@ import kpt.feature.memberlist.generated.resources.screens_member_list_load_more_
 import kpt.feature.memberlist.generated.resources.screens_member_list_loading_message
 import kpt.feature.memberlist.generated.resources.screens_member_list_title
 import kpt.feature.memberlist.generated.resources.screens_member_list_title_with_group
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `member-list-screen`. Collects [MemberListViewModel] state via

@@ -55,8 +55,6 @@ import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.FloatingActionButtonContent
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.feature.grouplist.components.GroupListCard
 import kpt.feature.grouplist.components.GroupListCardSkeleton
 import kpt.feature.grouplist.components.GroupListSearchBar
@@ -78,6 +76,8 @@ import kpt.feature.grouplist.generated.resources.screens_group_list_notification
 import kpt.feature.grouplist.generated.resources.screens_group_list_notifications_deferred
 import kpt.feature.grouplist.generated.resources.screens_group_list_search_empty_message
 import kpt.feature.grouplist.generated.resources.screens_group_list_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for `group-list-screen`. Collects [GroupListViewModel] state via

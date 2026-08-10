@@ -10,7 +10,6 @@
 package kpt.feature.syncstatus.components
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.EntityType
 import kpt.feature.syncstatus.generated.resources.Res
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_entity_attendance
@@ -19,6 +18,7 @@ import kpt.feature.syncstatus.generated.resources.screens_sync_status_entity_mee
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_entity_member
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_entity_savings
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_entity_share_out
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#i18n.en.entity_row_label: "{{entityType | humanize}}"` — shared humanization bridge

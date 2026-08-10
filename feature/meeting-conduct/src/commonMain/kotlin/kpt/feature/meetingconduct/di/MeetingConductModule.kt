@@ -9,9 +9,9 @@
  */
 package kpt.feature.meetingconduct.di
 
+import kpt.feature.meetingconduct.MeetingConductViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.meetingconduct.MeetingConductViewModel
 
 /**
  * Koin module for the `meeting-conduct` feature. `MeetingConductRepository` resolves from

@@ -36,10 +36,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_password_hide_cd
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_password_show_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Reusable single-line auth text field wrapping [OutlinedTextField]: rounded 12dp corners, a

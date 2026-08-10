@@ -61,11 +61,8 @@ import kpt.core.base.designsystem.component.KptTopAppBar
 import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.GroupTypeConfig
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.groupcreate.components.GroupCreateDropdownField
 import kpt.feature.groupcreate.components.GroupCreateErrorBanner
 import kpt.feature.groupcreate.components.GroupCreateTextField
@@ -196,6 +193,9 @@ import kpt.feature.groupcreate.generated.resources.screens_group_create_validati
 import kpt.feature.groupcreate.generated.resources.screens_group_create_validation_share_min_invalid
 import kpt.feature.groupcreate.generated.resources.screens_group_create_validation_share_value_invalid
 import kpt.feature.groupcreate.generated.resources.screens_group_create_validation_social_fund_percent_invalid
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /** Weekday options for `meeting_day_dropdown` — domain vocabulary, not translatable UI copy. */
 private val MEETING_DAY_OPTIONS = // i18n:skip

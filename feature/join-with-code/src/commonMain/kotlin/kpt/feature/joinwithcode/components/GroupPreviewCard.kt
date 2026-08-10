@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupPreview
 import kpt.feature.joinwithcode.JoinWithCodeTestTags
 import kpt.feature.joinwithcode.generated.resources.Res
@@ -38,6 +37,7 @@ import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_label
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_preview_card_cd
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_preview_title
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_role_chip_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Group preview confirmation card — `ui.yaml#components.group_preview_card`. Displays the

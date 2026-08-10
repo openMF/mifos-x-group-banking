@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanStatusFilter
 import kpt.feature.loanlist.LoanListTestTags
 import kpt.feature.loanlist.generated.resources.Res
@@ -29,6 +28,7 @@ import kpt.feature.loanlist.generated.resources.screens_loan_list_filter_active
 import kpt.feature.loanlist.generated.resources.screens_loan_list_filter_all
 import kpt.feature.loanlist.generated.resources.screens_loan_list_filter_closed
 import kpt.feature.loanlist.generated.resources.screens_loan_list_filter_overdue
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Horizontal status-filter chip row — `ui.yaml#components.filter_chips_row` (4 chips: All /

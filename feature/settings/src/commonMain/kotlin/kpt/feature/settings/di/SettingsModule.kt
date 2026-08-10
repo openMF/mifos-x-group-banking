@@ -9,10 +9,10 @@
  */
 package kpt.feature.settings.di
 
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
 import kpt.feature.settings.AppVersionInfo
 import kpt.feature.settings.SettingsViewModel
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 
 /**
  * Koin module for the group-banking `settings` feature (`kpt.feature.settings`

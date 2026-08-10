@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.testTag
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupCorpus
 import kpt.feature.groupdashboard.GroupDashboardTestTags
 import kpt.feature.groupdashboard.generated.resources.Res
@@ -38,6 +37,7 @@ import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_co
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_loans_outstanding_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_opening_balance_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_shareout_projection
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * ACCUMULATING-type metric card — `ui.yaml#components.corpus_card` (visible when

@@ -22,12 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.RepaymentTransaction
 import kpt.feature.loandetail.LoanDetailTestTags
 import kpt.feature.loandetail.generated.resources.Res
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_amount_kes
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_history_empty_message
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * One repayment-history transaction row — `ui.yaml#components.transaction_row`. `txn.type` stays

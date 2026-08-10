@@ -9,9 +9,9 @@
  */
 package kpt.feature.settingslogoutdialog.di
 
+import kpt.feature.settingslogoutdialog.SettingsLogoutDialogViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.settingslogoutdialog.SettingsLogoutDialogViewModel
 
 /**
  * Koin module for the `settings-logout-dialog` feature. `AuthRepository` and

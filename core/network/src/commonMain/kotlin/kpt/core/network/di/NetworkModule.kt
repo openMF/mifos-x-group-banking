@@ -16,9 +16,8 @@ import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
-import org.koin.dsl.module
-import kpt.core.network.auth.companionAuthHeaderPlugin
 import kpt.core.network.BuildKonfig
+import kpt.core.network.auth.companionAuthHeaderPlugin
 import kpt.core.network.service.batchsync.BatchSyncApi
 import kpt.core.network.service.batchsync.BatchSyncApiImpl
 import kpt.core.network.service.changepin.ChangePinApi
@@ -73,6 +72,7 @@ import kpt.core.network.service.savings.SavingsApi
 import kpt.core.network.service.savings.SavingsApiImpl
 import kpt.core.network.service.shareout.ShareOutApi
 import kpt.core.network.service.shareout.ShareOutApiImpl
+import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,

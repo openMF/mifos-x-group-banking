@@ -32,12 +32,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.MemberRole
 import kpt.feature.memberprofile.MemberProfileTestTags
 import kpt.feature.memberprofile.generated.resources.Res
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_change_role_title
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_confirm
+import org.jetbrains.compose.resources.stringResource
 
 private val ROLE_OPTIONS = listOf(MemberRole.CHAIRPERSON, MemberRole.TREASURER, MemberRole.SECRETARY, MemberRole.MEMBER)
 

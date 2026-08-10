@@ -41,13 +41,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.Group
 import kpt.feature.grouplist.generated.resources.Res
 import kpt.feature.grouplist.generated.resources.screens_group_list_card_cd
 import kpt.feature.grouplist.generated.resources.screens_group_list_cycle_label
 import kpt.feature.grouplist.generated.resources.screens_group_list_last_met
 import kpt.feature.grouplist.generated.resources.screens_group_list_member_count
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * One group row — `ui.yaml#components.group_card` (mirrors `preview/content.html` +

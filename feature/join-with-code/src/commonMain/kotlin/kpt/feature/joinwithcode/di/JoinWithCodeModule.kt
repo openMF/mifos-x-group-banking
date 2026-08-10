@@ -10,9 +10,9 @@
 package kpt.feature.joinwithcode.di
 
 import kpt.core.analytics.KptAnalyticsTracker
+import kpt.feature.joinwithcode.JoinWithCodeViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.joinwithcode.JoinWithCodeViewModel
 
 /**
  * Koin module for the `join-with-code` feature. `InvitationRepository` and `AuthRepository` are

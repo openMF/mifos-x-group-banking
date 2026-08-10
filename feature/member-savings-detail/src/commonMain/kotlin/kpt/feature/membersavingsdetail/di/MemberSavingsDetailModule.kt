@@ -9,9 +9,9 @@
  */
 package kpt.feature.membersavingsdetail.di
 
+import kpt.feature.membersavingsdetail.MemberSavingsDetailViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.membersavingsdetail.MemberSavingsDetailViewModel
 
 /**
  * Koin module for the `member-savings-detail` feature. `SavingsRepository` resolves from

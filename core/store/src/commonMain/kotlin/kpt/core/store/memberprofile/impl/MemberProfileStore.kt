@@ -16,7 +16,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.memberprofile.dao.MemberProfileCacheDao
 import kpt.core.database.memberprofile.entity.CachedActiveLoanSummary
 import kpt.core.database.memberprofile.entity.CachedMemberAccounts
@@ -37,6 +36,7 @@ import kpt.core.model.SavingsDataPoint
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.mapper.toDomainModels
 import kpt.core.network.service.memberprofile.MemberProfileApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

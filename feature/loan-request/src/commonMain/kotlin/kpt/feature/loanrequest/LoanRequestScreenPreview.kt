@@ -11,14 +11,14 @@ package kpt.feature.loanrequest
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.LoanPurpose
 import kpt.feature.loanrequest.generated.resources.Res
 import kpt.feature.loanrequest.generated.resources.screens_loan_request_submit_button
 import kpt.feature.loanrequest.generated.resources.screens_loan_request_submit_cd
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 // -- ui.yaml#states.*.demo_data-shaped fixtures --------------------------------------------------
 

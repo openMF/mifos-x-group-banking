@@ -9,9 +9,9 @@
  */
 package kpt.feature.memberlist.di
 
+import kpt.feature.memberlist.MemberListViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.memberlist.MemberListViewModel
 
 /**
  * Koin module for the `member-list` feature. `MemberRepository` and `GroupRepository` resolve

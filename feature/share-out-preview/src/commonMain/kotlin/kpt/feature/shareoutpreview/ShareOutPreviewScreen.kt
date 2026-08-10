@@ -56,13 +56,10 @@ import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.MemberPayout
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.shareoutpreview.generated.resources.Res
 import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview_a11y_confirm_button
 import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview_a11y_error_state
@@ -100,6 +97,9 @@ import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview
 import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview_total_pool
 import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview_total_profit
 import kpt.feature.shareoutpreview.generated.resources.screens_share_out_preview_your_position_label_format
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 private const val SHIMMER_COUNT = 4
 private val SHIMMER_HEIGHT = 80.dp

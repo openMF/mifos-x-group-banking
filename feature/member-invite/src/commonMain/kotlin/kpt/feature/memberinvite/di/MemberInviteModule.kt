@@ -9,9 +9,9 @@
  */
 package kpt.feature.memberinvite.di
 
+import kpt.feature.memberinvite.MemberInviteViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.memberinvite.MemberInviteViewModel
 
 /**
  * Koin module for the `member-invite` feature. `MemberInviteRepository` resolves from `DataModule`,

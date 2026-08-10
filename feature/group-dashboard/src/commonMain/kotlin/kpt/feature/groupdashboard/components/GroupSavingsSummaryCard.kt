@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.testTag
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.GroupConfig
 import kpt.core.model.GroupContributionModel
 import kpt.feature.groupdashboard.GroupDashboardTestTags
@@ -30,6 +29,7 @@ import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_co
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_contribution_share_based
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_savings_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_total_savings
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Group-level savings summary — `ui.yaml#components.savings_summary_card`. Contribution-model

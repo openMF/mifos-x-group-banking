@@ -20,13 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsTransactionFilter
 import kpt.feature.membersavingsdetail.MemberSavingsDetailTestTags
 import kpt.feature.membersavingsdetail.generated.resources.Res
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_filter_all
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_filter_deposits
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_filter_withdrawals
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.filter_chips_row` — 3 chips (All / Deposits / Withdrawals,

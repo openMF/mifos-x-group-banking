@@ -16,7 +16,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.fieldofficerdashboard.dao.FieldOfficerDashboardDao
 import kpt.core.database.fieldofficerdashboard.entity.CachedFieldOfficerDashboard
 import kpt.core.database.fieldofficerdashboard.entity.CachedGroupHealthSummary
@@ -27,6 +26,7 @@ import kpt.core.model.GroupHealthSummary
 import kpt.core.model.HealthIndicator
 import kpt.core.network.mapper.aggregateFieldOfficerDashboard
 import kpt.core.network.service.fieldofficerdashboard.FieldOfficerApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

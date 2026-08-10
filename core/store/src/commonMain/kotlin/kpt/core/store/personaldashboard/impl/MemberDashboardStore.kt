@@ -17,7 +17,6 @@ import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
-import kpt.core.store.AppStoreRegistry
 import kpt.core.database.personaldashboard.dao.MemberDashboardDao
 import kpt.core.database.personaldashboard.entity.CachedGroupSummary
 import kpt.core.database.personaldashboard.entity.CachedSavingsTransaction
@@ -30,6 +29,7 @@ import kpt.core.model.SavingsTransaction
 import kpt.core.model.TransactionType
 import kpt.core.network.mapper.toDomainModel
 import kpt.core.network.service.personaldashboard.MemberDashboardApi
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store

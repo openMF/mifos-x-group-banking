@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanSummary
 import kpt.feature.personalloans.generated.resources.Res
@@ -64,6 +63,7 @@ import kpt.feature.personalloans.generated.resources.screens_personal_loans_next
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_outstanding_amount_format
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_overdue_cd
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_status_chip_cd
+import org.jetbrains.compose.resources.stringResource
 
 private const val CARD_SKELETON_MIN_HEIGHT_DP = 96
 

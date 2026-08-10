@@ -11,15 +11,15 @@ package kpt.feature.personalloans
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanStatusFilter
 import kpt.core.model.LoanSummary
 import kpt.feature.personalloans.components.PersonalLoansCard
 import kpt.feature.personalloans.components.PersonalLoansCardSkeleton
 import kpt.feature.personalloans.components.PersonalLoansFilterChips
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `PersonalLoansScreen.kt`. See API.md#preview. Data source:

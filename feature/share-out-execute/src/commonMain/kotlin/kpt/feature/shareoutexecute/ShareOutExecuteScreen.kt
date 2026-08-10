@@ -70,14 +70,10 @@ import kpt.core.base.security.BiometricResult
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.MemberExecutionStatus
 import kpt.core.model.MemberPayout
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.shareoutexecute.generated.resources.Res
 import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute_a11y_back
 import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute_a11y_biometric_button
@@ -123,6 +119,10 @@ import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute
 import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute_summary_members_to_receive
 import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute_summary_one_recipient
 import kpt.feature.shareoutexecute.generated.resources.screens_share_out_execute_total_pool_label
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `share-out-execute-screen`. Collects [ShareOutExecuteViewModel] state, consumes

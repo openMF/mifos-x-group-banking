@@ -13,9 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.SavingsDataPoint
 import kpt.core.model.SavingsMember
 import kpt.core.model.SavingsStatementEntry
@@ -25,6 +22,9 @@ import kpt.feature.membersavingsdetail.components.MemberSavingsHeaderCard
 import kpt.feature.membersavingsdetail.components.SavingsFilterChips
 import kpt.feature.membersavingsdetail.components.SavingsSparklineCard
 import kpt.feature.membersavingsdetail.components.SavingsStatementRow
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `MemberSavingsDetailScreen.kt`. See API.md#preview. Data source:

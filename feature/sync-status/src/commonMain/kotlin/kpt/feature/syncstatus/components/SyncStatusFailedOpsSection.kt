@@ -24,12 +24,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SyncQueueItem
 import kpt.core.model.operationTypeToEntityType
 import kpt.feature.syncstatus.SyncStatusTestTags
 import kpt.feature.syncstatus.generated.resources.Res
 import kpt.feature.syncstatus.generated.resources.screens_sync_status_failed_item_title_format
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.failed_operations_section` — visible only when `failedCount > 0`.

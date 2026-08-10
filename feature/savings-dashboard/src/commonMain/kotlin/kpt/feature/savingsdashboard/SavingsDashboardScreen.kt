@@ -69,16 +69,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.ui.scaffold.rememberKptPullToRefreshState
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.MemberGroupSavingsRow
 import kpt.core.model.MemberIndividualSavingsRow
 import kpt.core.model.SavingsDashboardTab
 import kpt.core.model.WeeklyContributionPoint
+import kpt.core.ui.scaffold.KptScaffold
+import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import kpt.feature.savingsdashboard.generated.resources.Res
 import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboard_action_retry
 import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboard_avatar_cd_format
@@ -117,6 +114,9 @@ import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboar
 import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboard_tab_individual
 import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboard_total_individual_label
 import kpt.feature.savingsdashboard.generated.resources.screens_savings_dashboard_trend_empty
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 private const val SHARE_BASED = "SHARE_BASED_VARIABLE"
 private val CHART_HEIGHT = 180.dp

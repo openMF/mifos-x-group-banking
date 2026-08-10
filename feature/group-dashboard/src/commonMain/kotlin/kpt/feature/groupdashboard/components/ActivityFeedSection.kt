@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.testTag
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.ActivityItem
 import kpt.core.model.ActivityType
 import kpt.feature.groupdashboard.GroupDashboardTestTags
@@ -40,6 +39,7 @@ import kpt.feature.groupdashboard.generated.resources.Res
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_activity_amount
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_activity_label
 import kpt.feature.groupdashboard.generated.resources.screens_group_dashboard_activity_supporting
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Recent-activity card — `ui.yaml#components.activity_feed_section`. Wraps the section label

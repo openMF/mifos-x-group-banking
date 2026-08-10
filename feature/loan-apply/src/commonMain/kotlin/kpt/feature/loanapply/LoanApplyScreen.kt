@@ -48,11 +48,8 @@ import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.LoanPurpose
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.loanapply.components.LoanApplyAmountField
 import kpt.feature.loanapply.components.LoanApplyCorpusWarningBanner
 import kpt.feature.loanapply.components.LoanApplyDropdownField
@@ -105,6 +102,9 @@ import kpt.feature.loanapply.generated.resources.screens_loan_apply_purpose_othe
 import kpt.feature.loanapply.generated.resources.screens_loan_apply_success_icon_cd
 import kpt.feature.loanapply.generated.resources.screens_loan_apply_success_message
 import kpt.feature.loanapply.generated.resources.screens_loan_apply_topbar_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `loan-apply-screen` (`ui.yaml#route`: `/groups/{groupId}/loans/apply`). Collects

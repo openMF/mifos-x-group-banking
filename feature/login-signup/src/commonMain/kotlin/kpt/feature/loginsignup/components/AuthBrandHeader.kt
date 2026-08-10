@@ -24,11 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_tagline
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_wordmark_mifos
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_wordmark_save
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * MifosSave brand lockup shown above the login/signup card — the [MifosSaveBrandMark] ring

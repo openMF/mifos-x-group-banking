@@ -15,12 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanDetailTab
 import kpt.feature.loandetail.LoanDetailTestTags
 import kpt.feature.loandetail.generated.resources.Res
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_tab_history
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_tab_schedule
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Schedule / Repayment-History tab selector — `ui.yaml#components.detail_tabs`. Dispatches

@@ -53,12 +53,9 @@ import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.util.ShareUtils
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.MeetingSummaryData
 import kpt.core.model.SavingsBreakdownItem
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.meetingsummary.generated.resources.Res
 import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_action_retry
 import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_attendance_label
@@ -88,6 +85,9 @@ import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_sh
 import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_title
 import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_title_format
 import kpt.feature.meetingsummary.generated.resources.screens_meeting_summary_total_collected_label
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `meeting-summary-screen`. Collects [MeetingSummaryViewModel] state via

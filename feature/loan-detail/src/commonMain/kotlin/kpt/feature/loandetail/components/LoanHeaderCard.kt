@@ -21,13 +21,13 @@ import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanDetail
 import kpt.feature.loandetail.LoanDetailTestTags
 import kpt.feature.loandetail.generated.resources.Res
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_disbursed_label
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_interest_label
 import kpt.feature.loandetail.generated.resources.screens_loan_detail_principal_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Loan header summary — `ui.yaml#components.member_header_card`. Member name, loan product,

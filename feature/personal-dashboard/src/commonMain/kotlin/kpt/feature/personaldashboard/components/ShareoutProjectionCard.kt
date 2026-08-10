@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.personaldashboard.PersonalDashboardTestTags
 import kpt.feature.personaldashboard.generated.resources.Res
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_amount_kes
@@ -35,6 +34,7 @@ import kpt.feature.personaldashboard.generated.resources.screens_personal_dashbo
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_rotation_position
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_rotation_position_label
 import kpt.feature.personaldashboard.generated.resources.screens_personal_dashboard_shareout_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Pool-model-adaptive projection card — `ui.yaml#components.shareout_projection_card`. Mutually

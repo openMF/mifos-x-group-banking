@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.LoanStatusFilter
 import kpt.feature.personalloans.PersonalLoansTestTags
 import kpt.feature.personalloans.generated.resources.Res
@@ -30,6 +29,7 @@ import kpt.feature.personalloans.generated.resources.screens_personal_loans_filt
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_filter_all
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_filter_chips_cd
 import kpt.feature.personalloans.generated.resources.screens_personal_loans_filter_closed
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Horizontal status-filter chip row — `ui.yaml#components.filter_chips_row` (3 chips: All /

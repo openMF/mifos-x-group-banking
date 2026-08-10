@@ -9,9 +9,9 @@
  */
 package kpt.feature.loanmarkdefaulteddialog.di
 
+import kpt.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialogViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.loanmarkdefaulteddialog.LoanMarkDefaultedDialogViewModel
 
 /**
  * Koin module for the `loan-mark-defaulted-dialog` feature. `LoanWriteoffRepository` resolves

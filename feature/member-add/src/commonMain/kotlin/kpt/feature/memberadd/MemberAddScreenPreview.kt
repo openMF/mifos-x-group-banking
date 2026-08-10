@@ -11,10 +11,10 @@ package kpt.feature.memberadd
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
+import kpt.core.model.MemberRole
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-import kpt.core.model.MemberRole
 
 // -- demo-data.yaml#entries fixtures (MemberAddState / MemberAddState_Offline /
 // MemberAddState_ValidationError) -------------------------------------------------------------

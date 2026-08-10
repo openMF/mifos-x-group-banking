@@ -45,9 +45,6 @@ import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.feature.joinwithcode.components.GroupPreviewCard
 import kpt.feature.joinwithcode.components.InviteCodeField
 import kpt.feature.joinwithcode.components.JoinCodeErrorBanner
@@ -66,6 +63,9 @@ import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_error
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_title
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_validating_cd
 import kpt.feature.joinwithcode.generated.resources.screens_join_with_code_validating_message
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for the invite-code entry + group-preview confirmation screen

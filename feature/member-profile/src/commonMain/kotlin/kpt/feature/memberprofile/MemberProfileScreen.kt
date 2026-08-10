@@ -45,9 +45,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.feature.memberprofile.components.ActiveLoanCard
 import kpt.feature.memberprofile.components.AttendanceCard
 import kpt.feature.memberprofile.components.MemberHeaderCard
@@ -64,6 +61,9 @@ import kpt.feature.memberprofile.generated.resources.screens_member_profile_erro
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_error_state_title
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_role_updated
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_screen_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `member-profile-screen`. Collects [MemberProfileViewModel] state via

@@ -66,16 +66,13 @@ import kpt.core.base.designsystem.core.KptTopAppBarConfiguration
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.meeting.AttendanceStatus
 import kpt.core.model.meeting.GroupMember
 import kpt.core.model.meeting.LoanApplication
 import kpt.core.model.meeting.LoanSummary
 import kpt.core.model.meeting.LoanVote
 import kpt.core.model.meeting.SavingsType
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.meetingconduct.generated.resources.Res
 import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_attendance_absent
 import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_attendance_fine_chip
@@ -165,6 +162,9 @@ import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_su
 import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_topbar_subtitle
 import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_topbar_title
 import kpt.feature.meetingconduct.generated.resources.screens_meeting_conduct_view_full_report
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `meeting-conduct-screen` (`ui.yaml#route`: `/meetings/{meetingId}/conduct`). Collects

@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.loginsignup.LoginSignupTestTags
 import kpt.feature.loginsignup.generated.resources.Res
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_demo_dialog_body
@@ -53,6 +52,7 @@ import kpt.feature.loginsignup.generated.resources.screens_login_signup_demo_dia
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_demo_dialog_icon_cd
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_demo_dialog_legal_note
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_demo_dialog_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Demo Explore confirm dialog (`ui.yaml#components.demo_confirm_dialog`, F1/B1/G1). Armed by the

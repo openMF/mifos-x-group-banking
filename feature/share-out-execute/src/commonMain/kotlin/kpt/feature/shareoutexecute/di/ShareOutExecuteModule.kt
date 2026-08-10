@@ -9,11 +9,11 @@
  */
 package kpt.feature.shareoutexecute.di
 
-import org.koin.compose.viewmodel.dsl.viewModel
-import org.koin.dsl.module
 import kpt.core.model.GroupTypeConfig
 import kpt.core.model.MemberPayout
 import kpt.feature.shareoutexecute.ShareOutExecuteViewModel
+import org.koin.compose.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 
 /**
  * Koin module for the `share-out-execute` feature. `ShareOutRepository` resolves from `DataModule`,

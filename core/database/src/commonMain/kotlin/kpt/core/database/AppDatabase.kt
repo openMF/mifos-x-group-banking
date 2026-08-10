@@ -13,12 +13,6 @@ import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
-import kpt.core.database.infra.dao.BookkeeperDao
-import kpt.core.database.infra.dao.DraftDao
-import kpt.core.database.infra.dao.FetchedAtDao
-import kpt.core.database.infra.entity.BookkeeperEntity
-import kpt.core.database.infra.entity.DraftEntity
-import kpt.core.database.infra.entity.FetchedAtEntity
 import kpt.core.database.fieldofficerdashboard.dao.FieldOfficerDashboardDao
 import kpt.core.database.fieldofficerdashboard.entity.FieldOfficerDashboardCacheEntity
 import kpt.core.database.groupdashboard.dao.GroupDashboardDao
@@ -27,6 +21,12 @@ import kpt.core.database.grouplist.dao.GroupListDao
 import kpt.core.database.grouplist.entity.GroupListEntity
 import kpt.core.database.grouptypepicker.dao.GroupTypeConfigDao
 import kpt.core.database.grouptypepicker.entity.GroupTypeConfigEntity
+import kpt.core.database.infra.dao.BookkeeperDao
+import kpt.core.database.infra.dao.DraftDao
+import kpt.core.database.infra.dao.FetchedAtDao
+import kpt.core.database.infra.entity.BookkeeperEntity
+import kpt.core.database.infra.entity.DraftEntity
+import kpt.core.database.infra.entity.FetchedAtEntity
 import kpt.core.database.loandetail.dao.LoanDetailDao
 import kpt.core.database.loandetail.entity.LoanDetailCacheEntity
 import kpt.core.database.loanlist.dao.LoanListDao

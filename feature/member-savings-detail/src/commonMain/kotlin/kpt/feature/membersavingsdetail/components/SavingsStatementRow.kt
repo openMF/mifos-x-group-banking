@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsStatementEntry
 import kpt.core.model.SavingsTransactionType
 import kpt.feature.membersavingsdetail.generated.resources.Res
@@ -63,6 +62,7 @@ import kpt.feature.membersavingsdetail.generated.resources.screens_member_saving
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_txn_type_transfer
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_txn_type_unknown
 import kpt.feature.membersavingsdetail.generated.resources.screens_member_savings_detail_txn_type_withdrawal
+import org.jetbrains.compose.resources.stringResource
 
 private val DEPOSIT_COLOR = Color(0xFF1B5E20)
 private val WITHDRAWAL_COLOR = Color(0xFFB71C1C)

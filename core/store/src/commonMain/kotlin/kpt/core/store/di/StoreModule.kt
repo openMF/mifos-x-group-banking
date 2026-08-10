@@ -10,14 +10,12 @@
 package kpt.core.store.di
 
 import kpt.core.store.AppStoreRegistry
-import kpt.core.store.infra.StoreCacheManager
-import kpt.core.store.infra.impl.StoreCacheManagerImpl
-import org.koin.core.module.Module
-import org.koin.dsl.module
 import kpt.core.store.fieldofficerdashboard.impl.provideFieldOfficerDashboardStore
 import kpt.core.store.groupdashboard.impl.provideGroupDashboardStore
 import kpt.core.store.grouplist.impl.provideGroupsPagingStore
 import kpt.core.store.grouptypepicker.impl.provideGroupTypeConfigStore
+import kpt.core.store.infra.StoreCacheManager
+import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import kpt.core.store.loandetail.impl.provideLoanDetailStore
 import kpt.core.store.loanlist.impl.provideLoansPagingStore
 import kpt.core.store.meetingcalendar.impl.provideMeetingCalendarStore
@@ -27,6 +25,8 @@ import kpt.core.store.memberprofile.impl.provideMemberProfileStore
 import kpt.core.store.organizerdashboard.impl.provideOrganizerDashboardStore
 import kpt.core.store.personaldashboard.impl.provideMemberDashboardStore
 import kpt.core.store.previousmeetingreview.impl.provideMeetingAttendanceStore
+import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
  * Koin module for app-level Store wiring.

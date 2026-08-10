@@ -42,7 +42,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.MeetingFrequency
 import kpt.feature.meetingcalendar.MeetingCalendarTestTags
 import kpt.feature.meetingcalendar.generated.resources.Res
@@ -63,6 +62,7 @@ import kpt.feature.meetingcalendar.generated.resources.screens_meeting_calendar_
 import kpt.feature.meetingcalendar.generated.resources.screens_meeting_calendar_schedule_editor_title
 import kpt.feature.meetingcalendar.generated.resources.screens_meeting_calendar_schedule_frequency_label
 import kpt.feature.meetingcalendar.generated.resources.screens_meeting_calendar_schedule_time_label
+import org.jetbrains.compose.resources.stringResource
 
 /** The 7 selectable meeting days — enum-name value stored in state, localized label rendered. */
 private val DAY_OPTIONS = listOf(

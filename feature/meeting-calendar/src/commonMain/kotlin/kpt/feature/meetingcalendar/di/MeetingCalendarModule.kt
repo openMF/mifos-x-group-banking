@@ -9,9 +9,9 @@
  */
 package kpt.feature.meetingcalendar.di
 
+import kpt.feature.meetingcalendar.MeetingCalendarViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.meetingcalendar.MeetingCalendarViewModel
 
 /**
  * Koin module for the `meeting-calendar` feature. `MeetingRepository` is resolved from `DataModule`,

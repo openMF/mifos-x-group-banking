@@ -11,10 +11,10 @@ package kpt.feature.loanrepaymentdialog
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
+import kpt.core.model.PaymentMethod
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-import kpt.core.model.PaymentMethod
 
 // -- ui.yaml#states.*.demo_data fixtures ---------------------------------------------------------
 

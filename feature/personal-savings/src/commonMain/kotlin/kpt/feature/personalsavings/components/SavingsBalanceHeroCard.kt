@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.SavingsTab
 import kpt.feature.personalsavings.PersonalSavingsTestTags
 import kpt.feature.personalsavings.generated.resources.Res
@@ -35,6 +34,7 @@ import kpt.feature.personalsavings.generated.resources.screens_personal_savings_
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_balance_card_cd
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_group_linked_balance_label
 import kpt.feature.personalsavings.generated.resources.screens_personal_savings_individual_balance_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.balance_hero_card` — the active tab's current balance + savings account

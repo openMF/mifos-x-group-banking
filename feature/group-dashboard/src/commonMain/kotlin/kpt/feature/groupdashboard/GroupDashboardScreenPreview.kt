@@ -12,9 +12,6 @@ package kpt.feature.groupdashboard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.ActivityItem
 import kpt.core.model.ActivityType
 import kpt.core.model.GroupAccounts
@@ -33,6 +30,9 @@ import kpt.feature.groupdashboard.components.GroupHeaderCard
 import kpt.feature.groupdashboard.components.GroupSavingsSummaryCard
 import kpt.feature.groupdashboard.components.QuickActionsSection
 import kpt.feature.groupdashboard.components.RotationMetricCard
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `GroupDashboardScreen.kt`. See API.md#preview. Data source:

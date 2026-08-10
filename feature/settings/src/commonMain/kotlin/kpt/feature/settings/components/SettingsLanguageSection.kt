@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kpt.core.model.user.LanguageConfig
-import org.jetbrains.compose.resources.stringResource
 import kpt.feature.settings.generated.resources.Res
 import kpt.feature.settings.generated.resources.screens_settings_a11y_lang_english
 import kpt.feature.settings.generated.resources.screens_settings_a11y_lang_french
@@ -28,6 +27,7 @@ import kpt.feature.settings.generated.resources.screens_settings_lang_english
 import kpt.feature.settings.generated.resources.screens_settings_lang_french
 import kpt.feature.settings.generated.resources.screens_settings_lang_hindi
 import kpt.feature.settings.generated.resources.screens_settings_lang_swahili
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * The 4 language rows backing `ui.yaml#components.language_selector_group` — English / Kiswahili

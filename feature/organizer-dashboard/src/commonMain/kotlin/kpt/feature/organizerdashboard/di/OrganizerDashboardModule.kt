@@ -9,9 +9,9 @@
  */
 package kpt.feature.organizerdashboard.di
 
+import kpt.feature.organizerdashboard.OrganizerDashboardViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.organizerdashboard.OrganizerDashboardViewModel
 
 /**
  * Koin module for the `organizer-dashboard` feature. `OrganizerDashboardRepository` is resolved from

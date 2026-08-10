@@ -11,10 +11,10 @@ package kpt.feature.loginsignup
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
+import kpt.feature.loginsignup.components.DemoExploreConfirmDialog
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-import kpt.feature.loginsignup.components.DemoExploreConfirmDialog
 
 /**
  * `@Preview` gallery for `LoginSignupScreen.kt`. See API.md#preview. Data source: `demo-data.yaml`

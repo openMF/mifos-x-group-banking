@@ -12,9 +12,6 @@ package kpt.feature.loandetail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanDetail
 import kpt.core.model.LoanDetailTab
@@ -30,6 +27,9 @@ import kpt.feature.loandetail.components.RepaymentHistoryEmptyState
 import kpt.feature.loandetail.components.RepaymentScheduleHeaderRow
 import kpt.feature.loandetail.components.RepaymentScheduleRowItem
 import kpt.feature.loandetail.components.RepaymentTransactionRow
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `LoanDetailScreen.kt`. See API.md#preview. Data source:

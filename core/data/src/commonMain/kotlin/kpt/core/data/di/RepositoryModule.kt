@@ -17,19 +17,6 @@ import kpt.core.base.common.di.CommonModule
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.data.infra.NetworkMonitor
 import kpt.core.data.infra.impl.RoomFetchedAtRepository
-import kpt.core.data.user.UserDataRepository
-import kpt.core.data.user.UserLogoutManager
-import kpt.core.data.user.impl.UserDataRepositoryImpl
-import kpt.core.data.user.impl.UserLogoutManagerImpl
-import kpt.core.database.AppDatabase
-import kpt.core.database.di.DatabaseModule
-import kpt.core.datastore.di.DatastoreModule
-import kpt.core.network.di.NetworkModule
-import kpt.core.store.AppStoreRegistry
-import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import kpt.core.data.repository.AuthRepository
 import kpt.core.data.repository.AuthRepositoryImpl
 import kpt.core.data.repository.ChangePinRepository
@@ -88,6 +75,19 @@ import kpt.core.data.repository.SyncManager
 import kpt.core.data.repository.SyncManagerImpl
 import kpt.core.data.repository.SyncQueueRepository
 import kpt.core.data.repository.SyncQueueRepositoryImpl
+import kpt.core.data.user.UserDataRepository
+import kpt.core.data.user.UserLogoutManager
+import kpt.core.data.user.impl.UserDataRepositoryImpl
+import kpt.core.data.user.impl.UserLogoutManagerImpl
+import kpt.core.database.AppDatabase
+import kpt.core.database.di.DatabaseModule
+import kpt.core.datastore.di.DatastoreModule
+import kpt.core.network.di.NetworkModule
+import kpt.core.store.AppStoreRegistry
+import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)

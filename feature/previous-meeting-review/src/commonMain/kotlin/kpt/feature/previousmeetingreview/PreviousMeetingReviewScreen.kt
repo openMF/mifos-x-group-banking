@@ -54,16 +54,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kpt.core.model.AttendanceRecord
 import kpt.core.model.AttendanceStatus
 import kpt.core.model.LoanSummaryItem
 import kpt.core.model.PreviousMeetingDetail
 import kpt.core.model.SavingsBreakdownItem
 import kpt.core.model.UnresolvedItem
+import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.previousmeetingreview.generated.resources.Res
 import kpt.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_action_retry
 import kpt.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_attendance_chip_a11y
@@ -98,6 +95,9 @@ import kpt.feature.previousmeetingreview.generated.resources.screens_previous_me
 import kpt.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_total_collected_label
 import kpt.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_unresolved_header
 import kpt.feature.previousmeetingreview.generated.resources.screens_previous_meeting_review_warning_icon_a11y
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Container for `previous-meeting-review-screen` (FR-019). Collects

@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.ActiveLoanSummary
 import kpt.feature.memberprofile.MemberProfileTestTags
 import kpt.feature.memberprofile.generated.resources.Res
@@ -37,6 +36,7 @@ import kpt.feature.memberprofile.generated.resources.screens_member_profile_loan
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_loan_arrears_cd
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_loan_label
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_loan_outstanding
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * `ui.yaml#components.active_loan_card` — visible ONLY when `accounts.activeLoan != null`

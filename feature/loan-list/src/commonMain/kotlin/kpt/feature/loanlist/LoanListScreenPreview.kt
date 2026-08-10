@@ -11,10 +11,6 @@ package kpt.feature.loanlist
 
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
-import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import kpt.core.model.LoanAccountStatus
 import kpt.core.model.LoanStatusFilter
 import kpt.core.model.LoanSummary
@@ -23,6 +19,10 @@ import kpt.feature.loanlist.components.LoanListCardSkeleton
 import kpt.feature.loanlist.components.LoanListFilterChips
 import kpt.feature.loanlist.generated.resources.Res
 import kpt.feature.loanlist.generated.resources.screens_loan_list_error_network_message
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
  * `@Preview` gallery for `LoanListScreen.kt`. See API.md#preview. Data source: `demo-data.yaml`

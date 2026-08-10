@@ -9,9 +9,9 @@
  */
 package kpt.feature.grouptypepicker.di
 
+import kpt.feature.grouptypepicker.GroupTypePickerViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.grouptypepicker.GroupTypePickerViewModel
 
 /**
  * Koin module for the `group-type-picker` feature. `GroupTypeConfigRepository` is resolved

@@ -53,8 +53,6 @@ import kpt.core.base.designsystem.component.KptOutlinedButton
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.feature.loginsignup.components.AuthBrandHeader
 import kpt.feature.loginsignup.components.AuthDividerLabeled
 import kpt.feature.loginsignup.components.AuthErrorBanner
@@ -109,6 +107,8 @@ import kpt.feature.loginsignup.generated.resources.screens_login_signup_validati
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_validation_identifier_invalid
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_validation_name_required
 import kpt.feature.loginsignup.generated.resources.screens_login_signup_validation_password_weak
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Container for the unified login/signup entry screen (`login-signup-screen`). Collects

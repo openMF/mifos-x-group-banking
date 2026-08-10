@@ -34,7 +34,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import kpt.core.model.MemberProfile
 import kpt.core.model.MemberRole
 import kpt.feature.memberprofile.MemberProfileTestTags
@@ -46,6 +45,7 @@ import kpt.feature.memberprofile.generated.resources.screens_member_profile_role
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_role_member
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_role_secretary
 import kpt.feature.memberprofile.generated.resources.screens_member_profile_role_treasurer
+import org.jetbrains.compose.resources.stringResource
 
 private val AVATAR_SIZE = 72.dp
 
