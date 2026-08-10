@@ -5,7 +5,7 @@
 
 `:feature:personal-dashboard` — the member home screen (`/dashboard/member`), unified-identity
 (no `clientId`/`selfServiceToken` nav-param — resolved from the auth token). Namespace
-`org.mifos.groupbanking.feature.personaldashboard`. Source of truth:
+`kpt.feature.personaldashboard`. Source of truth:
 `idea-layer/screens/personal-dashboard/{ui,flow,data-flow,docs}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.loandetail.LoanDetailViewModel` — extends
+`kpt.feature.loandetail.LoanDetailViewModel` — extends
 `BaseViewModel<LoanDetailState, LoanDetailEvent, LoanDetailAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `LoanDetailRepository`
 (`core/data`, `loanDetailStream(loanId, scope, fetchPolicy)`), `SessionManager`
@@ -67,7 +67,7 @@ Mark-Defaulted buttons (`visible_when: canRecordRepayment && loan.status == ACTI
 
 ## di
 
-`org.mifos.groupbanking.feature.loandetail.di.LoanDetailModule` — Koin module,
+`kpt.feature.loandetail.di.LoanDetailModule` — Koin module,
 `viewModel { parameters -> LoanDetailViewModel(..., loanId = parameters.get()) }` (not
 `viewModelOf` — `loanId` is a nav-arg, not a DI-graph type). Included in
 `KoinModules.kt#featureModule`. `LoanDetailRepository` resolved from `DataModule`,
@@ -78,7 +78,7 @@ Mark-Defaulted buttons (`visible_when: canRecordRepayment && loan.status == ACTI
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.loandetail.LoanDetailScreen` — Container+Content split.
+`kpt.feature.loandetail.LoanDetailScreen` — Container+Content split.
 `LoanDetailScreen(loanId, onNavigateBack, viewModel = koinViewModel(parameters = {
 parametersOf(loanId) }))` collects `viewModel.stateFlow`, consumes `LoanDetailEvent`s via
 `EventsEffect` (`NavigateBack` → `onNavigateBack()`; `ShowRepaymentDialog` /
@@ -95,7 +95,7 @@ dispatch `OnRefresh`) and state-driven renders `LoanDetailScreenState.{Loading,C
 
 ## route
 
-`org.mifos.groupbanking.feature.loandetail.LoanDetailRoute` — `@Serializable data class
+`kpt.feature.loandetail.LoanDetailRoute` — `@Serializable data class
 LoanDetailRoute(val loanId: Long)`, route `/loans/{loanId}` (`ui.yaml#route`). `NavController
 .navigateToLoanDetail(loanId, navOptions)` + `NavGraphBuilder.loanDetailScreen(onNavigateBack)`.
 Registered on `cmp-navigation`'s `GroupBankingNavHost.kt` (`loan-list` → `loan-detail` wired for

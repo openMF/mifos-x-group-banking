@@ -5,7 +5,7 @@
 
 `:feature:personal-savings` — the member's own tabbed savings ledger (`/savings`), entered from
 `personal-dashboard`'s `user_taps_savings_card` entry point. Namespace
-`org.mifos.groupbanking.feature.personalsavings`. Source of truth:
+`kpt.feature.personalsavings`. Source of truth:
 `idea-layer/screens/personal-savings/{ui,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

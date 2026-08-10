@@ -44,6 +44,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.groupbanking.feature.shareoutpreview.generated.resources"
+        packageOfResClass = "kpt.feature.shareoutpreview.generated.resources"
     }
 }

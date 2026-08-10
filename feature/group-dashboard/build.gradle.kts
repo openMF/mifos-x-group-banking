@@ -43,6 +43,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.groupbanking.feature.groupdashboard.generated.resources"
+        packageOfResClass = "kpt.feature.groupdashboard.generated.resources"
     }
 }

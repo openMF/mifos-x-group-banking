@@ -5,7 +5,7 @@
 
 `:feature:savings-dashboard` — the contribution-model-aware, group/individual tabbed savings
 dashboard (`/groups/{groupId}/savings`), entered from `group-dashboard`'s `OnViewSavings` entry
-point. Namespace `org.mifos.groupbanking.feature.savingsdashboard`. Source of truth:
+point. Namespace `kpt.feature.savingsdashboard`. Source of truth:
 `idea-layer/screens/savings-dashboard/{ui,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

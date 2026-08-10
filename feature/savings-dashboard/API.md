@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.savingsdashboard.SavingsDashboardViewModel` — extends
+`kpt.feature.savingsdashboard.SavingsDashboardViewModel` — extends
 `BaseViewModel<SavingsDashboardState, SavingsDashboardEvent, SavingsDashboardAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `SavingsRepository` (`core/data`,
 `loadSavingsDashboard(groupId)` — a single composite `suspend fun`, no Store5 wrap), `NetworkMonitor`
@@ -58,7 +58,7 @@ member).
 
 ## di
 
-`org.mifos.groupbanking.feature.savingsdashboard.di.SavingsDashboardModule` — Koin module,
+`kpt.feature.savingsdashboard.di.SavingsDashboardModule` — Koin module,
 `viewModel { parameters -> SavingsDashboardViewModel(..., groupId = parameters.get(), typeConfig =
 parameters.get()) }` (not `viewModelOf` — the 2 nav-args are not DI-graph types). Included in
 `KoinModules.kt#featureModule`. `SavingsRepository` resolved from `DataModule`, `NetworkMonitor`

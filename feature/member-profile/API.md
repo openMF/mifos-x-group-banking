@@ -3,7 +3,7 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.memberprofile.MemberProfileViewModel` — extends
+`kpt.feature.memberprofile.MemberProfileViewModel` — extends
 `BaseViewModel<MemberProfileState, MemberProfileEvent, MemberProfileAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `MemberProfileRepository`
 (`core/data`, composite fan-in of `get_client` + `get_client_accounts` + `get_member_role`, plus
@@ -71,7 +71,7 @@ error that never flips the screen away from the already-loaded profile.
 
 ## di
 
-`org.mifos.groupbanking.feature.memberprofile.di.MemberProfileModule` — Koin module,
+`kpt.feature.memberprofile.di.MemberProfileModule` — Koin module,
 `viewModel { parameters -> MemberProfileViewModel(..., memberId = parameters.get(), groupId =
 parameters.get()) }` (not `viewModelOf` — `memberId`/`groupId` are nav-args, not DI-graph types).
 Included in `KoinModules.kt#featureModule`. `MemberProfileRepository` resolved from `DataModule`,

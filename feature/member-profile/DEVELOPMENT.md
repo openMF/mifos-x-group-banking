@@ -5,7 +5,7 @@
 
 `:feature:member-profile` — a single member's profile (`/groups/{groupId}/members/{memberId}`),
 reached from `member-list`'s `member_row_tap`. Namespace
-`org.mifos.groupbanking.feature.memberprofile`. Source of truth:
+`kpt.feature.memberprofile`. Source of truth:
 `idea-layer/screens/member-profile/{ui,api,docs,flow,data-flow}.yaml`.
 
 ## 2. Public API

@@ -35,20 +35,14 @@ buildkonfig {
         )
         // The companion server (mcp-mifosx Go BFF) is the app's single backend — it holds the
         // service credential, does orchestration + proxying to the active Fineract instance. Every
-        // *ApiConfig#baseUrl default reads COMPANION_BASE_URL; the app never talks to Fineract
-        // directly. SoT: COMPANION_BASE_URL env / local.properties#companion.base.url.
+        // The app's single governed base URL — every client reads COMPANION_BASE_URL directly
+        // (the companion BFF); the app never talks to Fineract directly. Per-API *ApiConfig classes
+        // were removed (fixed single base URL + DynamicBaseUrlPlugin for runtime overrides).
+        // SoT: COMPANION_BASE_URL env / local.properties#companion.base.url.
         buildConfigField(
             STRING, "COMPANION_BASE_URL",
             System.getenv("COMPANION_BASE_URL")
                 ?: localProps.getProperty("companion.base.url", "https://mifossave-companion.onrender.com"),
-        )
-        // Retained for any raw-Fineract passthrough config a fork may re-point; the app's governed
-        // base URL is COMPANION_BASE_URL above. instance-sync.sh still cascades these from the
-        // single-instance SoT (server-layer/migrations/instances.json#active).
-        buildConfigField(
-            STRING, "FINERACT_BASE_URL",
-            System.getenv("FINERACT_BASE_URL")
-                ?: localProps.getProperty("fineract.base.url", "https://mifos-bank-2.mifos.community"),
         )
         buildConfigField(
             STRING, "FINERACT_TENANT",

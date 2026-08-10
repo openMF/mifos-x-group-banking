@@ -5,7 +5,7 @@
 
 `:feature:personal-loans` — the member's own loan list (`/loans`), entered from
 `personal-dashboard`'s `user_taps_loan_card` entry point. Namespace
-`org.mifos.groupbanking.feature.personalloans`. Source of truth:
+`kpt.feature.personalloans`. Source of truth:
 `idea-layer/screens/personal-loans/{ui,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

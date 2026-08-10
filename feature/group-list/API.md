@@ -3,14 +3,14 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.grouplist.GroupListViewModel` — extends
+`kpt.feature.grouplist.GroupListViewModel` — extends
 `BaseViewModel<GroupListState, GroupListEvent, GroupListAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Full field/action/event contract documented in the
 ViewModel source KDoc — this section is owned by `kmp-viewmodel-gen`.
 
 ## di
 
-`org.mifos.groupbanking.feature.grouplist.di.GroupListModule` — Koin module,
+`kpt.feature.grouplist.di.GroupListModule` — Koin module,
 `viewModelOf(::GroupListViewModel)`. Already included in `KoinModules.kt#featureModule`.
 
 <!-- kmp-screen-gen:BEGIN -->

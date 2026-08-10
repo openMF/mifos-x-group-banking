@@ -5,7 +5,7 @@
 ## 1. Module Identity
 
 `:feature:group-create` — 4-step, type-adaptive group creation wizard (Identity -> Rules ->
-Members -> Review/Submit). Namespace `org.mifos.groupbanking.feature.groupcreate`.
+Members -> Review/Submit). Namespace `kpt.feature.groupcreate`.
 Source of truth: `idea-layer/screens/group-create/{ui,api,docs,flow,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

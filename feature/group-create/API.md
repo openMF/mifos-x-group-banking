@@ -5,7 +5,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.groupcreate.GroupCreateViewModel` — extends
+`kpt.feature.groupcreate.GroupCreateViewModel` — extends
 `BaseViewModel<GroupCreateState, GroupCreateEvent, GroupCreateAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`).
 
@@ -83,7 +83,7 @@ per-type defaults. `GroupCreateScreenState` (`Content`/`Submitting`/`Success`/`E
 
 ## di
 
-`org.mifos.groupbanking.feature.groupcreate.di.GroupCreateModule` — Koin module. Included via
+`kpt.feature.groupcreate.di.GroupCreateModule` — Koin module. Included via
 `cmp-navigation/.../KoinModules.kt#featureModule.includes(...)`. Registers
 `GroupCreateViewModel` with the `viewModel { parameters -> ... }` builder (`initialTypeConfig`
 resolved via `parameters.get()` — a nav-arg, not a DI-graph type) plus
@@ -96,7 +96,7 @@ same flagged follow-up as `LoginSignupModule`/`JoinWithCodeModule`). `GroupCreat
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.groupcreate.GroupCreateScreen` (Container, `internal`) —
+`kpt.feature.groupcreate.GroupCreateScreen` (Container, `internal`) —
 collects `GroupCreateViewModel.stateFlow` via `collectAsStateWithLifecycle`, forwards the
 required `typeConfig: GroupTypeConfig` nav-arg to Koin via `parametersOf(typeConfig)`, consumes
 `GroupCreateEvent`s through `EventsEffect` (`NavigateToGroupDashboard` / `NavigateBack` /

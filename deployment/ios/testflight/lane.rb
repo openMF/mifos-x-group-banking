@@ -206,6 +206,7 @@ platform :ios do
     pilot(
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       app_identifier:                       ios_config[:app_identifier],
+      app_platform:                         "ios",   # distribute_only can't infer platform from an IPA — must be explicit (else Spaceship prompts + crashes in non-interactive mode)
       build_number:                         build_number,
       distribute_only:                      true,
       distribute_external:                  true,

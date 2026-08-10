@@ -9,33 +9,33 @@
 
 | Service | Endpoint(s) | Verb | Request DTO | Response DTO | Returns |
 |---|---|---|---|---|---|
-| `CompanionAuthApi` (`org.mifos.groupbanking.core.network.service.loginsignup`) | `/companion/auth/self-register` | POST | `SelfRegisterRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
+| `CompanionAuthApi` (`kpt.core.network.service.loginsignup`) | `/companion/auth/self-register` | POST | `SelfRegisterRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
 | `CompanionAuthApi` | `/companion/auth/login` | POST | `LoginRequestDto` | `AuthResponseDto` | `NetworkResult<AuthResponseDto, NetworkError>` |
 | `CompanionAuthApi` | `/companion/auth/me` | GET (Bearer) | — | `UserProfileDto` | `NetworkResult<UserProfileDto, NetworkError>` |
-| `GroupTypeConfigApi` (`org.mifos.groupbanking.core.network.service.grouptypepicker`) | `/companion/datatables/group_type_config/{entityId}` | GET | — (path param `entityId: Long = 0`) | `List<GroupTypeConfigDto>` | `NetworkResult<List<GroupTypeConfigDto>, NetworkError>` |
-| `GroupApi` (`org.mifos.groupbanking.core.network.service.grouplist`) | `/companion/groups/mine` | GET (query `paged`/`limit`/`offset`) | — | `GroupPageDto` | `NetworkResult<GroupPageDto, NetworkError>` |
-| `InvitationApi` (`org.mifos.groupbanking.core.network.service.joinwithcode`) | `/companion/datatables/invitations/{code}` | GET | — | `InvitationRowDto` | `NetworkResult<InvitationRowDto, NetworkError>` |
+| `GroupTypeConfigApi` (`kpt.core.network.service.grouptypepicker`) | `/companion/datatables/group_type_config/{entityId}` | GET | — (path param `entityId: Long = 0`) | `List<GroupTypeConfigDto>` | `NetworkResult<List<GroupTypeConfigDto>, NetworkError>` |
+| `GroupApi` (`kpt.core.network.service.grouplist`) | `/companion/groups/mine` | GET (query `paged`/`limit`/`offset`) | — | `GroupPageDto` | `NetworkResult<GroupPageDto, NetworkError>` |
+| `InvitationApi` (`kpt.core.network.service.joinwithcode`) | `/companion/datatables/invitations/{code}` | GET | — | `InvitationRowDto` | `NetworkResult<InvitationRowDto, NetworkError>` |
 | `InvitationApi` | `/companion/groups/{groupId}` | GET | — | `GroupPreviewDto` | `NetworkResult<GroupPreviewDto, NetworkError>` |
 | `InvitationApi` | `/companion/groups/{groupId}/associate-clients` | POST | `AssociateClientsRequestDto` | `AssociateClientsResponseDto` | `NetworkResult<AssociateClientsResponseDto, NetworkError>` |
 | `InvitationApi` | `/companion/datatables/invitations/{code}/{rowId}` | PUT | `MarkAcceptedRequestDto` | `MarkAcceptedResponseDto` | `NetworkResult<MarkAcceptedResponseDto, NetworkError>` |
-| `GroupCreateApi` (`org.mifos.groupbanking.core.network.service.groupcreate`) | `/offices` | GET (query `orderBy`, default `name`) | — | `List<OfficeDto>` | `NetworkResult<List<OfficeDto>, NetworkError>` |
+| `GroupCreateApi` (`kpt.core.network.service.groupcreate`) | `/offices` | GET (query `orderBy`, default `name`) | — | `List<OfficeDto>` | `NetworkResult<List<OfficeDto>, NetworkError>` |
 | `GroupCreateApi` | `/companion/groups` | POST | `CreateGroupRequestDto` | `CreateGroupResponseDto` | `NetworkResult<CreateGroupResponseDto, NetworkError>` |
-| `MemberDashboardApi` (`org.mifos.groupbanking.core.network.service.personaldashboard`) | `/companion/member/dashboard` | GET (query `selectedGroupId`, optional) | — | `MemberDashboardResponseDto` | `NetworkResult<MemberDashboardResponseDto, NetworkError>` |
-| `GroupDashboardApi` (`org.mifos.groupbanking.core.network.service.groupdashboard`) | `/companion/groups/{groupId}` | GET | — | `GroupDetailDto` | `NetworkResult<GroupDetailDto, NetworkError>` |
+| `MemberDashboardApi` (`kpt.core.network.service.personaldashboard`) | `/companion/member/dashboard` | GET (query `selectedGroupId`, optional) | — | `MemberDashboardResponseDto` | `NetworkResult<MemberDashboardResponseDto, NetworkError>` |
+| `GroupDashboardApi` (`kpt.core.network.service.groupdashboard`) | `/companion/groups/{groupId}` | GET | — | `GroupDetailDto` | `NetworkResult<GroupDetailDto, NetworkError>` |
 | `GroupDashboardApi` | `/companion/groups/{groupId}/my-role` | GET | — | `ViewerRoleInfoDto` | `NetworkResult<ViewerRoleInfoDto, NetworkError>` |
 | `GroupDashboardApi` | `/companion/groups/{groupId}/corpus` | GET | — | `GroupCorpusDto` | `NetworkResult<GroupCorpusDto, NetworkError>` |
 | `GroupDashboardApi` | `/companion/groups/{groupId}/accounts` | GET | — | `GroupAccountsDto` | `NetworkResult<GroupAccountsDto, NetworkError>` |
-| `LoanDetailApi` (`org.mifos.groupbanking.core.network.service.loandetail`) | `/loans/{loanId}` | GET (query `associations`, default `repaymentSchedule,transactions`) | — | `LoanDetailResponseDto` | `NetworkResult<LoanDetailResponseDto, NetworkError>` |
-| `LoanApplyApi` (`org.mifos.groupbanking.core.network.service.loanapply`) | `/groups/{groupId}` | GET (query `associations=clientMembers`) | — | `GroupMembersResponseDto` | `NetworkResult<GroupMembersResponseDto, NetworkError>` |
+| `LoanDetailApi` (`kpt.core.network.service.loandetail`) | `/loans/{loanId}` | GET (query `associations`, default `repaymentSchedule,transactions`) | — | `LoanDetailResponseDto` | `NetworkResult<LoanDetailResponseDto, NetworkError>` |
+| `LoanApplyApi` (`kpt.core.network.service.loanapply`) | `/groups/{groupId}` | GET (query `associations=clientMembers`) | — | `GroupMembersResponseDto` | `NetworkResult<GroupMembersResponseDto, NetworkError>` |
 | `LoanApplyApi` | `/loanproducts` | GET | — | `List<LoanProductDto>` | `NetworkResult<List<LoanProductDto>, NetworkError>` |
 | `LoanApplyApi` | `/loans/template` | GET (query `clientId`/`productId`/`templateType`, default `individual`) | — | `LoanApplyTemplateDto` | `NetworkResult<LoanApplyTemplateDto, NetworkError>` |
 | `LoanApplyApi` | `/clients/{clientId}/accounts` | GET | — | `MemberSavingsResponseDto` | `NetworkResult<MemberSavingsResponseDto, NetworkError>` |
 | `LoanApplyApi` | `/datatables/dt_group_corpus/{groupId}` | GET | — | `GroupCorpusRowDto` | `NetworkResult<GroupCorpusRowDto, NetworkError>` |
 | `LoanApplyApi` | `/datatables/dt_group_config/{groupId}` | GET | — | `GroupLoanConfigDto` | `NetworkResult<GroupLoanConfigDto, NetworkError>` |
 | `LoanApplyApi` | `/loans` | POST | `ApplyLoanRequestDto` | `ApplyLoanResponseDto` | `NetworkResult<ApplyLoanResponseDto, NetworkError>` |
-| `BatchSyncApi` (`org.mifos.groupbanking.core.network.service.batchsync`) | `/fineract-provider/api/v1/batches` | POST | `BatchSyncRequestDto` | `List<BatchSyncResponseItemDto>` (top-level JSON array, no envelope) | `NetworkResult<List<BatchSyncResponseItemDto>, NetworkError>` |
-| `ChangePinApi` (`org.mifos.groupbanking.core.network.service.changepin`) | `/fineract-provider/api/v1/self/user/updatePassword` | PUT (BasicAuth) | `ChangePinRequestDto` | `ChangePinResponseDto` | `NetworkResult<ChangePinResponseDto, NetworkError>` |
-| `SavingsApi` (`org.mifos.groupbanking.core.network.service.savings`) | `/self/savingsaccounts/{savingsId}/transactions` | GET (query `limit`/`offset`, reused for BOTH group-linked and individual accounts) | — | `List<SavingsLedgerEntryDto>` (top-level JSON array) | `NetworkResult<List<SavingsLedgerEntryDto>, NetworkError>` |
+| `BatchSyncApi` (`kpt.core.network.service.batchsync`) | `/fineract-provider/api/v1/batches` | POST | `BatchSyncRequestDto` | `List<BatchSyncResponseItemDto>` (top-level JSON array, no envelope) | `NetworkResult<List<BatchSyncResponseItemDto>, NetworkError>` |
+| `ChangePinApi` (`kpt.core.network.service.changepin`) | `/fineract-provider/api/v1/self/user/updatePassword` | PUT (BasicAuth) | `ChangePinRequestDto` | `ChangePinResponseDto` | `NetworkResult<ChangePinResponseDto, NetworkError>` |
+| `SavingsApi` (`kpt.core.network.service.savings`) | `/self/savingsaccounts/{savingsId}/transactions` | GET (query `limit`/`offset`, reused for BOTH group-linked and individual accounts) | — | `List<SavingsLedgerEntryDto>` (top-level JSON array) | `NetworkResult<List<SavingsLedgerEntryDto>, NetworkError>` |
 | `SavingsApi` | `/companion/groups/{groupId}/members/{memberId}/savings` | GET (query `limit`/`offset`) | — | `MemberSavingsDetailDto` | `NetworkResult<MemberSavingsDetailDto, NetworkError>` |
 | `SavingsApi` | `/companion/groups/{groupId}/savings` | GET | — | `GroupSavingsSummaryDto` | `NetworkResult<GroupSavingsSummaryDto, NetworkError>` |
 | `SavingsApi` | `/companion/groups/{groupId}/savings/individual` | GET | — | `IndividualSavingsSummaryDto` | `NetworkResult<IndividualSavingsSummaryDto, NetworkError>` |
@@ -208,3 +208,706 @@ registered for override-surface symmetry; `SavingsApiImpl` currently reuses the 
 `HttpClient` singleton (bound to `CompanionAuthApiConfig.baseUrl`) rather than constructing a
 second engine from this config's `baseUrl`.
 <!-- kmp-client-gen:END -->
+
+
+---
+
+# Data Model Reference
+
+_(merged from the former `core/network/model/API.md`)_
+
+<!-- generated-by: kmp-dto-gen -->
+<!-- kmp-dto-gen:BEGIN -->
+# core/network/model — API.md
+
+## dtos
+
+| DTO | `@SerialName` mapping | Nullability | Wire operation |
+|---|---|---|---|
+| `SelfRegisterRequestDto` | `name`, `emailPhone`, `password` | all non-null, required | `POST /companion/auth/self-register` (COMP-AUTH-001) |
+| `LoginRequestDto` | `emailPhone`, `password` | all non-null, required | `POST /companion/auth/login` (COMP-AUTH-002) |
+| `AuthResponseDto` | `userId`, `sessionToken`, `tokenExpiresAt`, `groupMemberships` (default `[]`) | `groupMemberships` defaults empty; others required | response of COMP-AUTH-001 + COMP-AUTH-002 |
+| `UserProfileDto` | `userId`, `name`, `emailPhone`, `groupMemberships` (default `[]`) | `groupMemberships` defaults empty; others required | `GET /companion/auth/me` (COMP-AUTH-003) |
+| `GroupMembershipDto` | `groupId`, `groupName`, `role` (default `UNKNOWN`), `joinedAt` | `role` defaults `UNKNOWN`; others required | nested in `AuthResponseDto` / `UserProfileDto` |
+| `GroupRoleDto` | enum `@SerialName`: `ORGANIZER`, `MEMBER`, `TREASURER`, `SECRETARY`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback for any future server-added role | field of `GroupMembershipDto.role` |
+| `GroupTypeConfigDto` | `typeSlug` (default `UNKNOWN`), `displayName`, `tagline`, `savingsMechanism` (default `UNKNOWN`), `contributionMode` (default `UNKNOWN`), `lendingEnabled`, `hasSocialFund`, `hasBankLinkage`, `welfareOnlyMode`, `formallyRegistered`, `defaultLoanMultiplier`, `defaultInterestRatePct`, `defaultCycleLengthMonths`, `maxMembers`, `minMembers` | 3 enum fields default `UNKNOWN`; remaining 12 non-null required | `GET /companion/datatables/group_type_config/{entityId}` (COMP-DT-003, entityId=0=seed catalogue) |
+| `GroupTypeSlugDto` | enum `@SerialName`: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO_VILLAGE_BANK`, `BURIAL_WELFARE`, `JLG`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback for any future server-added group type | field of `GroupTypeConfigDto.typeSlug` |
+| `SavingsMechanismDto` | enum `@SerialName`: `ACCUMULATING`, `ROTATING_PAYOUT`, `NONE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupTypeConfigDto.savingsMechanism` |
+| `ContributionModeDto` | enum `@SerialName`: `SHARE_BASED_VARIABLE`, `FIXED`, `MINIMAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupTypeConfigDto.contributionMode` |
+| `GroupDto` | `id`, `name`, `groupType` (default `UNKNOWN`), `viewerRole` (default `UNKNOWN`), `cycleNumber`, `memberCount`, `lastMeetingDate`, `healthIndicator` (default `UNKNOWN`), `overdueRate`, `status`, `fineractGroupId` | 3 enum fields default `UNKNOWN`; remaining 8 non-null required | `GET /companion/groups/mine` (COMP-GRP-001) — CANONICAL `Group`, reused by group-dashboard + member features |
+| `GroupPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope of COMP-GRP-001 (`page_size=20`) |
+| `GroupTypeDto` | enum `@SerialName`: `VSLA`, `ROSCA`, `ASCA`, `SILC`, `SHG`, `SACCO`, `CBO`, `BURIAL`, `JLG`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOTE short-form `CBO`/`BURIAL` (distinct wire values from `GroupTypeSlugDto`'s `CBO_VILLAGE_BANK`/`BURIAL_WELFARE` — see `## 4. Boundaries`) | field of `GroupDto.groupType` |
+| `ViewerRoleDto` | enum `@SerialName`: `ORGANIZER`, `MEMBER`, `TREASURER`, `CHAIRPERSON`, `SECRETARY`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `GroupDto.viewerRole` |
+| `HealthIndicatorDto` | enum `@SerialName`: `GREEN`, `AMBER`, `RED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; server-computed from `overdueRate`, mapped 1:1 (domain also independently re-derives via `HealthIndicator.fromOverdueRate`) | field of `GroupDto.healthIndicator` |
+| `InvitationRowDto` | `token`, `group_id`, `inviter_client_id`, `invited_email_phone`, `role_to_assign` (default `UNKNOWN`, reuses `GroupRoleDto`), `expires_at`, `accepted_at` (nullable, default `null`) | `roleToAssign` defaults `UNKNOWN`; `acceptedAt` nullable (`null` = code unused); rest required. Raw Fineract datatable columns — snake_case `@SerialName`s, NOT the companion-bridge camelCase convention used elsewhere in this file | `GET /companion/datatables/invitations/{entityId}` (COMP-DT-004) |
+| `GroupPreviewDto` | `groupId`, `groupName`, `groupType` (default `UNKNOWN`, reuses `GroupTypeSlugDto`), `organizerName`, `memberCount`, `officeId`, `roleToAssign` (default `UNKNOWN`, reuses `GroupRoleDto`) | 2 enum fields default `UNKNOWN`; rest required. Companion-bridge camelCase | `GET /companion/groups/{groupId}` |
+| `AssociateClientsRequestDto` | `clientIds`, `roleToAssign` (default `UNKNOWN`, reuses `GroupRoleDto`) | `clientIds` required, non-empty expected; `roleToAssign` defaults `UNKNOWN` | `POST /companion/groups/{groupId}/associate-clients` (COMP-GRP-003) request |
+| `AssociateClientsResponseDto` | `resourceId`, `groupId`, `clientIds` | all required | response of COMP-GRP-003 |
+| `MarkAcceptedRequestDto` | `accepted_at` | required | `PUT /companion/datatables/invitations/{entityId}/{rowId}` (COMP-DT-004) request; snake_case (raw datatable column) |
+| `MarkAcceptedResponseDto` | `resourceId`, `changes` (nested `MarkAcceptedChangesDto`) | all required | response of the mark-accepted `PUT` |
+| `MarkAcceptedChangesDto` | `accepted_at` | required | nested in `MarkAcceptedResponseDto.changes`; snake_case, echoes the updated datatable column |
+| `MemberDashboardResponseDto` | `memberName`, `myGroups` (default `[]`), `selectedGroup`, `poolModel` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `groupLinkedSavingsBalance`, `individualSavingsBalance`, `shareOutProjection` (nullable, default `null`), `rotationPosition` (nullable, default `null`), `nextRecipientEta` (nullable, default `null`), `recentTransactions` (default `[]`) | 3 nullable fields default `null`; `myGroups`/`recentTransactions` default empty; `poolModel` defaults `UNKNOWN`; rest required | `GET /companion/member/dashboard` — unified-identity companion API, no `clientId`/`selfServiceToken` |
+| `GroupSummaryDto` | `groupId`, `name`, `poolModel` (default `UNKNOWN`, reuses `SavingsMechanismDto`) | `poolModel` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.myGroups` / `.selectedGroup` |
+| `SavingsTransactionDto` | `id`, `date`, `type` (default `UNKNOWN`), `amount` | `type` defaults `UNKNOWN`; rest required | field of `MemberDashboardResponseDto.recentTransactions` — CANONICAL compact shape, see naming-collision note below |
+| `TransactionTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback (also absorbs richer wire values like `INTEREST_POSTING`/`FEE_DEDUCTION` that this compact contract does not model) | field of `SavingsTransactionDto.type` |
+| `CreateGroupRequestDto` | `name`, `officeId`, `userId`, `currency`, `meetingDay`, `meetingTime`, `typeConfig` | all required, camelCase | `POST /companion/groups` (COMP-GRP-001) request |
+| `CreateGroupTypeConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula` (default `UNKNOWN`), `payout_order_method` (default `UNKNOWN`), `share_value`, `contribution_amount`, `social_fund_enabled`, `social_fund_percent`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount`, `max_members` | 5 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable columns (Hard Rule 5), NOT the companion camelCase convention | field of `CreateGroupRequestDto.typeConfig`; provisioned as a `group_type_config` datatable row (COMP-GRP-001 step 5) |
+| `CreateGroupResponseDto` | `groupId`, `fineractGroupId`, `inviteCode` | all required, camelCase | response of COMP-GRP-001 |
+| `OfficeDto` | `id`, `name`, `nameDecorated`, `externalId` (nullable, default `null`) | `externalId` nullable/optional (registry-vs-operation-schema gap, see note below); rest required | `GET /offices` (`orderBy=name` default), cached SWR (`ttl=3600`) |
+| `ContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; DISTINCT value-set from `ContributionModeDto` — see reuse note below | field of `CreateGroupTypeConfigDto.contributionModel` |
+| `ShareoutFormulaDto` | enum `@SerialName`: `NONE`, `PRORATA_SHARES`, `PRORATA_SAVINGS`, `EQUAL`, `INVESTMENT_PROPORTIONAL`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `CreateGroupTypeConfigDto.shareoutFormula` |
+| `PayoutOrderMethodDto` | enum `@SerialName`: `FIXED_ORDER`, `LOTTERY`, `AUCTION`, `NEED_BASED`, `NA`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; api.yaml declares 5 known values (task prose narrowed to 3 — api.yaml wins per PP-1) | field of `CreateGroupTypeConfigDto.payoutOrderMethod` |
+| `GroupDashboardResponseDto` | `group`, `viewerRole`, `corpus`, `accounts` | all required, camelCase | client-side composite (COMP-GRP-001 4-way parallel fan-in); NOT returned by a single endpoint, assembled by `GroupRepository` |
+| `GroupDetailDto` | `id`, `fineractGroupId`, `name`, `cycleNumber`, `cycleLengthMonths`, `meetingFrequency`, `memberCount`, `overdueLoansCount`, `status`, `typeConfig` | all required, camelCase | `GET /companion/groups/{groupId}` (`get_group`, COMP-GRP-001 read path); NOT the same shape as `GroupDto` — see field-shape-divergence note below |
+| `GroupInstanceConfigDto` | `group_type` (default `UNKNOWN`, reuses `GroupTypeSlugDto`), `pool_model` (default `UNKNOWN`, reuses `SavingsMechanismDto`), `contribution_model` (default `UNKNOWN`), `shareout_formula`, `payout_order_method`, `share_value`, `contribution_amount`, `social_fund_enabled`, `cycle_length_months`, `loan_multiplier`, `interest_rate`, `fine_amount` | 3 enum fields default `UNKNOWN`; remaining 9 non-null required. **snake_case** — raw `group_type_config` Fineract datatable row for THIS group (Hard Rule 5) | field of `GroupDetailDto.typeConfig`; naming-collision with `GroupTypeConfigDto` — see note below |
+| `GroupContributionModelDto` | enum `@SerialName`: `FIXED_AMOUNT`, `SHARE_BASED_VARIABLE`, `FIXED_NEGOTIATED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; identical value-set to `ContributionModelDto` (group-create) but declared independently — see note below | field of `GroupInstanceConfigDto.contribution_model` |
+| `ViewerRoleInfoDto` | `role` (default `UNKNOWN`, reuses `ViewerRoleDto`), `memberId` | `role` defaults `UNKNOWN`; `memberId` required | `GET /companion/groups/{groupId}/my-role` (`get_viewer_role`) |
+| `GroupCorpusDto` | `currentBalance`, `openingBalance`, `totalContributionsThisCycle`, `totalLoansOutstanding`, `lastUpdated`, `rotationPosition` (nullable, default `null`), `nextRecipientName` (nullable, default `null`), `nextRecipientPosition` (nullable, default `null`) | 3 nullable ROTATING_PAYOUT-only fields default `null`; rest required | `GET /companion/groups/{groupId}/corpus` (`get_group_corpus`) |
+| `ActivityItemDto` | `id`, `type` (default `UNKNOWN`), `description`, `amount` (nullable, default `null`), `date`, `memberName` (nullable, default `null`) | `amount`/`memberName` nullable; `type` defaults `UNKNOWN`; rest required | field of `GroupAccountsDto.recentActivity` (last 10) |
+| `ActivityTypeDto` | enum `@SerialName`: `MEETING`, `DEPOSIT`, `LOAN`, `PENALTY`, `SHARE_OUT`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `ActivityItemDto.type` |
+| `GroupAccountsDto` | `savingsBalance`, `loansOutstanding`, `activeLoanCount`, `shareOutProjection` (nullable, default `null`), `recentActivity` (default `[]`) | `shareOutProjection` nullable (ACCUMULATING only); `recentActivity` defaults empty; rest required | `GET /companion/groups/{groupId}/accounts` (`get_group_accounts`) |
+| `GroupConfigDto` | `shareValue`/`shareMin`/`shareMax`/`contributionAmount`/`loanMultiplier`/`interestRate`/`fineAmount`/`minimumDisbursementThreshold` (all nullable, default `null`), `cycleLengthMonths` (required) | 8 nullable fields; only `cycleLengthMonths` required | NOT returned by any endpoint — "constructed in GroupRepository from the GroupTypeConfig embedded in get_group response" per `api.yaml#dtos.GroupConfig`; kept `@Serializable` for round-trip test coverage |
+| `MemberDto` | `id`, `fineractClientId`, `displayName`, `photoUri` (nullable, default `null`), `role` (default `UNKNOWN`), `savingsBalance`, `loanStatus` (default `UNKNOWN`) | `photoUri` nullable; 2 enum fields default `UNKNOWN`; rest required | `GET /groups/{groupId}/clients` — CANONICAL `Member`, reused by member-profile + member-add + member-invite; see registry-divergence note below |
+| `MemberPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope (`page_size=20`, stale-while-revalidate `ttl=120`) |
+| `MemberRoleDto` | enum `@SerialName`: `CHAIRPERSON`, `TREASURER`, `SECRETARY`, `MEMBER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; 4 known values declared by member-list's own `api.yaml#dtos.MemberRole` — NOT identical to `GroupRoleDto` or `ViewerRoleDto`, see note below | field of `MemberDto.role` |
+| `LoanStatusDto` | enum `@SerialName`: `ACTIVE`, `NONE`, `OVERDUE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `MemberDto.loanStatus` |
+| `MemberProfileDto` | `id`, `displayName`, `firstName` (`@SerialName("firstname")`), `lastName` (`@SerialName("lastname")`), `mobileNo`, `imagePresent`, `status`, `activationDate`, `officeId` | all required, no defaults | `GET /clients/{clientId}` (`get_client`) — raw Fineract client resource; deliberately NOT `MemberDto`, see field-shape-divergence note below |
+| `FineractStatusDto` | `id`, `value` | both required | shared nested `{id, value}` status pair — reused by `MemberProfileDto.status`, `MemberSavingsAccountDto.status`, `MemberLoanAccountDto.status` |
+| `MemberAccountsDto` | `savingsAccounts` (default `[]`), `loanAccounts` (default `[]`) | both default empty | `GET /clients/{clientId}/accounts` (`get_client_accounts`) — literal raw response; deliberately NOT the aggregated `api.yaml#dtos.MemberAccounts` shape, see note below |
+| `MemberSavingsAccountDto` | `id`, `productName`, `accountNo`, `balance`, `status` | all required | field of `MemberAccountsDto.savingsAccounts` |
+| `MemberLoanAccountDto` | `id`, `productName`, `accountNo`, `status`, `summary` | all required | field of `MemberAccountsDto.loanAccounts` |
+| `MemberLoanAccountSummaryDto` | `principalDisbursed`, `principalOutstanding`, `totalOverdue` | all required | field of `MemberLoanAccountDto.summary` |
+| `MemberRoleInfoDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `GET /datatables/dt_member_role/{clientId}` (`get_member_role`, response `type: array`) |
+| `UpdateMemberRoleRequestDto` | `role` (default `UNKNOWN`, reuses `MemberRoleDto`), `groupId`, `assignedDate` | `role` defaults `UNKNOWN`; rest required | `PUT /datatables/dt_member_role/{clientId}` (`update_member_role`) request body |
+| `UpdateMemberRoleResponseDto` | `resourceId` | required | response of `update_member_role` |
+| `LoanSummaryDto` | `id`, `memberId`, `memberName`, `memberPhotoUrl` (nullable, default `null`), `loanProductName`, `principalAmount`, `outstandingBalance`, `overdueAmount`, `status` (default `UNKNOWN`), `nextRepaymentDate` (nullable, default `null`), `isOverdue`, `fineractLoanId` | `memberPhotoUrl`/`nextRepaymentDate` nullable; `status` defaults `UNKNOWN`; rest required | `GET /groups/{groupId}/loans` (loan-list) — CANONICAL `LoanSummary`, reused by loan-detail + loan dialogs + personal-loans; see registry-divergence note below |
+| `LoanPageDto` | `totalFilteredRecords`, `pageItems` (default `[]`) | `pageItems` defaults empty; `totalFilteredRecords` required | offset-paginated envelope of `GET /groups/{groupId}/loans` (`page_size=20`, stale-while-revalidate `ttl=180`) |
+| `LoanAccountStatusDto` | enum `@SerialName`: `ACTIVE`, `OVERDUE`, `CLOSED`, `PENDING`, `REJECTED`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; named `LoanAccountStatusDto` (not `LoanStatusDto`) to avoid a symbol collision with the EXISTING `LoanStatusDto` (member-list's member-level loan-status chip) — see naming-collision note below | field of `LoanSummaryDto.status` |
+| `LoanDetailDto` | `id`, `memberId`, `memberName`, `loanProductName`, `principalAmount`, `disbursedDate`, `interestRatePercent`, `totalOutstanding`, `totalOverdue`, `status` (default `UNKNOWN`, REUSES `LoanAccountStatusDto`), `fineractLoanId` | `status` defaults `UNKNOWN`; rest required | `GET /loans/{loanId}` (loan-detail header) — see registry-divergence note below |
+| `RepaymentScheduleRowDto` | `weekNumber`, `dueDate`, `dueAmount`, `paidAmount`, `balance`, `status` (default `UNKNOWN`) | `status` defaults `UNKNOWN`; rest required | field of `LoanDetailResponseDto.repaymentSchedule` |
+| `RepaymentRowStatusDto` | enum `@SerialName`: `PAID`, `PARTIAL`, `UPCOMING`, `OVERDUE`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `RepaymentScheduleRowDto.status` |
+| `RepaymentTransactionDto` | `id`, `type` (raw `String`, no declared value-set), `date`, `amount` | all required | field of `LoanDetailResponseDto.transactions` |
+| `LoanDetailResponseDto` | `loan` (`LoanDetailDto`), `repaymentSchedule` (default `[]`), `transactions` (default `[]`) | `loan` required; both lists default empty | composite envelope of `GET /loans/{loanId}?associations=repaymentSchedule,transactions` — inferred (not literally named under `api.yaml#dtos`, same precedent as `LoanPageDto`) |
+| `RecordRepaymentRequestDto` | `transactionDate`, `transactionAmount`, `paymentTypeId`, `receiptNumber` (nullable, default `null`), `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `receiptNumber` nullable; `locale`/`dateFormat` default per `api.yaml`; rest required | `POST /loans/{loanId}/transactions?command=repayment` (`make_repayment`) request; see registry-divergence note below |
+| `RecordRepaymentResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `make_repayment` — literal Fineract resource-create envelope |
+| `WriteoffLoanRequestDto` | `transactionDate`, `locale` (default `"en"`), `dateFormat` (default `"dd MMMM yyyy"`) | `transactionDate` required; `locale`/`dateFormat` default per `api.yaml` | `POST /loans/{loanId}/transactions?command=writeoff` (`write_off_loan`) request |
+| `WriteoffLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `write_off_loan` — literal Fineract resource-create envelope; structurally identical to `RecordRepaymentResponseDto` but kept a distinct per-operation type per established precedent |
+| `GroupMemberDto` | `id`, `displayName`, `imagePresent` | all required | `GET /groups/{groupId}?associations=clientMembers` (`get_group_members`, cache `ttl=3600`, `cache-first`) — loan-apply member selector; see in-file `dtos.GroupMember` divergence note below |
+| `GroupMembersResponseDto` | `clientMembers` (default `[]`) | `clientMembers` defaults empty | envelope of `get_group_members` |
+| `LoanProductDto` | `id`, `name`, `shortName`, `principal`, `minPrincipal`, `maxPrincipal`, `numberOfRepayments`, `interestRatePerPeriod` | all required | `GET /loanproducts` (`get_loan_products`, cache `ttl=3600`, `cache-first`); literal operation response — richer than the abbreviated `dtos.LoanProduct` block, see note below |
+| `LoanApplyTemplateDto` | `principal`, `numberOfRepayments`, `interestRatePerPeriod`, `interestType` (reuses `FineractStatusDto`), `amortizationType` (reuses `FineractStatusDto`), `repaymentEvery` | all required | `GET /loans/template` (`get_loan_template`) |
+| `MemberSavingsAccountRowDto` | `id`, `accountBalance`, `status` (`SavingsAccountStatusDto`) | all required | field of `get_member_savings`'s `savingsAccounts[]` |
+| `SavingsAccountStatusDto` | `value` | required | value-only status pair — distinct from `FineractStatusDto` (`{id, value}`) |
+| `MemberSavingsResponseDto` | `savingsAccounts` (default `[]`) | defaults empty | `GET /clients/{clientId}/accounts` (`get_member_savings`) |
+| `GroupCorpusRowDto` | `corpus_balance`, `last_updated` | both required | `GET /datatables/dt_group_corpus/{groupId}` (`get_group_corpus`); snake_case raw datatable row — distinct from the existing `GroupCorpusDto`, see note below |
+| `GroupLoanConfigDto` | `loan_multiplier`, `max_loan_amount`, `meeting_frequency` | all required | `GET /datatables/dt_group_config/{groupId}` (`get_group_config`); snake_case raw datatable row — distinct from the existing `GroupConfigDto`, see note below |
+| `ApplyLoanRequestDto` | `clientId`, `productId`, `principal`, `loanTermFrequency`, `loanTermFrequencyType` (default `{1,"Weeks"}`), `numberOfRepayments`, `repaymentEvery` (default `1`), `repaymentFrequencyType` (default `{1,"Weeks"}`), `interestRatePerPeriod`, `amortizationType` (default `{1,"Equal installments"}`), `interestType` (default `{0,"Declining Balance"}`), `interestCalculationPeriodType` (default `{1,"Same as repayment period"}`), `transactionProcessingStrategyId` (default `1`), `expectedDisbursementDate`, `submittedOnDate`, `loanPurposeId` | 5 lookup-pair fields + 2 Int constants default to `api.yaml`'s literal values; rest required | `POST /loans` (`create_new_loan`) request; literal Fineract body — see domain `ApplyLoanRequest` simplification note below |
+| `ApplyLoanResponseDto` | `officeId`, `clientId`, `loanId`, `resourceId` | all required | response of `create_new_loan` — literal Fineract resource-create envelope |
+| `LoanPurposeDto` | enum `@SerialName`: `MEDICAL`, `EDUCATION`, `BUSINESS`, `EMERGENCY`, `OTHER`, `SCHOOL_FEES`, `FARMING`, `HOME_IMPROVEMENT`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback; NOT literally wire-transmitted for `create_new_loan` (only sends the resolved `loanPurposeId: Int`), same "chip-selector resolved to an Int" precedent as `PaymentMethod`/`paymentTypeId`; IS literally wire-transmitted for loan-request's `LoanRequestPayloadDto.purpose` (bare `@SerialName` string, no wrapper object) — extended with `SCHOOL_FEES`/`FARMING`/`HOME_IMPROVEMENT` per PP-1, see note below | shared purpose selector, `api.yaml#dtos.LoanPurpose` (loan-apply) + `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options` (loan-request) |
+| `LoanRequestPayloadDto` | `clientId`, `requested_amount`, `purpose` (reuses `LoanPurposeDto`), `duration_weeks`, `savings_balance_at_request`, `submitted_at`, `status` (default `"PENDING"`) | `status` defaults `"PENDING"`; rest required. `clientId` camelCase, remaining 5 own fields snake_case — raw `dt_loan_request` datatable columns (Hard Rule 5) | `POST /datatables/dt_loan_request` (`submit_loan_request`) request body; offline-queued via `cache.offline: queue_to_syncqueue` when `cmp-network-monitor` reports offline |
+| `LoanRequestResponseDto` | `resourceId`, `officeId`, `clientId`, `resourceExternalId` | all required | response of `submit_loan_request` — literal Fineract datatable resource-create envelope |
+| `BatchOperationDto` | `requestId`, `relativeUrl`, `method`, `body` | all required | field of `BatchSyncRequestDto.requests` — one batched Fineract sub-request |
+| `BatchSyncRequestDto` | `requests` (default `[]`) | `requests` defaults empty | `POST /fineract-provider/api/v1/batches` (`batch_sync`) request body |
+| `BatchSyncResponseItemDto` | `requestId`, `statusCode`, `body` | all required | response ROW of `batch_sync` — the HTTP body itself is a bare `type: array` of this shape, no wrapper object |
+| `ChangePinRequestDto` | `password`, `repeatPassword` | both required, no defaults (`api.yaml` declares neither field as optional, so no `@EncodeDefault` is needed, unlike `LoanRequestPayloadDto.status`) | `PUT /fineract-provider/api/v1/self/user/updatePassword` (`change_pin`) request; both fields resolve to the SAME domain `ChangePinRequest.newPin` — see `## 4. Boundaries` |
+| `ChangePinResponseDto` | `resourceId` | required | response of `change_pin` — standard Fineract self-service `updatePassword` command-processing envelope |
+| `SavingsLedgerEntryDto` | `id`, `transactionType` (raw `{value,code,description}`), `date` (raw `List<Int>`), `amount`, `runningBalance`, `currency` | all required | `GET /self/savingsaccounts/{savingsId}/transactions` (`get_group_linked_transactions`/`get_individual_transactions`) — raw Fineract self-service ledger row; see 4-way `SavingsTransactionDto` naming-collision note below |
+| `SavingsLedgerTransactionTypeDto` | `value`, `code`, `description` | all required | field of `SavingsLedgerEntryDto.transactionType`; kept raw (no enum, no declared `code` value-set — Hard Rule 4) |
+| `SavingsLedgerCurrencyDto` | `code`, `displaySymbol` | both required | field of `SavingsLedgerEntryDto.currency` |
+| `SavingsMemberDto` | `memberId`, `displayName`, `photoUri` (nullable, default `null`) | `photoUri` nullable; rest required | field of `MemberSavingsDetailDto.member` |
+| `SavingsDataPointDto` | `date`, `balance` | both required | field of `MemberSavingsDetailDto.sparklineData`; maps to the EXISTING `core/model.SavingsDataPoint` |
+| `SavingsStatementTypeDto` | enum `@SerialName`: `DEPOSIT`, `WITHDRAWAL`, `INTEREST_POSTING`, `FEE_DEDUCTION`, `TRANSFER`, `UNKNOWN` | `UNKNOWN` is the T7/EC30 fallback | field of `SavingsStatementEntryDto.type` |
+| `SavingsStatementEntryDto` | `id`, `date`, `type` (default `UNKNOWN`), `amount`, `runningBalance`, `reversed` | `type` defaults `UNKNOWN`; rest required | field of `MemberSavingsDetailDto.transactions` — see 4-way naming-collision note below |
+| `MemberSavingsDetailDto` | `member`, `savingsAccountNo`, `savingsBalance`, `sharesHeld` (nullable, default `null`), `shareValue` (nullable, default `null`), `sparklineData` (default `[]`), `transactions` (default `[]`), `totalTransactions`, `hasNextPage` | 2 SHARE_BASED_VARIABLE-only fields nullable; 2 lists default empty; rest required | `GET /companion/groups/{groupId}/members/{memberId}/savings` (`get_member_savings_detail`) |
+| `WeeklyContributionPointDto` | `weekLabel`, `groupAmount`, `individualAmount` | all required | field of `GroupSavingsSummaryDto.weeklyTrend` / `IndividualSavingsSummaryDto.weeklyTrend` |
+| `MemberGroupSavingsRowDto` | `memberId`, `name`, `totalContributed`, `lastContribution`, `meetingsContributed`, `sharesHeld` (nullable, default `null`), `shareValue` (nullable, default `null`) | 2 SHARE_BASED_VARIABLE-only fields nullable; rest required | field of `GroupSavingsSummaryDto.memberRows` |
+| `GroupSavingsSummaryDto` | `cycleTarget`, `cycleCollected`, `totalCollected`, `weeklyTrend` (default `[]`), `memberRows` (default `[]`) | 2 lists default empty; rest required | `GET /companion/groups/{groupId}/savings` (`get_group_savings_summary`) |
+| `MemberIndividualSavingsRowDto` | `memberId`, `name`, `currentBalance`, `lastTransaction` (nullable, default `null`), `lastTransactionDate` (nullable, default `null`) | 2 nullable fields default `null`; rest required | field of `IndividualSavingsSummaryDto.memberRows` |
+| `IndividualSavingsSummaryDto` | `totalBalance`, `weeklyTrend` (default `[]`), `memberRows` (default `[]`) | 2 lists default empty; rest required | `GET /companion/groups/{groupId}/savings/individual` (`get_individual_savings_summary`) |
+
+**Shared Savings domain layer (`SavingsDto.kt`/`SavingsMappers.kt`) — built ONCE for personal-savings +
+member-savings-detail + savings-dashboard (informational; no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for member-savings-detail or savings-dashboard — each feature's own
+`api.yaml` is the sole SoT, per PP-1):** `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`
+(raw Fineract shape) was generated as `SavingsLedgerEntryDto` — see the 4-way naming-collision note
+immediately below. `idea-layer/screens/member-savings-detail/api.yaml#dtos.SavingsTransaction` was
+generated as `SavingsStatementEntryDto` (same collision-avoidance reasoning). `SavingsDataPointDto`
+reuses the EXISTING `core/model.SavingsDataPoint` domain model outright on the mapper side (no new
+domain type) — see `core/model/API.md`.
+
+**FOUR-way `SavingsTransactionDto`/`SavingsTransaction` naming collision (flagged for the
+cross-feature repair station, extends the THREE-way note already on `SavingsTransactionDto.kt`):**
+four sources now declare a type under the conceptual "savings transaction" name, each with a
+DIFFERENT shape:
+
+1. `SavingsTransactionDto` (`SavingsTransactionDto.kt`, personal-dashboard's own approved
+   `api.yaml`, status `approved`): compact companion shape — `id: String`, `date: String`,
+   `type: TransactionTypeDto` (`DEPOSIT`/`WITHDRAWAL`/`UNKNOWN`), `amount: Double`.
+2. `idea-layer/dtos/SavingsTransactionDto.yaml` (registry v1.0.0): richer Fineract-raw shape —
+   `id: Long`, `memberId: Long`, `savingsAccountId: Long`, `transactionType: String` (4 values
+   incl. `interest_posting`/`fee_deduction`), `date: String`, `currency: String`,
+   `runningBalance: Double?`, `note: String?`.
+3. `SavingsLedgerEntryDto` (this file, `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`):
+   still-richer raw-Fineract-SelfService component shape — `id: Long`,
+   `transactionType: {value, code, description}`, `date: List<Int>`, `amount: Double`,
+   `runningBalance: Double`, `currency: {code, displaySymbol}`.
+4. `SavingsStatementEntryDto` (this file, `idea-layer/screens/member-savings-detail/api.yaml#dtos.SavingsTransaction`):
+   companion-normalized statement row — `id: String`, `date: String`,
+   `type: TransactionType` (5 values: `DEPOSIT`/`WITHDRAWAL`/`INTEREST_POSTING`/`FEE_DEDUCTION`/
+   `TRANSFER`), `amount: Double`, `runningBalance: Double`, `reversed: Boolean`.
+
+Each shape was generated from its OWN declaring feature's approved `api.yaml`/kdoc (Hard Rule 5),
+never forced into reuse — resolving the full four-way collision (e.g. renaming (3) to a
+`SavingsLedgerEntry`-family concept distinct from "transaction", or migrating consumers onto a
+single companion shape) is explicitly OUT of this generation's scope and flagged for Station 3.
+
+**`SavingsTab` naming collision (personal-savings vs savings-dashboard, flagged for the
+cross-feature repair station):** `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTab`
+(`[GROUP_LINKED, INDIVIDUAL]`) and `idea-layer/screens/savings-dashboard/api.yaml#dtos.SavingsTab`
+(`[GROUP, INDIVIDUAL]`) declare DIFFERENT value-sets under the SAME bare name. Neither is
+`@Serializable` (pure client-side tab state, no DTO here) — modeled as `SavingsTab`
+(personal-savings) and `SavingsDashboardTab` (savings-dashboard) in `core/model/Savings.kt`;
+see that file's kdoc for the full note. Resolve at Station 3.
+
+Source features: `idea-layer/screens/login-signup/{api.yaml,docs.yaml,flow.yaml}`;
+`idea-layer/screens/group-type-picker/{api.yaml,docs.yaml}` (COMP-DT-003);
+`idea-layer/screens/group-list/{api.yaml,docs.yaml,data-flow.yaml}` (COMP-GRP-001);
+`idea-layer/screens/join-with-code/{api.yaml,docs.yaml}` (COMP-DT-004 + COMP-GRP-003);
+`idea-layer/screens/personal-dashboard/{api.yaml,docs.yaml}` (companion `GET
+/companion/member/dashboard`, status: approved, approved 2026-07-17);
+`idea-layer/screens/group-create/api.yaml` (COMP-GRP-001 `POST
+/companion/groups` + `GET /offices`; no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature — `api.yaml` is the sole SoT, per PP-1
+"registry, or its equivalent, wins");
+`idea-layer/screens/group-dashboard/{api.yaml,ui.yaml,docs.yaml}` (COMP-GRP-001
+4-way parallel fan-in: `get_group` + `get_viewer_role` + `get_group_corpus` +
+`get_group_accounts`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature — `api.yaml` is the sole SoT);
+`idea-layer/screens/member-list/api.yaml` (`GET /groups/{groupId}/clients`,
+offset-paginated `limit`/`offset`, `page_size=20`, stale-while-revalidate
+`ttl=120` + offline show-cached; `api.yaml#dtos.Member` is the SoT used here
+— a DIFFERENT `idea-layer/dtos/MemberDto.yaml` registry entry also exists for
+the same list endpoint, see divergence note below);
+`idea-layer/screens/member-profile/api.yaml` (`GET /clients/{clientId}` +
+`GET /clients/{clientId}/accounts` + `GET /datatables/dt_member_role/{clientId}`
++ `PUT /datatables/dt_member_role/{clientId}`; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/loan-list/{api.yaml,ui.yaml}` (`GET
+/groups/{groupId}/loans`, offset-paginated, `page_size=20`,
+stale-while-revalidate `ttl=180` + offline show-cached; `api.yaml#dtos.LoanSummary`
+is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
+entry also exists but describes a DIFFERENT endpoint/consumer set, see
+divergence note below);
+`idea-layer/screens/loan-detail/api.yaml` (`GET /loans/{loanId}`,
+`associations=repaymentSchedule,transactions`, stale-while-revalidate
+`ttl=120` + offline show-cached; `api.yaml#dtos.{LoanDetail,
+RepaymentScheduleRow, RepaymentRowStatus, RepaymentTransaction, LoanDetailTab}`
+is the SoT used here — a DIFFERENT `idea-layer/dtos/LoanDto.yaml` registry
+entry for the SAME `GET /loans/{loanId}` endpoint also exists, see
+divergence note below; `idea-layer/dtos/LoanRepaymentDto.yaml` likewise
+declares a richer raw-Fineract repayment-transaction shape than
+`RepaymentTransactionDto` here, same class of divergence);
+`idea-layer/screens/loan-repayment-dialog/{api.yaml,ui.yaml}` (`POST
+/loans/{loanId}/transactions?command=repayment`, `make_repayment`;
+`api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry declares THIS literal request/response shape, though
+`idea-layer/dtos/LoanRepaymentDto.yaml` describes the SAME endpoint with a
+different, richer shape — see divergence note below);
+`idea-layer/screens/loan-mark-defaulted-dialog/{api.yaml,ui.yaml,docs.yaml}`
+(`POST /loans/{loanId}/transactions?command=writeoff`, `write_off_loan`;
+`api.yaml#api[0]` is the sole SoT — no dedicated `idea-layer/dtos/{Dto}.yaml`
+registry entry exists for this feature, per PP-1);
+`idea-layer/screens/loan-apply/api.yaml` (7 operations: `get_group_members`,
+`get_loan_products`, `get_loan_template`, `get_member_savings`,
+`get_group_corpus`, `get_group_config`, `create_new_loan`; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its OWN in-file `dtos.GroupMember`/
+`dtos.LoanProduct` blocks are abbreviated summaries of the literal operation
+responses, see divergence note below);
+`idea-layer/screens/loan-request/api.yaml` (`POST /datatables/dt_loan_request`,
+`submit_loan_request`, `cache: { ttl: 0, strategy: no-cache, offline:
+queue_to_syncqueue }`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry
+entry exists for this feature — `api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/sync-status/api.yaml` (`POST
+/fineract-provider/api/v1/batches`, `batch_sync` — drains the ALREADY-SHIPPED
+offline `sync_queue` via one atomic Fineract batch call; no dedicated
+`idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its own `dtos.SyncQueueItem` block
+diverges from the shipped `SyncQueueItem` Room schema, see note below);
+`idea-layer/screens/personal-savings/{api.yaml,ui.yaml}` (`GET
+/self/savingsaccounts/{savingsId}/transactions`, group-linked AND individual accounts, raw
+Fineract self-service ledger, stale-while-revalidate `ttl=300` + offline `use_sqldelight`; no
+dedicated `idea-layer/dtos/{Dto}.yaml` registry entry declares THIS raw shape — `api.yaml` is the
+sole SoT for `SavingsLedgerEntryDto`, per PP-1; see the 4-way `SavingsTransactionDto`
+naming-collision note above);
+`idea-layer/screens/member-savings-detail/api.yaml` (`GET
+/companion/groups/{groupId}/members/{memberId}/savings`, `get_member_savings_detail`,
+offset-paginated `limit`/`offset`, `page_size=20`, stale-while-revalidate `ttl=120` + offline
+`show_cached`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1);
+`idea-layer/screens/savings-dashboard/api.yaml` (2 operations: `get_group_savings_summary`
+(`GET /companion/groups/{groupId}/savings`) + `get_individual_savings_summary`
+(`GET /companion/groups/{groupId}/savings/individual`), stale-while-revalidate `ttl=300` + offline
+`show_cached`; no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry exists for this feature —
+`api.yaml` is the sole SoT, per PP-1; its own `dtos.SavingsTab` block collides with
+personal-savings' `dtos.SavingsTab` under the same bare name — see the `SavingsTab` naming-collision
+note above).
+
+**`LoanPurposeDto` extension for loan-request (PP-1 — screen-SoT wins,
+informational, not a divergence):** `idea-layer/screens/loan-request/ui.yaml#components.purpose_dropdown.options`
+declares 7 purpose values — 4 (`MEDICAL`/`BUSINESS`/`EMERGENCY`/`OTHER`)
+already existed on this SHARED enum; `SCHOOL_FEES`/`FARMING`/
+`HOME_IMPROVEMENT` were ADDED to the SAME `LoanPurposeDto` (never forked into
+a second wire enum). `LoanApplyDtoTest.kt`'s unknown-fallback fixture was
+updated to probe `"DEBT_CONSOLIDATION"` instead of the now-real
+`"HOME_IMPROVEMENT"` — the T7/EC30 `UNKNOWN` fallback contract is unaffected,
+only the specific probed value moved.
+
+**`LoanRequestPayloadDto`/`LoanRequestResponseDto` — no `idea-layer/dtos/{Dto}.yaml`
+registry entry (informational, per PP-1):** loan-request declares its wire
+shapes inline in `api.yaml#dtos.{LoanRequestPayload,LoanRequestResponse}` —
+these generated DTOs mirror that block verbatim, plus a
+`SyncQueueEntry`-shaped block also declared in `api.yaml#dtos` that was
+DELIBERATELY NOT generated here: `SyncQueueEntry`/`SyncQueueRepository` are
+shared cross-feature offline infrastructure (declared in
+`api.yaml#dependencies.repositories`, not this feature's own DTO/mapper
+surface), same "repository lives outside this generation step" precedent as
+`MemberAddRepository`'s kdoc. `LoanRequestMappers.kt#toJsonPayload()` /
+`loanRequestPayloadDtoFromJson()` are the serialization SoT a future
+`SyncQueueRepository` implementation should reuse for the queued
+`SyncQueueEntry.payload` `String` field, rather than re-deriving a second
+Json config.
+
+**`GroupMemberDto`/`LoanProductDto` vs `api.yaml#dtos.GroupMember`/
+`.LoanProduct` in-file divergences (flagged for the cross-feature repair
+station, same "literal operation response wins over the abbreviated dtos
+summary" precedent as `OfficeDto`/`CreateGroupTypeConfigDto`):**
+`dtos.GroupMember` additionally declares `fineractClientId: Long` with NO
+separate wire source anywhere on `get_group_members`'s literal response
+(`id`/`displayName`/`imagePresent` only) — modeled as a client-side-derived
+domain field (`GroupMember.fineractClientId = id`) rather than an invented
+wire field (Hard Rule 4). `dtos.LoanProduct` is narrower than
+`get_loan_products`'s literal response (declares only `id`/`name`/
+`shortName`/`minPrincipal`/`maxPrincipal`/`interestRatePerPeriod`, omitting
+`principal`/`numberOfRepayments` the operation actually returns) —
+`LoanProductDto` carries the FULL literal response per Hard Rule 5.
+
+**`GroupCorpusRowDto`/`GroupLoanConfigDto` bare-name collisions (flagged for
+the cross-feature repair station, same class of issue as the
+`GroupInstanceConfigDto` vs `GroupTypeConfigDto` collision above):**
+loan-apply's `get_group_corpus` (`GET /datatables/dt_group_corpus/{groupId}`,
+fields `corpus_balance`/`last_updated`) and `get_group_config` (`GET
+/datatables/dt_group_config/{groupId}`, fields `loan_multiplier`/
+`max_loan_amount`/`meeting_frequency`) are raw snake_case datatable rows —
+DIFFERENT wire shapes, DIFFERENT endpoints from the existing companion
+`GroupCorpusDto` (`GET /companion/groups/{groupId}/corpus`, camelCase, much
+richer) and `GroupConfigDto` (client-side-constructed, not returned by any
+endpoint). Named `GroupCorpusRowDto`/`GroupLoanConfigDto` to avoid the Kotlin
+class-name clash while flagging the shared-concept collision for Station 3.
+
+**`RecordRepaymentRequestDto`-style domain/wire split for `ApplyLoanRequest`
+(informational, not a registry conflict):** the domain `ApplyLoanRequest`
+(`memberId`/`productId`/`amount`/`durationWeeks`/`purpose`/`groupId`, per
+`api.yaml#dtos.LoanApplicationRequest`) is deliberately NOT the same shape as
+`ApplyLoanRequestDto` (the literal `create_new_loan` Fineract body) — same
+"domain simplified input, wire literal boilerplate" precedent as
+`RecordRepaymentRequest`/`RecordRepaymentRequestDto`. `LoanApplyMappers.kt`
+resolves `interestRatePerPeriod` from the selected `LoanProduct`,
+`submittedOnDate`/`expectedDisbursementDate` via the SHARED
+`fineractTransactionDate` helper (reused from `RecordRepaymentMappers.kt`,
+not duplicated), and `loanPurposeId` from `LoanPurpose.fineractPurposeId`
+(sequential 1-5 assignment — `api.yaml` declares no explicit per-value wire
+id, confirmed gap).
+
+**`LoanPurposeDto` — declared despite no literal wire round-trip today
+(informational):** `create_new_loan`'s body only ever transmits the
+already-resolved `loanPurposeId: Int`, same "chip-selector resolved to an
+Int before it hits the wire" precedent as `PaymentMethod`/`paymentTypeId`
+(`RecordRepayment.kt`). Declared `@Serializable` with a full `UNKNOWN`
+fallback per this generation's explicit brief plus forward-compatibility (a
+future `GET`-loan-detail response echoing the purpose back would decode
+safely through this same type).
+
+**`RecordRepaymentRequestDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
+registry divergence (flagged for the cross-feature repair station, same class
+of issue as the `LoanDetailDto`/`RepaymentTransactionDto` divergence above —
+this time the registry's OWN declared `source.endpoint` is the SAME `POST
+/loans/{loanId}/transactions?command=repayment` this DTO wires, and its
+`used_by` explicitly names "loan-repayment-dialog submits this"):** despite
+that direct `used_by` reference, the registry entry (v1.0.0) declares a
+post-hoc transaction-RECORD view (`id: Long`, `loanId: Long`, `amount:
+Double`, `date: String`, `type: String` with values `repayment`/
+`partial_repayment`/`waiver`/`fee_payment`/`interest_waiver`, `currency:
+String`, `principalPortion: Double?`, `interestPortion: Double?`,
+`outstandingAfter: Double?`) — NOT the literal request body
+(`transactionDate`/`transactionAmount`/`paymentTypeId`/`receiptNumber`/
+`locale`/`dateFormat`) or response body (`officeId`/`clientId`/`loanId`/
+`resourceId`) loan-repayment-dialog's OWN `api.yaml#api[0]` declares.
+`RecordRepaymentRequestDto`/`RecordRepaymentResponseDto` here were generated
+from the literal operation contract instead (Hard Rule 5: wire truth over the
+registry summary), the same precedent already established for
+`RepaymentTransactionDto` (`LoanDetailDto.kt`) against this SAME registry
+entry. Reconcile at Station 3 — the registry's richer transaction-record shape
+may fit `get_loan_hist` (loan-detail's repayment-history tab, already modeled
+by `RepaymentTransactionDto`) better than either request/response pair here.
+
+**`LoanDetailDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
+(flagged for the cross-feature repair station, same pattern as the
+`LoanSummaryDto` divergence above — this time the registry's OWN declared
+`source.endpoint` is the SAME `GET /loans/{loanId}` this DTO wires):** the
+registry entry (v1.0.0) declares a DIFFERENT `LoanDto` shape —
+`principal: Double`, `interestRate: Double`, `status: String` with LOWERCASE
+lifecycle values `pending`/`approved`/`disbursed`/`repaid`/`defaulted`/
+`rejected`/`withdrawn`, `disbursedOn: String?`, `expectedMaturityDate: String?`,
+`amountRepaid: Double?`, `amountOutstanding: Double?` — and its `used_by`
+lists `loan-management` (`get_loan`), NOT `loan-detail`. `LoanDetailDto` here
+was generated from loan-detail's OWN approved `api.yaml#dtos.LoanDetail`
+instead (same precedent established by `LoanSummaryDto`: the declaring
+feature's own approved contract wins over a registry entry whose `used_by`
+does not list the feature). Reconcile at Station 3 — options include renaming
+the registry's richer per-loan-lifecycle row to `LoanAccountDto`, or migrating
+loan-management onto this companion shape if their consumers turn out to be
+the same wire contract.
+
+**`RepaymentTransactionDto` vs `idea-layer/dtos/LoanRepaymentDto.yaml`
+registry divergence (flagged for the cross-feature repair station, same
+class of issue):** the registry entry (v1.0.0, `history_endpoint: GET
+/loans/{loanId}/transactions`) declares a richer raw-Fineract shape —
+`loanId: Long`, `type: String` with values `repayment`/`partial_repayment`/
+`waiver`/`fee_payment`/`interest_waiver`, `currency: String`,
+`principalPortion: Double?`, `interestPortion: Double?`,
+`outstandingAfter: Double?` — and lists `loan-management` (`make_repayment`,
+`get_loan_hist`) as its consumer. `RepaymentTransactionDto` here was
+generated from loan-detail's OWN approved `api.yaml#dtos.RepaymentTransaction`
+instead (`id`/`type`/`date`/`amount` only). Reconcile at Station 3 — resolve
+whether loan-detail's repayment-history tab should eventually consume the
+richer registry shape (e.g. for `principalPortion`/`interestPortion` display).
+
+**`LoanDetailResponseDto` composite-envelope design decision (flagged for
+Station 3, informational — not a registry conflict):** `api.yaml#api[0]
+(get_loan_detail)`'s literal Fineract response nests `repaymentSchedule` as
+`{ periods: [...] }` (one level deeper) and raw `{id,value}` status pairs /
+`List<Int>` date arrays throughout — none of which this DTO models directly
+(same "companion bridge normalizes Fineract's raw response" assumption
+`LoanSummaryDto` makes for loan-list). `LoanDetailResponseDto` instead bundles
+the THREE `api.yaml#dtos`-declared shapes (`LoanDetail`,
+`List<RepaymentScheduleRow>`, `List<RepaymentTransaction>`) into one composite
+envelope, inferred from the fact that `get_loan_detail` is a SINGLE endpoint
+returning header + schedule + history together — same "envelope inferred from
+the operation's top-level response shape, not literally declared under
+`dtos:`" precedent as loan-list's `LoanPageDto`. If a future repository
+generator finds the companion bridge actually returns these as separate calls
+or a different envelope shape, this composite should be revisited.
+
+**`LoanSummaryDto` vs `idea-layer/dtos/LoanDto.yaml` registry divergence
+(flagged for the cross-feature repair station, same class of issue as the
+`GroupDto.yaml` / `MemberDto.yaml` divergences above):** the registry entry
+(v1.0.0, `source.endpoint: GET /loans/{loanId}`,
+`source.list_endpoint: GET /loans?groupId={groupId}`) declares a DIFFERENT
+`LoanDto` shape — `principal: Double`, `interestRate: Double`, `status:
+String` with LOWERCASE values `pending`/`approved`/`disbursed`/`repaid`/
+`defaulted`/`rejected`/`withdrawn`, `disbursedOn: String?`,
+`expectedMaturityDate: String?`, `amountRepaid: Double?`,
+`amountOutstanding: Double?`, `loanProductName: String?` — and its `used_by`
+lists `loan-management` (`get_loan`, `list_all_groups`) + `end-user-dashboard`
+(`list_self_loans`), NOT `loan-list`. `LoanSummaryDto` here was generated
+from loan-list's OWN approved `api.yaml#dtos.LoanSummary` instead (`GET
+/groups/{groupId}/loans` — a DIFFERENT endpoint from the registry's), which
+explicitly declares the flat `memberPhotoUrl`/`outstandingBalance`/
+`overdueAmount`/`isOverdue`/`fineractLoanId` shape `ui.yaml#components.loan_card`
+binds to. Reconcile the two `LoanDto`/`LoanSummaryDto` declarations at
+Station 3 — options include renaming the registry's richer per-loan-lifecycle
+row to `LoanDetailDto`/`LoanAccountDto`, or migrating loan-management /
+end-user-dashboard onto this companion list shape if their consumers turn out
+to be the same wire contract.
+
+**`LoanAccountStatusDto` naming collision with `LoanStatusDto` (flagged for
+the cross-feature repair station — same "near-miss, don't force it"
+precedent as `MemberRoleDto` above):** member-list's `LoanStatusDto`
+(`MemberDto.kt`) is a per-MEMBER loan-status CHIP
+(`ACTIVE`/`NONE`/`OVERDUE`/`UNKNOWN`, 3 known values); loan-list's own
+`api.yaml#dtos.LoanStatus` declares a per-LOAN lifecycle status
+(`ACTIVE`/`OVERDUE`/`CLOSED`/`PENDING`/`REJECTED`, 5 known values). Neither
+value-set is a subset of the other (this enum has no `NONE`; `LoanStatusDto`
+has no `CLOSED`/`PENDING`/`REJECTED`), and re-using the bare name `LoanStatusDto`
+for a second, incompatible shape would be a Kotlin symbol collision (both
+declared in `kpt.core.network.model`) — so a new
+`LoanAccountStatusDto` was introduced instead of forcing reuse. Resolve
+whether the two loan-status concepts should be unified at Station 3.
+
+**`MemberProfileDto` vs `MemberDto` field-shape divergence (flagged for the
+cross-feature repair station, same "forcing reuse would require fabricating
+values" precedent as `GroupDetailDto` vs `GroupDto`):** the generation brief
+instructed reusing `MemberDto`/`MemberRoleDto` from member-list, but
+`get_client`'s literal response (`id: Long`, `displayName`, `firstname`,
+`lastname`, `mobileNo`, `imagePresent`, `status: {id, value}`,
+`activationDate`, `officeId`) carries NONE of `MemberDto`'s non-null-required
+`role`/`savingsBalance`/`loanStatus` and DOES carry 6 fields `MemberDto`
+doesn't have. A THIRD shape exists in the SAME `api.yaml` file — the
+abbreviated `dtos.Member` registry block (`id: String`,
+`firstName`/`lastName`/`phone`/`photoUri`/`joinDate`/`status: String`) —
+which matches neither `get_client`'s literal response nor `MemberDto`.
+`MemberProfileDto`'s `@SerialName`s mirror the LITERAL `get_client` operation
+response per Hard Rule 5 (wire truth over the abbreviated registry summary);
+`firstname`/`lastname` (lowercase `n`) is genuine Fineract API casing, not a
+typo. `MemberRoleDto` (the enum) WAS reused outright for
+`MemberRoleInfoDto.role` / `UpdateMemberRoleRequestDto.role` — its value-set
+is an exact match; only the identity ROW (`MemberDto`) was not reusable.
+Resolve all three `get_client`-adjacent shapes at Station 3.
+
+**`MemberAccountsDto` vs `api.yaml#dtos.MemberAccounts` divergence (flagged
+for the cross-feature repair station, same "constructed in GroupRepository"
+precedent as `GroupConfigDto`):** `get_client_accounts`' literal response is
+an array of raw savings/loan accounts (`savingsAccounts[]` /
+`loanAccounts[]`), NOT the aggregated `savingsBalance`/`savingsHistory`/
+`activeLoan` shape `api.yaml#dtos.MemberAccounts` declares. `MemberAccountsDto`
+mirrors the LITERAL operation response (Hard Rule 5); the aggregated shape is
+emitted as the DOMAIN model `MemberAccounts` instead (see `core/model/API.md`),
+derived by `MemberProfileMappers.kt` from this DTO's two arrays.
+`SavingsDataPoint` (weekly sparkline) has NO wire source anywhere in
+`api.yaml` — the mapper always produces an empty list (confirmed gap, same
+class as `GroupConfigDto.shareMin`).
+
+**`GroupDetailDto` vs `GroupDto` field-shape divergence (flagged for the
+cross-feature repair station):** `get_group`'s response
+(`id`/`fineractGroupId`/`name`/`cycleNumber`/`cycleLengthMonths`/
+`meetingFrequency`/`memberCount`/`overdueLoansCount`/`status`/`typeConfig`)
+genuinely diverges from the group-list `GroupDto` (COMP-GRP-001 `/mine`):
+missing `groupType`/`viewerRole`/`lastMeetingDate`/`healthIndicator`/
+`overdueRate` (all non-null required on `GroupDto`, no default), and carrying
+4 fields `GroupDto` doesn't have. The generation brief instructed reusing
+`GroupDto`/`Group` "do NOT duplicate", but doing so here would require
+fabricating values with no wire source (Hard Rule 4) — `GroupDetailDto` was
+introduced instead. Resolve at Station 3.
+
+**`GroupInstanceConfigDto` naming collision (flagged for the cross-feature
+repair station — same class of issue as the `SavingsTransactionDto` collision
+below):** `idea-layer/screens/group-dashboard/api.yaml#dtos.GroupTypeConfig`
+declares the snake_case per-group-instance shape embedded on
+`GroupDetailDto.typeConfig` under the bare name `GroupTypeConfig` — the SAME
+name already used by the camelCase COMP-DT-003 catalogue row
+(`GroupTypeConfigDto` in `GroupTypeConfigDto.kt`). The two are NOT the same
+wire shape (no field overlap beyond the group-type/pool-model axes) and use
+DIFFERENT casing conventions (this one is raw-datatable snake_case; the
+catalogue row is companion-bridge camelCase) — confirming they are genuinely
+different endpoints' payloads, not a copy-paste duplicate. Named
+`GroupInstanceConfigDto` here to avoid the Kotlin class-name clash while
+flagging the collision for Station 3.
+
+**`GroupContributionModelDto` — third contribution-mode-adjacent enum:**
+its value-set (`FIXED_AMOUNT`/`SHARE_BASED_VARIABLE`/`FIXED_NEGOTIATED`) is
+IDENTICAL to `ContributionModelDto`'s (group-create, see below), but the two
+were declared independently on unrelated features' `api.yaml`s with no shared
+source-of-truth cross-reference — NOT unified here; flagged for Station 3 to
+evaluate reusing `ContributionModelDto` instead of a 4th sibling enum.
+
+**Enum reuse (group-create, 2 of 5 typeConfig axes reuse existing wire
+enums, no duplicates):** `CreateGroupTypeConfigDto.groupType` reuses the
+EXISTING short-form `GroupTypeDto` (declared in `GroupDto.kt`, group-list
+feature) — `api.yaml#dtos.GroupTypeConfig.group_type`'s declared value-set
+(`VSLA`/`ROSCA`/.../`CBO`/`BURIAL`/`JLG`) is the SHORT form, matching
+`GroupTypeDto` exactly, NOT the long-form `GroupTypeSlugDto` used by the
+group-type-picker catalogue. `CreateGroupTypeConfigDto.poolModel` reuses the
+EXISTING `SavingsMechanismDto` (declared in `GroupTypeConfigDto.kt`) — its
+value-set (`ACCUMULATING`/`ROTATING_PAYOUT`/`NONE`) is identical to
+`typeConfig.pool_model`'s declared values. `contributionModel` (NEW
+`ContributionModelDto`), `shareoutFormula` (NEW `ShareoutFormulaDto`), and
+`payoutOrderMethod` (NEW `PayoutOrderMethodDto`) were NOT reuse candidates:
+`contribution_model`'s declared value-set (`FIXED_AMOUNT`/
+`SHARE_BASED_VARIABLE`/`FIXED_NEGOTIATED`) differs from the existing
+`ContributionModeDto` (`SHARE_BASED_VARIABLE`/`FIXED`/`MINIMAL`), and no
+existing enum covers `shareout_formula` or `payout_order_method` at all.
+
+**Enum reuse (join-with-code, no new enums introduced):** `InvitationRowDto.roleToAssign`,
+`GroupPreviewDto.roleToAssign`, and `AssociateClientsRequestDto.roleToAssign` all reuse the
+existing `GroupRoleDto` (declared in `LoginSignupDto.kt`) — its value-set
+(`ORGANIZER`/`MEMBER`/`TREASURER`/`SECRETARY`/`UNKNOWN`) exactly covers every role an invite can
+assign; `ViewerRoleDto`'s extra `CHAIRPERSON` value is never assignable via invite so it was not
+the fit. `GroupPreviewDto.groupType` reuses the existing `GroupTypeSlugDto` (declared in
+`GroupTypeConfigDto.kt`, long-form slugs) rather than the short-form `GroupTypeDto` used by
+`GroupDto` — this is a companion-bridge group lookup (like COMP-DT-003), not the group-list row
+contract.
+
+**Enum reuse (personal-dashboard, no new pool-model enum introduced):**
+`MemberDashboardResponseDto.poolModel` and `GroupSummaryDto.poolModel` both
+reuse the existing `SavingsMechanismDto` (declared in `GroupTypeConfigDto.kt`)
+rather than introducing a new pool-model wire enum — its value-set
+(`ACCUMULATING`/`ROTATING_PAYOUT`/`NONE`/`UNKNOWN`) exactly matches
+`idea-layer/screens/personal-dashboard/api.yaml#dtos.GroupSummary.poolModel`'s
+declared `ACCUMULATING | ROTATING_PAYOUT | NONE`.
+
+**Naming collision (`SavingsTransactionDto`, flagged for the cross-feature
+repair station — NOT resolved here, out of this generation's scope):** three
+sources declare a type named `SavingsTransactionDto` with THREE incompatible
+shapes:
+
+1. **This file** (from `personal-dashboard`'s own approved `api.yaml`, status
+   `approved`, approved 2026-07-17): compact companion shape — `id: String`,
+   `date: String`, `type: TransactionTypeDto` (`DEPOSIT`/`WITHDRAWAL`/`UNKNOWN`),
+   `amount: Double`.
+2. `idea-layer/dtos/SavingsTransactionDto.yaml` (registry v1.0.0): richer
+   Fineract-raw shape — `id: Long`, `memberId: Long`, `savingsAccountId: Long`,
+   `transactionType: String` (4 values incl. `interest_posting`/`fee_deduction`),
+   `date: String`, `currency: String`, `runningBalance: Double?`, `note: String?`
+   — sourced from `GET /savingsaccounts/{accountId}/transactions` and lists
+   `end-user-dashboard` / api_id `list_self_savings` as a consumer, but that
+   api_id does not exist on `personal-dashboard`'s current `api.yaml`
+   (`get_member_dashboard` is the only operation); `docs.yaml` states the
+   single companion call REPLACES the old per-account SelfService path this
+   registry entry describes — the registry entry is stale for this consumer.
+3. `idea-layer/screens/personal-savings/api.yaml#dtos.SavingsTransactionDto`:
+   still-richer raw-Fineract-SelfService component shape — `id: Long`,
+   `transactionType: {value: Int, code: String, description: String}`,
+   `date: List<Int>`, `amount: Double`, `runningBalance: Double`,
+   `currency: {code: String, displaySymbol: String}`.
+
+This generation emitted shape (1), the compact companion contract, per Hard
+Rule 5 (`@SerialName` must match the DECLARING feature's own approved
+contract) — `personal-dashboard`'s `api.yaml` is the SoT for THIS feature's
+DTO. Before `personal-savings` (or `savings-dashboard`, though its own
+`api.yaml` does not currently declare a `SavingsTransactionDto` at all) is
+generated via `kmp-dto-gen`, this class-name collision MUST be resolved at
+Station 3 — options include renaming `personal-savings`' raw ledger row to
+`SavingsLedgerEntryDto`, or migrating `personal-savings` onto the companion
+API and reusing THIS `SavingsTransactionDto` outright (matching the pattern
+already established for `GroupDto` below).
+
+**Wire-casing note:** `InvitationRowDto` and `MarkAcceptedRequestDto`/`MarkAcceptedChangesDto`
+use snake_case `@SerialName`s (raw Fineract datatable columns, matching `idea-layer/screens/join-with-code/api.yaml#dtos.InvitationRow` /
+`#dtos.MarkAcceptedRequest` verbatim) — distinct from every other DTO in this file, which uses the
+companion bridge's normalized camelCase. `GroupPreviewDto` / `AssociateClientsRequestDto` /
+`AssociateClientsResponseDto` (companion-bridge, non-datatable endpoints) use camelCase as usual.
+`CreateGroupTypeConfigDto` (group-create) is the newest snake_case member of this family — it is
+the raw `group_type_config` datatable payload nested inside `CreateGroupRequestDto`, whose OWN
+top-level fields (`name`/`officeId`/.../`typeConfig`) stay camelCase like every other companion
+request DTO.
+
+**Registry gap (flagged for the cross-feature repair station):** `mark_invitation_accepted`'s
+`rowId` path param is declared sourced from `validate_invite_token_response.id`, but neither
+`api.yaml#api[0].response.fields` nor `#dtos.InvitationRow` declare an `id` field —
+`InvitationRowDto` therefore does not carry one either (Hard Rule 4 forbids inventing an
+undeclared field). The repository/use-case layer that wires `mark_invitation_accepted`'s `rowId`
+will need this contract gap resolved upstream in the idea-layer `api.yaml`.
+
+**Registry gap (`OfficeDto.externalId`, flagged for the cross-feature repair station):**
+`idea-layer/screens/group-create/api.yaml#api[0] (get_offices)`'s response `items` schema
+declares 4 fields (`id`, `name`, `nameDecorated`, `externalId`), but the abbreviated
+`#dtos.Office` registry block only declares 3 (omits `externalId`). Modeled here as
+`externalId: String? = null` (nullable/optional) rather than invented as non-null-required — the
+two declarations should be reconciled upstream in `api.yaml`.
+
+**`PayoutOrderMethodDto` value-set widened from task prose (flagged, resolved per PP-1):** the
+generation brief's prose narrowed this enum to `FIXED_ORDER`/`LOTTERY`/`AUCTION`/`UNKNOWN` (4
+entries), but `idea-layer/screens/group-create/api.yaml#dtos.GroupTypeConfig.payout_order_method`
+(the actual SoT — no dedicated `idea-layer/dtos/{Dto}.yaml` registry exists for this feature)
+declares 5 known values: `FIXED_ORDER | LOTTERY | AUCTION | NEED_BASED | NA`. Per PP-1 ("when the
+registry [or its SoT-equivalent] and prose disagree, the registry wins"), all 5 were implemented
+(6 total with `UNKNOWN`), not the narrower 3+1 from the prose summary.
+
+Field-name casing precedent: `idea-layer/dtos/LoanDto.yaml` (camelCase wire
+fields, e.g. `memberId`, `disbursedOn`) — the companion bridge returns
+camelCase JSON, not raw Postgres snake_case, so every `@SerialName` here
+matches `api.yaml#dtos` field names verbatim (no case translation).
+
+**`MemberDto` vs `idea-layer/dtos/MemberDto.yaml` registry divergence
+(flagged for the cross-feature repair station — same class of issue as the
+`GroupDto.yaml` and `SavingsTransactionDto.yaml` divergences above):** the
+registry entry (v2.0.0, `source.list_endpoint: GET /groups/{groupId}/clients`
+— the SAME list endpoint declared here) declares a DIFFERENT `MemberDto`
+shape: `id: Long` (not `String`), `roleInGroup: String` with LOWERCASE values
+`organizer`/`treasurer`/`chairperson`/`secretary`/`member` (a raw
+per-(member,group) role sourced from `dt_member_role`, includes `organizer`
+which THIS DTO's `MemberRoleDto` does not), `status: String` (Fineract client
+status: `active`/`inactive`/`pending`/`closed` — an entirely different concept
+from `loanStatus`), `imageId: Long?` (a Fineract document ID, not a URL),
+`groupId: Long?`, `savingsAccountId: Long?`, `joinedDate: String?` — and
+carries NO `loanStatus`/`savingsBalance`/role-badge concept at all. Its
+`used_by` list is `member-onboarding` (`search_clients`, `get_client`) +
+`meeting-lifecycle` (`list_attendance`) — it does NOT list `member-list`.
+`MemberDto` in this file was generated from member-list's OWN approved
+`api.yaml#dtos.Member` instead — the feature's own contract explicitly
+declares `role: MemberRole` + `loanStatus: LoanStatus`, exactly the
+role-badge + loan-status shape this generation brief requested, and the
+registry entry's absent `used_by` reference plus non-overlapping field set
+indicate it describes a DIFFERENT consumer (the raw Fineract client
+resource), not this companion list contract. Reconcile the two `MemberDto`
+declarations at Station 3 — options include renaming the registry's richer
+per-client resource to `ClientDto`/`ClientProfileDto`, or migrating
+member-onboarding / meeting-lifecycle onto this companion shape if their
+consumers turn out to be the same wire contract.
+
+**`MemberRoleDto` — near-miss with two existing role enums, neither reused
+(flagged for Station 3, same "near-miss, don't force it" precedent as
+`ViewerRoleDto` vs `GroupRoleDto` above):** `GroupRoleDto`
+(`ORGANIZER`/`MEMBER`/`TREASURER`/`SECRETARY`) is missing `CHAIRPERSON`;
+`ViewerRoleDto` (`ORGANIZER`/`MEMBER`/`TREASURER`/`CHAIRPERSON`/`SECRETARY`)
+is a strict superset that additionally carries `ORGANIZER`, which
+member-list's own `api.yaml#dtos.MemberRole` does not declare. Neither is an
+exact value-set match, so a new `MemberRoleDto` was introduced rather than
+force-reusing either.
+
+Domain counterparts + field mapping: see `core/model/API.md`. DTO↔domain
+mappers: `core/network/src/commonMain/kotlin/org/mifos/groupbanking/core/network/mapper/LoginSignupMappers.kt`,
+`GroupTypeConfigMappers.kt`, `GroupMappers.kt`, `JoinWithCodeMappers.kt`,
+`MemberDashboardMappers.kt`, `SavingsTransactionMappers.kt`,
+`GroupCreateMappers.kt`, `GroupDashboardMappers.kt`, `MemberMappers.kt`,
+`MemberProfileMappers.kt`, `LoanSummaryMappers.kt`, `LoanDetailMappers.kt`,
+`RecordRepaymentMappers.kt`, `WriteoffLoanMappers.kt`, `LoanApplyMappers.kt`,
+`LoanRequestMappers.kt`, `BatchSyncMappers.kt`.
+
+**`api.yaml#dtos.SyncQueueItem` vs the ALREADY-SHIPPED `SyncQueueItem` Room
+schema divergence (flagged for the cross-feature repair station — full note
+in `core/model/API.md`):** sync-status's `api.yaml#dtos.SyncQueueItem` models
+`entityType: EntityType` + `operation: SyncOperation` as first-class columns;
+the shipped `SyncQueueItem` (`core/model/SyncQueue.kt`, reused outright by
+this generation, never redefined or migrated) instead stores a single
+generic `operationType: String` column. No DTO was generated for
+`api.yaml#dtos.SyncQueueItem` — it describes an already-persisted local Room
+row, not a payload `batch_sync` transmits or receives on the wire;
+`core/model/SyncClassifier.kt`'s `operationTypeToEntityType`/
+`operationTypeToSyncOperation` bridge the two representations at read time.
+Resolve at Station 3: either keep the classifier-bridge permanently, or
+schedule a `sync_queue` migration adding `entityType`/`operation` as
+first-class columns and retire the classifier.
+
+**Registry divergence note (PP-1, flagged for the cross-feature repair
+station):** `idea-layer/dtos/GroupDto.yaml` (registry v2.0.0) declares a
+DIFFERENT `Group` shape (`id: Long`, `groupTypeSlug`, `poolModel`,
+`contributionModel`, `corpusBalance`, `officeId`, `nextMeetingDate`,
+`staffId`) sourced from `GET /groups/{groupId}` / `GET
+/groups?staffId={staffId}` and claims `used_by: group-list`. That reference
+is STALE: `idea-layer/screens/group-list/docs.yaml` states COMP-GRP-001 (`GET
+/companion/groups/mine`) is the current group-read path, and the screen's own
+approved `api.yaml#dtos.Group` (the shape emitted
+here — `id: String`, `viewerRole`, `healthIndicator`, `overdueRate`,
+`fineractGroupId`, etc.) is the current contract (`status: approved`,
+approved 2026-07-17). `GroupDto` in this file was generated from the
+group-list screen's own `api.yaml`/`docs.yaml`/`data-flow.yaml`, NOT from the
+stale registry entry. The registry's `list_endpoint` + field set should be
+reconciled against COMP-GRP-001 (or re-scoped to the admin/staff
+`group-management` endpoints it still accurately describes) at Station 3.
+
+**`ChangePinRequestDto`/`ChangePinResponseDto` — settings screen change-PIN
+(informational, per PP-1):** `idea-layer/screens/settings/api.yaml#dtos.{ChangePinRequest,ChangePinResponse}`
+is the sole SoT (no dedicated `idea-layer/dtos/{Dto}.yaml` registry entry
+exists for this feature). `ChangePinRequestDto.password`/`.repeatPassword`
+both resolve to the SAME domain `ChangePinRequest.newPin` value — Fineract's
+self-service `updatePassword` confirmation-pair convention, matching the
+member entering their new PIN once in `change_pin_dialog`
+(`idea-layer/screens/settings/ui.yaml#components.change_pin_dialog`).
+`ChangePinRequest.currentPin` (the domain input) is NOT a DTO field — it
+authenticates the request via the `BasicAuth` header
+(`api.yaml#api[0].auth: BasicAuth`), same "wire-only field excluded from the
+request DTO" precedent as `RecordRepaymentRequestDto`'s excluded path
+params. `core/network/mapper/ChangePinMappers.kt` is the DTO<->domain
+boundary. Settings also reuses two pre-existing enums outright rather than
+forking new wire types: `LanguageConfig` (`kpt.core.model.user`, domain-only,
+no DTO — see `core/model/DEVELOPMENT.md` §9) gained a `SWAHILI` entry for
+`api.yaml#dtos.AppLanguage`'s 4-value set; `ui.yaml#state_model.selectedTheme`'s
+`AppTheme` (`LIGHT`/`DARK`/`SYSTEM`) was NOT generated as a new DTO/enum at
+all — it maps 1:1 onto the pre-existing `DarkThemeConfig` domain enum
+(`SYSTEM` <-> `FOLLOW_SYSTEM`), which is persisted locally via
+`UserPreferencesRepository` (multiplatform-settings key-value storage, no
+network round-trip) — out of this DTO/mapper generation's scope entirely.
+<!-- kmp-dto-gen:END -->

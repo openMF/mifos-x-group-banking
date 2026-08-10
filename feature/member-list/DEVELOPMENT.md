@@ -5,7 +5,7 @@
 
 `:feature:member-list` — the paginated roster of a savings group's members
 (`/groups/{groupId}/members`), reached from `group-dashboard`'s `view_members_button`. Namespace
-`org.mifos.groupbanking.feature.memberlist`. Source of truth:
+`kpt.feature.memberlist`. Source of truth:
 `idea-layer/screens/member-list/{ui,api,docs,flow,data-flow}.yaml`.
 
 ## 2. Public API

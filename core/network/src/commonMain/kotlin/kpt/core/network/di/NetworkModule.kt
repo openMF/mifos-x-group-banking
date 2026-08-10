@@ -17,88 +17,62 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import org.koin.dsl.module
-import org.mifos.groupbanking.core.network.auth.companionAuthHeaderPlugin
-import org.mifos.groupbanking.core.network.config.BatchSyncApiConfig
-import org.mifos.groupbanking.core.network.config.ChangePinApiConfig
-import org.mifos.groupbanking.core.network.config.CompanionAuthApiConfig
-import org.mifos.groupbanking.core.network.config.FieldOfficerApiConfig
-import org.mifos.groupbanking.core.network.config.GroupApiConfig
-import org.mifos.groupbanking.core.network.config.GroupCreateApiConfig
-import org.mifos.groupbanking.core.network.config.GroupDashboardApiConfig
-import org.mifos.groupbanking.core.network.config.GroupTypeConfigApiConfig
-import org.mifos.groupbanking.core.network.config.InvitationApiConfig
-import org.mifos.groupbanking.core.network.config.LoanApiConfig
-import org.mifos.groupbanking.core.network.config.LoanApplyApiConfig
-import org.mifos.groupbanking.core.network.config.LoanDetailApiConfig
-import org.mifos.groupbanking.core.network.config.LoanRepaymentApiConfig
-import org.mifos.groupbanking.core.network.config.LoanRequestApiConfig
-import org.mifos.groupbanking.core.network.config.LoanWriteoffApiConfig
-import org.mifos.groupbanking.core.network.config.MeetingApiConfig
-import org.mifos.groupbanking.core.network.config.MeetingAttendanceApiConfig
-import org.mifos.groupbanking.core.network.config.MeetingConductApiConfig
-import org.mifos.groupbanking.core.network.config.MeetingRecordApiConfig
-import org.mifos.groupbanking.core.network.config.MemberAddApiConfig
-import org.mifos.groupbanking.core.network.config.MemberApiConfig
-import org.mifos.groupbanking.core.network.config.MemberDashboardApiConfig
-import org.mifos.groupbanking.core.network.config.MemberInviteApiConfig
-import org.mifos.groupbanking.core.network.config.MemberProfileApiConfig
-import org.mifos.groupbanking.core.network.config.OrganizerDashboardApiConfig
-import org.mifos.groupbanking.core.network.config.SavingsApiConfig
-import org.mifos.groupbanking.core.network.config.ShareOutApiConfig
-import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApi
-import org.mifos.groupbanking.core.network.service.batchsync.BatchSyncApiImpl
-import org.mifos.groupbanking.core.network.service.changepin.ChangePinApi
-import org.mifos.groupbanking.core.network.service.changepin.ChangePinApiImpl
-import org.mifos.groupbanking.core.network.service.fieldofficerdashboard.FieldOfficerApi
-import org.mifos.groupbanking.core.network.service.fieldofficerdashboard.FieldOfficerApiImpl
-import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApi
-import org.mifos.groupbanking.core.network.service.groupcreate.GroupCreateApiImpl
-import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApi
-import org.mifos.groupbanking.core.network.service.groupdashboard.GroupDashboardApiImpl
-import org.mifos.groupbanking.core.network.service.grouplist.GroupApi
-import org.mifos.groupbanking.core.network.service.grouplist.GroupApiImpl
-import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApi
-import org.mifos.groupbanking.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
-import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApi
-import org.mifos.groupbanking.core.network.service.joinwithcode.InvitationApiImpl
-import org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApi
-import org.mifos.groupbanking.core.network.service.loanapply.LoanApplyApiImpl
-import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApi
-import org.mifos.groupbanking.core.network.service.loandetail.LoanDetailApiImpl
-import org.mifos.groupbanking.core.network.service.loanlist.LoanApi
-import org.mifos.groupbanking.core.network.service.loanlist.LoanApiImpl
-import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApi
-import org.mifos.groupbanking.core.network.service.loanrepayment.LoanRepaymentApiImpl
-import org.mifos.groupbanking.core.network.service.loanrequest.LoanRequestApi
-import org.mifos.groupbanking.core.network.service.loanrequest.LoanRequestApiImpl
-import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApi
-import org.mifos.groupbanking.core.network.service.loanwriteoff.LoanWriteoffApiImpl
-import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApi
-import org.mifos.groupbanking.core.network.service.loginsignup.CompanionAuthApiImpl
-import org.mifos.groupbanking.core.network.service.meetingcalendar.MeetingApi
-import org.mifos.groupbanking.core.network.service.meetingcalendar.MeetingApiImpl
-import org.mifos.groupbanking.core.network.service.meetingconduct.MeetingConductApi
-import org.mifos.groupbanking.core.network.service.meetingconduct.MeetingConductApiImpl
-import org.mifos.groupbanking.core.network.service.meetingsummary.MeetingRecordApi
-import org.mifos.groupbanking.core.network.service.meetingsummary.MeetingRecordApiImpl
-import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApi
-import org.mifos.groupbanking.core.network.service.memberadd.MemberAddApiImpl
-import org.mifos.groupbanking.core.network.service.memberinvite.MemberInviteApi
-import org.mifos.groupbanking.core.network.service.memberinvite.MemberInviteApiImpl
-import org.mifos.groupbanking.core.network.service.memberlist.MemberApi
-import org.mifos.groupbanking.core.network.service.memberlist.MemberApiImpl
-import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApi
-import org.mifos.groupbanking.core.network.service.memberprofile.MemberProfileApiImpl
-import org.mifos.groupbanking.core.network.service.organizerdashboard.OrganizerDashboardApi
-import org.mifos.groupbanking.core.network.service.organizerdashboard.OrganizerDashboardApiImpl
-import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApi
-import org.mifos.groupbanking.core.network.service.personaldashboard.MemberDashboardApiImpl
-import org.mifos.groupbanking.core.network.service.previousmeetingreview.MeetingAttendanceApi
-import org.mifos.groupbanking.core.network.service.previousmeetingreview.MeetingAttendanceApiImpl
-import org.mifos.groupbanking.core.network.service.savings.SavingsApi
-import org.mifos.groupbanking.core.network.service.savings.SavingsApiImpl
-import org.mifos.groupbanking.core.network.service.shareout.ShareOutApi
-import org.mifos.groupbanking.core.network.service.shareout.ShareOutApiImpl
+import kpt.core.network.auth.companionAuthHeaderPlugin
+import kpt.core.network.BuildKonfig
+import kpt.core.network.service.batchsync.BatchSyncApi
+import kpt.core.network.service.batchsync.BatchSyncApiImpl
+import kpt.core.network.service.changepin.ChangePinApi
+import kpt.core.network.service.changepin.ChangePinApiImpl
+import kpt.core.network.service.fieldofficerdashboard.FieldOfficerApi
+import kpt.core.network.service.fieldofficerdashboard.FieldOfficerApiImpl
+import kpt.core.network.service.groupcreate.GroupCreateApi
+import kpt.core.network.service.groupcreate.GroupCreateApiImpl
+import kpt.core.network.service.groupdashboard.GroupDashboardApi
+import kpt.core.network.service.groupdashboard.GroupDashboardApiImpl
+import kpt.core.network.service.grouplist.GroupApi
+import kpt.core.network.service.grouplist.GroupApiImpl
+import kpt.core.network.service.grouptypepicker.GroupTypeConfigApi
+import kpt.core.network.service.grouptypepicker.GroupTypeConfigApiImpl
+import kpt.core.network.service.joinwithcode.InvitationApi
+import kpt.core.network.service.joinwithcode.InvitationApiImpl
+import kpt.core.network.service.loanapply.LoanApplyApi
+import kpt.core.network.service.loanapply.LoanApplyApiImpl
+import kpt.core.network.service.loandetail.LoanDetailApi
+import kpt.core.network.service.loandetail.LoanDetailApiImpl
+import kpt.core.network.service.loanlist.LoanApi
+import kpt.core.network.service.loanlist.LoanApiImpl
+import kpt.core.network.service.loanrepayment.LoanRepaymentApi
+import kpt.core.network.service.loanrepayment.LoanRepaymentApiImpl
+import kpt.core.network.service.loanrequest.LoanRequestApi
+import kpt.core.network.service.loanrequest.LoanRequestApiImpl
+import kpt.core.network.service.loanwriteoff.LoanWriteoffApi
+import kpt.core.network.service.loanwriteoff.LoanWriteoffApiImpl
+import kpt.core.network.service.loginsignup.CompanionAuthApi
+import kpt.core.network.service.loginsignup.CompanionAuthApiImpl
+import kpt.core.network.service.meetingcalendar.MeetingApi
+import kpt.core.network.service.meetingcalendar.MeetingApiImpl
+import kpt.core.network.service.meetingconduct.MeetingConductApi
+import kpt.core.network.service.meetingconduct.MeetingConductApiImpl
+import kpt.core.network.service.meetingsummary.MeetingRecordApi
+import kpt.core.network.service.meetingsummary.MeetingRecordApiImpl
+import kpt.core.network.service.memberadd.MemberAddApi
+import kpt.core.network.service.memberadd.MemberAddApiImpl
+import kpt.core.network.service.memberinvite.MemberInviteApi
+import kpt.core.network.service.memberinvite.MemberInviteApiImpl
+import kpt.core.network.service.memberlist.MemberApi
+import kpt.core.network.service.memberlist.MemberApiImpl
+import kpt.core.network.service.memberprofile.MemberProfileApi
+import kpt.core.network.service.memberprofile.MemberProfileApiImpl
+import kpt.core.network.service.organizerdashboard.OrganizerDashboardApi
+import kpt.core.network.service.organizerdashboard.OrganizerDashboardApiImpl
+import kpt.core.network.service.personaldashboard.MemberDashboardApi
+import kpt.core.network.service.personaldashboard.MemberDashboardApiImpl
+import kpt.core.network.service.previousmeetingreview.MeetingAttendanceApi
+import kpt.core.network.service.previousmeetingreview.MeetingAttendanceApiImpl
+import kpt.core.network.service.savings.SavingsApi
+import kpt.core.network.service.savings.SavingsApiImpl
+import kpt.core.network.service.shareout.ShareOutApi
+import kpt.core.network.service.shareout.ShareOutApiImpl
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
@@ -130,11 +104,9 @@ val NetworkModule = module {
 
     // Companion auth bridge (COMP-AUTH-001/002/003) — login-signup feature client stack.
     // CompanionAuthApiConfig.baseUrl default-param is overridden per-fork/per-environment by
-    // re-registering the single<CompanionAuthApiConfig> binding (see that class's KDoc).
-    single<CompanionAuthApiConfig> { CompanionAuthApiConfig() }
     single<HttpClient> {
         val defaultConfig = setupDefaultHttpClient(
-            baseUrl = get<CompanionAuthApiConfig>().baseUrl,
+            baseUrl = BuildKonfig.COMPANION_BASE_URL,
             // Talking to the companion (not Fineract directly): the companion handles tenancy, so
             // no Fineract-Platform-TenantId header is attached here. Auth is the Bearer sessionToken
             // added by companionAuthHeaderPlugin below.
@@ -174,7 +146,6 @@ val NetworkModule = module {
     // shared HttpClient singleton above (same companion server, no second engine). The config
     // binding is registered for override-surface symmetry with CompanionAuthApiConfig even
     // though the shared client is the one actually dispatching requests today.
-    single<GroupTypeConfigApiConfig> { GroupTypeConfigApiConfig() }
     single<GroupTypeConfigApi> { GroupTypeConfigApiImpl(httpClient = get()) }
 
     // Group list (COMP-GRP-001) — group-list feature client stack. Reuses the shared HttpClient
@@ -183,7 +154,6 @@ val NetworkModule = module {
     // shared client is the one actually dispatching requests today. The Repository/Store5
     // wrapper consuming GroupApi is emitted by a downstream kmp-store-gen/kmp-client-gen
     // generation step, not registered here.
-    single<GroupApiConfig> { GroupApiConfig() }
     single<GroupApi> { GroupApiImpl(httpClient = get()) }
 
     // Field-officer dashboard (FR-009) — raw Fineract reads (GET /groups,
@@ -192,7 +162,6 @@ val NetworkModule = module {
     // symmetry with CompanionAuthApiConfig even though the shared client dispatches the requests.
     // The composite Store5 read-store + repository consuming FieldOfficerApi is wired downstream in
     // appStoreModule / RepositoryModule, not registered here.
-    single<FieldOfficerApiConfig> { FieldOfficerApiConfig() }
     single<FieldOfficerApi> { FieldOfficerApiImpl(httpClient = get()) }
 
     // join-with-code (COMP-DT-004 + COMP-GRP-003) — join-with-code feature client stack.
@@ -201,7 +170,6 @@ val NetworkModule = module {
     // even though the shared client is the one actually dispatching requests today. The
     // Repository consuming InvitationApi (Store5-free mutation orchestration — no read-stream
     // to cache) is registered in RepositoryModule.kt.
-    single<InvitationApiConfig> { InvitationApiConfig() }
     single<InvitationApi> { InvitationApiImpl(httpClient = get()) }
 
     // member-invite organizer-side stack (COMP-DT-002 generate / COMP-DT-003 list / COMP-DT-005
@@ -211,7 +179,6 @@ val NetworkModule = module {
     // symmetry with CompanionAuthApiConfig even though the shared client dispatches the requests.
     // The Repository consuming MemberInviteApi (Store5-free submit-mutation — no read-stream to
     // cache) is registered in RepositoryModule.kt.
-    single<MemberInviteApiConfig> { MemberInviteApiConfig() }
     single<MemberInviteApi> { MemberInviteApiImpl(httpClient = get()) }
 
     // Group-create wizard (COMP-GRP-001 + raw Fineract `/offices` passthrough) — group-create
@@ -221,7 +188,6 @@ val NetworkModule = module {
     // requests today. The Repository consuming GroupCreateApi (Store5-free mutation
     // orchestration for createGroup; getOffices pending a future kmp-store-gen OfficeStore — see
     // GroupCreateRepository KDoc) is registered in RepositoryModule.kt.
-    single<GroupCreateApiConfig> { GroupCreateApiConfig() }
     single<GroupCreateApi> { GroupCreateApiImpl(httpClient = get()) }
 
     // Personal dashboard (COMP-DASH-001) — personal-dashboard feature client stack. Reuses the
@@ -230,7 +196,6 @@ val NetworkModule = module {
     // though the shared client is the one actually dispatching requests today. The
     // Repository/Store5 wrapper consuming MemberDashboardApi is emitted by a downstream
     // kmp-store-gen/kmp-client-gen generation step, not registered here.
-    single<MemberDashboardApiConfig> { MemberDashboardApiConfig() }
     single<MemberDashboardApi> { MemberDashboardApiImpl(httpClient = get()) }
 
     // Organizer dashboard (GET /companion/organizer/dashboard) — organizer-dashboard feature client
@@ -239,7 +204,6 @@ val NetworkModule = module {
     // even though the shared client is the one actually dispatching requests today. The
     // Repository/Store5 wrapper consuming OrganizerDashboardApi is wired downstream in
     // appStoreModule / RepositoryModule, not registered here.
-    single<OrganizerDashboardApiConfig> { OrganizerDashboardApiConfig() }
     single<OrganizerDashboardApi> { OrganizerDashboardApiImpl(httpClient = get()) }
 
     // Group dashboard (COMP-GRP-001 read path) — group-dashboard feature client stack. Reuses
@@ -249,7 +213,6 @@ val NetworkModule = module {
     // parallel-combine into the composite dashboard model + Store5 wrapper consuming
     // GroupDashboardApi is emitted by a downstream kmp-store-gen/kmp-client-gen generation step,
     // not registered here.
-    single<GroupDashboardApiConfig> { GroupDashboardApiConfig() }
     single<GroupDashboardApi> { GroupDashboardApiImpl(httpClient = get()) }
 
     // Member list (get_group_members) — member-list feature client stack. Reuses the shared
@@ -258,7 +221,6 @@ val NetworkModule = module {
     // client is the one actually dispatching requests today. The Repository/Store5 wrapper
     // consuming MemberApi is emitted by a downstream kmp-store-gen/kmp-client-gen generation
     // step, not registered here.
-    single<MemberApiConfig> { MemberApiConfig() }
     single<MemberApi> { MemberApiImpl(httpClient = get()) }
 
     // Loan list (get_group_loans) — loan-list feature client stack. Reuses the shared
@@ -267,7 +229,6 @@ val NetworkModule = module {
     // shared client is the one actually dispatching requests today. The Repository/Store5
     // wrapper consuming LoanApi is emitted by a downstream kmp-store-gen/kmp-client-gen
     // generation step, not registered here.
-    single<LoanApiConfig> { LoanApiConfig() }
     single<LoanApi> { LoanApiImpl(httpClient = get()) }
 
     // Loan detail (get_loan_detail / get_loan) — loan-detail feature client stack. Reuses the
@@ -277,7 +238,6 @@ val NetworkModule = module {
     // Repository/Store5 wrapper consuming LoanDetailApi (`stale_while_revalidate`, ttl=120 per
     // `data-flow.yaml#cache_strategy`) is emitted by a downstream kmp-store-gen/kmp-client-gen
     // generation step, not registered here.
-    single<LoanDetailApiConfig> { LoanDetailApiConfig() }
     single<LoanDetailApi> { LoanDetailApiImpl(httpClient = get()) }
 
     // Meeting record (get_meeting_record) — meeting-summary feature client stack. Reuses the
@@ -285,21 +245,18 @@ val NetworkModule = module {
     // binding is registered for override-surface symmetry. The Repository/Store5 wrapper consuming
     // MeetingRecordApi (`stale_while_revalidate`, ttl=600 per `data-flow.yaml#cache.strategy`) is
     // wrapped by provideMeetingSummaryStore (appStoreModule) + MeetingSummaryRepositoryImpl.
-    single<MeetingRecordApiConfig> { MeetingRecordApiConfig() }
     single<MeetingRecordApi> { MeetingRecordApiImpl(httpClient = get()) }
 
     // Meeting calendar (get_meeting_schedule + get_meeting_records_datatable) — meeting-calendar
     // feature client stack. Reuses the shared HttpClient singleton above (same server, no second
     // engine). MeetingApi is wrapped by provideMeetingCalendarStore (appStoreModule) +
     // MeetingRepositoryImpl. Config binding registered for override-surface symmetry.
-    single<MeetingApiConfig> { MeetingApiConfig() }
     single<MeetingApi> { MeetingApiImpl(httpClient = get()) }
 
     // Meeting attendance (get_meeting_attendance) — previous-meeting-review feature client stack.
     // Reuses the shared HttpClient singleton above (same server, no second engine).
     // MeetingAttendanceApi is wrapped by provideMeetingAttendanceStore (appStoreModule) +
     // PreviousMeetingReviewRepositoryImpl (merged with the reused MeetingSummaryStore record read).
-    single<MeetingAttendanceApiConfig> { MeetingAttendanceApiConfig() }
     single<MeetingAttendanceApi> { MeetingAttendanceApiImpl(httpClient = get()) }
 
     // Loan repayment (make_repayment) — loan-repayment-dialog feature client stack. Reuses the
@@ -309,7 +266,6 @@ val NetworkModule = module {
     // consuming LoanRepaymentApi (Store5-free mutation orchestration — no read-stream of its own,
     // invalidates the already-registered AppStoreRegistry.LoanDetail store on success) is
     // registered in RepositoryModule.kt.
-    single<LoanRepaymentApiConfig> { LoanRepaymentApiConfig() }
     single<LoanRepaymentApi> { LoanRepaymentApiImpl(httpClient = get()) }
 
     // Loan write-off (write_off_loan) — loan-mark-defaulted-dialog feature client stack. Reuses
@@ -320,7 +276,6 @@ val NetworkModule = module {
     // (Store5-free mutation orchestration — no read-stream of its own, invalidates the
     // already-registered AppStoreRegistry.LoanDetail store on success) is registered in
     // RepositoryModule.kt.
-    single<LoanWriteoffApiConfig> { LoanWriteoffApiConfig() }
     single<LoanWriteoffApi> { LoanWriteoffApiImpl(httpClient = get()) }
 
     // Member profile (get_client / get_client_accounts / get_member_role / update_member_role)
@@ -331,7 +286,6 @@ val NetworkModule = module {
     // even though the shared client is the one actually dispatching requests today. The composite
     // Store5 read-store + write-invalidation repository consuming MemberProfileApi is emitted by
     // a downstream kmp-store-gen/kmp-client-gen generation step, not registered here.
-    single<MemberProfileApiConfig> { MemberProfileApiConfig() }
     single<MemberProfileApi> { MemberProfileApiImpl(httpClient = get()) }
 
     // member-add create-chain (create_client -> assign_member_role -> optional upload_photo) —
@@ -343,7 +297,6 @@ val NetworkModule = module {
     // one actually dispatching requests today. The Repository consuming MemberAddApi (Store5-free
     // mutation orchestration — offline-queue-backed create-chain, no read-stream to cache) is
     // registered in RepositoryModule.kt.
-    single<MemberAddApiConfig> { MemberAddApiConfig() }
     single<MemberAddApi> { MemberAddApiImpl(httpClient = get()) }
 
     // Loan-apply form (get_group_members / get_loan_products / get_loan_template /
@@ -356,7 +309,6 @@ val NetworkModule = module {
     // consuming LoanApplyApi (Store5-free today — `business_logic.kind: composite` with no
     // AppStoreRegistry entry yet, pending a future kmp-store-gen LoanApplyStore) is registered in
     // RepositoryModule.kt.
-    single<LoanApplyApiConfig> { LoanApplyApiConfig() }
     single<LoanApplyApi> { LoanApplyApiImpl(httpClient = get()) }
 
     // Loan-request form (submit_loan_request) — loan-request feature client stack. Reuses the
@@ -367,7 +319,6 @@ val NetworkModule = module {
     // one actually dispatching requests today. The Repository consuming LoanRequestApi (Store5-free
     // — `business_logic.kind: crud`, offline-queue-backed via SyncQueueRepository, no read-stream
     // to cache) is registered in RepositoryModule.kt.
-    single<LoanRequestApiConfig> { LoanRequestApiConfig() }
     single<LoanRequestApi> { LoanRequestApiImpl(httpClient = get()) }
 
     // sync-status batch-drain (batch_sync, Fineract Batch API) — sync-status feature client
@@ -379,7 +330,6 @@ val NetworkModule = module {
     // `data-flow.yaml#cache.strategy: no_cache` on every entry, no read-stream to cache), which
     // consumes BatchSyncApi + the shared SyncQueueRepository + SyncMetadataStore, is registered
     // in RepositoryModule.kt.
-    single<BatchSyncApiConfig> { BatchSyncApiConfig() }
     single<BatchSyncApi> { BatchSyncApiImpl(httpClient = get()) }
 
     // Change-PIN (change_pin) — settings screen client stack. Reuses the shared HttpClient
@@ -390,7 +340,6 @@ val NetworkModule = module {
     // though the shared client is the one actually dispatching requests today. The Repository
     // consuming ChangePinApi (Store5-free — `business_logic.kind: crud`, no read-stream to cache)
     // is registered in RepositoryModule.kt.
-    single<ChangePinApiConfig> { ChangePinApiConfig() }
     single<ChangePinApi> { ChangePinApiImpl(httpClient = get()) }
 
     // Shared savings client stack (get_group_linked_transactions/get_individual_transactions —
@@ -404,7 +353,6 @@ val NetworkModule = module {
     // the one actually dispatching requests today. The Repository consuming SavingsApi (Store5-free
     // today — no AppStoreRegistry.Savings entry yet, pending a future kmp-store-gen SavingsStore)
     // is registered in RepositoryModule.kt.
-    single<SavingsApiConfig> { SavingsApiConfig() }
     single<SavingsApi> { SavingsApiImpl(httpClient = get()) }
 
     // share-out-preview companion read (get_shareout_preview — COMP-DIST-001 preview,
@@ -413,7 +361,6 @@ val NetworkModule = module {
     // override-surface symmetry with SavingsApiConfig even though the shared client dispatches the
     // request. The Repository consuming ShareOutApi (Store5-free today — no AppStoreRegistry entry
     // yet, pending a future kmp-store-gen ShareOutStore) is registered in RepositoryModule.kt.
-    single<ShareOutApiConfig> { ShareOutApiConfig() }
     single<ShareOutApi> { ShareOutApiImpl(httpClient = get()) }
 
     // meeting-conduct wizard (get_previous_meeting_record / get_group_members / get_group_corpus /
@@ -423,6 +370,5 @@ val NetworkModule = module {
     // engine). The config binding is registered for override-surface symmetry with LoanApplyApiConfig.
     // The Store5-free composite Repository consuming MeetingConductApi (+ shared SyncQueueRepository
     // for the offline enqueue seam) is registered in RepositoryModule.kt.
-    single<MeetingConductApiConfig> { MeetingConductApiConfig() }
     single<MeetingConductApi> { MeetingConductApiImpl(httpClient = get()) }
 }

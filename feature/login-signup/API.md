@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.loginsignup.LoginSignupViewModel` — extends
+`kpt.feature.loginsignup.LoginSignupViewModel` — extends
 `BaseViewModel<LoginSignupState, LoginSignupEvent, LoginSignupAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`).
 
@@ -57,7 +57,7 @@
 
 ## di
 
-`org.mifos.groupbanking.feature.loginsignup.di.LoginSignupModule` — Koin module.
+`kpt.feature.loginsignup.di.LoginSignupModule` — Koin module.
 Included via `cmp-navigation/.../KoinModules.kt#featureModule.includes(...)`.
 Declares `single { KptAnalyticsTracker(analyticsHelper = get()) }` (the tracker had no
 Koin registration anywhere in the codebase prior to this generation) plus
@@ -69,12 +69,12 @@ Koin registration anywhere in the codebase prior to this generation) plus
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`LoginSignupScreen.kt` (`org.mifos.groupbanking.feature.loginsignup`) — Container + Content split:
+`LoginSignupScreen.kt` (`kpt.feature.loginsignup`) — Container + Content split:
 
 - **Container** `internal fun LoginSignupScreen(onNavigateToPersonalDashboard, onNavigateToGroupList, onNavigateToGroupTypePicker, onNavigateToJoinWithCode, modifier, viewModel = koinViewModel())` — collects `viewModel.stateFlow` via `collectAsStateWithLifecycle`, consumes `LoginSignupEvent` via `EventsEffect` (4 nav branches + `ShowSnackbar` resolved to a `stringResource` + `PromptBiometric` re-dispatched as `OnBiometricUnlock`), delegates to Content.
 - **Content** `internal fun LoginSignupContent(state: LoginSignupState, onAction: (LoginSignupAction) -> Unit, modifier, snackbarHostState)` — hoisted state, stateless. `when (state.screenState)` renders all 4 `LoginSignupScreenState` members: `Loading`/`Content`/`Error` → `AuthFormSection(isLoading = …)`; `ZeroGroups` → `ZeroGroupsSection`.
 - **Sub-composables** (`internal`, previewed): `AuthFormSection` (mode toggle + fields + submit + biometric), `ZeroGroupsSection` (post-auth empty state).
-- **Reusable components** (`org.mifos.groupbanking.feature.loginsignup.components`, public): `AuthBrandHeader`, `AuthModeToggleTabs`, `AuthTextField`, `AuthErrorBanner`, `AuthDividerLabeled`, `ZeroGroupsEmptyState`.
+- **Reusable components** (`kpt.feature.loginsignup.components`, public): `AuthBrandHeader`, `AuthModeToggleTabs`, `AuthTextField`, `AuthErrorBanner`, `AuthDividerLabeled`, `ZeroGroupsEmptyState`.
 - Every `on_click` in `ui.yaml#components[]` dispatches a typed `LoginSignupAction` member (RULE-IMPL-DEAD-CLICKABLE-001 Rule 1/2) — no free `on{X}: () -> Unit` callbacks, no dead clickables.
 
 ## route
@@ -88,7 +88,7 @@ Koin registration anywhere in the codebase prior to this generation) plus
 
 ## tags
 
-`LoginSignupTestTags` (`org.mifos.groupbanking.feature.loginsignup`) — append-only, 15 constants: `SCREEN`, `AUTH_CARD`, `TAB_LOGIN`, `TAB_SIGNUP`, `FIELD_NAME`, `FIELD_EMAIL_PHONE`, `FIELD_PASSWORD`, `FORGOT_PASSWORD_LINK`, `LOGIN_BUTTON`, `SIGNUP_BUTTON`, `BIOMETRIC_BUTTON`, `ERROR_BANNER`, `ZERO_GROUPS_ILLUSTRATION`, `CREATE_GROUP_BUTTON`, `JOIN_WITH_CODE_BUTTON`.
+`LoginSignupTestTags` (`kpt.feature.loginsignup`) — append-only, 15 constants: `SCREEN`, `AUTH_CARD`, `TAB_LOGIN`, `TAB_SIGNUP`, `FIELD_NAME`, `FIELD_EMAIL_PHONE`, `FIELD_PASSWORD`, `FORGOT_PASSWORD_LINK`, `LOGIN_BUTTON`, `SIGNUP_BUTTON`, `BIOMETRIC_BUTTON`, `ERROR_BANNER`, `ZERO_GROUPS_ILLUSTRATION`, `CREATE_GROUP_BUTTON`, `JOIN_WITH_CODE_BUTTON`.
 
 ## permissions
 

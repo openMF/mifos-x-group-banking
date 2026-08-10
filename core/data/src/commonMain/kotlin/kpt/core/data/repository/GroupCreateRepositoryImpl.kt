@@ -1,0 +1,79 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package kpt.core.data.repository
+
+import co.touchlab.kermit.Logger
+import kpt.core.base.network.NetworkError
+import kpt.core.base.network.NetworkResult
+import kpt.core.model.CreateGroupRequest
+import kpt.core.model.GroupCreationResult
+import kpt.core.model.Office
+import kpt.core.network.mapper.toDomainModel
+import kpt.core.network.mapper.toDomainModels
+import kpt.core.network.mapper.toDto
+import kpt.core.network.mapper.toJsonPayload
+import kpt.core.network.service.groupcreate.GroupCreateApi
+
+private const val TAG = "GroupCreateRepository"
+private const val CREATE_GROUP_OPERATION_TYPE = "CREATE_GROUP"
+private const val CREATE_GROUP_TARGET_ROUTE = "/companion/groups"
+
+/**
+ * See [GroupCreateRepository] KDoc for the Store5-branch rationale (`business_logic.kind:
+ * processor` for [createGroup]) and the [getOffices] SC2 gap note. No try-catch here — every
+ * method is a plain `when` over [GroupCreateApi]'s [NetworkResult].
+ *
+ * See API.md#repositories — GroupCreateRepository.
+ */
+class GroupCreateRepositoryImpl(
+    private val api: GroupCreateApi,
+    private val syncQueueRepository: SyncQueueRepository,
+) : GroupCreateRepository {
+
+    override suspend fun getOffices(orderBy: String): NetworkResult<List<Office>, NetworkError> {
+        Logger.d(TAG) { "getOffices: orderBy=$orderBy" }
+        return when (val result = api.getOffices(orderBy)) {
+            is NetworkResult.Success -> {
+                val offices = result.data.toDomainModels()
+                Logger.i(TAG) { "getOffices succeeded count=${offices.size}" }
+                NetworkResult.Success(offices)
+            }
+            is NetworkResult.Error -> {
+                Logger.e(TAG) { "getOffices failed: ${result.error}" }
+                result
+            }
+        }
+    }
+
+    override suspend fun createGroup(request: CreateGroupRequest): NetworkResult<GroupCreationResult, NetworkError> {
+        Logger.d(TAG) { "createGroup: submitting name=${request.name} officeId=${request.officeId}" }
+        return when (val result = api.createGroup(request.toDto())) {
+            is NetworkResult.Success -> {
+                val creationResult = result.data.toDomainModel()
+                Logger.i(TAG) { "createGroup succeeded groupId=${creationResult.groupId}" }
+                NetworkResult.Success(creationResult)
+            }
+            is NetworkResult.Error -> {
+                Logger.e(TAG) { "createGroup failed: ${result.error}" }
+                result
+            }
+        }
+    }
+
+    override suspend fun enqueueOffline(request: CreateGroupRequest): Long {
+        val payloadJson = request.toDto().toJsonPayload()
+        Logger.i(TAG) { "enqueueOffline: queuing $CREATE_GROUP_OPERATION_TYPE name=${request.name}" }
+        return syncQueueRepository.enqueue(
+            operationType = CREATE_GROUP_OPERATION_TYPE,
+            targetTable = CREATE_GROUP_TARGET_ROUTE,
+            payloadJson = payloadJson,
+        )
+    }
+}

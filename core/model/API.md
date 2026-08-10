@@ -262,7 +262,7 @@ a per-member loan-status chip (`ACTIVE`/`NONE`/`OVERDUE`/`UNKNOWN`);
 loan-list's own registry declares a per-loan lifecycle status
 (`ACTIVE`/`OVERDUE`/`CLOSED`/`PENDING`/`REJECTED`). Neither value-set is a
 subset of the other, and the bare name `LoanStatus` was already taken by a
-different concept in the SAME package (`org.mifos.groupbanking.core.model`)
+different concept in the SAME package (`kpt.core.model`)
 — `LoanAccountStatus` was introduced instead of forcing reuse or a symbol
 clash. Resolve at Station 3.
 

@@ -5,7 +5,7 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.settings.SettingsViewModel` — extends
+`kpt.feature.settings.SettingsViewModel` — extends
 `BaseViewModel<SettingsState, SettingsEvent, SettingsAction>` (`kpt.core.base.ui.viewmodel.BaseViewModel`).
 Constructor deps: `UserPreferencesRepository` (`core/datastore`), `BiometricAuthenticator`
 (`core-base/security`), `ChangePinRepository` (`core/data`), `AppVersionInfo` (feature-local DI
@@ -57,7 +57,7 @@ currently unused — no i18n success-copy key exists yet, see class KDoc).
 
 ## di
 
-`org.mifos.groupbanking.feature.settings.di.SettingsModule` — Koin module,
+`kpt.feature.settings.di.SettingsModule` — Koin module,
 `single { AppVersionInfo(appVersion = "1.0.0", buildNumber = "1") }` (documented app-module wiring
 seam) + `viewModelOf(::SettingsViewModel)`. Included in `KoinModules.kt#featureModule` via the
 aliased import `GroupBankingSettingsModule` (short-name collision guard against the legacy

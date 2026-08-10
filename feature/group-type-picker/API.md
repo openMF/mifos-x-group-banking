@@ -3,14 +3,14 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.grouptypepicker.GroupTypePickerViewModel` — extends
+`kpt.feature.grouptypepicker.GroupTypePickerViewModel` — extends
 `BaseViewModel<GroupTypePickerState, GroupTypePickerEvent, GroupTypePickerAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Full field/action/event contract documented in the
 ViewModel source KDoc — this section is owned by `kmp-viewmodel-gen` on its next pass.
 
 ## di
 
-`org.mifos.groupbanking.feature.grouptypepicker.di.GroupTypePickerModule` — Koin module,
+`kpt.feature.grouptypepicker.di.GroupTypePickerModule` — Koin module,
 `viewModelOf(::GroupTypePickerViewModel)`. Already included in `KoinModules.kt#featureModule`.
 
 <!-- kmp-screen-gen:BEGIN -->

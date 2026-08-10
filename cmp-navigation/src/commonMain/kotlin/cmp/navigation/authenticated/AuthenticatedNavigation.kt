@@ -19,8 +19,8 @@ import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.popBackStackSafely
-import org.mifos.groupbanking.feature.settings.navigateToSettings
-import org.mifos.groupbanking.feature.settings.settingsScreen
+import kpt.feature.settings.navigateToSettings
+import kpt.feature.settings.settingsScreen
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -37,7 +37,7 @@ internal fun NavController.navigateToAuthenticatedGraph(navOptions: NavOptions? 
  * runtime, but it still lives in the `cmp-navigation` module and must compile. The legacy
  * `kpt.feature.settings.settingsDestination`/`navigateToSettings`/`notificationDestination` this
  * graph used to wire have been migrated away with the rest of `kpt.feature.settings`; this graph
- * is repointed at the new `org.mifos.groupbanking.feature.settings.settingsScreen(...)`. Because
+ * is repointed at the new `kpt.feature.settings.settingsScreen(...)`. Because
  * this legacy demo shell has no login/logout-confirmation concept of its own (unlike
  * `GroupBankingNavHost`, which wires the real `onNavigateToLogin`/`onShowLogoutDialog` targets --
  * see that file), [onNavigateToLogin] / [onShowLogoutDialog] both fall back to a real, honest

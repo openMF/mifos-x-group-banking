@@ -5,7 +5,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.loanlist.LoanListViewModel` — extends
+`kpt.feature.loanlist.LoanListViewModel` — extends
 `BaseViewModel<LoanListState, LoanListEvent, LoanListAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `LoanRepository` (`core/data`,
 `loansPagingStream(groupId, scope, fetchPolicy)`), `SessionManager` (`core-base/security`,
@@ -69,7 +69,7 @@ idea-layer `ui.yaml#state_model.actions.members` update rather than invented.
 
 ## di
 
-`org.mifos.groupbanking.feature.loanlist.di.LoanListModule` — Koin module,
+`kpt.feature.loanlist.di.LoanListModule` — Koin module,
 `viewModel { parameters -> LoanListViewModel(..., groupId = parameters.get()) }` (not
 `viewModelOf` — `groupId` is a nav-arg, not a DI-graph type). Included in
 `KoinModules.kt#featureModule`. `LoanRepository` resolved from `DataModule`, `SessionManager` from
@@ -80,7 +80,7 @@ single process-wide binding supplied by `LoginSignupModule`.
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.loanlist.LoanListScreen` — Container: collects `LoanListViewModel
+`kpt.feature.loanlist.LoanListScreen` — Container: collects `LoanListViewModel
 .stateFlow` via `collectAsStateWithLifecycle`, consumes `LoanListEvent`s through `EventsEffect`
 (`NavigateToLoanDetail`/`NavigateToLoanApply` → typed nav callbacks; `ShowSnackbar` → resolves
 `messageKey` to display text, mirrors `GroupListScreen`'s `messageKeyToText`). `groupId: Long` nav-
@@ -102,7 +102,7 @@ filter chips). FAB (`LoanListFabContent`) renders only when `state.canApplyLoan`
 
 ## route
 
-`org.mifos.groupbanking.feature.loanlist.LoanListRoute` — `@Serializable data class
+`kpt.feature.loanlist.LoanListRoute` — `@Serializable data class
 LoanListRoute(val groupId: Long)` (`/groups/{groupId}/loans`). `navigateToLoanList(groupId,
 navOptions)` extension on `NavController`. `NavGraphBuilder.loanListScreen(onNavigateToLoanDetail:
 (loanId: Long) -> Unit, onNavigateToLoanApply: (groupId: Long) -> Unit, onNavigateBack: () ->
@@ -126,7 +126,7 @@ each for `LoanListFabContent`, `LoanListLoadingSection`, `LoanListContentSection
 
 ## tags
 
-`org.mifos.groupbanking.feature.loanlist.LoanListTestTags` — append-only (RULE-KMP-COMPOSE-UITEST-001
+`kpt.feature.loanlist.LoanListTestTags` — append-only (RULE-KMP-COMPOSE-UITEST-001
 CU-5): `SCREEN`, `FILTER_CHIP_ALL`, `FILTER_CHIP_ACTIVE`, `FILTER_CHIP_OVERDUE`,
 `FILTER_CHIP_CLOSED`, `LOADING_INDICATOR`, `LOAN_LIST`, `FAB_APPLY`, `EMPTY_SECTION`,
 `ERROR_SECTION`, `ERROR_RETRY_BUTTON` (10 constants) plus `cardTag(loanId: Long): String` (per-row

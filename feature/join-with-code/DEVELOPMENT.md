@@ -6,7 +6,7 @@
 
 `:feature:join-with-code` — invite-code entry + group-preview confirmation flow (deep-link or
 manual 6-char code → validate → preview → confirm join → personal-dashboard). Namespace
-`org.mifos.groupbanking.feature.joinwithcode`. Source of truth:
+`kpt.feature.joinwithcode`. Source of truth:
 `idea-layer/screens/join-with-code/{ui,api,docs,flow,data-flow,tests}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

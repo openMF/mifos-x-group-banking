@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.joinwithcode.JoinWithCodeViewModel` — extends
+`kpt.feature.joinwithcode.JoinWithCodeViewModel` — extends
 `BaseViewModel<JoinWithCodeState, JoinWithCodeEvent, JoinWithCodeAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor: `invitationRepository:
 InvitationRepository`, `authRepository: AuthRepository`, `analytics: KptAnalyticsTracker`,
@@ -56,7 +56,7 @@ exhaustiveness only.
 
 ## di
 
-`org.mifos.groupbanking.feature.joinwithcode.di.JoinWithCodeModule` — Koin module. Included via
+`kpt.feature.joinwithcode.di.JoinWithCodeModule` — Koin module. Included via
 `cmp-navigation/.../KoinModules.kt#featureModule.includes(...)`. Declares
 `single { KptAnalyticsTracker(analyticsHelper = get()) }` (second occurrence of the follow-up
 flagged in `LoginSignupModule.kt` — see its KDoc) plus `viewModel { parameters ->
@@ -69,7 +69,7 @@ resolves from `core-base/observability`'s `observabilityModule` (already in `Koi
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.joinwithcode.JoinWithCodeScreen` (Container, `internal`) —
+`kpt.feature.joinwithcode.JoinWithCodeScreen` (Container, `internal`) —
 collects `JoinWithCodeViewModel.stateFlow` via `collectAsStateWithLifecycle`, consumes
 `JoinWithCodeEvent`s through `EventsEffect`, and delegates to the stateless
 `JoinWithCodeContent`. Takes `inviteCode: String?` (deep-link nav-arg forwarded to the

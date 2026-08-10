@@ -6,7 +6,7 @@
 
 `:feature:loan-list` — the filterable, paginated list of a savings group's loan accounts
 (`/groups/{groupId}/loans`), entered from `group-dashboard`'s "Loans" quick action or
-`bottom_nav`. Namespace `org.mifos.groupbanking.feature.loanlist`. Source of truth:
+`bottom_nav`. Namespace `kpt.feature.loanlist`. Source of truth:
 `idea-layer/screens/loan-list/{ui,flow,data-flow,docs}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

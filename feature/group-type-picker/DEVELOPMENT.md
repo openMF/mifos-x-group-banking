@@ -5,7 +5,7 @@
 
 `:feature:group-type-picker` — step 1a of the group-create wizard; presents the 9 seeded group
 type cards (VSLA, ROSCA, ASCA, SILC, SHG, SACCO, CBO/Village-Bank, Burial/Welfare, JLG). Namespace
-`org.mifos.groupbanking.feature.grouptypepicker`. Source of truth:
+`kpt.feature.grouptypepicker`. Source of truth:
 `idea-layer/screens/group-type-picker/{ui,api,docs,flow,data-flow,demo-data}.yaml`.
 
 ## 2. Public API

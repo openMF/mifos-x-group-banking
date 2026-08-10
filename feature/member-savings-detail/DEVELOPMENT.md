@@ -5,7 +5,7 @@
 
 `:feature:member-savings-detail` — contribution-model-aware member savings detail: paginated
 transaction statement with a 6-month sparkline trend and All/Deposits/Withdrawals filter chips.
-Namespace `org.mifos.groupbanking.feature.membersavingsdetail`. Source of truth:
+Namespace `kpt.feature.membersavingsdetail`. Source of truth:
 `idea-layer/screens/member-savings-detail/{ui,flow,data-flow}.yaml`.
 
 ## 2. Public API

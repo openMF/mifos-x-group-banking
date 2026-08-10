@@ -3,7 +3,7 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.memberlist.MemberListViewModel` — extends
+`kpt.feature.memberlist.MemberListViewModel` — extends
 `BaseViewModel<MemberListState, MemberListEvent, MemberListAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `MemberRepository`,
 `GroupRepository`, `CrashReporter`, `KptAnalyticsTracker`, `groupId: String` (nav-arg, resolved
@@ -59,6 +59,6 @@ Derived `MemberListState.screenState: MemberListScreenState` — `Loading` / `Co
 
 ## di
 
-`org.mifos.groupbanking.feature.memberlist.di.MemberListModule` — Koin module,
+`kpt.feature.memberlist.di.MemberListModule` — Koin module,
 `viewModel { parameters -> MemberListViewModel(..., groupId = parameters.get<String>()) }`
 (nav-arg qualifier position 1). Included in `cmp-navigation`'s `KoinModules.kt#featureModule`.

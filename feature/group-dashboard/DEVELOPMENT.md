@@ -5,7 +5,7 @@
 
 `:feature:group-dashboard` — the single-group dashboard (`/groups/{groupId}`), entered from
 `group-list` / `group-create` with `groupId` + `viewerRole` nav-params. Namespace
-`org.mifos.groupbanking.feature.groupdashboard`. Source of truth:
+`kpt.feature.groupdashboard`. Source of truth:
 `idea-layer/screens/group-dashboard/{ui,flow,data-flow,docs}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

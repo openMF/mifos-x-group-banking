@@ -4,7 +4,7 @@
 ## 1. Module Identity
 
 `:feature:login-signup` — unified authentication entry screen (self-registration + credential
-login + biometric re-auth + zero-group onboarding). Namespace `org.mifos.groupbanking.feature.loginsignup`.
+login + biometric re-auth + zero-group onboarding). Namespace `kpt.feature.loginsignup`.
 Source of truth: `idea-layer/screens/login-signup/{ui,api,docs,flow,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

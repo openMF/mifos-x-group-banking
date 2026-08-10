@@ -5,7 +5,7 @@
 
 `:feature:loan-request` — the member-side loan application form (`/loan-request`), entered from
 `personal-dashboard`'s "Request Loan" CTA or `personal-loans`'s FAB. Namespace
-`org.mifos.groupbanking.feature.loanrequest`. Source of truth:
+`kpt.feature.loanrequest`. Source of truth:
 `idea-layer/screens/loan-request/{ui,data-flow}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

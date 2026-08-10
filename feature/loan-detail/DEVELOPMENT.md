@@ -4,7 +4,7 @@
 ## 1. Module Identity
 
 `:feature:loan-detail` — the tabbed single-loan detail screen (`/loans/{loanId}`), entered from
-`loan-list`'s "Loan card tap". Namespace `org.mifos.groupbanking.feature.loandetail`. Source of
+`loan-list`'s "Loan card tap". Namespace `kpt.feature.loandetail`. Source of
 truth: `idea-layer/screens/loan-detail/{ui,flow,data-flow,docs}.yaml`.
 
 <!-- kmp-viewmodel-gen:BEGIN -->

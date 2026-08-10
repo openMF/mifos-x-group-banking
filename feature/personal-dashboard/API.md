@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.personaldashboard.PersonalDashboardViewModel` — extends
+`kpt.feature.personaldashboard.PersonalDashboardViewModel` — extends
 `BaseViewModel<PersonalDashboardState, PersonalDashboardEvent, PersonalDashboardAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `MemberDashboardRepository`
 (`core/data`), `SessionManager` (`core-base/security`), `CrashReporter` (`core-base/observability`),
@@ -56,7 +56,7 @@
 
 ## di
 
-`org.mifos.groupbanking.feature.personaldashboard.di.PersonalDashboardModule` — Koin module,
+`kpt.feature.personaldashboard.di.PersonalDashboardModule` — Koin module,
 `viewModelOf(::PersonalDashboardViewModel)`. Included in `KoinModules.kt#featureModule`.
 `MemberDashboardRepository` resolved from `DataModule`, `SessionManager` from `SecurityModule`,
 `CrashReporter` from `observabilityModule`, `KptAnalyticsTracker` from the single process-wide

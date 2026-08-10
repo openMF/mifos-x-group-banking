@@ -6,7 +6,7 @@
 ## 1. Module Identity
 
 `:feature:settings` — the group-banking `settings-screen` (language, appearance, security,
-notifications, about, logout). Namespace `org.mifos.groupbanking.feature.settings`. Source of
+notifications, about, logout). Namespace `kpt.feature.settings`. Source of
 truth: `idea-layer/screens/settings/{ui,data-flow}.yaml`.
 
 **Coexistence note:** this Gradle module ALSO still contains the legacy, unmigrated

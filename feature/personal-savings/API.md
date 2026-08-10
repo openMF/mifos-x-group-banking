@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.personalsavings.PersonalSavingsViewModel` — extends
+`kpt.feature.personalsavings.PersonalSavingsViewModel` — extends
 `BaseViewModel<PersonalSavingsState, PersonalSavingsEvent, PersonalSavingsAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `SavingsRepository` (`core/data`,
 `loadMemberSavings(...)` + `getSavingsTransactions(...)` — both plain `suspend fun`s, no Store5
@@ -64,7 +64,7 @@ date rather than assuming transport order.
 
 ## di
 
-`org.mifos.groupbanking.feature.personalsavings.di.PersonalSavingsModule` — Koin module,
+`kpt.feature.personalsavings.di.PersonalSavingsModule` — Koin module,
 `viewModel { parameters -> PersonalSavingsViewModel(..., clientId = parameters.get(),
 groupLinkedSavingsId = parameters.get(), individualSavingsId = parameters.getOrNull()) }` (not
 `viewModelOf` — the 3 nav-args are not DI-graph types). Included in
@@ -76,7 +76,7 @@ single process-wide binding supplied by `LoginSignupModule`.
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.personalsavings.PersonalSavingsScreen` (Container, `internal`) —
+`kpt.feature.personalsavings.PersonalSavingsScreen` (Container, `internal`) —
 collects `viewModel.stateFlow` via `collectAsStateWithLifecycle`, consumes `PersonalSavingsEvent`
 via `EventsEffect`, delegates to `PersonalSavingsContent` (Content, `internal`, stateless —
 hoisted `state: PersonalSavingsState` + `onAction: (PersonalSavingsAction) -> Unit` + plain
@@ -91,7 +91,7 @@ Components: `components.SavingsTabRow`, `components.SavingsBalanceHeroCard`,
 
 ## route
 
-`org.mifos.groupbanking.feature.personalsavings.PersonalSavingsRoute` — `@Serializable data class
+`kpt.feature.personalsavings.PersonalSavingsRoute` — `@Serializable data class
 PersonalSavingsRoute(val clientId: Long, val groupLinkedSavingsId: Long, val individualSavingsId:
 Long? = null)`. `NavController.navigateToPersonalSavings(clientId, groupLinkedSavingsId,
 individualSavingsId, navOptions)`. `NavGraphBuilder.personalSavingsScreen(onNavigateBack: () ->
@@ -111,7 +111,7 @@ non-container composable covered (CP-4).
 
 ## tags
 
-`org.mifos.groupbanking.feature.personalsavings.PersonalSavingsTestTags` — `SCREEN`, `TAB_ROW`,
+`kpt.feature.personalsavings.PersonalSavingsTestTags` — `SCREEN`, `TAB_ROW`,
 `TAB_GROUP_LINKED`, `TAB_INDIVIDUAL`, `LOADING_INDICATOR`, `TRANSACTION_LIST`, `BALANCE_CARD`,
 `CONTRIBUTION_PROGRESS_CARD`, `EMPTY_INDIVIDUAL_SECTION`, `ERROR_SECTION`, `ERROR_RETRY_BUTTON`,
 plus `transactionRowTag(transactionId: Long)` stable-key function. Append-only

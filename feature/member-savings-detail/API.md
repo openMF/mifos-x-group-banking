@@ -3,14 +3,14 @@
 
 ## viewmodel
 
-`org.mifos.groupbanking.feature.membersavingsdetail.MemberSavingsDetailViewModel` — extends
+`kpt.feature.membersavingsdetail.MemberSavingsDetailViewModel` — extends
 `BaseViewModel<MemberSavingsDetailState, MemberSavingsDetailEvent, MemberSavingsDetailAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Full field/action/event contract documented in the
 ViewModel source KDoc — this section is owned by `kmp-viewmodel-gen` on its next pass.
 
 ## di
 
-`org.mifos.groupbanking.feature.membersavingsdetail.di.MemberSavingsDetailModule` — Koin module,
+`kpt.feature.membersavingsdetail.di.MemberSavingsDetailModule` — Koin module,
 `viewModel { parameters -> MemberSavingsDetailViewModel(..., memberId = parameters.get(), groupId = parameters.get(), typeConfig = parameters.get()) }`
 (nav-param constructor args, not a plain `viewModelOf` binding). Already included in
 `KoinModules.kt#featureModule`.

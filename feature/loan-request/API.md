@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.loanrequest.LoanRequestViewModel` — extends
+`kpt.feature.loanrequest.LoanRequestViewModel` — extends
 `BaseViewModel<LoanRequestState, LoanRequestEvent, LoanRequestAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `LoanRequestRepository`
 (`core/data`, `submit(payload)` / `enqueueOffline(payload)`), `NetworkMonitor`
@@ -78,7 +78,7 @@ see `DEVELOPMENT.md#6`).
 
 ## di
 
-`org.mifos.groupbanking.feature.loanrequest.di.LoanRequestModule` — Koin module,
+`kpt.feature.loanrequest.di.LoanRequestModule` — Koin module,
 `viewModel { parameters -> LoanRequestViewModel(..., clientId = parameters.get(), savingsBalance =
 parameters.get(), loanMultiplier = parameters.getOrNull() ?: 3.0) }` (not `viewModelOf` —
 nav-args, not DI-graph types). Included in `KoinModules.kt#featureModule`. `LoanRequestRepository`
@@ -90,7 +90,7 @@ process-wide binding supplied by `LoginSignupModule`.
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.loanrequest.LoanRequestScreen` (Container) --
+`kpt.feature.loanrequest.LoanRequestScreen` (Container) --
 `LoanRequestScreen(clientId, savingsBalance, loanMultiplier, onNavigateToDashboard,
 onNavigateBack, modifier, viewModel = koinViewModel(parameters = { parametersOf(clientId,
 savingsBalance, loanMultiplier) }))`. Collects `stateFlow` via `collectAsStateWithLifecycle`,
@@ -115,7 +115,7 @@ declaration); `Content`/`SubmitSuccess`/`OfflineQueued` -> submit button only.
 
 ## route
 
-`org.mifos.groupbanking.feature.loanrequest.LoanRequestRoute` -- `@Serializable data class
+`kpt.feature.loanrequest.LoanRequestRoute` -- `@Serializable data class
 LoanRequestRoute(val clientId: Long, val savingsBalance: Double, val loanMultiplier: Double =
 3.0)`. `NavController.navigateToLoanRequest(clientId, savingsBalance, loanMultiplier = 3.0,
 navOptions = null)`. `NavGraphBuilder.loanRequestScreen(onNavigateToDashboard, onNavigateBack)` --
@@ -135,7 +135,7 @@ content-filled, offline, submitting, submit-error, submit-success, offline-queue
 
 ## tags
 
-`org.mifos.groupbanking.feature.loanrequest.LoanRequestTestTags` (append-only, RULE-KMP-COMPOSE-UITEST-001
+`kpt.feature.loanrequest.LoanRequestTestTags` (append-only, RULE-KMP-COMPOSE-UITEST-001
 CU-5) -- `SCREEN`, `TOP_BAR`, `OFFLINE_BANNER`, `SAVINGS_LIMIT_CARD`, `FIELD_AMOUNT`,
 `DROPDOWN_PURPOSE`, `DURATION_SLIDER`, `REPAYMENT_SUMMARY_CARD`, `SUBMIT_BUTTON`,
 `SUBMITTING_INDICATOR`, `SUCCESS_DIALOG`, `SUCCESS_DIALOG_OK_BUTTON`, `ERROR_CARD`,

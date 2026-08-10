@@ -4,7 +4,7 @@
 ## 1. Module Identity
 
 `:feature:group-list` — the authenticated user's savings-group portfolio (`/groups`), the app's
-post-login/root list screen. Namespace `org.mifos.groupbanking.feature.grouplist`. Source of
+post-login/root list screen. Namespace `kpt.feature.grouplist`. Source of
 truth: `idea-layer/exports/group-management/{SPEC,MOCKUP}.md` (this project's idea-layer uses the
 `exports/` + `mockups/` schema, not `screens/{f}/{ui,flow,data-flow,demo-data}.yaml` — no
 `idea-layer/screens/group-list/` directory exists for this project).

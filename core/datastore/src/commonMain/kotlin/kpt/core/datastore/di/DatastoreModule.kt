@@ -19,10 +19,10 @@ import kpt.core.datastore.infra.SyncStatePersister
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.mifos.groupbanking.core.datastore.session.CompanionSessionStore
-import org.mifos.groupbanking.core.datastore.session.CompanionSessionStoreImpl
-import org.mifos.groupbanking.core.datastore.sync.SyncMetadataStore
-import org.mifos.groupbanking.core.datastore.sync.SyncMetadataStoreImpl
+import kpt.core.datastore.session.CompanionSessionStore
+import kpt.core.datastore.session.CompanionSessionStoreImpl
+import kpt.core.datastore.sync.SyncMetadataStore
+import kpt.core.datastore.sync.SyncMetadataStoreImpl
 
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)

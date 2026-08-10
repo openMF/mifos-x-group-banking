@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.personalloans.PersonalLoansViewModel` — extends
+`kpt.feature.personalloans.PersonalLoansViewModel` — extends
 `BaseViewModel<PersonalLoansState, PersonalLoansEvent, PersonalLoansAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `LoanRepository` (`core/data`,
 `getLoansForClient(clientId)` — plain `suspend fun`, no Store5 wrap), `SessionManager`
@@ -53,7 +53,7 @@
 
 ## di
 
-`org.mifos.groupbanking.feature.personalloans.di.PersonalLoansModule` — Koin module,
+`kpt.feature.personalloans.di.PersonalLoansModule` — Koin module,
 `viewModel { parameters -> PersonalLoansViewModel(..., clientId = parameters.get()) }` (not
 `viewModelOf` — `clientId` is a nav-arg, not a DI-graph type). Included in
 `KoinModules.kt#featureModule`. `LoanRepository` resolved from `DataModule`, `SessionManager` from
@@ -64,7 +64,7 @@ process-wide binding supplied by `LoginSignupModule`.
 <!-- kmp-screen-gen:BEGIN -->
 ## screen
 
-`org.mifos.groupbanking.feature.personalloans.PersonalLoansScreen` (Container, `internal`) — collects
+`kpt.feature.personalloans.PersonalLoansScreen` (Container, `internal`) — collects
 `viewModel.stateFlow` via `collectAsStateWithLifecycle`, consumes `PersonalLoansEvent` via
 `EventsEffect`, delegates to `PersonalLoansContent` (Content, `internal`, stateless — hoisted
 `state: PersonalLoansState` + `onAction: (PersonalLoansAction) -> Unit` + plain `onNavigateBack: ()
@@ -78,7 +78,7 @@ process-wide binding supplied by `LoginSignupModule`.
 
 ## route
 
-`org.mifos.groupbanking.feature.personalloans.PersonalLoansRoute` — `@Serializable data class
+`kpt.feature.personalloans.PersonalLoansRoute` — `@Serializable data class
 PersonalLoansRoute(val clientId: Long)`. `NavController.navigateToPersonalLoans(clientId,
 navOptions)`. `NavGraphBuilder.personalLoansScreen(onNavigateToLoanRequest: (clientId: Long) ->
 Unit, onNavigateBack: () -> Unit)` — 2 callbacks, both required (no `= {}` defaults); no
@@ -95,7 +95,7 @@ expanded, Empty, Error). Every non-container composable covered (CP-4).
 
 ## tags
 
-`org.mifos.groupbanking.feature.personalloans.PersonalLoansTestTags` — `SCREEN`,
+`kpt.feature.personalloans.PersonalLoansTestTags` — `SCREEN`,
 `FILTER_CHIP_ALL`/`FILTER_CHIP_ACTIVE`/`FILTER_CHIP_CLOSED`, `LOADING_INDICATOR`, `LOAN_LIST`,
 `FAB_REQUEST_LOAN`, `EMPTY_SECTION`, `EMPTY_ACTION_BUTTON`, `ERROR_SECTION`,
 `ERROR_RETRY_BUTTON`, plus `cardTag(loanId: Long)` / `cardDetailsTag(loanId: Long)` stable-key

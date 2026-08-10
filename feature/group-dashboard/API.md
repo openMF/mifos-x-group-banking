@@ -4,7 +4,7 @@
 <!-- kmp-viewmodel-gen:BEGIN -->
 ## viewmodel
 
-`org.mifos.groupbanking.feature.groupdashboard.GroupDashboardViewModel` — extends
+`kpt.feature.groupdashboard.GroupDashboardViewModel` — extends
 `BaseViewModel<GroupDashboardState, GroupDashboardEvent, GroupDashboardAction>`
 (`kpt.core.base.ui.viewmodel.BaseViewModel`). Constructor deps: `GroupDashboardRepository`
 (`core/data`, composite fan-in of `get_group` + `get_viewer_role` + `get_group_corpus` +
@@ -78,7 +78,7 @@ also triggers `SessionManager.endSession()`).
 
 ## di
 
-`org.mifos.groupbanking.feature.groupdashboard.di.GroupDashboardModule` — Koin module,
+`kpt.feature.groupdashboard.di.GroupDashboardModule` — Koin module,
 `viewModel { parameters -> GroupDashboardViewModel(..., groupId = parameters.get(), viewerRole =
 parameters.get()) }` (not `viewModelOf` — `groupId`/`viewerRole` are nav-args, not DI-graph
 types). Included in `KoinModules.kt#featureModule`. `GroupDashboardRepository` resolved from
