@@ -30,8 +30,6 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kpt.core.data.demo.DemoSessionManager
-import kpt.core.data.demo.DemoSessionManagerImpl
 import kpt.core.data.repository.AuthRepository
 import kpt.core.data.repository.AuthRepositoryImpl
 import kpt.core.data.repository.ChangePinRepository
@@ -101,27 +99,6 @@ val DataModule = module {
     // processor), wraps CompanionAuthApi (NetworkModule) + CompanionSessionStore (DatastoreModule).
     single<LocalCacheCleaner> { RoomLocalCacheCleaner(database = get<AppDatabase>()) }
     single<AuthRepository> { AuthRepositoryImpl(api = get(), sessionStore = get(), cacheCleaner = get(), userDataRepository = get()) }
-
-    // login-signup Demo Explore offline guest session (ui.yaml#demo_confirm_dialog,
-    // flow.yaml#on_demo_confirm). Seeds the offline read caches the Demo-Explore mode browses —
-    // organizer-dashboard (landing) + group-list + group-dashboard + member-list + loan-list — from
-    // the bundled PROJECT_DEMO_DATA fixture, then persists a synthetic demo session. 100% offline,
-    // no companion API / Fineract. NOT seeded: savings-dashboard (its SavingsRepository is
-    // Store5-free / network-only — no Room SourceOfTruth to write). Not a Store5 read-store
-    // (business_logic.kind: processor) — a session-scoped seed manager, same branch as SyncManager /
-    // UserLogoutManager below. Depends on CompanionSessionStore (DatastoreModule) + the four read
-    // DAOs it seeds (DatabaseModule) + FetchedAtRepository (below).
-    single<DemoSessionManager> {
-        DemoSessionManagerImpl(
-            sessionStore = get(),
-            organizerDashboardDao = get<AppDatabase>().organizerDashboardDao,
-            groupListDao = get<AppDatabase>().groupListDao,
-            groupDashboardDao = get<AppDatabase>().groupDashboardDao,
-            memberListDao = get<AppDatabase>().memberListDao,
-            loanListDao = get<AppDatabase>().loanListDao,
-            fetchedAtRepository = get(),
-        )
-    }
 
     // group-type-picker seeded catalogue (COMP-DT-003) — wraps the NETWORK_WITH_CACHE
     // GroupTypeConfigStore (bound via AppStoreRegistry.GroupTypeConfig in appStoreModule) and

@@ -22,8 +22,6 @@ import kpt.core.base.network.NetworkResult
 import kpt.core.base.observability.CrashReporter
 import kpt.core.base.observability.CrashSeverity
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.demo.DemoSession
-import kpt.core.data.demo.DemoSessionManager
 import kpt.core.data.repository.AuthRepository
 import kpt.core.model.AuthSession
 import kpt.core.model.GroupMembership
@@ -33,6 +31,12 @@ import kpt.core.model.UserProfile
 import kpt.core.model.isGroupLeadership
 
 private const val TAG = "LoginSignupViewModel"
+
+// Demo Explore signs in as the live companion demo user — Amina Otieno, organizer+treasurer of the
+// Mwangaza Women's Group. A REAL companion login (not an offline seed) so every screen renders real
+// data (member profiles, meetings, savings) with real numeric ids. Public demo credentials.
+private const val DEMO_EMAIL_PHONE = "+254700000001"
+private const val DEMO_PASSWORD = "DemoExplore@2026"
 
 private const val MIN_NAME_LENGTH = 2
 private const val MIN_PASSWORD_LENGTH_SIGNUP = 8
@@ -248,8 +252,8 @@ sealed interface LoginSignupAction {
         /** Seeds the [pendingInviteCode] nav_param into state on first composition (TC-LS-010). */
         data class SetPendingInviteCode(val code: String?) : Internal
 
-        /** Result of the offline [DemoSessionManager.startDemoSession] seed. */
-        data class DemoSeedResult(val result: Result<DemoSession>) : Internal
+        /** Result of the Demo Explore companion login (real session, not an offline seed). */
+        data class DemoLoginResult(val result: NetworkResult<AuthSession, NetworkError>) : Internal
     }
 }
 
@@ -275,7 +279,6 @@ sealed interface LoginSignupAction {
  */
 internal class LoginSignupViewModel(
     private val authRepository: AuthRepository,
-    private val demoSessionManager: DemoSessionManager,
     private val analytics: KptAnalyticsTracker,
     private val crashReporter: CrashReporter,
 ) : BaseViewModel<LoginSignupState, LoginSignupEvent, LoginSignupAction>(
@@ -323,7 +326,7 @@ internal class LoginSignupViewModel(
             is LoginSignupAction.Internal.SignupResult -> handleSignupResult(action.result)
             is LoginSignupAction.Internal.BiometricResult -> handleBiometricResult(action.result)
             is LoginSignupAction.Internal.SetPendingInviteCode -> handleSetPendingInviteCode(action.code)
-            is LoginSignupAction.Internal.DemoSeedResult -> handleDemoSeedResult(action.result)
+            is LoginSignupAction.Internal.DemoLoginResult -> handleDemoLoginResult(action.result)
         }
     }
 
@@ -506,15 +509,18 @@ internal class LoginSignupViewModel(
     }
 
     private fun handleDemoConfirm() {
-        // Demo entry navigates on seed success itself — consume the biometric auto-prompt.
+        // Demo entry navigates on login success itself — consume the biometric auto-prompt.
         hasAutoPromptedBiometric = true
         demoJob?.cancel()
         demoJob = viewModelScope.launch {
-            // Close the dialog and enter the seeding state; the offline fixture hydrates via
-            // DemoSessionManager — no network, no companion API (flow.yaml#on_demo_confirm).
+            // A REAL companion login as the demo-explore user (not an offline seed): the live
+            // companion returns real group/member/meeting data, so every screen works — member
+            // profiles, meetings, savings — with real numeric ids. isSeedingDemo drives the dialog
+            // spinner; handleDemoLoginResult clears it + routes on the returned session.
             updateState { copy(showDemoDialog = false, isSeedingDemo = true, error = null) }
-            val result = demoSessionManager.startDemoSession()
-            trySendAction(LoginSignupAction.Internal.DemoSeedResult(result))
+            val credentials = LoginCredentials(emailPhone = DEMO_EMAIL_PHONE, password = DEMO_PASSWORD)
+            val result = authRepository.login(credentials)
+            trySendAction(LoginSignupAction.Internal.DemoLoginResult(result))
         }
     }
 
@@ -655,28 +661,39 @@ internal class LoginSignupViewModel(
         }
     }
 
-    private fun handleDemoSeedResult(result: Result<DemoSession>) {
-        result.fold(
-            onSuccess = { demo ->
-                Logger.i(TAG) { "demo session seeded userId=${demo.userId} — landing on organizer dashboard" }
-                updateState { copy(isSeedingDemo = false, error = null) }
-                // demo-explore-flow exit: land on the organizer-dashboard the seeded demo user owns.
-                sendEvent(LoginSignupEvent.NavigateToOrganizerDashboard)
-            },
-            onFailure = { t ->
+    private fun handleDemoLoginResult(result: NetworkResult<AuthSession, NetworkError>) {
+        when (result) {
+            is NetworkResult.Success -> {
+                val session = result.data
+                analytics.trackLogin(method = "demo", success = true)
+                Logger.i(TAG) { "demo login success groupCount=${session.groupMemberships.size} — routing" }
+                updateState {
+                    copy(
+                        isSeedingDemo = false,
+                        sessionToken = session.sessionToken,
+                        groupMemberships = session.groupMemberships,
+                        screenState = screenStateFor(session.groupMemberships),
+                        error = null,
+                    )
+                }
+                // Route on the demo user's real memberships — same landing logic as a normal login.
+                (pendingInviteResumeEvent() ?: routeEvent(session.groupMemberships))?.let(::sendEvent)
+            }
+            is NetworkResult.Error -> {
+                analytics.trackLogin(method = "demo", success = false, errorCode = result.error.name)
                 crashReporter.recordMessage(
-                    message = "login-signup: demo seed failed ${t.message}",
+                    message = "login-signup: demo login failed networkError=${result.error}",
                     level = CrashSeverity.Warning,
                 )
                 updateState {
                     copy(
                         isSeedingDemo = false,
                         screenState = LoginSignupScreenState.Error,
-                        error = LoginSignupError.Server,
+                        error = result.error.toLoginSignupError(AuthErrorContext.Login),
                     )
                 }
-            },
-        )
+            }
+        }
     }
 
     // -- Helpers ----------------------------------------------------------------------------------

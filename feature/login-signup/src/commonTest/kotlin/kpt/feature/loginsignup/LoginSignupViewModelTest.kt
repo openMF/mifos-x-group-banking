@@ -23,8 +23,6 @@ import kpt.core.base.analytics.NoOpAnalyticsHelper
 import kpt.core.base.network.NetworkError
 import kpt.core.base.network.NetworkResult
 import kpt.core.base.observability.ConsoleCrashReporter
-import kpt.core.data.demo.DemoSession
-import kpt.core.data.demo.DemoSessionManager
 import kpt.core.data.repository.AuthRepository
 import kpt.core.model.AuthSession
 import kpt.core.model.GroupMembership
@@ -48,17 +46,14 @@ class LoginSignupViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var repository: FakeAuthRepository
-    private lateinit var demoSessionManager: FakeDemoSessionManager
     private lateinit var viewModel: LoginSignupViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = FakeAuthRepository()
-        demoSessionManager = FakeDemoSessionManager()
         viewModel = LoginSignupViewModel(
             authRepository = repository,
-            demoSessionManager = demoSessionManager,
             analytics = KptAnalyticsTracker(NoOpAnalyticsHelper()),
             crashReporter = ConsoleCrashReporter(),
         )
@@ -349,7 +344,12 @@ class LoginSignupViewModelTest {
     }
 
     @Test
-    fun `OnDemoConfirm seeds the offline demo session and emits NavigateToOrganizerDashboard`() = runTest(testDispatcher) {
+    fun `OnDemoConfirm logs in as the demo user and emits NavigateToOrganizerDashboard`() = runTest(testDispatcher) {
+        // Demo Explore is a REAL companion login as the demo-explore user (organizer+treasurer) —
+        // only the credentials are canned; everything else is the production login + backend path.
+        repository.loginResult = NetworkResult.Success(
+            sampleSession(groups = listOf(sampleMembership(role = GroupRole.ORGANIZER))),
+        )
         viewModel.trySendAction(LoginSignupAction.OnDemoExplore)
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -359,14 +359,13 @@ class LoginSignupViewModelTest {
         }
 
         val state = viewModel.stateFlow.value
-        assertEquals(1, demoSessionManager.startCallCount)
         assertEquals(false, state.showDemoDialog)
         assertEquals(false, state.isSeedingDemo)
     }
 
     @Test
-    fun `OnDemoConfirm seed failure surfaces Error screen state without navigation`() = runTest(testDispatcher) {
-        demoSessionManager.startResult = Result.failure(IllegalStateException("disk full"))
+    fun `OnDemoConfirm login failure surfaces Error screen state without navigation`() = runTest(testDispatcher) {
+        repository.loginResult = NetworkResult.Error(NetworkError.SERVER)
 
         viewModel.trySendAction(LoginSignupAction.OnDemoConfirm)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -497,29 +496,3 @@ private class FakeAuthRepository : AuthRepository {
     }
 }
 
-/** In-memory [DemoSessionManager] fake — no persistence, no cache seed, no network. */
-private class FakeDemoSessionManager : DemoSessionManager {
-
-    var startResult: Result<DemoSession> = Result.success(
-        DemoSession(userId = "demo-user-amina", groupId = "demo-group-001", organizerName = "Amina Otieno"),
-    )
-
-    var startCallCount: Int = 0
-        private set
-    var clearCallCount: Int = 0
-        private set
-
-    private var active: Boolean = false
-
-    override suspend fun startDemoSession(): Result<DemoSession> {
-        startCallCount++
-        return startResult.also { active = it.isSuccess }
-    }
-
-    override fun isDemoSession(): Boolean = active
-
-    override suspend fun clearDemoSession() {
-        clearCallCount++
-        active = false
-    }
-}

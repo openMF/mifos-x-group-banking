@@ -585,7 +585,11 @@ fun GroupBankingNavHost(
                 //      member-savings-detail (view-savings tap) / back. Reached from member-list's
                 //      row tap.
                 memberProfileScreen(
-                    onNavigateToMemberList = { groupId -> navController.navigateToMemberList(groupId = groupId) },
+                    // member-profile top-bar back returns to the member list. POP the profile off the
+                    // back stack (return to the existing list that pushed it) — do NOT
+                    // navigateToMemberList(), which PUSHES a fresh list and creates a back loop
+                    // (list → profile → list' → profile' → …, back never escapes). Bug fix.
+                    onNavigateToMemberList = { navController.popBackStack() },
                     // member-profile `view savings` → the member's savings. The event carries only
                     // (memberId, groupId); `member-savings-detail`'s route is keyed by a
                     // GroupTypeConfig not available at this seam, so we navigate to the
