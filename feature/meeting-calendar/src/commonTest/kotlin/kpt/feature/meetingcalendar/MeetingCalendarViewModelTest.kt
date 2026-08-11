@@ -218,7 +218,11 @@ class MeetingCalendarViewModelTest {
         viewModel.trySendAction(MeetingCalendarAction.OnScheduleFieldChange(time = "14:30"))
         viewModel.trySendAction(MeetingCalendarAction.OnScheduleFieldChange(frequency = MeetingFrequency.BIWEEKLY))
 
-        val state = viewModel.awaitState { it.scheduleDay == "WEDNESDAY" && it.scheduleTime == "14:30" }
+        val state = viewModel.awaitState {
+            it.scheduleDay == "WEDNESDAY" &&
+                it.scheduleTime == "14:30" &&
+                it.scheduleFrequency == MeetingFrequency.BIWEEKLY
+        }
         assertEquals("WEDNESDAY", state.scheduleDay)
         assertEquals("14:30", state.scheduleTime)
         assertEquals(MeetingFrequency.BIWEEKLY, state.scheduleFrequency)
